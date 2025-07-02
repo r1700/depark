@@ -1,5 +1,5 @@
 {
-  "name": "@base-project/backend",
+  "name": "@depark/backend",
   "version": "1.0.0",
   "description": "Backend API server",
   "main": "dist/index.js",
@@ -10,7 +10,6 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@base-project/shared": "^1.0.0",
     "@supabase/supabase-js": "^2.49.8",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
