@@ -1,292 +1,197 @@
-# 🚀 Project template - Production Deployment Guide
+# 🚀 Smart Parking Management System
 
-A full-stack TypeScript monorepo with Express backend, React frontend, and Supabase database.
+A comprehensive system to manage automated multi-level parking facilities, from employee registration through parking operations and real-time retrieval coordination.
 
 ## 🚀 Quick Start
 
 **Required tools:**
-- Node.js 22+ 
+- Node.js 18+ 
 - npm
 - Git
+- Supabase CLI
 
 ```bash
 # Clone the repository
-git clone <your-repo-url>
-cd base-project
+git clone https://github.com/diversi-tech/depark
+cd depark
 
 # Install all dependencies
-npm run install:all
-
-# Build shared types package
-cd packages/shared && npm run build && cd ../..
+npm install:all
 
 # Set up environment files
-cd packages/backend && cp .env.example .env
-cd ../frontend && cp .env.example .env && cd ../..
+copy packages\backend\.env.example packages\backend\.env
+copy packages\frontend\.env.example packages\frontend\.env
+copy packages\opc\.env.example packages\opc\.env
 
-# Start both frontend and backend
-npm run dev
+# Set up database
+npx supabase start
+npx supabase db reset
+
+# Start all services (in separate terminals):
+
+# OPC Bridge Service
+npm run dev:opc
+
+# Backend API
+npm run dev:backend  
+
+# Frontend Applications
+npm run dev:frontend
 ```
 
 **That's it!** 🎉
-- Frontend: http://localhost:3000
+- Frontend Applications: http://localhost:3000
 - Backend API: http://localhost:3001/api
-- Health check: http://localhost:3001/api/health
+- OPC Bridge Service: http://localhost:3002 (Not built yet)
 
 ## 📋 Table of Contents
 
-- [🏗️ Architecture Overview](#️-architecture-overview)
-- [🔧 Prerequisites](#-prerequisites)
-- [🗄️ Database Setup (Supabase)](#️-database-setup-supabase)
-- [🖥️ Backend Deployment (Render)](#️-backend-deployment-render)
-- [🌐 Frontend Deployment (Netlify)](#-frontend-deployment-netlify)
-- [🔗 Final Configuration](#-final-configuration)
-- [✅ Testing Your Production Setup](#-testing-your-production-setup)
-- [🛠️ Troubleshooting](#️-troubleshooting)
+- [🏗️ Project Overview](#️-project-overview)
+- [🔧 Key Components](#-key-components)
+- [👥 Team Structure](#-team-structure)
+- [📚 Documentation](#-documentation)
+- [🤝 Contributing](#-contributing)
+- [📅 Project Timeline](#-project-timeline)
 
 ---
 
-## 🏗️ Architecture Overview
+## 🏗️ Project Overview
+
+This project provides a digital platform for managing smart parking facilities with automated underground storage. The system handles the complete parking lifecycle from employee onboarding, vehicle registration, automated parking coordination, to real-time car retrieval operations and comprehensive analytics.
+
+### Architecture Overview
 
 ```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Frontend      │    │   Backend       │    │   Database      │
-│   (Netlify)      │───▶│   (Render)      │───▶│   (Supabase)    │
-│   React + TS    │    │   Express + TS  │    │   PostgreSQL    │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   Frontend      │    │   Backend       │    │   OPC Bridge    │    │   Database      │
+│ (Cloudflare)    │──▶│   (Render)      │───▶│   (Local)       │──▶│   (Supabase)    │
+│ React + TS      │    │   Express + TS  │    │   Node.js + OPC │    │   PostgreSQL    │
+└─────────────────┘    └─────────────────┘    └─────────────────┘    └─────────────────┘
+                                                       │
+                                               ┌─────────────────┐
+                                               │  Parking        │
+                                               │  Hardware       │
+                                               │  (OPC-UA)       │
+                                               └─────────────────┘
 ```
 
 **Live URLs after deployment:**
-- Frontend: `https://your-app.netlify.app`
+- Frontend: `https://depark.pages.dev`
 - Backend API: `https://your-backend.onrender.com/api`
-- Database: Managed by Supabase
 
 ---
 
-## 🔧 Prerequisites
+## 🔧 Key Components
 
-Before starting, ensure you have accounts on:
+- **🔗 OPC Bridge Service:** Node.js service interfacing with parking hardware via OPC-UA
+- **⚡ Core API:** Node.js TypeScript service with comprehensive parking management
+- **👩‍💼 HR Dashboard:** React TypeScript application for employee and vehicle management  
+- **🎛️ Admin Dashboard:** React TypeScript application for system administration and analytics
+- **📱 Mobile Web App:** Progressive Web App for employee self-service
+- **📲 Tablet Interface:** Touch-optimized interface for on-site parking operations
+- **🗄️ Database:** Supabase PostgreSQL with real-time capabilities
+- **🔐 Integrations:** Google OAuth, Government vehicle database, WebSocket real-time updates
 
-- [GitHub](https://github.com) (for code repository)
-- [Supabase](https://supabase.com) (database)
-- [Render](https://render.com) (backend hosting)
-- [Netlify](https://netlify.com) (frontend hosting)
+## 👥 Team Structure
 
----
+The project is divided into four specialized teams working collaboratively on a unified system:
 
-## 🗄️ Database Setup (Supabase)
+### Team 1: OPC Bridge & Integration (4 developers)
+- **🔗 OPC Bridge Service:** Hardware communication and parking coordination
+- **🏛️ Government API Integration:** Vehicle dimension database management
 
-### Step 1: Create Supabase Project
+### Team 2: Core Infrastructure & HR Management (7 developers)  
+- **⚡ Backend API:** Core system architecture and business logic
+- **👩‍💼 HR Dashboard:** Employee and vehicle management interface
 
-1. **Sign up/Login** to [Supabase](https://supabase.com)
-2. **Create New Project**
-   - Project name: `project-template-db` (or your choice)
-   - Database password: Generate and **save securely**
-   - Region: Choose closest to your users
-   - Click "Create new project"
+### Team 3: Admin & Analytics (7 developers)
+- **🎛️ Admin Dashboard:** System administration and user approval workflows
+- **📊 Analytics System:** Usage statistics and operational insights
 
-3. **Wait for setup** (1-2 minutes)
+### Team 4: User Interfaces (6 developers)
+- **📱 Mobile Web App:** Employee self-service application
+- **📲 Tablet Interface:** On-site parking operations terminal
+- **🔄 Real-time Systems:** WebSocket implementation for live updates
 
-### Step 2: Set Up Database Schema
+All teams collaborate on the same unified codebase with clear feature ownership and integration responsibilities.
 
-1. Go to **SQL Editor** in the left sidebar
-2. Click **"New Query"**
-3. Copy and paste this SQL:
+## 📚 Documentation
 
-```sql
--- Create the items table
-CREATE TABLE IF NOT EXISTS items (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    name VARCHAR(255) NOT NULL,
-    type VARCHAR(100) NOT NULL,
-    amount DECIMAL(10, 2) NOT NULL,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
+### Project Documentation
 
--- Create indexes for better performance
-CREATE INDEX IF NOT EXISTS idx_items_type ON items(type);
-CREATE INDEX IF NOT EXISTS idx_items_created_at ON items(created_at);
+- [🏗️ High-Level Design (HLD)](https://docs.google.com/document/d/1TN53ZEET-_nMGjN8cYzhFKV8EWKr5UFW0XiB8LVfWRI/edit) - Contains user roles, system components, project timeline, and wireframes
+- [📊 Entity Types](./types/entity-types.md) - Complete database schema and type definitions
+- [🔌 API Types](./types/api-types.md) - Request/response interfaces and endpoint specifications
 
--- Enable Row Level Security
-ALTER TABLE items ENABLE ROW LEVEL SECURITY;
+### Team-Specific PRDs
 
--- Create policy to allow all operations (adjust as needed)
-CREATE POLICY "Allow all operations on items" ON items
-    FOR ALL 
-    TO public
-    USING (true)
-    WITH CHECK (true);
+- [🔗 Team 1 PRD](https://docs.google.com/document/d/1i64PwVd-M03rVHbtkVBGQgZEuV9J07mv3DklHtC__zU/edit) - OPC Bridge and integration requirements
+- [⚡ Team 2 PRD](https://docs.google.com/document/d/1Em4ErZ-WpclLEBpgva6bUa4Z1gQr0D9lnkIo0IEBGSI/edit) - Core infrastructure and HR management requirements  
+- [🎛️ Team 3 PRD](https://docs.google.com/document/d/1j-MOtZTTt52idzp-CDR0L7mVTUegztEpTEYsVz_ENZ4/edit) - Admin dashboard and analytics requirements
+- [📱 Team 4 PRD](https://docs.google.com/document/d/1CckqDQVlluoK3NsQVn_RrYf-ct5SZKA01jO6QemQyUg/edit) - User interface and real-time system requirements
+
+### Project Structure
+```
+├── migrations/           # Database migration scripts
+├── packages/
+│   ├── opc/              # OPC Bridge Service (Team 1)
+│   ├── backend/          # Core API Server (Teams 1, 2, 3)
+│   ├── frontend/         # Web Applications (Teams 2, 3, 4)
+├── types/                # Shared TypeScript definitions
+└── README.md
 ```
 
-4. Click **"RUN"** to execute
+---
 
-### Step 3: Get Your Credentials
+## 🤝 Contributing
 
-1. Go to **Settings → API**
-2. **Copy and save these values:**
-   - **Project URL**: `https://xxxxxxxxxxxxx.supabase.co`
-   - **Anon Key**: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`
-   - **Service Role Key**: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...` (for production)
+### Development Guidelines
 
-> ⚠️ **Keep these credentials secure!** Never commit them to git.
+1. **📋 Code Standards**
+   - Use TypeScript for all code
+   - Follow ESLint configuration  
+   - Maintain 80%+ test coverage
+   - Use conventional commit messages
+
+2. **🌿 Branch Strategy**
+   - `main`: Development and integration branch
+   - `prod`: Production deployment branch
+   - `feature/*`: Feature development
+   - `hotfix/*`: Critical fixes
+
+3. **🔄 Pull Request Process**
+   - Create feature branch from `main`
+   - Implement feature with tests
+   - Submit PR with clear description
+   - Ensure CI/CD passes
+   - Request team lead review
+
+4. **🗄️ Database Changes**
+   - Create migrations in `/migrations/` folder
+   - Include rollback scripts
+   - Test migrations on sample data
+   - Document breaking changes
+
+### Feature Development
+
+Each developer owns a specific feature with clear boundaries:
+- **Primary Owner:** Full responsibility for feature implementation
+- **Secondary Contributors:** Support for cross-cutting concerns
+- **Feature Documentation:** Individual README files for complex features
+
+## 📅 Project Timeline
+
+- **Week 1:** 🏗️ Foundation setup (database, routing, WebSocket, OPC bridge)
+- **Weeks 2-3:** ⚡ Core functionality implementation (entry flow, basic interfaces)  
+- **Weeks 4-5:** 🚀 Advanced features (mobile app, queue management, analytics)
+- **Week 6:** 🔧 Cross-team integration and comprehensive testing
+- **Week 7:** ✅ User acceptance testing and performance optimization
+- **Week 8:** 🚀 Production deployment and documentation finalization
 
 ---
 
-## 🖥️ Backend Deployment (Render)
+*Happy parking! 🅿️🚗*
 
-### Step 1: Prepare Your Repository
+## 📄 License
 
-1. **Push your code to GitHub** (if not already done):
-```bash
-git add .
-git commit -m "Ready for production deployment"
-git push origin main
-```
-
-### Step 2: Deploy to Render
-
-1. **Sign up/Login** to [Render](https://render.com)
-2. **Connect GitHub** account if not already connected
-3. **Create New Web Service**
-   - Click "New +" → "Web Service"
-   - Connect your repository
-   - Select your `project-template` repository
-
-4. **Configure the service:**
-   - **Name**: `project-template-backend`
-   - **Region**: Oregon (or closest to your users)
-   - **Branch**: `main`
-   - **Root Directory**: `packages/backend`
-   - **Runtime**: Node
-   - **Build Command**: 
-     ```bash
-     cd ../shared && npm install && npm run build && cd ../backend && npm ci --include=dev && npm run build
-     ```
-   - **Start Command**: `npm start`
-   - **Instance Type**: Free
-
-### Step 3: Set Environment Variables
-
-In the Render dashboard, go to **Environment** tab and add:
-
-| Key | Value | Notes |
-|-----|-------|-------|
-| `NODE_ENV` | `production` | |
-| `CORS_ORIGIN` | `https://your-frontend-url.netlify.app` | Update after frontend deployment |
-| `SUPABASE_URL` | `https://xxxxx.supabase.co` | From Supabase dashboard |
-| `SUPABASE_ANON_KEY` | `eyJhbGciOiJIUzI1...` | From Supabase dashboard |
-| `SUPABASE_SERVICE_ROLE_KEY` | `eyJhbGciOiJIUzI1...` | From Supabase dashboard (optional) |
-
-### Step 4: Deploy
-
-1. Click **"Create Web Service"**
-2. Wait for deployment (5-10 minutes)
-3. **Test your backend**: Visit `https://your-backend.onrender.com/api/health`
-
-> 📝 **Save your backend URL** - you'll need it for frontend configuration!
-
----
-
-## 🌐 Frontend Deployment (Netlify)
-
-### Step 1: Deploy to Netlify
-
-1. **Sign up/Login** to [Netlify](https://netlify.com)
-2. **Import Project**
-   - Click "Add New..." → "Project"
-   - Import from GitHub
-   - Select your `project-template` repository
-
-3. **Configure the project:**
-   - **Project Name**: `project-template-frontend`
-   - **Framework Preset**: Create React App
-   - **Base Directory**: `packages/frontend`
-   - **Build Command**: 
-     ```bash
-     cd ../shared && npm install && npm run build && cd ../frontend && npm install && npm run build
-     ```
-   - **Publish Directory**: `packages/frontend/build`
-
-### Step 2: Set Environment Variables
-
-In Netlify dashboard, go to **Settings** → **Environment Variables**:
-
-| Key | Value | Environment |
-|-----|-------|-------------|
-| `REACT_APP_API_URL` | `https://your-backend.onrender.com/api` | Production |
-| `REACT_APP_ENV` | `production` | Production |
-
-### Step 3: Deploy
-
-1. Click **"Deploy"**
-2. Wait for deployment (3-5 minutes)
-3. **Test your frontend**: Visit your Netlify URL
-
----
-
-## 🔗 Final Configuration
-
-### Update CORS Settings
-
-1. **Go back to Render** (backend)
-2. **Update Environment Variables**:
-   - Set `CORS_ORIGIN` to your actual Netlify URL: `https://your-app.netlify.app`
-3. **Redeploy** the backend service
-
-### Enable Auto-Deploy (Optional)
-
-**For Render:**
-1. Go to **Settings** → **Build & Deploy**
-2. Enable **Auto-Deploy**: `Yes`
-
-**For Netlify:**
-- Auto-deploy is enabled by default
-
----
-
-## ✅ Testing Your Production Setup
-
-### 1. Health Check
-Visit: `https://your-backend.onrender.com/api/health`
-
-**Expected response:**
-```json
-{
-  "success": true,
-  "data": {
-    "status": "healthy",
-    "timestamp": "2025-05-25T...",
-    "uptime": 123.45,
-    "environment": "production"
-  }
-}
-```
-
-### 3. Frontend Application
-Visit: `https://your-app.netlify.app`
-
-**Should show:**
-- ✅ Items list loads successfully
-- ✅ Backend status shows "healthy"
-- ✅ Clicking items shows details
-- ✅ No CORS errors in browser console
-
-### 4. Database Verification
-1. Go to **Supabase Dashboard** → **Table Editor**
-2. Check **items** table has data
-3. Verify new items appear when backend initializes
-
----
-
-## 🎉 Success!
-
-Your full-stack application is now running in production with:
-
-- ✅ **Frontend** on Netlify with global CDN
-- ✅ **Backend** on Render with auto-scaling
-- ✅ **Database** on Supabase with backups
-- ✅ **HTTPS** enabled everywhere
-- ✅ **Auto-deployment** from GitHub
-
-*Happy coding! 🚀*
+This project is private and proprietary. Unauthorized copying, distribution, or use is strictly prohibited.
