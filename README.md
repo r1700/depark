@@ -62,17 +62,17 @@ This project provides a digital platform for managing smart parking facilities w
 ### Architecture Overview
 
 ```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Frontend      │    │   Backend       │    │   OPC Bridge    │    │   Database      │
-│ (Cloudflare)    │──▶│   (Render)      │───▶│   (Local)       │──▶│   (Supabase)    │
-│ React + TS      │    │   Express + TS  │    │   Node.js + OPC │    │   PostgreSQL    │
-└─────────────────┘    └─────────────────┘    └─────────────────┘    └─────────────────┘
-                                                       │
-                                               ┌─────────────────┐
-                                               │  Parking        │
-                                               │  Hardware       │
-                                               │  (OPC-UA)       │
-                                               └─────────────────┘
+┌─────────────────┐      ┌─────────────────┐       ┌─────────────────┐
+│   Frontend      │      │   Backend       │       │   OPC Bridge    │
+│ (Cloudflare)    │ ──── │   (Render)      │ ───── │   (Local)       │
+│ React + TS      │      │   Express + TS  │       │   Node.js + OPC │
+└─────────────────┘      └─────────────────┘       └─────────────────┘
+                                 │                         │
+                         ┌─────────────────┐       ┌─────────────────┐
+                         │   Database      │       │  Parking        │
+                         │   (Supabase)    │       │  Hardware       │
+                         │   PostgreSQL    │       │  (OPC-UA)       │
+                         └─────────────────┘       └─────────────────┘
 ```
 
 **Live URLs after deployment:**
