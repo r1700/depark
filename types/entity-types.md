@@ -3,7 +3,7 @@
 ## User Management
 
 ```typescript
-interface BaseUser {
+export interface BaseUser {
   id: string;
   email: string;
   firstName: string;
@@ -12,7 +12,7 @@ interface BaseUser {
   updatedAt: Date;
 }
 
-interface User extends BaseUser {
+ export interface User extends BaseUser {
   department?: string;
   employeeId?: string;
   googleId?: string;
@@ -23,7 +23,7 @@ interface User extends BaseUser {
   approvedAt?: Date;
 }
 
-interface AdminUser extends BaseUser {
+ export interface AdminUser extends BaseUser {
   passwordHash: string;
   role: 'hr' | 'admin';
   permissions: string[];
