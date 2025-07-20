@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useSelector, useDispatch, TypedUseSelectorHook } from 'react-redux';
 import { fetchParkingData, setFilters ,Filters} from './parkingSlice';
-import { RootState, AppDispatch } from '../app/store'; 
+import { RootState, AppDispatch } from '../../app/store'; 
 import './parkingDashboard.css';
 
 

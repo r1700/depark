@@ -15,7 +15,7 @@ import {
   getUserQuery,
   getFullHourQuery,
   getFullDayQuery
-}  from '../app/exampleQueryResponse';
+}  from '../../app/exampleQueryResponse';
  export interface Filters {
   queryType: 'baseDay' | 'baseMonth' | 'baseHour' | 'user' | 'fullHour' | 'fullDay';
 }

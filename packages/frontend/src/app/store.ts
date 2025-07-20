@@ -1,5 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit';
-import parkingReducer from '../parking/parkingSlice';
+import parkingReducer from '../components/parking/parkingSlice';
 
 export const store = configureStore({
   reducer: { parking: parkingReducer },

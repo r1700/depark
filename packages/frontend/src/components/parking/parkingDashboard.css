@@ -1,5 +1,7 @@
 /* styles.css */
-
+div{
+  color: rgb(15, 5, 107);
+}
 table {
   border-collapse: collapse;
   margin: 20px auto;
@@ -8,17 +10,18 @@ table {
 }
 
 th, td {
-  border: 1px solid #ccc;
+  border: 1px solid #311a66;
   padding: 12px;
   text-align: center;
 }
 
 th {
-  background-color: #f2f2f2;
+  background-color: #758399;
   font-weight: bold;
 }
 
 tbody tr:hover {
+
   background-color: #f9f9f9;
 }
 
@@ -36,11 +39,13 @@ button {
 }
 
 button.active {
-  background-color: #60a5fa;
-  color: white;
+  background-color: #6e5d4e;
+  color: rgb(180, 62, 62);
 }
 
-.flex {
+.flex {  
+
+  background-color: #aaadb3;
   display: flex;
   justify-content: center;
   gap: 12px;
