@@ -13,6 +13,13 @@
     "build:opc": "npm run build --workspace=packages/opc",
     "build:backend": "npm run build --workspace=packages/backend",
     "build:frontend": "npm run build --workspace=packages/frontend",
-    "install:all": "npm install && npm install --workspace=packages/backend && npm install --workspace=packages/frontend && npm install --workspace=packages/opc"
+    "install:all": "npm install && npm install --workspace=packages/backend && npm install --workspace=packages/frontend && npm install --workspace=packages/opc",
+    "test": "jest"
+  },
+  "devDependencies": {
+    "@babel/preset-react": "^7.27.1",
+    "@babel/preset-typescript": "^7.27.1",
+    "jest": "^30.0.4",
+    "supertest": "^7.1.3"
   }
 }
