@@ -45,6 +45,7 @@ interface Vehicle {
   createdAt: Date;
   updatedAt: Date;
   addedBy: 'user' | 'hr';
+  ParkingSessionId :string;
   
   // Override dimensions (for manual entry or corrections)
   dimensionOverrides?: {
@@ -359,3 +360,13 @@ interface VehicleReport {
   generatedAt: Date;
 }
 ```
+ "id", 
+  "totalVehicles", 
+  "activeVehicles", 
+  "unknownModels", 
+  "dimensionSources", 
+  "topMakes", 
+  "generatedBy", 
+  "generatedAt", 
+  "createdAt", 
+  "updatedAt"
