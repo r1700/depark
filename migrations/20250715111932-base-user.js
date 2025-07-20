@@ -50,7 +50,7 @@ module.exports = {
                 firstName: 'Alice',
                 lastName: 'Johnson',
                 createdAt: new Date(),
-                updatedAt: new Date()
+                updatedAt: new Date() 
             }
         ]);
     },
