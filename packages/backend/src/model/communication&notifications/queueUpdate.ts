@@ -1,15 +1,17 @@
 import Joi from 'joi';
 
+
+
 export class QueueUpdateModel {
   static schema = Joi.object({
     id: Joi.string().required(),
     retrievalQueueId: Joi.string().required(),
-    position: Joi.number().integer().required(),
+    position: Joi.number().required(),
     estimatedTime: Joi.date().required(),
     status: Joi.string().valid('queued', 'processing', 'ready').required(),
     message: Joi.string().optional(),
     timestamp: Joi.date().required(),
-    broadcastTo: Joi.string().valid('specific_user', 'all_tablets', 'all_connected').required(),
+    broadcastTo: Joi.string().valid('specific_user', 'all_tablets', 'all_connected').required()
   });
 
   constructor(
@@ -19,7 +21,7 @@ export class QueueUpdateModel {
     public estimatedTime: Date,
     public status: 'queued' | 'processing' | 'ready',
     public timestamp: Date,
-    public broadcastTo: 'specific_user' | 'all_tablets' | 'all_connected', // Move required parameter before optional
+    public broadcastTo: 'specific_user' | 'all_tablets' | 'all_connected',
     public message?: string
   ) {}
 
@@ -40,7 +42,7 @@ export class QueueUpdateModel {
   }
 }
 
-// Example usage of the NotificationLogModel
+// Example usage of QueueUpdateModel
 
 const queueUpdateData = {
   id: "update123",
@@ -48,7 +50,7 @@ const queueUpdateData = {
   position: 1,
   estimatedTime: new Date(),
   status: "queued",
-  message: "Your retrieval is in queue.",
+  message: "Your item is being processed.",
   timestamp: new Date(),
   broadcastTo: "specific_user",
 };
