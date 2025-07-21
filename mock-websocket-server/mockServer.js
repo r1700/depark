@@ -6,25 +6,20 @@ const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
-// יצירת חיבור WebSocket
 wss.on('connection', ws => {
-  console.log('לקוח התחבר');
+  console.log('Client logged in');
   
-  // קבלת הודעה מהלקוח
   ws.on('message', message => {
-    console.log('הודעה מהלקוח:', message);
+    console.log('Message from the client:', message);
   });
   
-  // שליחה ללקוח
-  ws.send('שלום מהשרת!');
+  ws.send('hello from the server!');
 });
 
-// נתיב הבסיס של ה-HTTP
 app.get('/', (req, res) => {
-  res.send('ברוך הבא לשרת mock websocket!');
+  res.send('welcome to the mock websocket server!');
 });
 
-// הפעלת השרת על פורט 8081
 server.listen(8081, () => {
-  console.log('שרת HTTP ו-WebSocket פועל על http://localhost:8081');
+  console.log('HTTP and WebSocket server running at http://localhost:8081');
 });
