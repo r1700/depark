@@ -14,5 +14,26 @@
     "build:backend": "npm run build --workspace=packages/backend",
     "build:frontend": "npm run build --workspace=packages/frontend",
     "install:all": "npm install && npm install --workspace=packages/backend && npm install --workspace=packages/frontend && npm install --workspace=packages/opc"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "pg": "^8.16.3"
+  },
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/diversi-tech/depark.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/diversi-tech/depark/issues"
+  },
+  "homepage": "https://github.com/diversi-tech/depark#readme",
+  "devDependencies": {
+    "@types/express": "^4.17.23",
+    "@types/node": "^24.0.13",
+    "typescript": "^5.8.3"
   }
 }
