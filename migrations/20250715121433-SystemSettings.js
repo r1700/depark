@@ -3,24 +3,23 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    // יצירת טבלת SystemSettings
     await queryInterface.createTable('SystemSettings', {
       id: {
-        type: Sequelize.STRING,  // מזהה ייחודי לכל הגדרה במערכת
+        type: Sequelize.STRING,  
         primaryKey: true,
         allowNull: false,
       },
       key: {
-        type: Sequelize.STRING,  // המפתח של ההגדרה
+        type: Sequelize.STRING,  
         allowNull: false,
-        unique: true,  // מפתח ייחודי לכל הגדרה
+        unique: true,  
       },
       value: {
-        type: Sequelize.STRING,  // ערך ההגדרה, יכול להיות string, number או boolean
+        type: Sequelize.STRING,  
         allowNull: false,
       },
       description: {
-        type: Sequelize.STRING,  // תיאור קצר של ההגדרה
+        type: Sequelize.STRING,  
         allowNull: false,
       },
       category: {
@@ -28,22 +27,21 @@ module.exports = {
         allowNull: false,
       },
       updatedAt: {
-        type: Sequelize.DATE,  // זמן העדכון האחרון
+        type: Sequelize.DATE,  
         allowNull: false,
-        defaultValue: Sequelize.NOW,  // זמן ברירת מחדל
+        defaultValue: Sequelize.NOW,  
       },
       updatedBy: {
-        type: Sequelize.STRING,  // מזהה המנהל ששינה את ההגדרה
+        type: Sequelize.STRING,  
         allowNull: false,
       },
     });
 
-    // הכנסת נתונים לדוגמה לטבלת SystemSettings
     await queryInterface.bulkInsert('SystemSettings', [
       {
         id: '1',
         key: 'maxParkingTime',
-        value: '120', // דקות
+        value: '120', 
         description: 'Max time a vehicle can park in the facility',
         category: 'parking',
         updatedAt: new Date(),
@@ -52,7 +50,7 @@ module.exports = {
       {
         id: '2',
         key: 'authTimeout',
-        value: '30', // דקות
+        value: '30', 
         description: 'Timeout for user authentication session',
         category: 'auth',
         updatedAt: new Date(),
@@ -70,7 +68,7 @@ module.exports = {
       {
         id: '4',
         key: 'integrationEnabled',
-        value: 'true', // boolean
+        value: 'true', 
         description: 'Is system integration enabled',
         category: 'integration',
         updatedAt: new Date(),
@@ -79,7 +77,7 @@ module.exports = {
       {
         id: '5',
         key: 'govSyncInterval',
-        value: '3600', // seconds
+        value: '3600', 
         description: 'Interval between government database syncs',
         category: 'government_db',
         updatedAt: new Date(),
@@ -89,6 +87,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('SystemSettings');  // מחיקת טבלת SystemSettings במקרה של חזרה אחורה
+    await queryInterface.dropTable('SystemSettings');  
   }
 };

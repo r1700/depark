@@ -3,51 +3,49 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    // יצירת טבלת WebSocketConnections
     await queryInterface.createTable('WebSocketConnections', {
       id: {
-        type: Sequelize.STRING,  // מזהה ייחודי
+        type: Sequelize.STRING,  
         primaryKey: true,
         allowNull: false,
       },
       userId: {
-        type: Sequelize.STRING,  // מזהה משתמש (אופציונלי - null עבור חיבורים מטאבלט)
+        type: Sequelize.STRING,  
         allowNull: true,
       },
       connectionType: {
-        type: Sequelize.ENUM('mobile', 'tablet'),  // סוג החיבור (נייד או טאבלט)
+        type: Sequelize.ENUM('mobile', 'tablet'),  
         allowNull: false,
       },
       isActive: {
-        type: Sequelize.BOOLEAN,  // האם החיבור פעיל
+        type: Sequelize.BOOLEAN,  
         allowNull: false,
-        defaultValue: true,  // ברירת מחדל: חיבור פעיל
+        defaultValue: true,  
       },
       connectedAt: {
-        type: Sequelize.DATE,  // זמן החיבור
+        type: Sequelize.DATE,  
         allowNull: false,
       },
       lastActivity: {
-        type: Sequelize.DATE,  // זמן הפעילות האחרונה
+        type: Sequelize.DATE,  
         allowNull: false,
       },
       ipAddress: {
-        type: Sequelize.STRING,  // כתובת ה-IP של החיבור
+        type: Sequelize.STRING,  
         allowNull: false,
       },
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false,
-        defaultValue: Sequelize.NOW,  // זמן ברירת מחדל
+        defaultValue: Sequelize.NOW,  
       },
       updatedAt: {
         type: Sequelize.DATE,
         allowNull: false,
-        defaultValue: Sequelize.NOW,  // זמן ברירת מחדל
+        defaultValue: Sequelize.NOW,  
       },
     });
 
-    // הוספת חיבורים לדוגמה
     await queryInterface.bulkInsert('WebSocketConnections', [
       {
         id: 'connection1',
@@ -62,7 +60,7 @@ module.exports = {
       },
       {
         id: 'connection2',
-        userId: null,  // טאבלט (אין userId)
+        userId: null,  
         connectionType: 'tablet',
         isActive: true,
         connectedAt: new Date(),
@@ -75,7 +73,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    // מחיקת טבלת WebSocketConnections במקרה של חזרה אחורה
     await queryInterface.dropTable('WebSocketConnections');
   }
 };

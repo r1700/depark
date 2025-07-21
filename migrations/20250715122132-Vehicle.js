@@ -3,7 +3,6 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    // יצירת טבלת Vehicles
     await queryInterface.createTable('Vehicles', {
       id: {
         type: Sequelize.STRING,
@@ -63,7 +62,6 @@ module.exports = {
       }
     });
 
-    // הכנסת נתונים
     await queryInterface.bulkInsert('Vehicles', [
       {
         id: 'vehicle1',
@@ -99,7 +97,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    // מחיקת טבלת Vehicles במקרה של חזרה אחורה
     await queryInterface.dropTable('Vehicles');
   }
 };

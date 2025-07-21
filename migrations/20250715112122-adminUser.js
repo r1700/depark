@@ -3,42 +3,41 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('AdminUsers', {  // שמו של הטבלה: AdminUsers
+    await queryInterface.createTable('AdminUsers', {
       id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
         allowNull: false,
-        autoIncrement: true,  // יצירת מזהה אוטומטי
+        autoIncrement: true,  
       },
       passwordHash: {
         type: Sequelize.STRING,
-        allowNull: false,  // חייב להיות מלא
+        allowNull: false,  
       },
       role: {
         type: Sequelize.ENUM('hr', 'admin'),
-        allowNull: false,  // חובה להגדיר את התפקיד
+        allowNull: false,  
       },
       permissions: {
-        type: Sequelize.ARRAY(Sequelize.STRING),  // מערך של מיתר
-        allowNull: false,  // חובה להגדיר הרשאות
+        type: Sequelize.ARRAY(Sequelize.STRING),  
+        allowNull: false,  
       },
       lastLoginAt: {
         type: Sequelize.DATE,
-        allowNull: true,  // אופציונלי, יכול להיות NULL
+        allowNull: true,  
       },
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false,
-        defaultValue: Sequelize.NOW,  // זמן ברירת מחדל
+        defaultValue: Sequelize.NOW,  
       },
       updatedAt: {
         type: Sequelize.DATE,
         allowNull: false,
-        defaultValue: Sequelize.NOW,  // זמן ברירת מחדל
+        defaultValue: Sequelize.NOW,  
       },
     });
 
-    // Insert data into AdminUsers
     await queryInterface.bulkInsert('AdminUsers', [
       {
         passwordHash: 'hashed_password_1',
@@ -68,6 +67,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('AdminUsers');  // מחיקת טבלת AdminUsers במקרה של חזרה אחורה
+    await queryInterface.dropTable('AdminUsers');  
   }
 };

@@ -3,45 +3,43 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    // יצירת טבלת VehicleReports
     await queryInterface.createTable('VehicleReports', {
       id: {
-        type: Sequelize.STRING,  // מזהה ייחודי לדוח
+        type: Sequelize.STRING,  
         primaryKey: true,
         allowNull: false,
       },
       totalVehicles: {
-        type: Sequelize.INTEGER,  // מספר הרכבים הכולל
+        type: Sequelize.INTEGER,  
         allowNull: false,
       },
       activeVehicles: {
-        type: Sequelize.INTEGER,  // מספר הרכבים הפעילים
+        type: Sequelize.INTEGER,  
         allowNull: false,
       },
       unknownModels: {
-        type: Sequelize.INTEGER,  // מספר הדגמים הלא מזוהים
+        type: Sequelize.INTEGER,  
         allowNull: false,
       },
       dimensionSources: {
-        type: Sequelize.JSONB,  // מקורות ממדי הרכב (JSON או JSONB)
+        type: Sequelize.JSONB,  
         allowNull: false,
       },
       topMakes: {
-        type: Sequelize.JSONB,  // מידע על היצרנים המובילים
+        type: Sequelize.JSONB,  
         allowNull: false,
       },
       generatedBy: {
-        type: Sequelize.STRING,  // מזהה המשתמש שיצר את הדוח
+        type: Sequelize.STRING,  
         allowNull: false,
       },
       generatedAt: {
-        type: Sequelize.DATE,  // הזמן בו נוצר הדוח
+        type: Sequelize.DATE,  
         allowNull: false,
-        defaultValue: Sequelize.NOW,  // ברירת מחדל לזמן נוכחי
+        defaultValue: Sequelize.NOW,  
       },
     });
 
-    // הוספת דוח לדוגמה
     await queryInterface.bulkInsert('VehicleReports', [
       {
         id: '1',
@@ -67,7 +65,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    // מחיקת טבלת VehicleReports במקרה של חזרה אחורה
     await queryInterface.dropTable('VehicleReports');
   }
 };

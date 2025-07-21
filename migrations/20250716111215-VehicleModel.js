@@ -3,57 +3,55 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    // יצירת טבלת VehicleModels
     await queryInterface.createTable('VehicleModels', {
       id: {
-        type: Sequelize.STRING,  // id מסוג string
+        type: Sequelize.STRING,  
         primaryKey: true,
         allowNull: false,
       },
       make: {
-        type: Sequelize.STRING,  // יצרן הרכב
+        type: Sequelize.STRING,  
         allowNull: false,
       },
       model: {
-        type: Sequelize.STRING,  // מודל הרכב
+        type: Sequelize.STRING,  
         allowNull: false,
       },
       yearRange: {
-        type: Sequelize.JSONB,  // אובייקט JSON לאחסון טווח השנים
+        type: Sequelize.JSONB,  
         allowNull: false,
       },
       dimensions: {
-        type: Sequelize.JSONB,  // אובייקט JSON לאחסון מימדים
+        type: Sequelize.JSONB,  
         allowNull: false,
       },
       source: {
-        type: Sequelize.ENUM('manual', 'government_db', 'hr_input'),  // מקור המידע
+        type: Sequelize.ENUM('manual', 'government_db', 'hr_input'),  
         allowNull: false,
       },
       createdAt: {
-        type: Sequelize.DATE,  // תאריך יצירת המודל
+        type: Sequelize.DATE,  
         allowNull: false,
-        defaultValue: Sequelize.NOW,  // זמן ברירת מחדל
+        defaultValue: Sequelize.NOW,  
       },
       updatedAt: {
-        type: Sequelize.DATE,  // תאריך עדכון המודל
+        type: Sequelize.DATE,  
         allowNull: false,
-        defaultValue: Sequelize.NOW,  // זמן ברירת מחדל
+        defaultValue: Sequelize.NOW,  
       },
       updatedBy: {
-        type: Sequelize.STRING,  // מזהה המנהל שהעדכן את המודל (אופציונלי)
+        type: Sequelize.STRING,  
         allowNull: true,
       },
     });
 
-    // הוספת נתונים לטבלת VehicleModels
     await queryInterface.bulkInsert('VehicleModels', [
       {
         id: '1',
         make: 'Toyota',
         model: 'Corolla',
-        yearRange: JSON.stringify({ start: 2000, end: 2020 }), // המרת לטקסט JSON
-        dimensions: JSON.stringify({ length: 4.63, width: 1.78, height: 1.43 }), // המרת לטקסט JSON
+        yearRange: JSON.stringify({ start: 2000, end: 2020 }), 
+        dimensions: JSON.stringify({ length: 4.63, width: 1.78, height: 1.43 }), 
         source: 'manual',
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -63,8 +61,8 @@ module.exports = {
         id: '2',
         make: 'Ford',
         model: 'Focus',
-        yearRange: JSON.stringify({ start: 2005, end: 2021 }), // המרת לטקסט JSON
-        dimensions: JSON.stringify({ length: 4.37, width: 1.82, height: 1.46 }), // המרת לטקסט JSON
+        yearRange: JSON.stringify({ start: 2005, end: 2021 }), 
+        dimensions: JSON.stringify({ length: 4.37, width: 1.82, height: 1.46 }), 
         source: 'government_db',
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -74,7 +72,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    // מחיקת טבלת VehicleModels במקרה של חזרה אחורה
     await queryInterface.dropTable('VehicleModels');
   }
 };

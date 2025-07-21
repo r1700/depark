@@ -3,7 +3,6 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    // יצירת טבלת NotificationLogs
     await queryInterface.createTable('NotificationLogs', {
       id: {
         type: Sequelize.STRING,
@@ -56,7 +55,6 @@ module.exports = {
       },
     });
 
-    // הכנסת נתונים לדוגמה לטבלת NotificationLogs
     await queryInterface.bulkInsert('NotificationLogs', [
       {
         id: '1',
@@ -99,7 +97,7 @@ module.exports = {
       },
       {
         id: '4',
-        userId: null,  // יכול להיות null אם לא קשור למשתמש מסויים
+        userId: null,  
         type: 'system_maintenance',
         channel: 'push_notification',
         message: 'Scheduled system maintenance at 2 AM.',
@@ -114,6 +112,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('NotificationLogs');  // מחיקת הטבלה במקרה של rollback
+    await queryInterface.dropTable('NotificationLogs');  
   }
 };

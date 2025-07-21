@@ -3,7 +3,6 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    // יצירת טבלת OPCSystemStatuses
     await queryInterface.createTable('OPCSystemStatuses', {
       id: {
         type: Sequelize.STRING,
@@ -56,7 +55,6 @@ module.exports = {
       },
     });
 
-    // הכנסת נתונים לדוגמה לטבלת OPCSystemStatuses
     await queryInterface.bulkInsert('OPCSystemStatuses', [
       {
         id: '1',
@@ -94,6 +92,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('OPCSystemStatuses');  // מחיקת הטבלה במקרה של rollback
+    await queryInterface.dropTable('OPCSystemStatuses');  
   }
 };

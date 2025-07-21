@@ -5,51 +5,50 @@ module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('ParkingConfigurations', {
       id: {
-        type: Sequelize.STRING,  // מזהה ייחודי
+        type: Sequelize.STRING,  
         primaryKey: true,
         allowNull: false,
       },
       facilityName: {
-        type: Sequelize.STRING,  // שם המתקן או החניון
+        type: Sequelize.STRING,  
         allowNull: false,
       },
       totalSurfaceSpots: {
-        type: Sequelize.INTEGER,  // סך כל המקומות על פני השטח
+        type: Sequelize.INTEGER,  
         allowNull: false,
       },
       surfaceSpotIds: {
-        type: Sequelize.ARRAY(Sequelize.STRING),  // מזהים של המקומות על פני השטח
+        type: Sequelize.ARRAY(Sequelize.STRING),  
         allowNull: false,
       },
       avgRetrievalTimeMinutes: {
-        type: Sequelize.INTEGER,  // זמן ממוצע לשליפה (בדקות), ברירת המחדל 1
+        type: Sequelize.INTEGER,  
         defaultValue: 1,
         allowNull: false,
       },
       maxQueueSize: {
-        type: Sequelize.INTEGER,  // גודל התור המרבי
+        type: Sequelize.INTEGER,  
         allowNull: false,
       },
       operatingHours: {
-        type: Sequelize.JSON,  // שדה מסוג JSON
+        type: Sequelize.JSON,  
         allowNull: false,
       },
       timezone: {
-        type: Sequelize.STRING,  // אזור הזמן
+        type: Sequelize.STRING,  
         allowNull: false,
       },
       updatedAt: {
-        type: Sequelize.DATE,  // זמן עדכון אחרון
+        type: Sequelize.DATE,  
         allowNull: false,
         defaultValue: Sequelize.NOW,
       },
       updatedBy: {
-        type: Sequelize.STRING,  // מזהה המנהל ששינה את הנתונים
+        type: Sequelize.STRING,  
         allowNull: false,
       },
     });
 
-    // הכנסת נתונים לדוגמה לטבלת ParkingConfigurations
     await queryInterface.bulkInsert('ParkingConfigurations', [
       {
         id: '1',
@@ -58,7 +57,7 @@ module.exports = {
         surfaceSpotIds: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'],
         avgRetrievalTimeMinutes: 5,
         maxQueueSize: 10,
-        operatingHours: JSON.stringify({ start: '07:00', end: '19:00' }),  // השתמש ב-JSON.stringify
+        operatingHours: JSON.stringify({ start: '07:00', end: '19:00' }),  
         timezone: 'Asia/Jerusalem',
         updatedAt: new Date(),
         updatedBy: 'admin123',
@@ -70,7 +69,7 @@ module.exports = {
         surfaceSpotIds: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'],
         avgRetrievalTimeMinutes: 3,
         maxQueueSize: 5,
-        operatingHours: JSON.stringify({ start: '08:00', end: '20:00' }),  // השתמש ב-JSON.stringify
+        operatingHours: JSON.stringify({ start: '08:00', end: '20:00' }),  
         timezone: 'Asia/Jerusalem',
         updatedAt: new Date(),
         updatedBy: 'admin456',

@@ -5,42 +5,41 @@ module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('LoginAttempts', {  // שם הטבלה: LoginAttempts
       id: {
-        type: Sequelize.STRING,  // מזהה ייחודי
+        type: Sequelize.STRING,  
         primaryKey: true,
         allowNull: false,
       },
       email: {
-        type: Sequelize.STRING,  // כתובת האימייל של המשתמש
+        type: Sequelize.STRING,  
         allowNull: false,
       },
       userType: {
-        type: Sequelize.ENUM('user', 'admin'),  // סוג המשתמש (user או admin)
+        type: Sequelize.ENUM('user', 'admin'),  
         allowNull: false,
       },
       success: {
-        type: Sequelize.BOOLEAN,  // האם הכניסה הייתה מוצלחת או לא
+        type: Sequelize.BOOLEAN,  
         allowNull: false,
       },
       ipAddress: {
-        type: Sequelize.STRING,  // כתובת ה-IP ממנה בוצע הניסיון
+        type: Sequelize.STRING,  
         allowNull: false,
       },
       userAgent: {
-        type: Sequelize.STRING,  // פרטי הדפדפן/מכשיר מהם בוצע הניסיון
+        type: Sequelize.STRING,  
         allowNull: false,
       },
       failureReason: {
-        type: Sequelize.STRING,  // סיבת הכישלון (אם קיימת)
-        allowNull: true,  // זהו שדה אופציונלי
+        type: Sequelize.STRING,  
+        allowNull: true,  
       },
       timestamp: {
-        type: Sequelize.DATE,  // זמן הניסיון
+        type: Sequelize.DATE,  
         allowNull: false,
-        defaultValue: Sequelize.NOW,  // ברירת מחדל לזמן נוכחי
+        defaultValue: Sequelize.NOW,  
       },
     });
 
-    // הוספת נתונים לדוגמה לטבלת LoginAttempts
     await queryInterface.bulkInsert('LoginAttempts', [
       {
         id: '1',
@@ -67,6 +66,6 @@ module.exports = {
 
   async down(queryInterface, Sequelize) {
     console.log("down");
-    await queryInterface.dropTable('LoginAttempts');  // מחיקת הטבלה במקרה של חזרה אחורה
+    await queryInterface.dropTable('LoginAttempts');  
   }
 };

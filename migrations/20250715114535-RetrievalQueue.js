@@ -3,51 +3,50 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    // יצירת טבלת RetrievalQueues
     await queryInterface.createTable('RetrievalQueues', {
       id: {
-        type: Sequelize.STRING,  // מזהה ייחודי לתור של הבקשה
+        type: Sequelize.STRING,  
         primaryKey: true,
         allowNull: false,
       },
       sessionId: {
-        type: Sequelize.STRING,  // מזהה של מפגש החניה שאליו שייך הבקשה
+        type: Sequelize.STRING,  
         allowNull: false,
       },
       userId: {
-        type: Sequelize.STRING,  // מזהה המשתמש, אם בוצעה בקשה ממכשיר נייד (אופציונלי, null אם מדובר בבקשה מטאבלט)
+        type: Sequelize.STRING,  
         allowNull: true,
       },
       licensePlate: {
-        type: Sequelize.STRING,  // מספר הרישוי של הרכב
+        type: Sequelize.STRING,  
         allowNull: false,
       },
       undergroundSpot: {
-        type: Sequelize.STRING,  // מקום החניה התת-קרקעי שאליו הרכב צריך להגיע
+        type: Sequelize.STRING,  
         allowNull: false,
       },
       requestedAt: {
-        type: Sequelize.DATE,  // זמן בקשת השליפה
+        type: Sequelize.DATE,  
         allowNull: false,
       },
       estimatedTime: {
-        type: Sequelize.DATE,  // זמן משוער לפינוי הרכב
+        type: Sequelize.DATE,  
         allowNull: false,
       },
       position: {
-        type: Sequelize.INTEGER,  // מיקום בבקשה בתור
+        type: Sequelize.INTEGER,  
         allowNull: false,
       },
       status: {
-        type: Sequelize.ENUM('queued', 'processing', 'ready', 'completed'),  // סטטוס הבקשה בתור
+        type: Sequelize.ENUM('queued', 'processing', 'ready', 'completed'),  
         allowNull: false,
       },
       assignedPickupSpot: {
-        type: Sequelize.STRING,  // מקום הלקיחה המוקצה (אם קיים)
+        type: Sequelize.STRING,  
         allowNull: true,
       },
       requestSource: {
-        type: Sequelize.ENUM('mobile', 'tablet'),  // ממכשיר נייד או טאבלט
+        type: Sequelize.ENUM('mobile', 'tablet'),  
         allowNull: false,
       },
       createdAt: {
@@ -62,7 +61,6 @@ module.exports = {
       },
     });
 
-    // הכנסת נתונים לדוגמה לטבלת RetrievalQueues
     await queryInterface.bulkInsert('RetrievalQueues', [
       {
         id: '1',
@@ -98,6 +96,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('RetrievalQueues');  // מחיקת טבלת RetrievalQueues במקרה של חזרה אחורה
+    await queryInterface.dropTable('RetrievalQueues');  
   }
 };

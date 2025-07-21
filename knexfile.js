@@ -1,4 +1,3 @@
-// config/config.js
 module.exports = {
   development: {
     username: 'postgres',

@@ -3,7 +3,6 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    // יצירת טבלת UserSessions
     await queryInterface.createTable('UserSessions', {
       id: {
         type: Sequelize.STRING,
@@ -55,7 +54,6 @@ module.exports = {
       },
     });
 
-    // הכנסת נתונים
     await queryInterface.bulkInsert('UserSessions', [
       {
         id: 'session1',
@@ -63,7 +61,7 @@ module.exports = {
         userType: 'user',
         token: 'token12345',
         refreshToken: 'refreshToken123',
-        expiresAt: new Date(Date.now() + 3600 * 1000),  // שעה קדימה
+        expiresAt: new Date(Date.now() + 3600 * 1000),  
         isActive: true,
         ipAddress: '192.168.1.1',
         userAgent: 'Mozilla/5.0',
@@ -76,7 +74,7 @@ module.exports = {
         userType: 'admin',
         token: 'token67890',
         refreshToken: 'refreshToken456',
-        expiresAt: new Date(Date.now() + 3600 * 1000),  // שעה קדימה
+        expiresAt: new Date(Date.now() + 3600 * 1000),  
         isActive: true,
         ipAddress: '192.168.1.2',
         userAgent: 'Chrome/91.0',
@@ -87,7 +85,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    // מחיקת טבלת UserSessions במקרה של חזרה אחורה
     await queryInterface.dropTable('UserSessions');
   }
 };

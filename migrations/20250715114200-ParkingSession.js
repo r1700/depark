@@ -3,64 +3,61 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    // יצירת טבלת ParkingSessions
     await queryInterface.createTable('ParkingSessions', {
       id: {
-        type: Sequelize.STRING,  // מזהה ייחודי למפגש החניה
+        type: Sequelize.STRING,  
         primaryKey: true,
         allowNull: false,
       },
       userId: {
-        type: Sequelize.STRING,  // מזהה המשתמש
+        type: Sequelize.STRING,  
         allowNull: false,
       },
       vehicleId: {
-        type: Sequelize.STRING,  // מזהה הרכב
+        type: Sequelize.STRING,  
         allowNull: false,
       },
       licensePlate: {
-        type: Sequelize.STRING,  // מספר רישוי הרכב
+        type: Sequelize.STRING,  
         allowNull: false,
       },
       surfaceSpot: {
-        type: Sequelize.STRING,  // מספר מקום החניה בשטח (אופציונלי)
+        type: Sequelize.STRING,  
         allowNull: true,
       },
       undergroundSpot: {
-        type: Sequelize.STRING,  // מספר מקום החניה תת קרקעי (אופציונלי)
+        type: Sequelize.STRING,  
         allowNull: true,
       },
       status: {
-        type: Sequelize.ENUM('parked', 'retrieval_requested', 'completed'),  // סטטוס המפגש
-        allowNull: false,
+        type: Sequelize.ENUM('parked', 'retrieval_requested', 'completed'),  
       },
       entryTime: {
-        type: Sequelize.DATE,  // זמן הכניסה לחניה
+        type: Sequelize.DATE,  
         allowNull: false,
       },
       exitTime: {
-        type: Sequelize.DATE,  // זמן יציאה (אופציונלי)
+        type: Sequelize.DATE,  
         allowNull: true,
       },
       retrievalRequestTime: {
-        type: Sequelize.DATE,  // זמן בקשת השליפה (אופציונלי)
+        type: Sequelize.DATE,  
         allowNull: true,
       },
       actualRetrievalTime: {
-        type: Sequelize.DATE,  // זמן השליפה בפועל (אופציונלי)
+        type: Sequelize.DATE, 
         allowNull: true,
       },
       pickupSpot: {
-        type: Sequelize.STRING,  // מקום השליפה בשטח (אופציונלי)
+        type: Sequelize.STRING,  
         allowNull: true,
       },
       requestedBy: {
-        type: Sequelize.ENUM('mobile', 'tablet'),  // מהיכן בוצעה הבקשה לשליפה (אופציונלי)
+        type: Sequelize.ENUM('mobile', 'tablet'),  
         allowNull: true,
       },
     });
 
-    // הכנסת נתונים לדוגמה לטבלת ParkingSessions
     await queryInterface.bulkInsert('ParkingSessions', [
       {
         id: '1',
@@ -97,6 +94,6 @@ module.exports = {
 
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('ParkingSessions');  // מחיקת טבלת ParkingSessions במקרה של חזרה אחורה
+    await queryInterface.dropTable('ParkingSessions');  
   }
 };

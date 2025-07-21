@@ -3,46 +3,44 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    // יצירת טבלת SystemHealths
     await queryInterface.createTable('SystemHealths', {
       id: {
-        type: Sequelize.STRING,  // מזהה ייחודי
+        type: Sequelize.STRING, 
         primaryKey: true,
         allowNull: false,
       },
       component: {
-        type: Sequelize.ENUM('opc_bridge', 'api_server', 'database', 'websocket_server', 'government_sync'),  // רכיב המערכת
+        type: Sequelize.ENUM('opc_bridge', 'api_server', 'database', 'websocket_server', 'government_sync'),  
         allowNull: false,
       },
       status: {
-        type: Sequelize.ENUM('healthy', 'warning', 'error'),  // מצב הרכיב
+        type: Sequelize.ENUM('healthy', 'warning', 'error'),  
         allowNull: false,
       },
       message: {
-        type: Sequelize.STRING,  // הודעה אופציונלית המפרטת את המצב
+        type: Sequelize.STRING,  
         allowNull: true,
       },
       metrics: {
-        type: Sequelize.JSONB,  // נתוני מדדים (כגון: זיכרון, זמן תגובה וכו')
+        type: Sequelize.JSONB,  
         allowNull: true,
       },
       timestamp: {
-        type: Sequelize.DATE,  // זמן בו נבדק המצב
+        type: Sequelize.DATE,  
         allowNull: false,
       },
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false,
-        defaultValue: Sequelize.NOW,  // זמן ברירת מחדל
+        defaultValue: Sequelize.NOW,  
       },
       updatedAt: {
         type: Sequelize.DATE,
         allowNull: false,
-        defaultValue: Sequelize.NOW,  // זמן ברירת מחדל
+        defaultValue: Sequelize.NOW,  
       },
     });
 
-    // הכנסת נתונים לדוגמה לטבלת SystemHealths
     await queryInterface.bulkInsert('SystemHealths', [
       {
         id: '1',
@@ -87,6 +85,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('SystemHealths');  // מחיקת טבלת SystemHealths במקרה של חזרה אחורה
+    await queryInterface.dropTable('SystemHealths');  
   }
 };

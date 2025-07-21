@@ -3,62 +3,60 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    // יצירת טבלת ParkingUsageStats
     await queryInterface.createTable('ParkingUsageStats', {
       id: {
-        type: Sequelize.STRING,  // מזהה ייחודי לכל רישום סטטיסטי
+        type: Sequelize.STRING,  
         primaryKey: true,
         allowNull: false,
       },
       date: {
-        type: Sequelize.DATE,  // תאריך המדידה
+        type: Sequelize.DATE,  
         allowNull: false,
       },
       hour: {
-        type: Sequelize.INTEGER,  // שעה ביום (בין 0 ל-23)
+        type: Sequelize.INTEGER,  
         allowNull: false,
       },
       totalParkedCars: {
-        type: Sequelize.INTEGER,  // סך כל המכוניות החונות באותו זמן
+        type: Sequelize.INTEGER,  
         allowNull: false,
       },
       avgRetrievalTime: {
-        type: Sequelize.INTEGER,  // זמן ממוצע לשחרור מכונית (בדקות)
+        type: Sequelize.INTEGER,  
         allowNull: false,
       },
       maxQueueLength: {
-        type: Sequelize.INTEGER,  // אורך התור המקסימלי
+        type: Sequelize.INTEGER,  
         allowNull: false,
       },
       peakUsageTime: {
-        type: Sequelize.STRING,  // הזמן המקסימלי שבו הייתה עלות השימוש
+        type: Sequelize.STRING,  
         allowNull: false,
       },
       utilizationPercentage: {
-        type: Sequelize.FLOAT,  // אחוז ניצול המתקן
+        type: Sequelize.FLOAT,  
         allowNull: false,
       },
       totalEntries: {
-        type: Sequelize.INTEGER,  // סך כל הכניסות במהלך הזמן המדוד
+        type: Sequelize.INTEGER,  
         allowNull: false,
       },
       totalExits: {
-        type: Sequelize.INTEGER,  // סך כל היציאות במהלך הזמן המדוד
+        type: Sequelize.INTEGER,  
         allowNull: false,
       },
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false,
-        defaultValue: Sequelize.NOW,  // זמן ברירת מחדל
+        defaultValue: Sequelize.NOW,  
       },
       updatedAt: {
         type: Sequelize.DATE,
         allowNull: false,
-        defaultValue: Sequelize.NOW,  // זמן ברירת מחדל
+        defaultValue: Sequelize.NOW,  
       },
     });
 
-    // הכנסת נתונים לדוגמה לטבלת ParkingUsageStats
     await queryInterface.bulkInsert('ParkingUsageStats', [
       {
         id: '1',
@@ -92,7 +90,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    // מחיקת טבלת ParkingUsageStats במקרה של חזרה אחורה
     await queryInterface.dropTable('ParkingUsageStats');
   }
 };

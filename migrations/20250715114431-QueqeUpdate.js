@@ -3,55 +3,53 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    // יצירת טבלת QueueUpdates
     await queryInterface.createTable('QueueUpdates', {
       id: {
-        type: Sequelize.STRING,  // מזהה ייחודי
+        type: Sequelize.STRING,  
         primaryKey: true,
         allowNull: false,
       },
       retrievalQueueId: {
-        type: Sequelize.STRING,  // מזהה תור המשחק (recovery queue)
+        type: Sequelize.STRING,  
         allowNull: false,
       },
       position: {
-        type: Sequelize.INTEGER,  // מיקום בתור
+        type: Sequelize.INTEGER,  
         allowNull: false,
       },
       estimatedTime: {
-        type: Sequelize.DATE,  // זמן משוער
+        type: Sequelize.DATE,  
         allowNull: false,
       },
       status: {
-        type: Sequelize.ENUM('queued', 'processing', 'ready'),  // מצב עדכון התור
+        type: Sequelize.ENUM('queued', 'processing', 'ready'),  
         allowNull: false,
       },
       message: {
-        type: Sequelize.STRING,  // הודעה אופציונלית
+        type: Sequelize.STRING,  
         allowNull: true,
       },
       timestamp: {
-        type: Sequelize.DATE,  // זמן התיעוד
+        type: Sequelize.DATE,  
         allowNull: false,
-        defaultValue: Sequelize.NOW,  // ברירת מחדל לזמן נוכחי
+        defaultValue: Sequelize.NOW,  
       },
       broadcastTo: {
-        type: Sequelize.ENUM('specific_user', 'all_tablets', 'all_connected'),  // מי מקבל את השידור
+        type: Sequelize.ENUM('specific_user', 'all_tablets', 'all_connected'),  
         allowNull: false,
       },
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false,
-        defaultValue: Sequelize.NOW,  // ברירת מחדל לזמן נוכחי
+        defaultValue: Sequelize.NOW,  
       },
       updatedAt: {
         type: Sequelize.DATE,
         allowNull: false,
-        defaultValue: Sequelize.NOW,  // ברירת מחדל לזמן נוכחי
+        defaultValue: Sequelize.NOW,  
       },
     });
 
-    // הכנסת נתונים לדוגמה לטבלת QueueUpdates
     await queryInterface.bulkInsert('QueueUpdates', [
       {
         id: '1',
@@ -81,6 +79,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('QueueUpdates');  // מחיקת הטבלה במקרה של חזרה אחורה
+    await queryInterface.dropTable('QueueUpdates');  
   }
 };

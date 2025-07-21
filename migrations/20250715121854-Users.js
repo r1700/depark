@@ -3,7 +3,6 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    // יצירת הטבלה Users
     await queryInterface.createTable('Users', {
       id: {
         type: Sequelize.INTEGER,
@@ -68,7 +67,6 @@ module.exports = {
       },
     });
 
-    // הכנסת נתונים לטבלת Users
     await queryInterface.bulkInsert('Users', [
       {
         email: 'john.doe@example.com',

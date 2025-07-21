@@ -3,7 +3,6 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    // יצירת טבלת UsageReports
     await queryInterface.createTable('UsageReports', { 
       id: {
         type: Sequelize.STRING,
@@ -45,7 +44,6 @@ module.exports = {
       },
     });
 
-    // הכנסת נתונים לדוגמה לטבלת UsageReports
     await queryInterface.bulkInsert('UsageReports', [
       {
         id: '1',
@@ -95,7 +93,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    // מחיקת טבלת UsageReports במקרה של חזרה אחורה
     await queryInterface.dropTable('UsageReports');
   }
 };

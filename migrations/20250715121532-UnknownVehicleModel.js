@@ -3,55 +3,53 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    // יצירת טבלת UnknownVehicleModels
     await queryInterface.createTable('UnknownVehicleModels', {
       id: {
-        type: Sequelize.STRING,  // מזהה ייחודי למודל הרכב הלא ידוע
+        type: Sequelize.STRING,  
         primaryKey: true,
         allowNull: false,
       },
       make: {
-        type: Sequelize.STRING,  // יצרן הרכב
+        type: Sequelize.STRING,  
         allowNull: false,
       },
       model: {
-        type: Sequelize.STRING,  // מודל הרכב
+        type: Sequelize.STRING,  
         allowNull: false,
       },
       requestCount: {
-        type: Sequelize.INTEGER,  // מספר הפעמים שהמודל הלא ידוע התבקש
+        type: Sequelize.INTEGER,  
         allowNull: false,
-        defaultValue: 0,  // ברירת מחדל 0
+        defaultValue: 0,  
       },
       lastRequested: {
-        type: Sequelize.DATE,  // תאריך הפנייה האחרונה
+        type: Sequelize.DATE,  
         allowNull: false,
-        defaultValue: Sequelize.NOW,  // זמן ברירת מחדל
+        defaultValue: Sequelize.NOW,  
       },
       status: {
-        type: Sequelize.ENUM('pending_review', 'resolved', 'ignored'),  // סטטוס המודל
+        type: Sequelize.ENUM('pending_review', 'resolved', 'ignored'),  
         allowNull: false,
       },
       resolvedBy: {
-        type: Sequelize.STRING,  // מזהה המנהל שביצע את הפתרון (אופציונלי)
+        type: Sequelize.STRING,  
         allowNull: true,
       },
       resolvedAt: {
-        type: Sequelize.DATE,  // תאריך הפתרון (אופציונלי)
+        type: Sequelize.DATE,  
         allowNull: true,
       },
       resolvedVehicleModelId: {
-        type: Sequelize.STRING,  // מזהה המודל שקשור למודל הרכב אחרי פתרון
+        type: Sequelize.STRING,  
         allowNull: true,
       },
       createdAt: {
-        type: Sequelize.DATE,  // תאריך יצירת המודל
+        type: Sequelize.DATE,  
         allowNull: false,
-        defaultValue: Sequelize.NOW,  // זמן ברירת מחדל
+        defaultValue: Sequelize.NOW,  
       },
     });
 
-    // הכנסת נתונים לדוגמה לטבלת UnknownVehicleModels
     await queryInterface.bulkInsert('UnknownVehicleModels', [
       {
         id: '1',
@@ -87,6 +85,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('UnknownVehicleModels');  // מחיקת טבלת UnknownVehicleModels במקרה של חזרה אחורה
+    await queryInterface.dropTable('UnknownVehicleModels');  
   }
 };

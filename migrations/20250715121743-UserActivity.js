@@ -3,39 +3,38 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    // יצירת הטבלה UserActivities
     await queryInterface.createTable('UserActivities', { 
       id: {
-        type: Sequelize.STRING,  // מזהה ייחודי לכל פעולה
+        type: Sequelize.STRING,  
         primaryKey: true,
         allowNull: false,
       },
       userId: {
-        type: Sequelize.STRING,  // מזהה המשתמש שביצע את הפעולה
+        type: Sequelize.STRING,  
         allowNull: true,
       },
       userType: {
-        type: Sequelize.ENUM('hr', 'admin', 'employee', 'anonymous'),  // סוג המשתמש
+        type: Sequelize.ENUM('hr', 'admin', 'employee', 'anonymous'),  
         allowNull: false,
       },
       action: {
-        type: Sequelize.STRING,  // פעולה שנעשתה
+        type: Sequelize.STRING,  
         allowNull: false,
       },
       details: {
-        type: Sequelize.JSONB,  // פרטי הפעולה
+        type: Sequelize.JSONB,  
         allowNull: false,
       },
       ipAddress: {
-        type: Sequelize.STRING,  // כתובת ה-IP של המשתמש
+        type: Sequelize.STRING,  
         allowNull: true,
       },
       userAgent: {
-        type: Sequelize.STRING,  // מידע על הדפדפן או הלקוח
+        type: Sequelize.STRING,  
         allowNull: true,
       },
       timestamp: {
-        type: Sequelize.DATE,  // זמן ביצוע הפעולה
+        type: Sequelize.DATE,  
         allowNull: false,
       },
       createdAt: {
@@ -50,7 +49,6 @@ module.exports = {
       },
     });
 
-    // הכנסת נתונים לדוגמה
     await queryInterface.bulkInsert('UserActivities', [
       {
         id: '1',
@@ -80,7 +78,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    // מחיקת טבלת UserActivities במקרה של חזרה אחורה
     await queryInterface.dropTable('UserActivities');
   }
 };

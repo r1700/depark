@@ -3,38 +3,36 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    // יצירת טבלת ParkingSpots
     await queryInterface.createTable('ParkingSpots', {
       id: {
-        type: Sequelize.STRING,  // מזהה ייחודי למקום החניה
+        type: Sequelize.STRING,  
         primaryKey: true,
         allowNull: false,
       },
       type: {
-        type: Sequelize.ENUM('surface', 'underground'),  // סוג החניה: שטחית או תת קרקעית
+        type: Sequelize.ENUM('surface', 'underground'),  
         allowNull: false,
       },
       spotNumber: {
-        type: Sequelize.STRING,  // מספר המקום בחניה
+        type: Sequelize.STRING,  
         allowNull: false,
       },
       isOccupied: {
-        type: Sequelize.BOOLEAN,  // האם המקום תפוס
+        type: Sequelize.BOOLEAN,  
         allowNull: false,
-        defaultValue: false,  // ברירת מחדל: לא תפוס
+        defaultValue: false,  
       },
       currentVehicleId: {
-        type: Sequelize.STRING,  // מזהה הרכב התפוס (אופציונלי)
+        type: Sequelize.STRING,  
         allowNull: true,
       },
       lastUpdated: {
-        type: Sequelize.DATE,  // תאריך עדכון אחרון של המקום
+        type: Sequelize.DATE,  
         allowNull: false,
-        defaultValue: Sequelize.NOW,  // זמן ברירת מחדל
+        defaultValue: Sequelize.NOW,  
       },
     });
 
-    // הכנסת נתונים לדוגמה לטבלת ParkingSpots
     await queryInterface.bulkInsert('ParkingSpots', [
       {
         id: '1',
@@ -72,7 +70,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    // מחיקת טבלת ParkingSpots במקרה של חזרה אחורה
     await queryInterface.dropTable('ParkingSpots');
   }
 };

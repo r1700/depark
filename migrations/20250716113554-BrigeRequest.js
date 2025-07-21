@@ -58,7 +58,6 @@ module.exports = {
       },
     });
 
-    // הכנסת נתונים לדוגמה עם JSONB
     await queryInterface.bulkInsert('BridgeRequest', [
       {
         id: '1',
