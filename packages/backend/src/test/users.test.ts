@@ -53,7 +53,6 @@ describe('GET /api/users', () => {
     expect(response.body.error).toBe('Invalid role filter');
   });
 
-
   it('should return an empty array if no users match the role filter', async () => {
     const response = await request(app).get('/api/users?role=manager');
     expect(response.status).toBe(200);
