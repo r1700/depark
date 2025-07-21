@@ -2,6 +2,8 @@ import Joi from 'joi';
 
 
 
+
+
 export class QueueUpdateModel {
   static schema = Joi.object({
     id: Joi.string().required(),

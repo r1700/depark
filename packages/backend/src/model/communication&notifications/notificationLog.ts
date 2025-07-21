@@ -11,7 +11,11 @@ export class NotificationLogModel {
     deliveredAt: Joi.date().optional(),
     error: Joi.string().optional(),
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     timestamp: Joi.date().required(),
+=======
+    timestamp: Joi.date().required()
+>>>>>>> Stashed changes
 =======
     timestamp: Joi.date().required()
 >>>>>>> Stashed changes
@@ -25,8 +29,13 @@ export class NotificationLogModel {
     public delivered: boolean,
     public timestamp: Date,
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     public userId?: string, // Move optional parameter to the end
     public deliveredAt?: Date,
+=======
+    public deliveredAt?: Date,
+    public userId?: string,
+>>>>>>> Stashed changes
 =======
     public deliveredAt?: Date,
     public userId?: string,
@@ -46,8 +55,13 @@ export class NotificationLogModel {
       value.delivered,
       new Date(value.timestamp),
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
       value.userId,
       value.deliveredAt ? new Date(value.deliveredAt) : undefined,
+=======
+      value.deliveredAt ? new Date(value.deliveredAt) : undefined,
+      value.userId,
+>>>>>>> Stashed changes
 =======
       value.deliveredAt ? new Date(value.deliveredAt) : undefined,
       value.userId,
@@ -58,7 +72,11 @@ export class NotificationLogModel {
 }
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 // Example usage of the NotificationLogModel
+=======
+// Example usage of NotificationLogModel
+>>>>>>> Stashed changes
 =======
 // Example usage of NotificationLogModel
 >>>>>>> Stashed changes
@@ -68,8 +86,13 @@ const notificationLogData = {
   userId: "user456",
   type: "queue_update",
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
   channel: "websocket",
   message: "Your queue has been updated.",
+=======
+  channel: "push_notification",
+  message: "Your parking spot is ready.",
+>>>>>>> Stashed changes
 =======
   channel: "push_notification",
   message: "Your parking spot is ready.",
