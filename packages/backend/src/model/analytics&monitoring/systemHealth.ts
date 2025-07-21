@@ -14,8 +14,8 @@ export class SystemHealthModel {
     public id: string,
     public component: 'opc_bridge' | 'api_server' | 'database' | 'websocket_server' | 'government_sync',
     public status: 'healthy' | 'warning' | 'error',
-    public timestamp: Date, // פרמטר נדרש קודם
-    public message?: string, // פרמטר אופציונלי אחרי הנדרשים
+    public timestamp: Date, // Required parameter first
+    public message?: string, // Optional parameter after required ones
     public metrics?: Record<string, number>
   ) {}
 
@@ -34,7 +34,7 @@ export class SystemHealthModel {
   }
 }
 
-// דוגמת שימוש ב-SystemHealthModel
+// Example usage of the SystemHealthModel
 
 const systemHealthData = {
   id: "health123",

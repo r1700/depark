@@ -37,7 +37,8 @@ export class SystemSettingsModel {
   }
 }
 
-// דוגמה לשימוש במודל SystemSettingsModel
+
+// Example usage of the NotificationLogModel
 
 const systemSettingsData = {
   id: "setting123",

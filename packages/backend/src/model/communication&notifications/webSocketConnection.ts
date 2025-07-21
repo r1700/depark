@@ -13,12 +13,12 @@ export class WebSocketConnectionModel {
 
   constructor(
     public id: string,
-    public connectionType: 'mobile' | 'tablet', // פרמטר חיוני
+    public connectionType: 'mobile' | 'tablet', // Required parameter
     public isActive: boolean,
     public connectedAt: Date,
     public lastActivity: Date,
     public ipAddress: string,
-    public userId?: string // פרמטר אופציונלי
+    public userId?: string // Optional parameter
   ) {}
 
   static create(data: any): Promise<WebSocketConnectionModel> {
@@ -32,16 +32,16 @@ export class WebSocketConnectionModel {
       new Date(value.connectedAt),
       new Date(value.lastActivity),
       value.ipAddress,
-      value.userId // כאן userId יכול להיות undefined
+      value.userId // Here userId can be undefined
     ));
   }
 }
 
-// דוגמת שימוש ב-WebSocketConnectionModel
+// Example usage of WebSocketConnectionModel
 
 const connectionData = {
   id: "conn123",
-  userId: null, // null עבור חיבורי טאבלט
+  userId: null, // null for tablet connections
   connectionType: "tablet",
   isActive: true,
   connectedAt: new Date(),
@@ -51,8 +51,8 @@ const connectionData = {
 
 WebSocketConnectionModel.create(connectionData)
   .then(connection => {
-    console.log("החיבור ל-WebSocket נוצר בהצלחה:", connection);
+    console.log("WebSocket connection created successfully:", connection);
   })
   .catch(error => {
-    console.error("שגיאה ביצירת חיבור ל-WebSocket:", error);
+    console.error("Error creating WebSocket connection:", error);
   });

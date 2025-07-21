@@ -6,8 +6,8 @@ export class VehicleModel {
     make: Joi.string().required(),
     model: Joi.string().required(),
     yearRange: Joi.object({
-      start: Joi.number().integer().min(1886).max(new Date().getFullYear()).required(), // מינימום 1886 (שנת הרכב הראשון)
-      end: Joi.number().integer().min(Joi.ref('yearRange.start')).max(new Date().getFullYear()).required() // סוף לא יכול להיות לפני התחלה
+      start: Joi.number().integer().min(1886).max(new Date().getFullYear()).required(), // Minimum 1886 (year of the first vehicle)
+      end: Joi.number().integer().min(Joi.ref('yearRange.start')).max(new Date().getFullYear()).required() // End cannot be before start
     }).required(),
     dimensions: Joi.object({
       height: Joi.number().positive().required(),
@@ -18,7 +18,7 @@ export class VehicleModel {
     source: Joi.string().valid('manual', 'government_db', 'hr_input').required(),
     createdAt: Joi.date().required(),
     updatedAt: Joi.date().required(),
-    updatedBy: Joi.string().optional() // לא חובה
+    updatedBy: Joi.string().optional() // Not mandatory
   });
 
   constructor(
@@ -51,7 +51,7 @@ export class VehicleModel {
   }
 }
 
-// דוגמה לשימוש במודל VehicleModel
+// Example usage of VehicleModel
 
 const vehicleModelData = {
   id: "model123",

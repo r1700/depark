@@ -46,7 +46,7 @@ export class ParkingUsageStatsModel {
   }
 }
 
-// דוגמה לשימוש במודל ParkingUsageStatsModel
+// Example usage of the ParkingUsageStatsModel
 
 const parkingUsageStatsData = {
   id: "usage123",

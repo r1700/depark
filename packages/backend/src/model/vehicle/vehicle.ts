@@ -62,7 +62,8 @@ export class Vehicle {
   }
 }
 
-// דוגמה לשימוש במודל Vehicle
+
+// Example usage of the NotificationLogModel
 
 const vehicleData = {
   id: "1",

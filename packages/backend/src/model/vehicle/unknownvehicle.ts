@@ -46,7 +46,7 @@ export class UnknownVehicleModel {
   }
 }
 
-// דוגמה לשימוש במודל UnknownVehicleModel
+// Example usage of the NotificationLogModel
 
 const unknownVehicleModelData = {
   id: "unknownModel123",

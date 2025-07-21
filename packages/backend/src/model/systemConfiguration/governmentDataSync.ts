@@ -43,7 +43,7 @@ export class GovernmentDataSyncModel {
   }
 }
 
-// דוגמה לשימוש במודל GovernmentDataSyncModel
+// Example usage of the NotificationLogModel
 
 const governmentDataSyncData = {
   id: "sync123",
