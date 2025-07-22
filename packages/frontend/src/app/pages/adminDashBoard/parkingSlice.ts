@@ -16,22 +16,22 @@ import {
   getFullHourQuery,
   getFullDayQuery
 } from '../../exampleQueryResponse';
-export interface Filters {
+export interface Tabs {
   queryType: 'baseDay' | 'baseMonth' | 'baseHour' | 'user' | 'fullHour' | 'fullDay';
 }
 
 export interface ParkingState {
   data: any;
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
-  filters: Filters;
+  tabs: Tabs;
 }
 
 // ✅ asyncThunk 
 export const fetchParkingData = createAsyncThunk(
   'parking/fetchData',
 
-  async (filters: Filters) => {
-    const queryMap: Record<Filters['queryType'], () => object> = {
+  async (tabs: Tabs) => {
+    const queryMap: Record<Tabs['queryType'], () => object> = {
       baseDay: getBaseDayQuery,
       baseMonth: getBaseMonthQuery,
       baseHour: getBaseHourQuery,
@@ -40,8 +40,8 @@ export const fetchParkingData = createAsyncThunk(
       fullDay: getFullDayQuery,
     };
 
-    const data = queryMap[filters.queryType]();
-    const key = filters.queryType.charAt(0).toUpperCase() + filters.queryType.slice(1) + 'Query';
+    const data = queryMap[tabs.queryType]();
+    const key = tabs.queryType.charAt(0).toUpperCase() + tabs.queryType.slice(1) + 'Query';
     console.log('data:', data);
     return { [key]: data };
   }
@@ -50,7 +50,7 @@ export const fetchParkingData = createAsyncThunk(
 const initialState: ParkingState = {
   data: null,
   status: 'idle',
-  filters: { queryType: 'baseDay' }
+  tabs: { queryType: 'baseDay' }
 };
 
 // ✅ slice
@@ -58,8 +58,8 @@ const parkingSlice = createSlice({
   name: 'parking',
   initialState,
   reducers: {
-    setFilters(state, action) {
-      state.filters = action.payload;
+    setTabs(state, action) {
+      state.tabs = action.payload;
     }
   },
   extraReducers(builder) {
@@ -77,5 +77,5 @@ const parkingSlice = createSlice({
   }
 });
 
-export const { setFilters } = parkingSlice.actions;
+export const { setTabs } = parkingSlice.actions;
 export default parkingSlice.reducer;

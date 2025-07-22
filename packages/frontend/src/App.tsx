@@ -1,7 +1,7 @@
 import React from 'react';
 import { Provider } from 'react-redux';
 import { store } from './app/store';
-import ParkingDashboard from './app/pages/adminDashBord/parkingDashboard';
+import ParkingDashboard from './app/pages/adminDashBoard/parkingDashboard';
 
 export default function App() {
   return (
