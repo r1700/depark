@@ -2,7 +2,7 @@ import Joi from 'joi';
 
 export class SystemHealthModel {
   static schema = Joi.object({
-    id: Joi.string().required(),
+    id: Joi.number().integer().positive().allow(null).optional(),
     component: Joi.string().valid('opc_bridge', 'api_server', 'database', 'websocket_server', 'government_sync').required(),
     status: Joi.string().valid('healthy', 'warning', 'error').required(),
     message: Joi.string().optional(),
@@ -11,12 +11,13 @@ export class SystemHealthModel {
   });
 
   constructor(
-    public id: string,
+    
     public component: 'opc_bridge' | 'api_server' | 'database' | 'websocket_server' | 'government_sync',
     public status: 'healthy' | 'warning' | 'error',
     public timestamp: Date, // Required parameter first
     public message?: string, // Optional parameter after required ones
-    public metrics?: Record<string, number>
+    public metrics?: Record<string, number>,
+    public id?: number
   ) {}
 
   static create(data: any): Promise<SystemHealthModel> {
@@ -24,12 +25,13 @@ export class SystemHealthModel {
     if (error) return Promise.reject(error);
 
     return Promise.resolve(new SystemHealthModel(
-      value.id,
+      
       value.component,
       value.status,
       new Date(value.timestamp),
       value.message,
-      value.metrics
+      value.metrics,
+      value.id
     ));
   }
 }
@@ -37,7 +39,7 @@ export class SystemHealthModel {
 // Example usage of the SystemHealthModel
 
 const systemHealthData = {
-  id: "health123",
+  id: 123,
   component: "api_server",
   status: "healthy",
   message: "All systems operational",

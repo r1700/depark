@@ -2,7 +2,7 @@ import Joi from 'joi';
 
 export class VehicleModel {
   static schema = Joi.object({
-    id: Joi.string().required(),
+    id: Joi.number().integer().positive().allow(null).optional(),
     make: Joi.string().required(),
     model: Joi.string().required(),
     yearRange: Joi.object({
@@ -22,7 +22,7 @@ export class VehicleModel {
   });
 
   constructor(
-    public id: string,
+    
     public make: string,
     public model: string,
     public yearRange: { start: number; end: number },
@@ -30,7 +30,8 @@ export class VehicleModel {
     public source: 'manual' | 'government_db' | 'hr_input',
     public createdAt: Date,
     public updatedAt: Date,
-    public updatedBy?: string
+    public updatedBy?: string,
+    public id?: number
   ) {}
 
   static create(data: any): Promise<VehicleModel> {
@@ -38,7 +39,7 @@ export class VehicleModel {
     if (error) return Promise.reject(error);
 
     return Promise.resolve(new VehicleModel(
-      value.id,
+      
       value.make,
       value.model,
       value.yearRange,
@@ -46,7 +47,8 @@ export class VehicleModel {
       value.source,
       new Date(value.createdAt),
       new Date(value.updatedAt),
-      value.updatedBy
+      value.updatedBy,
+      value.id
     ));
   }
 }
@@ -54,7 +56,7 @@ export class VehicleModel {
 // Example usage of VehicleModel
 
 const vehicleModelData = {
-  id: "model123",
+  id:123,
   make: "Toyota",
   model: "Camry",
   yearRange: {

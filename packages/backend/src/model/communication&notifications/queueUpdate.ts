@@ -5,8 +5,8 @@ import Joi from 'joi';
 
 export class QueueUpdateModel {
   static schema = Joi.object({
-    id: Joi.string().required(),
-    retrievalQueueId: Joi.string().required(),
+    id: Joi.number().integer().positive().allow(null).optional(),
+    retrievalQueueId: Joi.number().required(),
     position: Joi.number().required(),
     estimatedTime: Joi.date().required(),
     status: Joi.string().valid('queued', 'processing', 'ready').required(),
@@ -16,14 +16,15 @@ export class QueueUpdateModel {
   });
 
   constructor(
-    public id: string,
-    public retrievalQueueId: string,
+    
+    public retrievalQueueId: number,
     public position: number,
     public estimatedTime: Date,
     public status: 'queued' | 'processing' | 'ready',
     public timestamp: Date,
     public broadcastTo: 'specific_user' | 'all_tablets' | 'all_connected',
-    public message?: string
+    public message?: string,
+    public id?: number
   ) {}
 
   static create(data: any): Promise<QueueUpdateModel> {
@@ -31,14 +32,15 @@ export class QueueUpdateModel {
     if (error) return Promise.reject(error);
 
     return Promise.resolve(new QueueUpdateModel(
-      value.id,
+      
       value.retrievalQueueId,
       value.position,
       new Date(value.estimatedTime),
       value.status,
       new Date(value.timestamp),
       value.broadcastTo,
-      value.message
+      value.message,
+      value.id
     ));
   }
 }
@@ -46,8 +48,8 @@ export class QueueUpdateModel {
 // Example usage of QueueUpdateModel
 
 const queueUpdateData = {
-  id: "update123",
-  retrievalQueueId: "queue456",
+  id: 123,
+  retrievalQueueId: 456,
   position: 1,
   estimatedTime: new Date(),
   status: "queued",

@@ -2,8 +2,8 @@ import Joi from 'joi';
 
 export class NotificationLogModel {
   static schema = Joi.object({
-    id: Joi.string().required(),
-    userId: Joi.string().optional(),
+    id: Joi.number().integer().positive().allow(null).optional(),
+    userId: Joi.number().optional(),
     type: Joi.string().valid('queue_update', 'retrieval_ready', 'parking_full', 'system_maintenance').required(),
     channel: Joi.string().valid('websocket', 'push_notification').required(),
     message: Joi.string().required(),
@@ -14,15 +14,16 @@ export class NotificationLogModel {
   });
 
   constructor(
-    public id: string,
+    
     public type: 'queue_update' | 'retrieval_ready' | 'parking_full' | 'system_maintenance',
     public channel: 'websocket' | 'push_notification',
     public message: string,
     public delivered: boolean,
     public timestamp: Date,
     public deliveredAt?: Date,
-    public userId?: string,
-    public error?: string
+    public userId?: number,
+    public error?: string,
+    public id?: number
   ) {}
 
   static create(data: any): Promise<NotificationLogModel> {
@@ -30,7 +31,7 @@ export class NotificationLogModel {
     if (error) return Promise.reject(error);
 
     return Promise.resolve(new NotificationLogModel(
-      value.id,
+     
       value.type,
       value.channel,
       value.message,
@@ -38,7 +39,8 @@ export class NotificationLogModel {
       new Date(value.timestamp),
       value.deliveredAt ? new Date(value.deliveredAt) : undefined,
       value.userId,
-      value.error
+      value.error,
+      value.id
     ));
   }
 }
@@ -46,8 +48,8 @@ export class NotificationLogModel {
 // Example usage of NotificationLogModel
 
 const notificationLogData = {
-  id: "log123",
-  userId: "user456",
+  id: 123,
+  userId: 456,
   type: "queue_update",
   channel: "push_notification",
   message: "Your parking spot is ready.",

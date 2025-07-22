@@ -1,7 +1,7 @@
 import Joi from 'joi';
 
 export interface LoginAttempt {
-  id: string;
+  id: number;
   email: string;
   userType: 'user' | 'admin';
   success: boolean;
@@ -13,7 +13,7 @@ export interface LoginAttempt {
 
 export class LoginAttemptModel {
   static schema = Joi.object({
-    id: Joi.string().required(),
+    id: Joi.number().integer().positive().allow(null).optional(),
     email: Joi.string().email().required(),
     userType: Joi.string().valid('user', 'admin').required(),
     success: Joi.boolean().required(),
@@ -24,14 +24,15 @@ export class LoginAttemptModel {
   });
 
   constructor(
-    public id: string,
+   
     public email: string,
     public userType: 'user' | 'admin',
     public success: boolean,
     public ipAddress: string,
     public userAgent: string,
     public timestamp: Date,
-    public failureReason?: string
+    public failureReason?: string,
+    public id?: number
   ) {}
 
   static create(data: any): Promise<LoginAttemptModel> {
@@ -39,14 +40,15 @@ export class LoginAttemptModel {
     if (error) return Promise.reject(error);
 
     return Promise.resolve(new LoginAttemptModel(
-      value.id,
+      
       value.email,
       value.userType,
       value.success,
       value.ipAddress,
       value.userAgent,
       new Date(value.timestamp),
-      value.failureReason
+      value.failureReason,
+      value.id
     ));
   }
 }
@@ -54,7 +56,7 @@ export class LoginAttemptModel {
 // Example usage of LoginAttemptModel
 
 const loginAttemptData = {
-  id: "attempt123",
+  id: 123,
   email: "user@example.com",
   userType: "user",
   success: false,

@@ -2,8 +2,8 @@ import Joi from 'joi';
 
 export class WebSocketConnectionModel {
   static schema = Joi.object({
-    id: Joi.string().required(),
-    userId: Joi.string().optional(),
+    id: Joi.number().integer().positive().allow(null).optional(),
+    userId: Joi.number().optional(),
     connectionType: Joi.string().valid('mobile', 'tablet').required(),
     isActive: Joi.boolean().required(),
     connectedAt: Joi.date().required(),
@@ -12,13 +12,14 @@ export class WebSocketConnectionModel {
   });
 
   constructor(
-    public id: string,
+    
     public connectionType: 'mobile' | 'tablet', // Required parameter
     public isActive: boolean,
     public connectedAt: Date,
     public lastActivity: Date,
     public ipAddress: string,
-    public userId?: string // Optional parameter
+    public userId?: number,
+    public id?: number
   ) {}
 
   static create(data: any): Promise<WebSocketConnectionModel> {
@@ -26,13 +27,14 @@ export class WebSocketConnectionModel {
     if (error) return Promise.reject(error);
 
     return Promise.resolve(new WebSocketConnectionModel(
-      value.id,
+      
       value.connectionType,
       value.isActive,
       new Date(value.connectedAt),
       new Date(value.lastActivity),
       value.ipAddress,
-      value.userId // Here userId can be undefined
+      value.userId,
+      value.id
     ));
   }
 }
@@ -40,7 +42,7 @@ export class WebSocketConnectionModel {
 // Example usage of WebSocketConnectionModel
 
 const connectionData = {
-  id: "conn123",
+  id: 123,
   userId: null, // null for tablet connections
   connectionType: "tablet",
   isActive: true,

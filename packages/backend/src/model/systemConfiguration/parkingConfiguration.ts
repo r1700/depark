@@ -2,7 +2,7 @@ import Joi from 'joi';
 
 export class ParkingConfigurationModel {
   static schema = Joi.object({
-    id: Joi.string().required(),
+    id: Joi.number().integer().positive().allow(null).optional(),
     facilityName: Joi.string().required(),
     totalSurfaceSpots: Joi.number().integer().min(1).required(),
     surfaceSpotIds: Joi.array().items(Joi.string()).required(),
@@ -18,7 +18,7 @@ export class ParkingConfigurationModel {
   });
 
   constructor(
-    public id: string,
+    
     public facilityName: string,
     public totalSurfaceSpots: number,
     public surfaceSpotIds: string[],
@@ -27,7 +27,8 @@ export class ParkingConfigurationModel {
     public operatingHours: { start: string; end: string },
     public timezone: string,
     public updatedAt: Date,
-    public updatedBy: string
+    public updatedBy: string,
+    public id?: number
   ) {}
 
   static create(data: any): Promise<ParkingConfigurationModel> {
@@ -35,7 +36,7 @@ export class ParkingConfigurationModel {
     if (error) return Promise.reject(error);
 
     return Promise.resolve(new ParkingConfigurationModel(
-      value.id,
+      
       value.facilityName,
       value.totalSurfaceSpots,
       value.surfaceSpotIds,
@@ -44,7 +45,8 @@ export class ParkingConfigurationModel {
       value.operatingHours,
       value.timezone,
       new Date(value.updatedAt),
-      value.updatedBy
+      value.updatedBy,
+      value.id
     ));
   }
 }
@@ -52,7 +54,7 @@ export class ParkingConfigurationModel {
 // Example usage of ParkingConfigurationModel
 
 const parkingConfigData = {
-  id: "parking1",
+  id:1,
   facilityName: "Main Street Parking",
   totalSurfaceSpots: 100,
   surfaceSpotIds: ["1", "2", "3", "4", "5", "6"],

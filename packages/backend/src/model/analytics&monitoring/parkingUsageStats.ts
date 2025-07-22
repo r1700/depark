@@ -2,7 +2,7 @@ import Joi from 'joi';
 
 export class ParkingUsageStatsModel {
   static schema = Joi.object({
-    id: Joi.string().required(),
+    id: Joi.number().integer().positive().allow(null).optional(),
     date: Joi.date().required(),
     hour: Joi.number().integer().min(0).max(23).required(),
     totalParkedCars: Joi.number().integer().min(0).required(),
@@ -15,7 +15,7 @@ export class ParkingUsageStatsModel {
   });
 
   constructor(
-    public id: string,
+    
     public date: Date,
     public hour: number,
     public totalParkedCars: number,
@@ -24,7 +24,8 @@ export class ParkingUsageStatsModel {
     public peakUsageTime: string,
     public utilizationPercentage: number,
     public totalEntries: number,
-    public totalExits: number
+    public totalExits: number,
+    public id?: number
   ) {}
 
   static create(data: any): Promise<ParkingUsageStatsModel> {
@@ -32,7 +33,7 @@ export class ParkingUsageStatsModel {
     if (error) return Promise.reject(error);
 
     return Promise.resolve(new ParkingUsageStatsModel(
-      value.id,
+     
       new Date(value.date),
       value.hour,
       value.totalParkedCars,
@@ -41,7 +42,8 @@ export class ParkingUsageStatsModel {
       value.peakUsageTime,
       value.utilizationPercentage,
       value.totalEntries,
-      value.totalExits
+      value.totalExits,
+      value.id
     ));
   }
 }
@@ -49,7 +51,7 @@ export class ParkingUsageStatsModel {
 // Example usage of the ParkingUsageStatsModel
 
 const parkingUsageStatsData = {
-  id: "usage123",
+  id: 123,
   date: new Date(),
   hour: 14,
   totalParkedCars: 150,

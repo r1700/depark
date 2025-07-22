@@ -2,8 +2,8 @@ import Joi from 'joi';
 
 export class UserActivityModel {
   static schema = Joi.object({
-    id: Joi.string().required(),
-    userId: Joi.string().optional(),
+    id: Joi.number().integer().positive().allow(null).optional(),
+    userId: Joi.number().optional(),
     userType: Joi.string().valid('hr', 'admin', 'employee', 'anonymous').required(),
     action: Joi.string().required(),
     details: Joi.object().required(),
@@ -13,14 +13,15 @@ export class UserActivityModel {
   });
 
   constructor(
-    public id: string,
+    
     public userType: 'hr' | 'admin' | 'employee' | 'anonymous', // Required parameter first
     public action: string,
     public details: Record<string, any>,
     public timestamp: Date,
-    public userId?: string, // Optional parameter after required ones
+    public userId?: number, // Optional parameter after required ones
     public ipAddress?: string,
-    public userAgent?: string
+    public userAgent?: string,
+    public id?: number
   ) {}
 
   static create(data: any): Promise<UserActivityModel> {
@@ -28,14 +29,15 @@ export class UserActivityModel {
     if (error) return Promise.reject(error);
 
     return Promise.resolve(new UserActivityModel(
-      value.id,
+     
       value.userType,
       value.action,
       value.details,
       new Date(value.timestamp),
       value.userId,
       value.ipAddress,
-      value.userAgent
+      value.userAgent,
+      value.id
     ));
   }
 }
@@ -43,8 +45,8 @@ export class UserActivityModel {
 // Example usage of UserActivityModel
 
 const userActivityData = {
-  id: "activity123",
-  userId: "user456",
+  id: 123,
+  userId: 456,
   userType: "employee",
   action: "login",
   details: { success: true },

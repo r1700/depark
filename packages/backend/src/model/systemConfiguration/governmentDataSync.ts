@@ -2,7 +2,7 @@ import Joi from 'joi';
 
 export class GovernmentDataSyncModel {
   static schema = Joi.object({
-    id: Joi.string().required(),
+    id: Joi.number().integer().positive().allow(null).optional(),
     syncDate: Joi.date().required(),
     recordsProcessed: Joi.number().integer().min(0).required(),
     recordsAdded: Joi.number().integer().min(0).required(),
@@ -14,7 +14,7 @@ export class GovernmentDataSyncModel {
   });
 
   constructor(
-    public id: string,
+    
     public syncDate: Date,
     public recordsProcessed: number,
     public recordsAdded: number,
@@ -22,7 +22,8 @@ export class GovernmentDataSyncModel {
     public errors: string[],
     public status: 'completed' | 'failed' | 'partial',
     public triggeredBy: string,
-    public fileSource?: string
+    public fileSource?: string,
+    public id?: number
   ) {}
 
   static create(data: any): Promise<GovernmentDataSyncModel> {
@@ -30,7 +31,7 @@ export class GovernmentDataSyncModel {
     if (error) return Promise.reject(error);
 
     return Promise.resolve(new GovernmentDataSyncModel(
-      value.id,
+      
       new Date(value.syncDate),
       value.recordsProcessed,
       value.recordsAdded,
@@ -38,7 +39,8 @@ export class GovernmentDataSyncModel {
       value.errors,
       value.status,
       value.triggeredBy,
-      value.fileSource
+      value.fileSource,
+      value.id
     ));
   }
 }
@@ -46,7 +48,7 @@ export class GovernmentDataSyncModel {
 // Example usage of the NotificationLogModel
 
 const governmentDataSyncData = {
-  id: "sync123",
+  id:123,
   syncDate: new Date(),
   recordsProcessed: 100,
   recordsAdded: 80,

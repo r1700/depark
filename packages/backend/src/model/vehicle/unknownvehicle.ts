@@ -2,7 +2,7 @@ import Joi from 'joi';
 
 export class UnknownVehicleModel {
   static schema = Joi.object({
-    id: Joi.string().required(),
+    id: Joi.number().integer().positive().allow(null).optional(),
     make: Joi.string().required(),
     model: Joi.string().required(),
     requestCount: Joi.number().integer().min(0).required(),
@@ -11,11 +11,11 @@ export class UnknownVehicleModel {
     createdAt: Joi.date().required(),
     resolvedBy: Joi.string().optional(),
     resolvedAt: Joi.date().optional(),
-    resolvedVehicleModelId: Joi.string().optional(),
+    resolvedVehicleModelId: Joi.number().optional(),
   });
 
   constructor(
-    public id: string,
+    
     public make: string,
     public model: string,
     public requestCount: number,
@@ -24,7 +24,8 @@ export class UnknownVehicleModel {
     public createdAt: Date,
     public resolvedBy?: string,
     public resolvedAt?: Date,
-    public resolvedVehicleModelId?: string
+    public resolvedVehicleModelId?: number,
+    public id?: number
   ) {}
 
   static create(data: any): Promise<UnknownVehicleModel> {
@@ -32,7 +33,7 @@ export class UnknownVehicleModel {
     if (error) return Promise.reject(error);
 
     return Promise.resolve(new UnknownVehicleModel(
-      value.id,
+      
       value.make,
       value.model,
       value.requestCount,
@@ -41,21 +42,27 @@ export class UnknownVehicleModel {
       new Date(value.createdAt),
       value.resolvedBy,
       value.resolvedAt ? new Date(value.resolvedAt) : undefined,
-      value.resolvedVehicleModelId
+      value.resolvedVehicleModelId,
+      value.id
     ));
   }
 }
 
 // Example usage of the NotificationLogModel
 
+
+
 const unknownVehicleModelData = {
-  id: "unknownModel123",
-  make: "UnknownMake",
-  model: "UnknownModel",
+  make: 'Toyota',
+  model: 'Corolla',
   requestCount: 5,
-  lastRequested: new Date(),
-  status: "pending_review",
-  createdAt: new Date()
+  lastRequested: '2023-10-01T12:00:00Z',
+  status: 'pending_review',
+  createdAt: '2023-10-01T12:00:00Z',
+  resolvedBy: null,
+  resolvedAt: null,
+  resolvedVehicleModelId: null,
+  id: 123
 };
 
 UnknownVehicleModel.create(unknownVehicleModelData)

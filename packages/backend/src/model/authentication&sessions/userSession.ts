@@ -2,8 +2,8 @@ import Joi from 'joi';
 
 export class UserSessionModel {
   static schema = Joi.object({
-    id: Joi.string().required(),
-    userId: Joi.string().required(),
+    id: Joi.number().integer().positive().allow(null).optional(),
+    userId: Joi.number().required(),
     userType: Joi.string().valid('user', 'admin').required(),
     token: Joi.string().required(),
     refreshToken: Joi.string().optional(),
@@ -16,8 +16,8 @@ export class UserSessionModel {
   });
 
   constructor(
-    public id: string,
-    public userId: string,
+    
+    public userId: number,
     public userType: 'user' | 'admin',
     public token: string,
     public expiresAt: Date,
@@ -26,7 +26,8 @@ export class UserSessionModel {
     public userAgent: string,
     public createdAt: Date,
     public lastActivity: Date,
-    public refreshToken?: string // Move optional parameter to the end
+    public refreshToken?: string,
+    public id?: number
   ) {}
 
   static create(data: any): Promise<UserSessionModel> {
@@ -34,7 +35,7 @@ export class UserSessionModel {
     if (error) return Promise.reject(error);
 
     return Promise.resolve(new UserSessionModel(
-      value.id,
+      
       value.userId,
       value.userType,
       value.token,
@@ -44,7 +45,8 @@ export class UserSessionModel {
       value.userAgent,
       new Date(value.createdAt),
       new Date(value.lastActivity),
-      value.refreshToken // Pass refreshToken here
+      value.refreshToken,
+      value.id
     ));
   }
 }
@@ -52,8 +54,8 @@ export class UserSessionModel {
 // Example usage of UserSessionModel
 
 const userSessionData = {
-  id: "session123",
-  userId: "user456",
+  id: 123,
+  userId: 456,
   userType: "user",
   token: "someToken",
   refreshToken: "someRefreshToken",

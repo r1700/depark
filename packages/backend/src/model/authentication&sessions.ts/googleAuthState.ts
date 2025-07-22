@@ -14,9 +14,9 @@ export interface GoogleAuthState {
 
 export class GoogleAuthStateModel {
   static schema = Joi.object({
-    id: Joi.string().required(),
+    id: Joi.number().integer().positive().allow(null).optional(),
     state: Joi.string().required(),
-    userId: Joi.string().optional(),
+    userId: Joi.number().optional(),
     email: Joi.string().email().required(),
     firstName: Joi.string().required(),
     lastName: Joi.string().required(),
@@ -26,7 +26,7 @@ export class GoogleAuthStateModel {
   });
 
   constructor(
-    public id: string,
+    
     public state: string,
     public email: string,
     public firstName: string,
@@ -34,7 +34,8 @@ export class GoogleAuthStateModel {
     public status: 'pending' | 'approved' | 'declined',
     public expiresAt: Date,
     public createdAt: Date,
-    public userId?: string
+    public userId?: number,
+    public id?: number
   ) {}
 
   static create(data: any): Promise<GoogleAuthStateModel> {
@@ -42,7 +43,7 @@ export class GoogleAuthStateModel {
     if (error) return Promise.reject(error);
 
     return Promise.resolve(new GoogleAuthStateModel(
-      value.id,
+     
       value.state,
       value.email,
       value.firstName,
@@ -50,7 +51,8 @@ export class GoogleAuthStateModel {
       value.status,
       new Date(value.expiresAt),
       new Date(value.createdAt),
-      value.userId
+      value.userId, 
+      value.id
     ));
   }
 }
@@ -58,9 +60,9 @@ export class GoogleAuthStateModel {
 // Example usage of GoogleAuthStateModel
 
 const googleAuthStateData = {
-  id: "auth123",
+  id: 123,
   state: "initial",
-  userId: "user456",
+  userId: 456,
   email: "user@example.com",
   firstName: "John",
   lastName: "Doe",

@@ -2,10 +2,10 @@ import Joi from 'joi';
 
 export class Vehicle {
   static schema = Joi.object({
-    id: Joi.string().required(),
-    userId: Joi.string().required(),
+    id: Joi.number().integer().positive().allow(null).optional(),
+    userId: Joi.number().required(),
     licensePlate: Joi.string().required(),
-    vehicleModelId: Joi.string().optional(),
+    vehicleModelId: Joi.number().optional(),
     color: Joi.string().optional(),
     isActive: Joi.boolean().required(),
     isCurrentlyParked: Joi.boolean().required(),
@@ -22,8 +22,8 @@ export class Vehicle {
   });
 
   constructor(
-    public id: string,
-    public userId: string,
+    
+    public userId: number,
     public licensePlate: string,
     public isActive: boolean,
     public isCurrentlyParked: boolean,
@@ -31,14 +31,15 @@ export class Vehicle {
     public updatedAt: Date,
     public addedBy: 'user' | 'hr',
     public dimensionsSource: 'model_reference' | 'manual_override' | 'government_db',
-    public vehicleModelId?: string,
+    public vehicleModelId?: number,
     public color?: string,
     public dimensionOverrides?: {
       height?: number;
       width?: number;
       length?: number;
       weight?: number;
-    }
+    },
+    public id?: number,
   ) {}
 
   static create(data: any): Promise<Vehicle> {
@@ -46,7 +47,7 @@ export class Vehicle {
     if (error) return Promise.reject(error);
 
     return Promise.resolve(new Vehicle(
-      value.id,
+      
       value.userId,
       value.licensePlate,
       value.isActive,
@@ -57,7 +58,8 @@ export class Vehicle {
       value.dimensionsSource,
       value.vehicleModelId,
       value.color,
-      value.dimensionOverrides
+      value.dimensionOverrides,
+      value.id,
     ));
   }
 }
@@ -66,10 +68,10 @@ export class Vehicle {
 // Example usage of the NotificationLogModel
 
 const vehicleData = {
-  id: "1",
-  userId: "user123",
+  id: 1,
+  userId: 123,
   licensePlate: "XYZ-1234",
-  vehicleModelId: "model456",
+  vehicleModelId: 456,
   color: "Red",
   isActive: true,
   isCurrentlyParked: false,

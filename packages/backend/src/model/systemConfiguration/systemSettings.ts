@@ -2,7 +2,7 @@ import Joi from 'joi';
 
 export class SystemSettingsModel {
   static schema = Joi.object({
-    id: Joi.string().required(),
+    id: Joi.number().integer().positive().allow(null).optional(),
     key: Joi.string().required(),
     value: Joi.alternatives().try(Joi.string(), Joi.number(), Joi.boolean()).required(),
     description: Joi.string().required(),
@@ -12,13 +12,14 @@ export class SystemSettingsModel {
   });
 
   constructor(
-    public id: string,
+    
     public key: string,
     public value: string | number | boolean,
     public description: string,
     public category: 'parking' | 'auth' | 'notifications' | 'integration' | 'government_db',
     public updatedAt: Date,
-    public updatedBy: string
+    public updatedBy: string,
+    public id?: number
   ) {}
 
   static create(data: any): Promise<SystemSettingsModel> {
@@ -26,13 +27,14 @@ export class SystemSettingsModel {
     if (error) return Promise.reject(error);
 
     return Promise.resolve(new SystemSettingsModel(
-      value.id,
+      
       value.key,
       value.value,
       value.description,
       value.category,
       new Date(value.updatedAt),
-      value.updatedBy
+      value.updatedBy,
+      value.id
     ));
   }
 }
@@ -41,7 +43,7 @@ export class SystemSettingsModel {
 // Example usage of the NotificationLogModel
 
 const systemSettingsData = {
-  id: "setting123",
+  id: 123,
   key: "maxParkingDuration",
   value: 120,
   description: "Maximum parking duration in minutes",
