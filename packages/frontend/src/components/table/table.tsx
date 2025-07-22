@@ -1,6 +1,11 @@
 import React from 'react';
 import './table.css';
 const DataTable = ({ data }: { data: any[] }) => {
+  if (!data || !Array.isArray(data) || data.length === 0) return <p>אין נתונים להצגה</p>;
+
+  const keys = Object.keys(data[0] || {});
+  if (keys.length === 0) return <p>אין נתונים להצגה</p>;
+
   return (
     <table className="table-auto border-collapse border border-gray-400 w-full mt-4">
       <thead>
