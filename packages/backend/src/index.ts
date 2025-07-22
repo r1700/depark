@@ -5,7 +5,6 @@ dotenv.config();
 import express from 'express';
 import cors from 'cors';
 import healthRoutes from './routes/health';
-import itemsRoutes from './routes/items';
 import { databaseService } from './services/database';
 
 
@@ -22,7 +21,6 @@ app.use(express.json());
 
 // Routes
 app.use('/api/health', healthRoutes);
-app.use('/api/items', itemsRoutes);
 
 
 app.listen(PORT, async () => {
@@ -36,7 +34,6 @@ app.listen(PORT, async () => {
     try {
       databaseService.canInitialize();
       try {
-        await databaseService.initializeSampleData();
         console.log('✅ Database initialized successfully');  
       } catch (error) {
         console.error('❌ Database sample-data initialization failed');
