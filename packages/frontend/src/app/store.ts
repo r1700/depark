@@ -1,5 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit';
-import parkingReducer from '../components/parking/parkingSlice';
+import parkingReducer from './pages/adminDashBord/parkingSlice';
 
 export const store = configureStore({
   reducer: { parking: parkingReducer },

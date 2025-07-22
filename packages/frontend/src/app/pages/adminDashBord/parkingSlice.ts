@@ -7,7 +7,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 //     const response = await axios.get(`/api/parking/${filters.queryType}`);
 //     return response.data;
 //   }
-// ); זה הטוב ובהמשך זה לדוגמא
+// ); Option to connect to the server
 import {
   getBaseDayQuery,
   getBaseMonthQuery,
@@ -15,18 +15,18 @@ import {
   getUserQuery,
   getFullHourQuery,
   getFullDayQuery
-}  from '../../app/exampleQueryResponse';
- export interface Filters {
+} from '../../exampleQueryResponse';
+export interface Filters {
   queryType: 'baseDay' | 'baseMonth' | 'baseHour' | 'user' | 'fullHour' | 'fullDay';
 }
 
- export interface ParkingState {
+export interface ParkingState {
   data: any;
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
   filters: Filters;
 }
 
-// ✅ asyncThunk קודם
+// ✅ asyncThunk 
 export const fetchParkingData = createAsyncThunk(
   'parking/fetchData',
 
@@ -39,32 +39,27 @@ export const fetchParkingData = createAsyncThunk(
       fullHour: getFullHourQuery,
       fullDay: getFullDayQuery,
     };
-    
+
     const data = queryMap[filters.queryType]();
     const key = filters.queryType.charAt(0).toUpperCase() + filters.queryType.slice(1) + 'Query';
     console.log('data:', data);
     return { [key]: data };
   }
 );
-// ✅ initialState אחריו
+// ✅ initialState
 const initialState: ParkingState = {
   data: null,
   status: 'idle',
   filters: { queryType: 'baseDay' }
 };
 
-// ✅ slice אחרי הכל
+// ✅ slice
 const parkingSlice = createSlice({
   name: 'parking',
   initialState,
   reducers: {
     setFilters(state, action) {
       state.filters = action.payload;
-    },
-    resetFilters(state) {
-      state.filters = initialState.filters;
-      state.data = null;
-      state.status = 'idle';
     }
   },
   extraReducers(builder) {
@@ -82,5 +77,5 @@ const parkingSlice = createSlice({
   }
 });
 
-export const {resetFilters , setFilters } = parkingSlice.actions;
+export const { setFilters } = parkingSlice.actions;
 export default parkingSlice.reducer;

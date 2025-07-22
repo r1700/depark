@@ -1,0 +1,33 @@
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  font-family: Arial, sans-serif;
+}
+
+/* כותרות הטבלה */
+th {
+  background-color: #104292; /* כחול */
+  color: white;
+  font-weight: bold;
+  padding: 12px;
+  border: 1px solid #d1d5db;
+  text-align: right;
+}
+
+
+td {
+  padding: 10px;
+  border: 1px solid #d1d5db;
+  text-align: right;
+}
+tbody tr:nth-child(even) {
+  background-color: #878a8d;
+}
+
+/* האבר: כשעוברים עם העכבר */
+tbody tr:hover {
+  background-color: #929597;
+  cursor: pointer;
+}
