@@ -14,5 +14,16 @@
     "build:backend": "npm run build --workspace=packages/backend",
     "build:frontend": "npm run build --workspace=packages/frontend",
     "install:all": "npm install && npm install --workspace=packages/backend && npm install --workspace=packages/frontend && npm install --workspace=packages/opc"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/material": "^7.2.0",
+    "cors": "^2.8.5",
+    "nodemailer": "^7.0.5",
+    "otp-generator": "^4.0.1",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "twilio": "^5.7.3"
   }
 }
