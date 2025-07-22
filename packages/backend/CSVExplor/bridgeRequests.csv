@@ -1,0 +1,5 @@
+id,type,payload,status,sentAt,retryCount,maxRetries
+"1","vehicle_lookup","[object Object]","pending","Fri Jul 21 2023 13:00:00 GMT+0300 (שעון ישראל (קיץ))","0","3"
+"2","store_location","[object Object]","sent","Fri Jul 21 2023 13:30:00 GMT+0300 (שעון ישראל (קיץ))","1","3"
+"3","retrieval_request","[object Object]","acknowledged","Fri Jul 21 2023 14:00:00 GMT+0300 (שעון ישראל (קיץ))","0","3"
+"4","queue_status","[object Object]","failed","Fri Jul 21 2023 14:15:00 GMT+0300 (שעון ישראל (קיץ))","2","3"
