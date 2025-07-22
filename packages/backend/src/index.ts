@@ -5,8 +5,10 @@ dotenv.config();
 import express from 'express';
 import cors from 'cors';
 import healthRoutes from './routes/health';
-import itemsRoutes from './routes/items';
-import { databaseService } from './services/database';
+// import itemsRoutes from './routes/items';
+// import { databaseService } from './services/database';
+
+import loggerRoutes from './middlewares/locallLoggerMiddleware';  // הוספנו את הייבוא של app.ts
 
 
 const app = express();
@@ -20,10 +22,12 @@ app.use(cors({
 }));
 app.use(express.json());
 
+// Logging Middleware - it should be applied here before all paths
+app.use(loggerRoutes);  // Adding middleware to all requests
+
 // Routes
 app.use('/api/health', healthRoutes);
-app.use('/api/items', itemsRoutes);
-
+// app.use('/api/items', itemsRoutes);
 
 app.listen(PORT, async () => {
   console.log(`🚀 Server running on port ${PORT}`);
@@ -34,9 +38,9 @@ app.listen(PORT, async () => {
   if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
     console.log('🗄️ Initializing database...');
     try {
-      databaseService.canInitialize();
+      // databaseService.canInitialize();
       try {
-        await databaseService.initializeSampleData();
+        // await databaseService.initializeSampleData();
         console.log('✅ Database initialized successfully');  
       } catch (error) {
         console.error('❌ Database sample-data initialization failed');
