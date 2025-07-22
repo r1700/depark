@@ -1,6 +1,6 @@
 import express, { Request, Response } from "express";
 import { Router } from 'express';
-import { saveCSV } from '../services/exportToCSV'; // ייבוא הפונקציה מהקובץ השני
+import { saveCSV } from '../services/exportToCSV'; 
 
 // const app = express();
 const router = Router();
@@ -27,10 +27,6 @@ router.post('/save-csv', (req: Request, res: Response) => {
     }
 });
 
-// app.use(router);
 
-// app.listen(port, () => {
-//     console.log(`Server running at http://localhost:${port}`);
-// });
 
 export default router;
