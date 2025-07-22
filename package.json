@@ -1,6 +1,7 @@
 {
   "name": "depark",
   "version": "1.0.0",
+  "type": "module",
   "description": "A comprehensive system to manage automated multi-level parking facilities",
   "private": true,
   "workspaces": [
@@ -14,5 +15,8 @@
     "build:backend": "npm run build --workspace=packages/backend",
     "build:frontend": "npm run build --workspace=packages/frontend",
     "install:all": "npm install && npm install --workspace=packages/backend && npm install --workspace=packages/frontend && npm install --workspace=packages/opc"
+  },
+  "dependencies": {
+    "react-scripts": "^5.0.1"
   }
 }
