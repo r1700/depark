@@ -107,3 +107,9 @@ Thumbs.db
 
 # Local environment files
 .env*.local
+
+# config files
+config/config.json
+
+# models
+models/index.js
