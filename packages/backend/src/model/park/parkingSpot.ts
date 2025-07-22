@@ -1,46 +1,37 @@
 import Joi from 'joi';
 
-// יצירת מחלקת ParkingSpot
+// Creating a ParkingSpot class
 export class ParkingSpot {
   static schema = Joi.object({
-    id: Joi.string().required(),
+    id: Joi.number().integer().positive().optional(),
     type: Joi.string().valid('surface', 'underground').required(),
     spotNumber: Joi.string().required(),
     isOccupied: Joi.boolean().required(),
-    currentVehicleId: Joi.string().optional(),
+    VehicleId: Joi.number().integer().positive().optional(),//reference to Vehicle
     lastUpdated: Joi.date().required(),
   });
 
   constructor(
-    public id: string,
     public type: 'surface' | 'underground',
     public spotNumber: string,
     public isOccupied: boolean,
-    public currentVehicleId?: string,
-    public lastUpdated: Date = new Date()
+    public VehicleId?: number,
+    public lastUpdated: Date = new Date(),
+    public id?: number // identty
   ) {}
 
-  // פונקציה ליצירת אובייקט ParkingSpot
+  //  Method to create a new ParkingSpot object
   static create(data: any): ParkingSpot {
     const { error, value } = this.schema.validate(data);
     if (error) throw error;
     return new ParkingSpot(
-      value.id,
       value.type,
       value.spotNumber,
       value.isOccupied,
-      value.currentVehicleId,
-      value.lastUpdated
+      value.VehicleId,
+      value.lastUpdated,
+      value.id
     );
   }
 }
 
-const newParkingSpot = ParkingSpot.create({
-  id: 'spot001',
-  type: 'surface',
-  spotNumber: 'A1',
-  isOccupied: false,
-  lastUpdated: new Date(),
-});
-
-console.log(newParkingSpot);

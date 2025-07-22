@@ -1,9 +1,10 @@
 import Joi from 'joi';
-import { BaseUser } from './baseUser';  // מייבא את BaseUser
+import { BaseUser } from './baseUser';  // Imports BaseUser
 
 export class AdminUser extends BaseUser {
   static schema = Joi.object({
     id: BaseUser.schema.extract('id'),
+    idNumber: BaseUser.schema.extract('idNumber'),
     email: BaseUser.schema.extract('email'),
     firstName: BaseUser.schema.extract('firstName'),
     lastName: BaseUser.schema.extract('lastName'),
@@ -21,7 +22,7 @@ export class AdminUser extends BaseUser {
   lastLoginAt?: Date;
 
   constructor(
-    id: string,
+    idNumber: string,
     email: string,
     firstName: string,
     lastName: string,
@@ -30,21 +31,22 @@ export class AdminUser extends BaseUser {
     passwordHash: string,
     role: 'hr' | 'admin',
     permissions: string[],
-    lastLoginAt?: Date
+    lastLoginAt?: Date,
+    public id?: number // identty
   ) {
-    super(id, email, firstName, lastName, createdAt, updatedAt); // קריאה ל-BaseUser constructor
+    super(idNumber, email, firstName, lastName, createdAt, updatedAt, id); // קריאה ל-BaseUser constructor
     this.passwordHash = passwordHash;
     this.role = role;
     this.permissions = permissions;
     this.lastLoginAt = lastLoginAt;
   }
 
-  // פונקציה ליצירת אובייקט AdminUser
+  // Function to create an AdminUser object
   static create(data: any): AdminUser {
     const { error, value } = this.schema.validate(data);
     if (error) throw error;
     return new AdminUser(
-      value.id,
+      value.idNumber,
       value.email,
       value.firstName,
       value.lastName,
@@ -53,23 +55,9 @@ export class AdminUser extends BaseUser {
       value.passwordHash,
       value.role,
       value.permissions,
-      value.lastLoginAt
+      value.lastLoginAt,
+      value.id
     );
   }
 }
 
-// דוגמת יצירה של אובייקט AdminUser
-const adminUser = AdminUser.create({
-    id: '456',
-    email: 'admin@example.com',
-    firstName: 'Alice',
-    lastName: 'Smith',
-    createdAt: new Date('2023-01-01'),
-    updatedAt: new Date(),
-    passwordHash: 'hashed_password_123',
-    role: 'admin',
-    permissions: ['manage_users', 'edit_data'],
-    lastLoginAt: new Date('2023-07-10')
-  });
-  
-console.log(adminUser);

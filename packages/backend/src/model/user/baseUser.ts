@@ -1,9 +1,10 @@
 import Joi from 'joi';
 
-// יצירת מחלקת BaseUser
+// Creating a BaseUser class
 export class BaseUser {
   static schema = Joi.object({
-    id: Joi.string().required(),
+    id: Joi.number().integer().positive().optional(),
+    idNumber: Joi.string().required(),
     email: Joi.string().email().required(),
     firstName: Joi.string().required(),
     lastName: Joi.string().required(),
@@ -12,29 +13,20 @@ export class BaseUser {
   });
 
   constructor(
-    public id: string,
+    public idNumber: string,
     public email: string,
     public firstName: string,
     public lastName: string,
     public createdAt: Date,
-    public updatedAt: Date
-  ) {}
+    public updatedAt: Date,
+    public id?: number // identty
+  ) { }
 
-  // פונקציה ליצירת אובייקט BaseUser
+  // Function to create a BaseUser object
   static create(data: any): BaseUser {
     const { error, value } = this.schema.validate(data);
     if (error) throw error;
-    return new BaseUser(value.id, value.email, value.firstName, value.lastName, value.createdAt, value.updatedAt);
+    return new BaseUser( value.idNumber, value.email, value.firstName, value.lastName, value.createdAt, value.updatedAt,value.id);
   }
 }
 
-const newBaseUser = BaseUser.create({
-    id: 'user123',
-    email: 'user@example.com',
-    firstName: 'John',
-    lastName: 'Doe',
-    createdAt: new Date(),
-    updatedAt: new Date()
-  });
-  
-  console.log(newBaseUser);

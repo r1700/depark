@@ -1,9 +1,9 @@
 import Joi from 'joi';
 
-// יצירת מחלקת UsageReport
+// Creating a UsageReport class
 export class UsageReport {
   static schema = Joi.object({
-    id: Joi.string().required(),
+    id:  Joi.number().integer().positive().optional(),
     reportType: Joi.valid('daily', 'weekly', 'monthly', 'custom').required(),
     startDate: Joi.date().required(),
     endDate: Joi.date().required(),
@@ -32,7 +32,6 @@ export class UsageReport {
   });
 
   constructor(
-    public id: string,
     public reportType: 'daily' | 'weekly' | 'monthly' | 'custom',
     public startDate: Date,
     public endDate: Date,
@@ -47,15 +46,15 @@ export class UsageReport {
     },
     public format: 'json' | 'csv' | 'pdf',
     public filePath?: string,
-    public generatedAt: Date = new Date()
+    public generatedAt: Date = new Date(),
+    public id?: number // identty
   ) {}
 
-  // פונקציה ליצירת UsageReport
+  // Function to create a UsageReport
   static create(data: any): UsageReport {
     const { error, value } = this.schema.validate(data);
     if (error) throw error;
     return new UsageReport(
-      value.id,
       value.reportType,
       value.startDate,
       value.endDate,
@@ -63,34 +62,9 @@ export class UsageReport {
       value.data,
       value.format,
       value.filePath,
-      value.generatedAt
+      value.generatedAt,
+      value.id
     );
   }
 }
 
-// דוגמת יצירה של UsageReport
-const newUsageReport = UsageReport.create({
-  id: 'report123',
-  reportType: 'daily',
-  startDate: new Date('2025-07-01'),
-  endDate: new Date('2025-07-01'),
-  generatedBy: 'user123',
-  data: {
-    totalSessions: 100,
-    avgParkingDuration: 45,
-    avgRetrievalTime: 5,
-    peakHours: [
-      { hour: 14, sessions: 20 },
-      { hour: 18, sessions: 15 },
-    ],
-    utilizationRate: 0.85,
-    userStats: [
-      { userId: 'user123', sessionCount: 20 },
-      { userId: 'user456', sessionCount: 15 },
-    ],
-  },
-  format: 'json',
-  generatedAt: new Date(),
-});
-
-console.log(newUsageReport);  // הצגת אובייקט UsageReport שנוצר

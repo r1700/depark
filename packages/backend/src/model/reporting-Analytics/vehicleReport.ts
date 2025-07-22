@@ -1,9 +1,9 @@
 import Joi from 'joi';
 
-// יצירת מחלקת VehicleReport
+// Creating a VehicleReport class
 export class VehicleReport {
   static schema = Joi.object({
-    id: Joi.string().required(),
+    id: Joi.number().integer().positive().optional(),
     totalVehicles: Joi.number().required(),
     activeVehicles: Joi.number().required(),
     unknownModels: Joi.number().required(),
@@ -23,7 +23,6 @@ export class VehicleReport {
   });
 
   constructor(
-    public id: string,
     public totalVehicles: number,
     public activeVehicles: number,
     public unknownModels: number,
@@ -34,29 +33,29 @@ export class VehicleReport {
     },
     public topMakes: { make: string; count: number }[],
     public generatedBy: string,
-    public generatedAt: Date = new Date()
+    public generatedAt: Date = new Date(),
+    public id?: number // identty
   ) {}
 
-  // פונקציה ליצירת VehicleReport
+  //Function to create VehicleReport
   static create(data: any): VehicleReport {
     const { error, value } = this.schema.validate(data);
     if (error) throw error;
     return new VehicleReport(
-      value.id,
       value.totalVehicles,
       value.activeVehicles,
       value.unknownModels,
       value.dimensionSources,
       value.topMakes,
       value.generatedBy,
-      value.generatedAt
+      value.generatedAt,
+      value.id
     );
   }
 }
 
-// דוגמת יצירה של VehicleReport
-const newVehicleReport = VehicleReport.create({
-  id: 'vehicleReport123',
+// Example of creating a VehicleReport
+const newVehicleReport = VehicleReport.create({  
   totalVehicles: 1200,
   activeVehicles: 900,
   unknownModels: 100,
@@ -73,4 +72,4 @@ const newVehicleReport = VehicleReport.create({
   generatedAt: new Date(),
 });
 
-console.log(newVehicleReport);  // הצגת אובייקט VehicleReport שנוצר
+console.log(newVehicleReport);  // Displaying the created VehicleReport object

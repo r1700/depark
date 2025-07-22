@@ -1,9 +1,9 @@
 import Joi from 'joi';
 
-// יצירת מחלקת OPCSystemStatus
+// Creating the OPCSystemStatus class
 export class OPCSystemStatus {
   static schema = Joi.object({
-    id: Joi.string().required(),
+    id: Joi.number().integer().positive().optional(),
     isConnected: Joi.boolean().required(),
     lastHeartbeat: Joi.date().required(),
     availableSurfaceSpots: Joi.number().required(),
@@ -18,7 +18,6 @@ export class OPCSystemStatus {
   });
 
   constructor(
-    public id: string,
     public isConnected: boolean,
     public lastHeartbeat: Date,
     public availableSurfaceSpots: number,
@@ -29,40 +28,23 @@ export class OPCSystemStatus {
       successfulRetrievals: number;
       failedOperations: number;
     },
-    public timestamp: Date
+    public timestamp: Date,
+    public id?: number // identity
   ) {}
 
-  // פונקציה ליצירת OPCSystemStatus
+  // Function to create OPCSystemStatus
   static create(data: any): OPCSystemStatus {
     const { error, value } = this.schema.validate(data);
     if (error) throw error;
     return new OPCSystemStatus(
-      value.id,
       value.isConnected,
       value.lastHeartbeat,
       value.availableSurfaceSpots,
       value.queueLength,
       value.systemErrors,
       value.performanceMetrics,
-      value.timestamp
+      value.timestamp,
+      value.id
     );
   }
 }
-
-// דוגמת יצירה של OPCSystemStatus
-const newOPCSystemStatus = OPCSystemStatus.create({
-  id: 'system001',
-  isConnected: true,
-  lastHeartbeat: new Date(),
-  availableSurfaceSpots: 25,
-  queueLength: 10,
-  systemErrors: [],
-  performanceMetrics: {
-    avgRetrievalTime: 3.5,
-    successfulRetrievals: 100,
-    failedOperations: 2,
-  },
-  timestamp: new Date(),
-});
-
-console.log(newOPCSystemStatus);  // הצגת אובייקט OPCSystemStatus שנוצר

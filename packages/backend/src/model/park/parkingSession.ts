@@ -2,9 +2,9 @@ import Joi from 'joi';
 
 export class ParkingSession {
   static schema = Joi.object({
-    id: Joi.string().required(),
-    userId: Joi.string().required(),
-    vehicleId: Joi.string().required(),
+    id: Joi.number().integer().positive().optional(),
+    userId: Joi.number().integer().positive().required(),//reference to BaseUser
+    vehicleId: Joi.number().integer().positive().required(),// reference to Vehicle
     licensePlate: Joi.string().required(),
     surfaceSpot: Joi.string().optional(),
     undergroundSpot: Joi.string().optional(),
@@ -15,13 +15,12 @@ export class ParkingSession {
     actualRetrievalTime: Joi.date().optional(),
     pickupSpot: Joi.string().optional(),
     requestedBy: Joi.valid('mobile', 'tablet').optional(),
-    parkingSpotId: Joi.string().required(), // reference to the parking spot ID////////////
+    parkingSpotId: Joi.number().integer().positive().required(), //reference to ParkingSpot
   });
 
   constructor(
-    public id: string,
-    public userId: string,
-    public vehicleId: string,
+    public userId: number,
+    public vehicleId: number,
     public licensePlate: string,
     public surfaceSpot?: string,
     public undergroundSpot?: string,
@@ -32,15 +31,15 @@ export class ParkingSession {
     public actualRetrievalTime?: Date,
     public pickupSpot?: string,
     public requestedBy?: 'mobile' | 'tablet',
-    public parkingSpotId?: string // reference to the parking spot ID
-  ) {}
+    public parkingSpotId?: number ,
+    public id?: number // identty
+  ) { }
 
   // Method to create a new ParkingSession object
   static create(data: any): ParkingSession {
     const { error, value } = this.schema.validate(data);
     if (error) throw error;
     return new ParkingSession(
-      value.id,
       value.userId,
       value.vehicleId,
       value.licensePlate,
@@ -53,20 +52,9 @@ export class ParkingSession {
       value.actualRetrievalTime,
       value.pickupSpot,
       value.requestedBy,
-      value.parkingSpotId
+      value.parkingSpotId,
+      value.id,
     );
   }
 }
 
-// Example of creating a ParkingSession
-const newParkingSession = ParkingSession.create({
-  id: 'session123',
-  userId: 'user123',
-  vehicleId: 'vehicle123',
-  licensePlate: 'ABC1234',
-  status: 'parked',
-  entryTime: new Date(),
-  parkingSpotId: 'spot123', // Reference to a parking spot ID
-});
-
-console.log(newParkingSession);

@@ -1,10 +1,10 @@
 import Joi from 'joi';
-import { BaseUser } from './baseUser';  // מייבא את BaseUser
+import { BaseUser } from './baseUser';  //Imports BaseUser
 
 export class User extends BaseUser {
   static schema = Joi.object({
-    // ...BaseUser.schema.describe().keys,  // מגריל את כל המאפיינים מ-BaseUser
     id: BaseUser.schema.extract('id'),
+    idNumber: BaseUser.schema.extract('idNumber'),
     email: BaseUser.schema.extract('email'),
     firstName: BaseUser.schema.extract('firstName'),
     lastName: BaseUser.schema.extract('lastName'),
@@ -30,7 +30,7 @@ export class User extends BaseUser {
   approvedAt?: Date;
 
   constructor(
-    id: string,
+    idNumber:string,
     email: string,
     firstName: string,
     lastName: string,
@@ -38,6 +38,7 @@ export class User extends BaseUser {
     updatedAt: Date,
     status: 'pending' | 'approved' | 'declined' | 'suspended',
     createdBy: string,
+    id?: number ,// identty,
     department?: string,
     employeeId?: string,
     googleId?: string,
@@ -45,7 +46,7 @@ export class User extends BaseUser {
     approvedBy?: string,
     approvedAt?: Date
   ) {
-    super(id, email, firstName, lastName, createdAt, updatedAt);  // קריאה ל-BaseUser constructor
+    super(idNumber, email, firstName, lastName, createdAt, updatedAt, id);  // קריאה ל-BaseUser constructor
     this.status = status;
     this.createdBy = createdBy;
     this.department = department;
@@ -56,19 +57,20 @@ export class User extends BaseUser {
     this.approvedAt = approvedAt;
   }
 
-  // פונקציה ליצירת אובייקט User
+  // Function to create a User object
   static create(data: any): User {
     const { error, value } = this.schema.validate(data);
     if (error) throw error;
     return new User(
-      value.id,
+      value.idNumber,
       value.email,
       value.firstName,
       value.lastName,
-      value.createdAt,
+      value.createdAt,      
       value.updatedAt,
       value.status,
       value.createdBy,
+      value.id,
       value.department,
       value.employeeId,
       value.googleId,
@@ -79,22 +81,3 @@ export class User extends BaseUser {
   }
 }
 
-// דוגמת יצירה של אובייקט User
-const user = User.create({
-  id: '123',
-  email: 'example@example.com',
-  firstName: 'John',
-  lastName: 'Doe',
-  createdAt: new Date('2023-01-01'),
-  updatedAt: new Date(),
-  status: 'approved',
-  createdBy: 'admin123',
-  department: 'IT',
-  employeeId: 'emp123',
-  googleId: 'google123',
-  maxCarsAllowedParking: 5,
-  approvedBy: 'admin456',
-  approvedAt: new Date()
-});
-
-console.log(user);

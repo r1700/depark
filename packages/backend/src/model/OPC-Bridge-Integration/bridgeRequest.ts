@@ -1,11 +1,11 @@
 import Joi from 'joi';
 
-// יצירת מחלקת BridgeRequest
+// Creating a BridgeRequest class
 export class BridgeRequest {
   static schema = Joi.object({
-    id: Joi.string().required(),
+    id: Joi.number().integer().positive().optional(),
     type: Joi.valid('vehicle_lookup', 'store_location', 'retrieval_request', 'queue_status').required(),
-    payload: Joi.object().required(), // יאפשר כל מבנה נתונים
+    payload: Joi.object().required(), // Will allow any data structure
     status: Joi.valid('pending', 'sent', 'acknowledged', 'failed').required(),
     sentAt: Joi.date().required(),
     acknowledgedAt: Joi.date().optional(),
@@ -16,7 +16,6 @@ export class BridgeRequest {
   });
 
   constructor(
-    public id: string,
     public type: 'vehicle_lookup' | 'store_location' | 'retrieval_request' | 'queue_status',
     public payload: Record<string, any>,
     public status: 'pending' | 'sent' | 'acknowledged' | 'failed',
@@ -25,15 +24,15 @@ export class BridgeRequest {
     public response?: Record<string, any>,
     public retryCount: number = 0,
     public maxRetries: number = 3,
-    public error?: string
+    public error?: string,
+    public id?: number // identity
   ) {}
 
-  // פונקציה ליצירת BridgeRequest
+  // Function to create BridgeRequest
   static create(data: any): BridgeRequest {
     const { error, value } = this.schema.validate(data);
     if (error) throw error;
     return new BridgeRequest(
-      value.id,
       value.type,
       value.payload,
       value.status,
@@ -42,20 +41,9 @@ export class BridgeRequest {
       value.response,
       value.retryCount,
       value.maxRetries,
-      value.error
+      value.error,
+      value.id
     );
   }
 }
 
-// דוגמת יצירה של BridgeRequest
-const newBridgeRequest = BridgeRequest.create({
-  id: 'request001',
-  type: 'vehicle_lookup',
-  payload: { vehicleId: 'vehicle123' },
-  status: 'pending',
-  sentAt: new Date(),
-  retryCount: 0,
-  maxRetries: 3,
-});
-
-console.log(newBridgeRequest);  // הצגת אובייקט BridgeRequest שנוצר
