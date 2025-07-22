@@ -6,7 +6,7 @@ const connectToDB = async () => {
     user: 'postgres',          
     host: 'localhost',         
     database: 'depark', 
-    password: 's0527664299!', 
+    password: '123', 
     port: 5432,               
   });
 
