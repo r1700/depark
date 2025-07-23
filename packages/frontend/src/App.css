@@ -1,5 +1,3 @@
-<<<<<<< Updated upstream
-/* Reset ובסיס */
 * {
   margin: 0;
   padding: 0;
@@ -7,159 +5,296 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
   background-color: #f5f5f5;
   color: #333;
   line-height: 1.6;
 }
 
+.App {
+  text-align: center;
+}
+
+/* החזר את .container למצב בינוני: */
 .container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
+  max-width: 1600px; /* רחב יותר מ-1400px */
+  margin: 0 auto; /* מרכז */
+  padding: 40px; /* padding גדול יותר מהצדדים */
+  box-sizing: border-box;
 }
 
 .admin-config {
   background: white;
   border-radius: 10px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  padding: 2rem;
-  margin: 20px;
+  padding: 3rem; /* padding גדול יותר */
+  margin: 30px; /* margin גדול יותר מהצדדים */
+  min-height: auto;
 }
 
+/* החזר את הכותרת למצב רגיל: */
 .admin-config h1 {
   color: #333;
   text-align: center;
-  font-size: 1.8rem;
+  font-size: 2.3rem; /* גדול יותר */
   font-weight: 400;
-  margin-bottom: 2rem;
-  padding-bottom: 1rem;
+  margin-bottom: 2.5rem;
+  padding-bottom: 1.5rem;
   border-bottom: 2px solid #4A90E2;
 }
 
-/* Grid Layout */
+/* שנה את Grid Layout ל-2 עמודות: */
 .config-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
-  gap: 1.5rem;
-  margin-bottom: 2rem;
+  grid-template-columns: 1fr 1fr; /* 2 ריבועים בכל שורה */
+  gap: 2.5rem; /* מרווח גדול יותר */
+  margin-bottom: 2.5rem;
 }
 
-/* Config Sections */
+/* הסר את config-grid-bottom - כל הריבועים באותו grid */
+.config-grid-bottom {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* 2 ריבועים */
+  gap: 2.5rem;
+  margin-bottom: 2.5rem;
+}
+
+/* ריבועים גדולים יותר: */
 .config-section {
   background: white;
   border: 1px solid #4A90E2;
   border-radius: 8px;
-  padding: 1.5rem;
-  position: relative;
-  min-height: 250px;
+  padding: 2.2rem; /* padding גדול יותר */
+  min-height: 400px; /* גובה גדול יותר */
 }
 
 .config-section h2 {
   color: #4A90E2;
-  font-size: 1rem;
+  font-size: 1.2rem; /* גדול יותר */
   font-weight: 600;
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
 }
 
-/* Form Groups */
+.section-number {
+  background: #4A90E2;
+  color: white;
+  border-radius: 50%;
+  width: 26px; /* גדול יותר */
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+/* Form elements גדולים יותר: */
 .form-group {
-  margin-bottom: 1.2rem;
+  margin-bottom: 1.5rem;
 }
 
 .form-group label {
   display: block;
   color: #666;
   font-weight: 500;
-  margin-bottom: 0.5rem;
-  font-size: 0.9rem;
+  margin-bottom: 0.8rem;
+  font-size: 1rem; /* גדול יותר */
+  text-align: left;
 }
 
 .form-group input,
 .form-group select {
   width: 100%;
-  padding: 0.6rem;
+  padding: 0.8rem; /* גדול יותר */
   border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 0.9rem;
+  border-radius: 6px; /* radius גדול יותר */
+  font-size: 1rem; /* גדול יותר */
   background: white;
 }
 
-.form-group input:focus,
-.form-group select:focus {
-  outline: none;
-  border-color: #4A90E2;
-  box-shadow: 0 0 3px rgba(74, 144, 226, 0.3);
-}
+/* החלף את .days-selector ו-.day-checkbox (שורות 104-122) בזה: */
 
-/* Days Selector - כמו בתמונה */
 .days-selector {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
+  grid-template-columns: repeat(6, 1fr); /* 6 ימים בשורה אחת */
+  gap: 0.6rem; /* מרווח קטן יותר */
+  margin-top: 1.2rem;
 }
 
 .day-checkbox {
-  display: flex !important;
-  align-items: center;
-  font-size: 0.85rem;
-  color: #666;
-  padding: 0.3rem 0;
+  position: relative;
+  display: block;
   cursor: pointer;
+  user-select: none;
 }
 
 .day-checkbox input[type="checkbox"] {
-  margin-right: 0.6rem;
-  transform: scale(1.2);
-  accent-color: #4A90E2;
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  width: 0;
+  height: 0;
 }
 
-.day-label {
-  font-size: 0.85rem;
-  color: #666;
+/* כפתור יום מותאם אישית */
+.day-checkbox .day-label {
+  display: block;
+  padding: 0.8rem 0.4rem; /* צר יותר - padding קטן בצדדים */
+  background: #f8f9fa;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  color: #6c757d;
+  font-size: 0.85rem; /* קצת יותר קטן */
+  font-weight: 600;
+  text-align: center;
+  transition: all 0.3s ease;
+  min-height: 48px; /* גובה קטן יותר */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap; /* מונע שבירת טקסט */
 }
 
-/* Spots Management - החניות שלך */
+/* מצב לא נבחר - hover */
+.day-checkbox:hover .day-label {
+  background: #e9ecef;
+  border-color: #4A90E2;
+  color: #495057;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* מצב נבחר */
+.day-checkbox input[type="checkbox"]:checked + .day-label {
+  background: linear-gradient(135deg, #4A90E2, #357ABD);
+  border-color: #357ABD;
+  color: white;
+  font-weight: 700;
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.4);
+}
+
+/* מצב נבחר + hover */
+.day-checkbox input[type="checkbox"]:checked + .day-label:hover {
+  background: linear-gradient(135deg, #357ABD, #2c5aa0);
+  transform: scale(1.05) translateY(-1px);
+  box-shadow: 0 6px 16px rgba(74, 144, 226, 0.5);
+}
+
+/* אנימציה */
+.day-checkbox .day-label {
+  animation: dayFadeIn 0.5s ease-out;
+}
+
+@keyframes dayFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* רספונסיב */
+@media (max-width: 768px) {
+  .days-selector {
+    grid-template-columns: repeat(3, 1fr); /* 3 בשורה במובייל */
+    gap: 0.5rem;
+  }
+  
+  .day-checkbox .day-label {
+    padding: 0.6rem 0.3rem; /* עוד יותר צר במובייל */
+    font-size: 0.75rem; /* טקסט קטן יותר */
+    min-height: 42px;
+  }
+}
+
+/* עבור מסכים קטנים מאוד: */
+@media (max-width: 480px) {
+  .days-selector {
+    grid-template-columns: repeat(2, 1fr); /* 2 בשורה במסכים קטנים מאוד */
+    gap: 0.4rem;
+  }
+  
+  .day-checkbox .day-label {
+    padding: 0.5rem 0.2rem;
+    font-size: 0.7rem;
+    min-height: 38px;
+  }
+}
+
+/* עבור מסכים בינוניים: */
+@media (max-width: 1000px) and (min-width: 769px) {
+  .days-selector {
+    grid-template-columns: repeat(6, 1fr); /* עדיין 6 במסכים בינוניים */
+    gap: 0.5rem;
+  }
+  
+  .day-checkbox .day-label {
+    padding: 0.7rem 0.3rem; /* צר יותר במסכים בינוניים */
+    font-size: 0.8rem;
+    min-height: 45px;
+  }
+}
+
+/* מסכים גדולים מאוד: */
+@media (min-width: 1400px) {
+  .days-selector {
+    grid-template-columns: repeat(6, 1fr); /* 6 בשורה במסכים גדולים */
+    gap: 0.8rem; /* מרווח גדול יותר */
+  }
+  
+  .day-checkbox .day-label {
+    padding: 0.9rem 0.6rem; /* קצת יותר רחב במסכים גדולים */
+    font-size: 0.9rem;
+    min-height: 52px;
+  }
+}
+
+/* Spots Management - עיצוב יפה */
 .spots-management {
   margin-top: 1rem;
 }
 
 .add-spot-btn {
-  background: #27ae60;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  padding: 0.75rem 1.5rem;
+  background: #27ae60 !important; /* כפה ירוק עם !important */
+  color: white !important;
+  border: none !important;
+  border-radius: 8px; /* radius גדול יותר */
+  padding: 1rem 1.5rem; /* גדול יותר */
   font-weight: 600;
   cursor: pointer;
-  margin-bottom: 1rem;
-  font-size: 0.9rem;
+  margin-bottom: 1.2rem;
+  width: 100%;
+  font-size: 1rem; /* גדול יותר */
 }
 
 .add-spot-btn:hover {
-  background: #229954;
+  background: #229954 !important; /* כפה ירוק כהה עם !important */
 }
 
 .add-spot-btn:disabled {
-  background: #95a5a6;
+  background: #95a5a6 !important; /* כפה אפור עם !important */
   cursor: not-allowed;
 }
 
-/* Add Spot Container */
 .add-spot-container {
   margin-bottom: 1rem;
 }
 
 .new-spot-input {
   width: 100%;
-  padding: 0.75rem;
+  padding: 1rem 1.2rem; /* גדול יותר */
   border: 2px solid #4A90E2;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  background: #f8f9fa;
+  border-radius: 8px;
+  font-size: 1rem; /* גדול יותר */
+  background: linear-gradient(135deg, #f8f9fa, #fff);
+  transition: all 0.3s ease;
 }
 
 .new-spot-input:focus {
@@ -168,7 +303,6 @@ body {
   background: white;
 }
 
-/* Existing Spots */
 .existing-spots {
   margin-top: 1rem;
 }
@@ -177,986 +311,443 @@ body {
   margin-bottom: 1rem;
   color: #666;
   font-size: 0.9rem;
+  text-align: left;
 }
 
 .spots-list {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.spot-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.spot-tag {
-  background: white;
-  border: 2px solid #3498db;
-  border-radius: 6px;
-  padding: 0.5rem 0.75rem;
-  font-weight: 600;
-  color: #2c3e50;
-  font-size: 0.9rem;
-}
-
-.spot-tag[data-type="vip"] {
-  background: linear-gradient(135deg, #f39c12, #e67e22);
-  color: white;
-  border-color: #d68910;
-}
-
-.spot-tag[data-type="premium"] {
-  background: linear-gradient(135deg, #9b59b6, #8e44ad);
-  color: white;
-  border-color: #7d3c98;
-}
-
-.spot-tag[data-type="handicap"] {
-  background: linear-gradient(135deg, #3498db, #2980b9);
-  color: white;
-  border-color: #2471a3;
-}
-
-.remove-spot-btn {
-  background: #e74c3c;
-  color: white;
-  border: none;
-  border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  font-size: 14px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-}
-
-.remove-spot-btn:hover {
-  background: #c0392b;
-  transform: scale(1.1);
-}
-
-.no-spots {
-  color: #999;
-  font-style: italic;
-  text-align: center;
-  padding: 2rem;
-  background: #f8f9fa;
-  border-radius: 6px;
-  border: 2px dashed #ddd;
-}
-
-/* Actions */
-.actions-container {
-  text-align: center;
-  margin-top: 2rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid #eee;
-}
-
-.save-btn {
-  background: #4A90E2;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  padding: 0.8rem 2rem;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  margin-right: 1rem;
-}
-
-.save-btn:hover {
-  background: #357ABD;
-}
-
-.save-btn:disabled {
-  background: #95a5a6;
-  cursor: not-allowed;
-}
-
-.reset-btn {
-  background: #95a5a6;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  padding: 0.8rem 2rem;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.reset-btn:hover {
-  background: #7f8c8d;
-}
-
-.reset-btn:disabled {
-  background: #95a5a6;
-  cursor: not-allowed;
-}
-
-/* Messages */
-.message {
-  padding: 1rem;
-  border-radius: 6px;
-  margin-bottom: 1rem;
-  font-weight: 600;
-  text-align: center;
-}
-
-.message.success {
-  background: #d4edda;
-  color: #155724;
-  border: 1px solid #c3e6cb;
-}
-
-.message.error {
-  background: #f8d7da;
-  color: #721c24;
-  border: 1px solid #f5c6cb;
-}
-
-/* Responsive */
-@media (max-width: 1200px) {
-  .config-grid {
-    grid-template-columns: 1fr 1fr 1fr;
-  }
-}
-
-@media (max-width: 768px) {
-  .config-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .days-selector {
-    grid-template-columns: 1fr;
-  }
-}
-
-.loading {
-=======
-/* Reset & Base */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-body {
-  font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
-  background: #f8f9fa;
-  height: 100vh;
-  color: #333;
-  direction: ltr; /* 👈 שינוי מימין לשמאל */
-  text-align: left; /* 👈 יישור שמאל */
-  padding-top: 80px;
+  flex-direction: column;
+  gap: 0.7rem; /* מרווח גדול יותר */
+  max-height: 280px; /* גובה גדול יותר */
   overflow-y: auto;
-}
-
-.App {
-  text-align: left; /* 👈 יישור שמאל */
-  min-height: 100vh;
-  padding-top: 0;
-}
-
-/* Admin Config - White Theme */
-.admin-config {
-  max-width: 1400px;
-  margin: 2rem auto;
-  padding: 3rem;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e9ecef;
-}
-
-.admin-config h1 {
-  color: #2c3e50;
-  font-size: 2.5rem;
-  font-weight: 700;
-  margin-bottom: 3rem;
-  text-align: left; /* 👈 שמאל במקום מרכז */
-  border-bottom: 3px solid #007bff;
-  padding-bottom: 1rem;
-}
-
-.config-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr); /* 👈 שינוי מ-3 ל-2 עמודות */
-  gap: 2rem;
-  margin-bottom: 3rem;
-}
-
-.config-section {
-  background: white;
-  padding: 2.5rem;
-  border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-  border: 2px solid #f1f3f4;
-  transition: all 0.3s ease;
-  min-height: 300px;
-  display: flex;
-  flex-direction: column;
-}
-
-.config-section:hover {
-  border-color: #007bff;
-  box-shadow: 0 4px 20px rgba(0, 123, 255, 0.15);
-  transform: translateY(-2px);
-}
-
-.config-section h2 {
-  color: #007bff;
-  font-size: 1.4rem;
-  margin-bottom: 1.5rem;
-  font-weight: 600;
-  padding-bottom: 0.5rem;
-  border-bottom: 2px solid #f1f3f4;
-  text-align: left; /* 👈 שמאל במקום מרכז */
-}
-
-/* Navigation Bar */
-.navbar {
-  background: rgba(0, 123, 255, 0.95);
-  padding: 1rem 2rem;
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  width: 100%;
-  z-index: 1000;
-  backdrop-filter: blur(10px);
-  direction: ltr; /* 👈 LTR לnavbar */
-}
-
-.nav-btn {
-  background: white;
-  color: #007bff;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  white-space: nowrap;
-}
-
-.nav-btn:hover {
-  background: #f8f9fa;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
-
-.nav-btn.logout {
-  background: #dc3545;
-  color: white;
-  margin-left: auto; /* 👈 left במקום right */
-}
-
-.nav-btn.logout:hover {
-  background: #c82333;
-}
-
-.nav-btn.add-user {
-  background: #28a745;
-  color: white;
-}
-
-.nav-btn.add-user:hover {
-  background: #218838;
-}
-
-/* User Dashboard */
-.user-dashboard {
-  max-width: 800px;
-  margin: 2rem auto;
-  padding: 3rem;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-  text-align: center;
-}
-
-.user-dashboard h1 {
-  color: #2c3e50;
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
-}
-
-.user-dashboard p {
-  color: #6c757d;
-  font-size: 1.2rem;
-}
-
-/* Forms - Clean Design */
-
-.form-group {
-  margin-bottom: 2rem;
-  width: 100%;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 0.75rem;
-  color: #495057;
-  font-weight: 600;
-  font-size: 1rem;
-  text-align: left; /* 👈 שמאל */
-}
-
-.form-group input,
-.form-group select,
-.form-group textarea {
-  width: 100%;
-  padding: 1rem;
-  border: 2px solid #dee2e6;
-  border-radius: 8px;
-  font-size: 1rem;
-  transition: all 0.3s ease;
-  background: white;
-  text-align: left; /* 👈 שמאל */
-}
-
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
-  border-color: #007bff;
-  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
-  outline: none;
-}
-
-/* Checkboxes - Better Positioning */
-.form-group label:has(input[type="checkbox"]) {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
-  padding: 1rem;
+  overflow-x: hidden;
+  padding: 1.2rem; /* padding גדול יותר */
   background: #f8f9fa;
   border: 2px solid #e9ecef;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-weight: 500;
-  text-align: left; /* 👈 שמאל */
-}
-
-.form-group label:has(input[type="checkbox"]):hover {
-  background: #e3f2fd;
-  border-color: #007bff;
-  transform: translateY(-1px);
-}
-
-.form-group input[type="checkbox"] {
-  width: 20px;
-  height: 20px;
-  accent-color: #007bff;
-  margin: 0;
-}
-
-/* Days Selector - Clean Layout */
-.days-selector {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 1rem;
-  margin-top: 1rem;
-  margin-bottom: 1.5rem;
-}
-
-.day-checkbox {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start; /* 👈 שמאל במקום מרכז */
-  padding: 1rem;
-  background: white;
-  border: 2px solid #dee2e6;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-weight: 500;
-  text-align: left; /* 👈 שמאל */
-  min-height: 60px;
-}
-
-.day-checkbox:hover {
-  background: #e3f2fd;
-  border-color: #007bff;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
-}
-
-.day-checkbox:has(input[type="checkbox"]:checked) {
-  background: #007bff;
-  border-color: #0056b3;
-  color: white;
-  box-shadow: 0 4px 16px rgba(0, 123, 255, 0.4);
-}
-
-.day-checkbox input[type="checkbox"] {
-  display: none;
-}
-
-.day-label {
-  font-weight: 600;
-  color: #495057;
-  text-align: left; /* 👈 שמאל */
-  font-size: 0.95rem;
-}
-
-.day-checkbox:has(input[type="checkbox"]:checked) .day-label {
-  color: white;
-  font-weight: 700;
-}
-
-/* Spots Input */
-.spots-input-container {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  margin: 1rem 0;
-  padding: 1.5rem;
-  background: #f8f9fa;
-  border-radius: 12px;
-  border: 2px solid #dee2e6;
-}
-
-.spots-textarea {
-  width: 100%;
-  min-height: 120px;
-  padding: 1rem;
-  border: 2px solid #dee2e6;
   border-radius: 8px;
-  font-size: 1rem;
-  font-family: 'Courier New', monospace;
-  resize: vertical;
-  transition: all 0.3s ease;
-  line-height: 1.5;
-  text-align: left; /* 👈 שמאל */
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.spots-textarea:focus {
-  border-color: #007bff;
-  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
-  outline: none;
-}
-
-.input-help {
-  background: white;
-  border: 1px solid #dee2e6;
-  border-radius: 8px;
-  padding: 1rem;
-  text-align: left; /* 👈 שמאל */
-}
-
-.input-help p {
-  margin: 0 0 0.5rem 0;
-  color: #495057;
-  font-weight: 600;
-  text-align: left; /* 👈 שמאל */
-}
-
-.input-help ul {
-  margin: 0;
-  padding-left: 1.2rem; /* 👈 left במקום right */
-  color: #6c757d;
-  text-align: left; /* 👈 שמאל */
-}
-
-.input-help li {
-  margin-bottom: 0.3rem;
-  font-size: 0.9rem;
-}
-
-kbd {
-  background-color: #f8f9fa;
-  border: 1px solid #dee2e6;
-  border-radius: 3px;
-  padding: 2px 6px;
-  font-size: 0.85em;
-  font-family: monospace;
-  box-shadow: 0 1px 1px rgba(0,0,0,0.15);
-}
-
-/* Spots Preview */
-.spots-preview {
-  background: white;
-  border: 2px solid #007bff;
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-.preview-header {
-  background: linear-gradient(135deg, #007bff, #0056b3);
-  color: white;
-  padding: 1rem;
-  text-align: left; /* 👈 שמאל במקום מרכז */
-  font-size: 1.1rem;
-}
-
-.spots-grid {
-  padding: 1.5rem;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  max-height: 250px;
-  overflow-y: auto;
-  background: #f8f9fa;
-  border-radius: 8px;
-  border: 2px solid #e9ecef;
-  justify-content: flex-start;
-  align-items: flex-start;
-}
-
-.spots-grid::-webkit-scrollbar {
-  width: 8px;
-}
-
-.spots-grid::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 10px;
-}
-
-.spots-grid::-webkit-scrollbar-thumb {
-  background: #007bff;
-  border-radius: 10px;
-}
-
-.spots-grid::-webkit-scrollbar-thumb:hover {
-  background: #0056b3;
-}
-
-.spot-tag {
-  background: linear-gradient(135deg, #007bff, #0056b3);
-  color: white;
-  border: 1px solid #0056b3;
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  font-family: 'Segoe UI', Arial, sans-serif;
-  font-size: 0.9rem;
-  font-weight: 600;
-  white-space: nowrap;
-  transition: all 0.3s ease;
-  display: inline-flex;
-  align-items: center;
-  box-shadow: 0 2px 6px rgba(0, 123, 255, 0.3);
-  margin: 0.25rem;
-}
-
-.spot-tag:hover {
-  background: linear-gradient(135deg, #0056b3, #004085);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
-}
-
-.spot-tag[data-type="vip"] {
-  background: linear-gradient(135deg, #ffc107, #e0a800);
-  color: #212529;
-  border-color: #e0a800;
-  box-shadow: 0 2px 6px rgba(255, 193, 7, 0.3);
-}
-
-.spot-tag[data-type="handicap"] {
-  background: linear-gradient(135deg, #28a745, #1e7e34);
-  color: white;
-  border-color: #1e7e34;
-  box-shadow: 0 2px 6px rgba(40, 167, 69, 0.3);
-}
-
-.spot-tag[data-type="premium"] {
-  background: linear-gradient(135deg, #6f42c1, #5a2d91);
-  color: white;
-  border-color: #5a2d91;
-  box-shadow: 0 2px 6px rgba(111, 66, 193, 0.3);
-}
-
-/* Spots Management */
-.spots-management {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  margin: 1rem 0;
-  padding: 2rem;
-  background: #f8f9fa;
-  border-radius: 12px;
-  border: 2px solid #e9ecef;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-}
-
-/* Add Spot Button */
-.add-spot-btn {
-  background: linear-gradient(135deg, #007bff, #0056b3);
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  align-self: flex-start;
-  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
-  min-width: 200px;
-  justify-content: center;
-}
-
-.add-spot-btn:hover {
-  background: linear-gradient(135deg, #0056b3, #004085);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
-}
-
-.add-spot-btn:active {
-  transform: translateY(0px);
-  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
-}
-
-/* Add Spot Container */
-.add-spot-container {
-  background: white;
-  padding: 1.5rem;
-  border-radius: 10px;
-  border: 2px solid #007bff;
-  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.15);
-  margin-top: 1rem;
-}
-
-.new-spot-input {
-  width: 100%;
-  padding: 1rem;
-  border: 2px solid #007bff;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  margin-bottom: 0.5rem;
-  background: white;
-}
-
-.new-spot-input:focus {
-  border-color: #0056b3;
-  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
-  outline: none;
-}
-
-.spot-input-help {
-  color: #007bff;
-  font-size: 0.9rem;
-  font-weight: 500;
-  text-align: left;
-  margin-top: 0.5rem;
-  font-style: italic;
-}
-
-/* Existing Spots */
-.existing-spots {
-  background: white;
-  border-radius: 10px;
-  overflow: hidden;
-  border: 2px solid #007bff;
-}
-
-.spots-header {
-  background: linear-gradient(135deg, #007bff, #0056b3);
-  color: white;
-  padding: 1rem;
-  text-align: left;
-  font-size: 1.1rem;
-}
-
-.spots-list {
-  padding: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  max-height: 300px;
-  overflow-y: auto;
-}
-
-/* Spot Item */
-.spot-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1rem;
-  background: white;
-  border: 2px solid #e9ecef;
-  border-radius: 10px;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-}
-
-.spot-item:hover {
-  background: #f8f9fa;
-  border-color: #007bff;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(0, 123, 255, 0.15);
-}
-
-/* Remove Spot Button */
-.remove-spot-btn {
-  background: #dc3545;
-  color: white;
-  border: none;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  font-size: 1.1rem;
-  font-weight: bold;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
-  margin-left: 1rem;
-  box-shadow: 0 2px 6px rgba(220, 53, 69, 0.3);
-}
-
-.remove-spot-btn:hover {
-  background: #c82333;
-  transform: scale(1.05);
-  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
-}
-
-/* No Spots Message */
-.no-spots {
->>>>>>> Stashed changes
-  color: #6c757d;
-  font-style: italic;
-  text-align: center;
-  padding: 2rem;
-<<<<<<< Updated upstream
-=======
-  background: #f8f9fa;
-  border-radius: 8px;
-  border: 2px dashed #dee2e6;
-}
-
-/* Scrollbar for spots list */
+/* Custom Scrollbar - דק יותר */
 .spots-list::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 
 .spots-list::-webkit-scrollbar-track {
   background: #f1f1f1;
-  border-radius: 10px;
+  border-radius: 3px;
 }
 
 .spots-list::-webkit-scrollbar-thumb {
-  background: #007bff;
-  border-radius: 10px;
+  background: #4A90E2;
+  border-radius: 3px;
 }
 
 .spots-list::-webkit-scrollbar-thumb:hover {
-  background: #0056b3;
+  background: #357ABD;
 }
 
-.processing {
-  color: #ffc107;
-  font-size: 0.9rem;
-  animation: pulse 1.5s infinite;
-  font-weight: 600;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
-}
-
-/* Last Update Info */
-.last-update-info {
-  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-  border: 1px solid #dee2e6;
-  border-radius: 8px;
-  padding: 1rem;
-  text-align: left; /* 👈 שמאל במקום מרכז */
-  margin: 1.5rem 0;
-  font-size: 0.9rem;
-  color: #6c757d;
-}
-
-.last-update-info p {
-  margin: 0;
-  font-weight: 500;
-}
-
-/* Action Buttons */
-.actions {
+.spot-item {
   display: flex;
-  gap: 1rem;
-  justify-content: flex-start; /* 👈 שמאל במקום מרכז */
-  padding: 2rem 0;
-  border-top: 2px solid #dee2e6;
-  margin-top: 2rem;
+  align-items: center;
+  justify-content: space-between;
+  background: white;
+  border: 2px solid #4A90E2;
+  border-radius: 8px;
+  padding: 1.2rem; /* padding גדול יותר */
+  min-height: 60px; /* גובה גדול יותר */
+  width: 100%;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0; /* מונע כיווץ */
 }
 
-.actions button {
-  padding: 0.75rem 2rem;
+.spot-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+  border-color: #357ABD;
+}
+
+/* אייקון אחיד לכל החניות */
+/* .spot-item::before {
+  content: "🅿️"; 
+  position: absolute;
+  top: 50%;
+  left: 1rem;
+  transform: translateY(-50%);
+  font-size: 1.2rem;
+} */
+
+/* Remove Button - בצד ימין */
+.remove-spot-btn {
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+  color: white;
   border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  margin-left: 1rem;
+  flex-shrink: 0;
+}
+
+.remove-spot-btn:hover {
+  background: linear-gradient(135deg, #c0392b, #a93226);
+  transform: scale(1.2) rotate(90deg);
+  box-shadow: 0 3px 8px rgba(231, 76, 60, 0.4);
+}
+
+/* No Spots Message */
+.no-spots {
+  color: #999;
+  font-style: italic;
+  text-align: center;
+  padding: 3rem 1rem;
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
   border-radius: 8px;
+  border: 2px dashed #ddd;
+  position: relative;
+  min-height: 240px; /* שינוי מ-180px ל-210px */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.no-spots::before {
+  content: "🚗";
+  display: block;
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+/* Spots Header */
+.spots-header {
+  margin-bottom: 1rem;
+  color: #4A90E2;
   font-size: 1rem;
   font-weight: 600;
-  cursor: pointer;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.spots-header::before {
+  content: "🅿️";
+  font-size: 1.2rem;
+}
+
+/* Add Spot Container */
+.add-spot-container {
+  margin-bottom: 1.5rem;
+}
+
+.new-spot-input {
+  width: 100%;
+  padding: 1rem 1.2rem; /* גדול יותר */
+  border: 2px solid #4A90E2;
+  border-radius: 8px;
+  font-size: 1rem; /* גדול יותר */
+  background: linear-gradient(135deg, #f8f9fa, #fff);
   transition: all 0.3s ease;
-  min-width: 150px;
 }
 
-.actions button:not(.secondary) {
-  background: linear-gradient(135deg, #007bff, #0056b3);
-  color: white;
+.new-spot-input:focus {
+  outline: none;
+  border-color: #357ABD;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+  transform: translateY(-1px);
 }
 
-.actions button:not(.secondary):hover {
-  background: linear-gradient(135deg, #0056b3, #004085);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+.new-spot-input::placeholder {
+  color: #999;
+  font-style: italic;
 }
 
-.actions button.secondary {
-  background: #6c757d;
-  color: white;
+/* Animation for new spots */
+.spot-item {
+  animation: spotFadeIn 0.5s ease-out;
 }
 
-.actions button.secondary:hover {
-  background: #545b62;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+@keyframes spotFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
-.actions button:disabled {
-  background: #6c757d;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .spots-list {
+    max-height: 150px; /* קצת יותר קטן במובייל */
+  }
+  
+  .spot-item {
+    padding: 0.8rem;
+    min-height: 45px;
+  }
+  
+  .spot-tag {
+    font-size: 1rem;
+    padding-left: 1.5rem;
+  }
+  
+  .remove-spot-btn {
+    width: 20px;
+    height: 20px;
+    font-size: 14px;
+  }
 }
 
-/* Messages */
-.message {
-  padding: 1.5rem;
-  border-radius: 10px;
-  margin-bottom: 2.5rem;
-  font-weight: 600;
-  text-align: left; /* 👈 שמאל במקום מרכז */
-  font-size: 1.1rem;
-}
-
-.message.success {
-  background: #d4edda;
-  border: 2px solid #28a745;
-  color: #155724;
-}
-
-.message.error {
-  background: #f8d7da;
-  border: 2px solid #dc3545;
-  color: #721c24;
-}
-
-/* Helper Text */
-.helper-text {
-  color: #6c757d;
-  font-size: 0.9rem;
-  margin-top: 0.5rem;
-  text-align: left; /* 👈 שמאל */
-}
-
-/* Custom Scrollbar for Webkit Browsers */
-::-webkit-scrollbar {
-  width: 12px;
-}
-
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #007bff;
-  border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #0056b3;
-}
-
-/* RTL Support - If needed in the future */
-/*
-body {
-  direction: rtl;
-  text-align: right;
-}
-
-.navbar {
-  justify-content: flex-end;
-}
-
-.config-grid {
-  direction: rtl;
-}
-
-.config-section {
-  text-align: right;
-}
-
-.form-group label {
-  text-align: right;
-}
-
-.day-checkbox {
-  justify-content: flex-end;
-}
-
-.spots-grid {
-  direction: rtl;
-}
-
-.spot-tag {
-  margin-right: 0.25rem;
-}
-
-.spot-tag[data-type="vip"] {
-  background: linear-gradient(135deg, #e0a800, #ffc107);
-}
-
-.spot-tag[data-type="handicap"] {
-  background: linear-gradient(135deg, #1e7e34, #28a745);
-}
-
-.spot-tag[data-type="premium"] {
-  background: linear-gradient(135deg, #5a2d91, #6f42c1);
-}
-*/
-
-/* הוסף גם את זה ל-App.css אם רוצה שהסקשן האחרון יהיה רחב: */
-.config-section:last-child {
-  grid-column: 1 / -1; /* ימתח על כל העמודות הזמינות */
-}
-
-/* הוסף ל-App.css: */
 .loading {
   color: #6c757d;
   font-style: italic;
-  animation: pulse 1.5s infinite;
+  text-align: center;
+  padding: 2rem;
 }
 
-.limit-update-time {
-  margin-top: 0.5rem;
+/* הוסף לApp.css: */
+
+.add-spot-btn-full {
+  background: linear-gradient(135deg, #95a5a6, #7f8c8d) !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+  box-shadow: none !important;
 }
 
-.limit-update-time small {
+.add-spot-btn-full::before {
+  content: "🚫 ";
+  margin-right: 0.5rem;
+}
+
+.add-spot-btn-full:hover {
+  background: linear-gradient(135deg, #95a5a6, #7f8c8d) !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* החלף את .spot-tag ו-.spot-item::before בזה: */
+
+.spot-tag {
+  font-weight: 700;
+  font-size: 1.15rem; /* גדול יותר */
+  color: #2c3e50;
+  text-align: left;
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.spot-tag::before {
+  content: "🅿️";
+  font-size: 1.1rem; /* גדול יותר */
+  margin-right: 1rem; /* מרווח גדול יותר */
+}
+
+/* מחק את .spot-item::before לגמרי */
+
+/* הוסף בסוף הקובץ - Checkboxes יפים לריבוע החמישי: */
+
+/* Container לכל ה-checkboxes */
+.settings-checkboxes,
+.system-checkboxes,
+.config-checkboxes {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 2 בכל שורה */
+  gap: 0.8rem;
+  margin-top: 1rem;
+}
+
+/* כל checkbox יפה */
+.settings-checkbox,
+.system-checkbox,
+.config-checkbox {
+  position: relative;
+  display: block;
+  cursor: pointer;
+  user-select: none;
+}
+
+.settings-checkbox input[type="checkbox"],
+.system-checkbox input[type="checkbox"],
+.config-checkbox input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  width: 0;
+  height: 0;
+}
+
+/* Label יפה כמו הימים */
+.settings-checkbox .checkbox-label,
+.system-checkbox .checkbox-label,
+.config-checkbox .checkbox-label {
+  display: block;
+  padding: 1rem;
+  background: #f8f9fa;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
   color: #6c757d;
-  font-size: 0.8rem;
->>>>>>> Stashed changes
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: center;
+  transition: all 0.3s ease;
+  min-height: 55px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Hover effect */
+.settings-checkbox:hover .checkbox-label,
+.system-checkbox:hover .checkbox-label,
+.config-checkbox:hover .checkbox-label {
+  background: #e9ecef;
+  border-color: #4A90E2;
+  color: #495057;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* מצב נבחר - ירוק יפה */
+.settings-checkbox input[type="checkbox"]:checked + .checkbox-label,
+.system-checkbox input[type="checkbox"]:checked + .checkbox-label,
+.config-checkbox input[type="checkbox"]:checked + .checkbox-label {
+  background: linear-gradient(135deg, #27ae60, #229954);
+  border-color: #229954;
+  color: white;
+  font-weight: 700;
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(39, 174, 96, 0.4);
+}
+
+/* מצב נבחר + hover */
+.settings-checkbox input[type="checkbox"]:checked + .checkbox-label:hover,
+.system-checkbox input[type="checkbox"]:checked + .checkbox-label:hover,
+.config-checkbox input[type="checkbox"]:checked + .checkbox-label:hover {
+  background: linear-gradient(135deg, #229954, #1e8449);
+  transform: scale(1.02) translateY(-1px);
+  box-shadow: 0 6px 16px rgba(39, 174, 96, 0.5);
+}
+
+/* אייקון ✓ כשנבחר */
+.settings-checkbox input[type="checkbox"]:checked + .checkbox-label::before,
+.system-checkbox input[type="checkbox"]:checked + .checkbox-label::before,
+.config-checkbox input[type="checkbox"]:checked + .checkbox-label::before {
+  content: "✓";
+  position: absolute;
+  top: 5px;
+  right: 8px;
+  color: white;
+  font-weight: bold;
+  font-size: 1.2rem;
+  animation: checkmarkPop 0.3s ease-out;
+}
+
+@keyframes checkmarkPop {
+  0% {
+    transform: scale(0) rotate(-180deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2) rotate(-90deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+/* אפקט ללחיצה */
+.settings-checkbox:active .checkbox-label,
+.system-checkbox:active .checkbox-label,
+.config-checkbox:active .checkbox-label {
+  transform: scale(0.98);
+}
+
+.settings-checkbox input[type="checkbox"]:checked:active + .checkbox-label,
+.system-checkbox input[type="checkbox"]:checked:active + .checkbox-label,
+.config-checkbox input[type="checkbox"]:checked:active + .checkbox-label {
+  transform: scale(1);
+}
+
+/* אנימציה בטעינה */
+.settings-checkbox .checkbox-label,
+.system-checkbox .checkbox-label,
+.config-checkbox .checkbox-label {
+  animation: checkboxFadeIn 0.5s ease-out;
+}
+
+@keyframes checkboxFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* רספונסיב */
+@media (max-width: 768px) {
+  .settings-checkboxes,
+  .system-checkboxes,
+  .config-checkboxes {
+    grid-template-columns: 1fr; /* עמודה אחת במובייל */
+    gap: 0.6rem;
+  }
+  
+  .settings-checkbox .checkbox-label,
+  .system-checkbox .checkbox-label,
+  .config-checkbox .checkbox-label {
+    padding: 0.8rem;
+    font-size: 0.85rem;
+    min-height: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .settings-checkbox .checkbox-label,
+  .system-checkbox .checkbox-label,
+  .config-checkbox .checkbox-label {
+    padding: 0.7rem;
+    font-size: 0.8rem;
+    min-height: 45px;
+  }
+}
+
+/* עבור מסכים גדולים - 3 בשורה */
+@media (min-width: 1400px) {
+  .settings-checkboxes,
+  .system-checkboxes,
+  .config-checkboxes {
+    grid-template-columns: repeat(3, 1fr); /* 3 בשורה במסכים גדולים */
+    gap: 1rem;
+  }
+  
+  .settings-checkbox .checkbox-label,
+  .system-checkbox .checkbox-label,
+  .config-checkbox .checkbox-label {
+    padding: 1.1rem;
+    font-size: 1rem;
+    min-height: 60px;
+  }
 }
