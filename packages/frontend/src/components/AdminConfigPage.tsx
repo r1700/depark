@@ -862,52 +862,27 @@ export default function AdminConfigPage() {
                       onChange={(e) =>
                         setParkingConfig(prev => ({
                           ...prev,
-                          maintenanceMode: e.target.value === 'on'
-                        }))
-                      }
-                    >
-                      <FormControlLabel
-                        value="on"
-                        control={<Radio color="primary" />}
-                        label={<Typography color="primary">Active</Typography>}
+                          maintenanceMode: e.target.checked
+                        }))}
+                        color="primary" // ← כחול
                       />
-                      <FormControlLabel
-                        value="off"
-                        control={<Radio color="primary" />}
-                        label={<Typography color="primary">off</Typography>}
+                    }
+                    label="Maintenance Mode"
+                  />
+                  
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={parkingConfig.showAdminAnalytics}
+                        onChange={(e) => setParkingConfig(prev => ({
+                          ...prev,
+                          showAdminAnalytics: e.target.checked
+                        }))}
+                        color="primary" // ← כחול
                       />
-                    </RadioGroup>
-                  </Box>
-
-                  {/* Show Admin Analytics checkbox remains as is */}
-<Box>
-  <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
-    Show Admin Analytics
-  </Typography>
-  <RadioGroup
-    row
-    value={parkingConfig.showAdminAnalytics ? 'on' : 'off'}
-    onChange={(e) =>
-      setParkingConfig(prev => ({
-        ...prev,
-        showAdminAnalytics: e.target.value === 'on'
-      }))
-    }
-  >
-    <FormControlLabel
-      value="on"
-      control={<Radio color="primary" />}
-      label={<Typography color="primary">Active</Typography>}
-    />
-    <FormControlLabel
-      value="off"
-      control={<Radio color="primary" />}
-      label={<Typography color="primary">off</Typography>}
-    />
-  </RadioGroup>
-  
-</Box>
-
+                    }
+                    label="Show Admin Analytics"
+                  />
                 </Stack>
               </CardContent>
             </StyledCard>
@@ -928,7 +903,7 @@ export default function AdminConfigPage() {
                 startIcon={saving ? <TimeIcon /> : undefined}
                 sx={{
                   minWidth: 200,
-                  bgcolor: 'primary.main',
+                  bgcolor: 'primary.main', // תמיד כחול
                   color: 'white',
                   boxShadow: '0 4px 16px rgba(25, 118, 210, 0.10)',
                   borderRadius: 3,
