@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import React, { useState } from "react";
 import LoginScreen from './components/screen-login/LoginScreen';
 import { Box, Button, Container, Typography } from "@mui/material";
@@ -32,17 +31,3 @@ const handleLogin = React.useCallback(() => {
 };
 
 export default App;
-=======
-import React from 'react';
-import { Provider } from 'react-redux';
-import { store } from './app/store';
-import ParkingDashboard from './app/pages/adminDashBoard/parkingDashboard';
-
-export default function App() {
-  return (
-    <Provider store={store}>
-      <ParkingDashboard />
-    </Provider>
-  );
-}
->>>>>>> origin/main
