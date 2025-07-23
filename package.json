@@ -14,5 +14,19 @@
     "build:backend": "npm run build --workspace=packages/backend",
     "build:frontend": "npm run build --workspace=packages/frontend",
     "install:all": "npm install && npm install --workspace=packages/backend && npm install --workspace=packages/frontend && npm install --workspace=packages/opc"
+<<<<<<< HEAD
   }
 }
+=======
+  },
+  "dependencies": {
+    "@reduxjs/toolkit": "^2.8.2",
+    "all": "^0.0.0",
+    "isexe": "^3.1.1",
+    "react-redux": "^9.2.0"
+  },
+  "devDependencies": {
+    "@types/react-redux": "^7.1.34"
+  }
+}
+>>>>>>> origin/main
