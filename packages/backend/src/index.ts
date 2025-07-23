@@ -8,7 +8,7 @@ import healthRoutes from './routes/health';
 // import itemsRoutes from './routes/items';
 // import { databaseService } from './services/database';
 
-import loggerRoutes from './middlewares/locallLoggerMiddleware';  // הוספנו את הייבוא של app.ts
+import loggerRoutes from './middlewares/locallLoggerMiddleware';
 
 
 const app = express();

@@ -2,7 +2,7 @@ import winston from 'winston';
 import path from 'path';
 import fs from 'fs';
 import express from 'express';
-import moment from 'moment'; // הוספנו את moment עבור המרת זמן מקומי
+import moment from 'moment';
 
 const { combine, timestamp, printf } = winston.format;
 
@@ -26,23 +26,18 @@ const logger = winston.createLogger({
     }),
     logFormat
   ),
-  transports: [
-    // Error logs
+  transports: [ // Error & Information & Combined logs    
     new winston.transports.File({
       filename: path.join(logsDirectory, 'error.log'), level: 'error',
-    }),
-    // Information logs
+    }),    
     new winston.transports.File({
       filename: path.join(logsDirectory, 'info.log'), level: 'info'
-    }),
-
-    // Combined logs
+    }),    
     new winston.transports.File({
       filename: path.join(logsDirectory, 'combined.log'),
     }),
   ],
 });
-
 
 const router = express.Router();  // Create router
 
