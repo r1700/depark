@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "es6",
     "types": [
-      "workbox-sw",
+      // "workbox-sw",
       "node"
     ],
     "lib": [
