@@ -12,11 +12,20 @@
   }
   ,
 
-  "dependencies": {
+ 
+
+   "dependencies": {
     "express": "^4.17.1",
     "react": "^17.0.2",
-    "react-dom": "^17.0.2"
-  },
+    "react-dom": "^17.0.2",
+    "@reduxjs/toolkit": "^2.8.2",
+    "all": "^0.0.0",
+    "isexe": "^3.1.1",
+    "pg": "^8.16.3",
+    "react-redux": "^9.2.0",
+    "sequelize": "^6.37.7"
+},
+ 
   "devDependencies": {
     "eslint": "^7.32.0",
     "webpack": "^5.64.4",
