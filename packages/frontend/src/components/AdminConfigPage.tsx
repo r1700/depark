@@ -20,7 +20,7 @@ import {
   Divider,
   ThemeProvider,
   createTheme,
-  Checkbox, // ← הוסף כאן!
+  Checkbox,
 } from '@mui/material';
 
 import {
@@ -43,13 +43,13 @@ interface ParkingConfig {
   timezone: string;
   surfaceSpotIds: string[];
   totalSpots: number;
-  
-  // הסר את השעות הכלליות:
+
+  // Remove general hours:
   // openingHour: string;
   // closingHour: string;
   // activeDays: string[];
-  
-  // הוסף שעות לכל יום:
+
+  // Add hours for each day:
   dailyHours: {
     [key: string]: {
       isActive: boolean;
@@ -57,7 +57,7 @@ interface ParkingConfig {
       closingHour: string;
     };
   };
-  
+
   maxQueueSize: number;
   avgRetrievalTime: number;
   maintenanceMode: boolean;
@@ -67,7 +67,7 @@ interface ParkingConfig {
 }
 
 // Styled Components
-// אלטרנטיבה - מסגרת עם זוהר כחול:
+// Alternative - blue glow border:
 const StyledCard = styled(Card)(({ theme }) => ({
   height: '100%',
   display: 'flex',
@@ -79,7 +79,7 @@ const StyledCard = styled(Card)(({ theme }) => ({
     0 4px 20px rgba(25, 118, 210, 0.1),
     0 0 0 1px rgba(25, 118, 210, 0.05),
     inset 0 1px 0 rgba(255, 255, 255, 0.1)
-  `, // ← צללים מרובים לאפקט עומק
+  `, // Multiple shadows for depth effect
   background: 'linear-gradient(145deg, #ffffff 0%, #f8fbff 100%)',
   position: 'relative',
   '&::before': {
@@ -102,15 +102,15 @@ const StyledCard = styled(Card)(({ theme }) => ({
       0 16px 50px rgba(25, 118, 210, 0.25),
       0 0 0 1px rgba(25, 118, 210, 0.1),
       0 0 30px rgba(25, 118, 210, 0.3)
-    `, // ← זוהר כחול
+    `, // Blue glow
     '&::before': {
-      opacity: 0.1, // ← זוהר עדין מסביב
+      opacity: 0.1, // Soft glow around
     }
   },
 }));
 
 const StyledChip = styled(Chip)(({ theme }) => ({
-  transition: 'background-color 0.2s ease', // ← רק transition לצבע
+  transition: 'background-color 0.2s ease', // Only transition for color
 }));
 
 // Theme
@@ -135,7 +135,7 @@ const timezones = [
 ];
 
 const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-const maxSpotsLimit = 100; // ← שנה מ-100 ל-3
+const maxSpotsLimit = 100; // Change from 100 to 3
 
 export default function AdminConfigPage() {
   // Initial config
@@ -172,24 +172,24 @@ export default function AdminConfigPage() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [spotToDelete, setSpotToDelete] = useState<{index: number, name: string} | null>(null);
 
-  // Auto-hide error popup after 8 seconds
+  // Auto-hide error popup after 3 seconds
   useEffect(() => {
     if (showErrorPopup) {
       const timer = setTimeout(() => {
         setShowErrorPopup(false);
         setCurrentError(null);
-      }, 3000); // 3 שניות
+      }, 3000); // 3 seconds
 
       return () => clearTimeout(timer);
     }
   }, [showErrorPopup]);
 
-  // הוסף useEffect לסגירת הודעת השמירה אוטומטית
+  // Add useEffect for auto-closing save message
   useEffect(() => {
     if (message && message.type === 'success') {
       const timer = setTimeout(() => {
         setMessage(null);
-      }, 3000); // 3 שניות
+      }, 3000); // 3 seconds
 
       return () => clearTimeout(timer);
     }
@@ -253,10 +253,7 @@ export default function AdminConfigPage() {
         surfaceSpotIds: prev.surfaceSpotIds.filter((_, i) => i !== spotToDelete.index),
         totalSpots: prev.surfaceSpotIds.length - 1
       }));
-      
-      
     }
-    
     setShowDeleteConfirm(false);
     setSpotToDelete(null);
   };
@@ -269,62 +266,62 @@ export default function AdminConfigPage() {
   // Validate required fields with priority order
   const validateConfig = (): { isValid: boolean; firstError: string | null; allErrors: string[] } => {
     const errors: string[] = [];
-    
+
     if (!parkingConfig.facilityName.trim()) {
       errors.push('Please enter a Facility Name');
     }
-    
+
     if (!parkingConfig.lotId.trim()) {
       errors.push('Please enter a Lot ID');
     }
-    
+
     if (parkingConfig.surfaceSpotIds.length === 0) {
       errors.push('Please add at least one parking spot');
     }
-    
-    // בדיקת ימים פעילים
-    const activeDays = Object.keys(parkingConfig.dailyHours).filter(day => 
+
+    // Check active days
+    const activeDays = Object.keys(parkingConfig.dailyHours).filter(day =>
       parkingConfig.dailyHours[day].isActive
     );
-    
+
     if (activeDays.length === 0) {
       errors.push('Please select at least one active day');
     }
-    
-    // בדיקת שעות לכל יום פעיל
+
+    // Check hours for each active day
     for (const day of activeDays) {
       const dayData = parkingConfig.dailyHours[day];
-      
+
       if (!dayData.openingHour || dayData.openingHour === '--:--') {
         errors.push(`Please set opening hour for ${day}`);
         break;
       }
-      
+
       if (!dayData.closingHour || dayData.closingHour === '--:--') {
         errors.push(`Please set closing hour for ${day}`);
         break;
       }
-      
-      // בדיקת שעות לוגיות
+
+      // Logical hours check
       const [openHour, openMin] = dayData.openingHour.split(':').map(Number);
       const [closeHour, closeMin] = dayData.closingHour.split(':').map(Number);
       const openMinutes = openHour * 60 + openMin;
       const closeMinutes = closeHour * 60 + closeMin;
-      
+
       if (closeMinutes <= openMinutes) {
         errors.push(`Closing hour must be after opening hour for ${day}`);
         break;
       }
     }
-    
+
     if (parkingConfig.maxQueueSize <= 0) {
       errors.push('Please set Max Queue Size to a number greater than 0');
     }
-    
+
     if (parkingConfig.avgRetrievalTime <= 0) {
       errors.push('Please set Average Retrieval Time to a number greater than 0');
     }
-    
+
     return {
       isValid: errors.length === 0,
       firstError: errors.length > 0 ? errors[0] : null,
@@ -345,7 +342,7 @@ export default function AdminConfigPage() {
       maintenanceMode: parkingConfig.maintenanceMode,
       showAdminAnalytics: parkingConfig.showAdminAnalytics
     };
-    
+
     const lastSaved = {
       facilityName: lastSavedConfig.facilityName,
       lotId: lastSavedConfig.lotId,
@@ -357,44 +354,44 @@ export default function AdminConfigPage() {
       maintenanceMode: lastSavedConfig.maintenanceMode,
       showAdminAnalytics: lastSavedConfig.showAdminAnalytics
     };
-    
+
     return JSON.stringify(current) !== JSON.stringify(lastSaved);
   };
 
   const saveConfig = async () => {
-    // בדיקה - האם יש שינויים בכלל
+    // Check - are there any changes at all
     if (!hasChanges()) {
       setCurrentError('⚠️ No changes detected. Please make some changes before saving.');
       setShowErrorPopup(true);
-      return; // עוצר את השמירה
+      return; // Stop saving
     }
-    
-    // בדיקה שנייה - ולידציה של השדות
+
+    // Second check - field validation
     const validation = validateConfig();
     if (!validation.isValid && validation.firstError) {
       setCurrentError(`❌ ${validation.firstError}`);
       setShowErrorPopup(true);
-      return; // ← עוצר כאן אם יש שגיאות
+      return; // Stop here if there are errors
     }
-    
-    // רק אם עברנו את שתי הבדיקות - שומרים
+
+    // Only if both checks passed - save
     setSaving(true);
     try {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
       const updatedConfig = {
         ...parkingConfig,
         totalSpots: parkingConfig.surfaceSpotIds.length,
         updatedAt: new Date(),
         updatedBy: 'admin'
       };
-      
+
       setParkingConfig(updatedConfig);
       setLastSavedConfig(updatedConfig);
-      setMessage({ 
-        type: 'success', 
-        text: '✅ Configuration saved successfully!' 
+      setMessage({
+        type: 'success',
+        text: '✅ Configuration saved successfully!'
       });
     } catch (error) {
       setCurrentError('❌ Error saving configuration. Please try again.');
@@ -427,9 +424,9 @@ export default function AdminConfigPage() {
       updatedAt: new Date(),
       updatedBy: 'admin'
     });
-    setMessage({ 
-      type: 'success', 
-      text: '🔄 Configuration reset to defaults!' 
+    setMessage({
+      type: 'success',
+      text: '🔄 Configuration reset to defaults!'
     });
   };
 
