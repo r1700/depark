@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import LoginScreen from './components/screen-login/LoginScreen';
 import { Box, Button, Container, Typography } from "@mui/material";
 
+
 const App: React.FC = () => {
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
 
@@ -23,8 +24,7 @@ const handleLogin = React.useCallback(() => {
           </Button>
         </Box>
       ) : (
-        <LoginScreen onLogin={handleLogin} />
-
+       <LoginScreen onLogin={handleLogin} />
       )}
     </Container>
   );
