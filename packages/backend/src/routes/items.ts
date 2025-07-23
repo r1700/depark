@@ -9,20 +9,13 @@ const router = Router();
 const useDatabase = !!(process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY);
 
 // GET /api/items - Get all items
-router.get('/', async (req, res) => {
-  try {
-   
-    
-    
-   
-    
-    
-    // Fallback to mock data if database fails
-  }catch (error) {
-    console.error('Error fetching items:', error);
-  }
+
 
 // GET /api/items/:id - Get specific item
-})
+
+   
+    
+    
 
 
+export default router;

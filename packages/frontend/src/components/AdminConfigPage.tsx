@@ -1,686 +1,1043 @@
-// AdminConfigPage.tsx
 import React, { useState, useEffect } from 'react';
+import {
+  Container,
+  Paper,
+  Typography,
+  Box,
+  TextField,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Button,
+  Chip,
+  FormControlLabel,
+  Card,
+  CardContent,
+  CardHeader,
+  Avatar,
+  Stack,
+  Divider,
+  ThemeProvider,
+  createTheme,
+  Checkbox, // ← הוסף כאן!
+} from '@mui/material';
 
-// טיפוסים זמניים (עד שתיצרי את קובץ הטיפוסים)
-interface ParkingConfiguration {
-  id: string;
+import {
+  Info as InfoIcon,
+  LocalParking as ParkingIcon,
+  Schedule as ScheduleIcon,
+  Queue as QueueIcon,
+  Settings as SettingsIcon,
+  Add as AddIcon,
+  Delete as DeleteIcon,
+  AccessTime as TimeIcon
+} from '@mui/icons-material';
+
+import { styled } from '@mui/material/styles';
+
+// Types
+interface ParkingConfig {
   facilityName: string;
+  lotId: string;
   timezone: string;
-  totalSurfaceSpots: number;
   surfaceSpotIds: string[];
-  operatingHours: {
-    start: string;
-    end: string;
+  totalSpots: number;
+  
+  // הסר את השעות הכלליות:
+  // openingHour: string;
+  // closingHour: string;
+  // activeDays: string[];
+  
+  // הוסף שעות לכל יום:
+  dailyHours: {
+    [key: string]: {
+      isActive: boolean;
+      openingHour: string;
+      closingHour: string;
+    };
   };
-  activeDays?: string[];
+  
   maxQueueSize: number;
-  avgRetrievalTimeMinutes: number;
-  maxParallelRetrievals?: number;
-  updatedAt: Date;
-  updatedBy: string;
+  avgRetrievalTime: number;
+  maintenanceMode: boolean;
+  showAdminAnalytics: boolean;
+  updatedAt?: Date;
+  updatedBy?: string;
 }
 
-interface SystemSettings {
-  maintenance_mode: boolean;
-  show_admin_analytics: boolean;
-  updatedAt: Date;
-  updatedBy: string;
-}
+// Styled Components
+// אלטרנטיבה - מסגרת עם זוהר כחול:
+const StyledCard = styled(Card)(({ theme }) => ({
+  height: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+  border: '2px solid #1976d2',
+  borderRadius: '16px',
+  boxShadow: `
+    0 4px 20px rgba(25, 118, 210, 0.1),
+    0 0 0 1px rgba(25, 118, 210, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1)
+  `, // ← צללים מרובים לאפקט עומק
+  background: 'linear-gradient(145deg, #ffffff 0%, #f8fbff 100%)',
+  position: 'relative',
+  '&::before': {
+    content: '""',
+    position: 'absolute',
+    top: -2,
+    left: -2,
+    right: -2,
+    bottom: -2,
+    background: 'linear-gradient(135deg, #1976d2, #42a5f5, #1976d2)',
+    borderRadius: '18px',
+    opacity: 0,
+    transition: 'opacity 0.3s ease',
+    zIndex: -1,
+  },
+  '&:hover': {
+    transform: 'translateY(-6px)',
+    borderColor: '#1565c0',
+    boxShadow: `
+      0 16px 50px rgba(25, 118, 210, 0.25),
+      0 0 0 1px rgba(25, 118, 210, 0.1),
+      0 0 30px rgba(25, 118, 210, 0.3)
+    `, // ← זוהר כחול
+    '&::before': {
+      opacity: 0.1, // ← זוהר עדין מסביב
+    }
+  },
+}));
+
+const StyledChip = styled(Chip)(({ theme }) => ({
+  transition: 'background-color 0.2s ease', // ← רק transition לצבע
+}));
+
+// Theme
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#1976d2',
+    },
+    secondary: {
+      main: '#dc004e',
+    },
+  },
+});
+
+// Constants
+const timezones = [
+  'Asia/Jerusalem',
+  'America/New_York',
+  'Europe/London',
+  'Asia/Tokyo',
+  'Australia/Sydney'
+];
+
+const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const maxSpotsLimit = 100; // ← שנה מ-100 ל-3
 
 export default function AdminConfigPage() {
-  const [parkingConfig, setParkingConfig] = useState<ParkingConfiguration | null>(null);
-  const [systemSettings, setSystemSettings] = useState<SystemSettings | null>(null);
-  const [loading, setLoading] = useState(true);
+  // Initial config
+  const initialConfig: ParkingConfig = {
+    facilityName: '',
+    lotId: '',
+    timezone: 'Asia/Jerusalem',
+    surfaceSpotIds: [],
+    totalSpots: 0,
+    dailyHours: {
+      Sunday: { isActive: false, openingHour: '00:00', closingHour: '00:00' },
+      Monday: { isActive: false, openingHour: '00:00', closingHour: '00:00' },
+      Tuesday: { isActive: false, openingHour: '00:00', closingHour: '00:00' },
+      Wednesday: { isActive: false, openingHour: '00:00', closingHour: '00:00' },
+      Thursday: { isActive: false, openingHour: '00:00', closingHour: '00:00' },
+      Friday: { isActive: false, openingHour: '00:00', closingHour: '00:00' },
+      Saturday: { isActive: false, openingHour: '00:00', closingHour: '00:00' }
+    },
+    maxQueueSize: 0,
+    avgRetrievalTime: 0,
+    maintenanceMode: false,
+    showAdminAnalytics: false
+  };
+
+  // State
+  const [parkingConfig, setParkingConfig] = useState<ParkingConfig>(initialConfig);
+  const [lastSavedConfig, setLastSavedConfig] = useState<ParkingConfig>(initialConfig);
+  const [newSpotId, setNewSpotId] = useState('');
+  const [showAddSpot, setShowAddSpot] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
-  const [rawSpotsText, setRawSpotsText] = useState(''); // הוסף state נוסף עבור הטקסט הגולמי
-  const [processingTimeout, setProcessingTimeout] = useState<NodeJS.Timeout | null>(null);
-  const [isProcessing, setIsProcessing] = useState(false); // הוסף state עבור אינדיקטור עיבוד
-  const [showAddSpot, setShowAddSpot] = useState(false); // הוסף state עבור תצוגת הוספת חניה חדשה
-  const [newSpotId, setNewSpotId] = useState(''); // הוסף state עבור מזהה חניה חדשה
-  const [maxSpotsLimit, setMaxSpotsLimit] = useState(3); // ← שנה ל-3
-  const [isLimitLoading, setIsLimitLoading] = useState<boolean>(true); // הוסף state לטעינת המגבלה
-  const [limitUpdatedAt, setLimitUpdatedAt] = useState<Date | null>(null); // הוסף state לזמן עדכון המגבלה
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [showErrorPopup, setShowErrorPopup] = useState(false);
+  const [currentError, setCurrentError] = useState<string | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [spotToDelete, setSpotToDelete] = useState<{index: number, name: string} | null>(null);
 
-  // טעינת נתונים
+  // Auto-hide error popup after 8 seconds
   useEffect(() => {
-    fetchConfig();
-  }, []);
+    if (showErrorPopup) {
+      const timer = setTimeout(() => {
+        setShowErrorPopup(false);
+        setCurrentError(null);
+      }, 3000); // 3 שניות
 
-  useEffect(() => {
-    if (parkingConfig?.surfaceSpotIds) {
-      setRawSpotsText(parkingConfig.surfaceSpotIds.join(', '));
+      return () => clearTimeout(timer);
     }
-  }, [parkingConfig?.surfaceSpotIds]);
+  }, [showErrorPopup]);
 
-  // וודא שהקוד הזה קיים ועובד:
+  // הוסף useEffect לסגירת הודעת השמירה אוטומטית
   useEffect(() => {
-    const loadParkingLimit = async () => {
-      try {
-        console.log('🔄 Loading parking limit from database...');
-        
-        // 👈 פשוט קבע 3 ללא קריאה לשרת (כי השרת לא עובד)
-        setMaxSpotsLimit(3);
-        console.log(`✅ Set parking limit to: 3 spots`);
-        
-        /* הסתר זמנית כי השרת לא עובד:
-        const response = await fetch('http://localhost:3001/api/parking-limit');
-        const result = await response.json();
-        
-        if (result.success) {
-          setMaxSpotsLimit(result.maxSpots);
-          console.log(`✅ Loaded parking limit: ${result.maxSpots} spots`);
+    if (message && message.type === 'success') {
+      const timer = setTimeout(() => {
+        setMessage(null);
+      }, 3000); // 3 שניות
+
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
+
+  // Functions
+  const handleDayToggle = (day: string) => {
+    setParkingConfig(prev => ({
+      ...prev,
+      dailyHours: {
+        ...prev.dailyHours,
+        [day]: {
+          ...prev.dailyHours[day],
+          isActive: !prev.dailyHours[day].isActive
         }
-        */
-      } catch (error) {
-        console.error('❌ Network error:', error);
-        setMaxSpotsLimit(3); // fallback ל-3
-      } finally {
-        setIsLimitLoading(false);
       }
+    }));
+  };
+
+  const handleTimeChange = (day: string, timeType: 'openingHour' | 'closingHour', value: string) => {
+    setParkingConfig(prev => ({
+      ...prev,
+      dailyHours: {
+        ...prev.dailyHours,
+        [day]: {
+          ...prev.dailyHours[day],
+          [timeType]: value
+        }
+      }
+    }));
+  };
+
+  const addNewSpot = () => {
+    if (newSpotId.trim() && parkingConfig.surfaceSpotIds.length < maxSpotsLimit) {
+      if (!parkingConfig.surfaceSpotIds.includes(newSpotId.trim())) {
+        const newSpot = newSpotId.trim();
+        setParkingConfig(prev => ({
+          ...prev,
+          surfaceSpotIds: [...prev.surfaceSpotIds, newSpot],
+          totalSpots: prev.surfaceSpotIds.length + 1
+        }));
+        setNewSpotId('');
+        setShowAddSpot(false);
+      } else {
+        setCurrentError('❌ Spot ID already exists');
+        setShowErrorPopup(true);
+      }
+    }
+  };
+
+  const removeSpot = (index: number) => {
+    const spotName = parkingConfig.surfaceSpotIds[index];
+    setSpotToDelete({ index, name: spotName });
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDelete = () => {
+    if (spotToDelete) {
+      setParkingConfig(prev => ({
+        ...prev,
+        surfaceSpotIds: prev.surfaceSpotIds.filter((_, i) => i !== spotToDelete.index),
+        totalSpots: prev.surfaceSpotIds.length - 1
+      }));
+      
+      
+    }
+    
+    setShowDeleteConfirm(false);
+    setSpotToDelete(null);
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteConfirm(false);
+    setSpotToDelete(null);
+  };
+
+  // Validate required fields with priority order
+  const validateConfig = (): { isValid: boolean; firstError: string | null; allErrors: string[] } => {
+    const errors: string[] = [];
+    
+    if (!parkingConfig.facilityName.trim()) {
+      errors.push('Please enter a Facility Name');
+    }
+    
+    if (!parkingConfig.lotId.trim()) {
+      errors.push('Please enter a Lot ID');
+    }
+    
+    if (parkingConfig.surfaceSpotIds.length === 0) {
+      errors.push('Please add at least one parking spot');
+    }
+    
+    // בדיקת ימים פעילים
+    const activeDays = Object.keys(parkingConfig.dailyHours).filter(day => 
+      parkingConfig.dailyHours[day].isActive
+    );
+    
+    if (activeDays.length === 0) {
+      errors.push('Please select at least one active day');
+    }
+    
+    // בדיקת שעות לכל יום פעיל
+    for (const day of activeDays) {
+      const dayData = parkingConfig.dailyHours[day];
+      
+      if (!dayData.openingHour || dayData.openingHour === '--:--') {
+        errors.push(`Please set opening hour for ${day}`);
+        break;
+      }
+      
+      if (!dayData.closingHour || dayData.closingHour === '--:--') {
+        errors.push(`Please set closing hour for ${day}`);
+        break;
+      }
+      
+      // בדיקת שעות לוגיות
+      const [openHour, openMin] = dayData.openingHour.split(':').map(Number);
+      const [closeHour, closeMin] = dayData.closingHour.split(':').map(Number);
+      const openMinutes = openHour * 60 + openMin;
+      const closeMinutes = closeHour * 60 + closeMin;
+      
+      if (closeMinutes <= openMinutes) {
+        errors.push(`Closing hour must be after opening hour for ${day}`);
+        break;
+      }
+    }
+    
+    if (parkingConfig.maxQueueSize <= 0) {
+      errors.push('Please set Max Queue Size to a number greater than 0');
+    }
+    
+    if (parkingConfig.avgRetrievalTime <= 0) {
+      errors.push('Please set Average Retrieval Time to a number greater than 0');
+    }
+    
+    return {
+      isValid: errors.length === 0,
+      firstError: errors.length > 0 ? errors[0] : null,
+      allErrors: errors
+    };
+  };
+
+  // Check if configuration has changes
+  const hasChanges = () => {
+    const current = {
+      facilityName: parkingConfig.facilityName,
+      lotId: parkingConfig.lotId,
+      timezone: parkingConfig.timezone,
+      surfaceSpotIds: [...parkingConfig.surfaceSpotIds].sort(),
+      dailyHours: parkingConfig.dailyHours,
+      maxQueueSize: parkingConfig.maxQueueSize,
+      avgRetrievalTime: parkingConfig.avgRetrievalTime,
+      maintenanceMode: parkingConfig.maintenanceMode,
+      showAdminAnalytics: parkingConfig.showAdminAnalytics
     };
     
-    loadParkingLimit();
-  }, []);
-
-  const fetchConfig = async () => {
-    try {
-      // תמיד התחל עם קונפיגורציה ריקה, ללא קריאה לשרת
-      setParkingConfig({
-        id: '',
-        facilityName: '',
-        timezone: 'Asia/Jerusalem',
-        totalSurfaceSpots: 0,
-        surfaceSpotIds: [],
-        operatingHours: {
-          start: '',
-          end: ''
-        },
-        activeDays: [],
-        maxQueueSize: 0,
-        avgRetrievalTimeMinutes: 0,
-        updatedAt: new Date(),
-        updatedBy: 'admin'
-      });
-      
-      setSystemSettings({
-        maintenance_mode: false,
-        show_admin_analytics: false,
-        updatedAt: new Date(),
-        updatedBy: 'admin'
-      });
-      
-    } catch (error) {
-      console.error('Init error:', error);
-    } finally {
-      setLoading(false);
-    }
+    const lastSaved = {
+      facilityName: lastSavedConfig.facilityName,
+      lotId: lastSavedConfig.lotId,
+      timezone: lastSavedConfig.timezone,
+      surfaceSpotIds: [...lastSavedConfig.surfaceSpotIds].sort(),
+      dailyHours: lastSavedConfig.dailyHours,
+      maxQueueSize: lastSavedConfig.maxQueueSize,
+      avgRetrievalTime: lastSavedConfig.avgRetrievalTime,
+      maintenanceMode: lastSavedConfig.maintenanceMode,
+      showAdminAnalytics: lastSavedConfig.showAdminAnalytics
+    };
+    
+    return JSON.stringify(current) !== JSON.stringify(lastSaved);
   };
 
   const saveConfig = async () => {
+    // בדיקה - האם יש שינויים בכלל
+    if (!hasChanges()) {
+      setCurrentError('⚠️ No changes detected. Please make some changes before saving.');
+      setShowErrorPopup(true);
+      return; // עוצר את השמירה
+    }
+    
+    // בדיקה שנייה - ולידציה של השדות
+    const validation = validateConfig();
+    if (!validation.isValid && validation.firstError) {
+      setCurrentError(`❌ ${validation.firstError}`);
+      setShowErrorPopup(true);
+      return; // ← עוצר כאן אם יש שגיאות
+    }
+    
+    // רק אם עברנו את שתי הבדיקות - שומרים
     setSaving(true);
-    setMessage(null);
-
     try {
-      console.log('📤 Sending data to server...');
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // יצירת זמן חדש
-      const currentTime = new Date();
+      const updatedConfig = {
+        ...parkingConfig,
+        totalSpots: parkingConfig.surfaceSpotIds.length,
+        updatedAt: new Date(),
+        updatedBy: 'admin'
+      };
       
-      const response = await fetch('http://localhost:3001/api/admin/config', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          parkingConfig: {
-            ...parkingConfig,
-            updatedAt: currentTime,
-            updatedBy: 'admin'
-          },
-          systemSettings: {
-            ...systemSettings,
-            updatedAt: currentTime,
-            updatedBy: 'admin'
-          }
-        })
+      setParkingConfig(updatedConfig);
+      setLastSavedConfig(updatedConfig);
+      setMessage({ 
+        type: 'success', 
+        text: '✅ Configuration saved successfully!' 
       });
-
-      const data = await response.json();
-      console.log('📥 Server response:', data);
-      
-      if (data.success) {
-        setMessage({ type: 'success', text: 'Configuration saved successfully!' });
-        
-        // 👈 זה החלק החשוב - עדכון הזמן בstate המקומי!
-        setParkingConfig(prev => ({
-          ...prev!,
-          updatedAt: currentTime, // זמן חדש יתעדכן בממשק מיד!
-          updatedBy: 'admin'
-        }));
-        
-        setSystemSettings(prev => ({
-          ...prev!,
-          updatedAt: currentTime, // זמן חדש יתעדכן בממשק מיד!
-          updatedBy: 'admin'
-        }));
-        
-        console.log('✅ Time updated successfully to:', currentTime.toLocaleString());
-        
-      } else {
-        setMessage({ type: 'error', text: data.error || 'Failed to save configuration' });
-      }
     } catch (error) {
-      console.error('❌ Save error:', error);
-      
-      // גם במקרה של שגיאה - עדכן את הזמן כי השינויים נשמרו מקומית
-      const currentTime = new Date();
-      setParkingConfig(prev => ({
-        ...prev!,
-        updatedAt: currentTime,
-        updatedBy: 'admin'
-      }));
-      
-      setSystemSettings(prev => ({
-        ...prev!,
-        updatedAt: currentTime,
-        updatedBy: 'admin'
-      }));
-      
-      setMessage({ type: 'error', text: 'Error saving configuration (but time updated locally)' });
+      setCurrentError('❌ Error saving configuration. Please try again.');
+      setShowErrorPopup(true);
     } finally {
       setSaving(false);
     }
   };
 
   const resetToDefaults = () => {
-    if (window.confirm('Are you sure you want to reset all settings to empty values?')) {
-      const currentTime = new Date(); // זמן חדש עבור האיפוס
-    
-      setParkingConfig(prev => prev ? {
-        ...prev,
-        id: '',
-        facilityName: '',
-        timezone: 'Asia/Jerusalem',
-        totalSurfaceSpots: 0,
-        surfaceSpotIds: [],
-        operatingHours: { start: '', end: '' },
-        activeDays: [],
-        maxQueueSize: 0,
-        avgRetrievalTimeMinutes: 0,
-        updatedAt: currentTime, // 👈 זמן חדש גם באיפוס!
-        updatedBy: 'admin'
-      } : null);
-    
-      setSystemSettings(prev => prev ? {
-        ...prev,
-        maintenance_mode: false,
-        show_admin_analytics: false,
-        updatedAt: currentTime, // 👈 זמן חדש גם באיפוס!
-        updatedBy: 'admin'
-      } : null);
-    
-      setRawSpotsText('');
-      setIsProcessing(false);
-      setNewSpotId('');
-      setShowAddSpot(false);
-    
-      console.log('🗑️ Data cleared, time updated to:', currentTime.toLocaleString());
-    }
+    setParkingConfig({
+      facilityName: '',
+      lotId: '',
+      timezone: 'Asia/Jerusalem',
+      surfaceSpotIds: [],
+      totalSpots: 0,
+      dailyHours: {
+        Sunday: { isActive: false, openingHour: '00:00', closingHour: '00:00' },
+        Monday: { isActive: false, openingHour: '00:00', closingHour: '00:00' },
+        Tuesday: { isActive: false, openingHour: '00:00', closingHour: '00:00' },
+        Wednesday: { isActive: false, openingHour: '00:00', closingHour: '00:00' },
+        Thursday: { isActive: false, openingHour: '00:00', closingHour: '00:00' },
+        Friday: { isActive: false, openingHour: '00:00', closingHour: '00:00' },
+        Saturday: { isActive: false, openingHour: '00:00', closingHour: '00:00' }
+      },
+      maxQueueSize: 0,
+      avgRetrievalTime: 0,
+      maintenanceMode: false,
+      showAdminAnalytics: false,
+      updatedAt: new Date(),
+      updatedBy: 'admin'
+    });
+    setMessage({ 
+      type: 'success', 
+      text: '🔄 Configuration reset to defaults!' 
+    });
   };
-
-  // אם תרצה עיבוד רק על מקשים (ללא טיימר כלל):
-
-  const handleSpotsInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const value = e.target.value;
-    setRawSpotsText(value); // רק שמירת הטקסט, ללא עיבוד
-    
-    // הצגת אינדיקטור שיש שינויים לא שמורים
-    setIsProcessing(true);
-  };
-
-  const handleSpotsKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter') {
-      e.preventDefault(); // מנע שורה חדשה
-      processAndUpdate();
-    }
-    
-    if (e.key === 'Tab') {
-      processAndUpdate();
-    }
-    
-    // Ctrl+S לשמירה מהירה
-    if (e.ctrlKey && e.key === 's') {
-      e.preventDefault();
-      processAndUpdate();
-    }
-  };
-
-  const processAndUpdate = () => {
-    // בטל טיימרים קיימים
-    if (processingTimeout) {
-      clearTimeout(processingTimeout);
-      setProcessingTimeout(null);
-    }
-    
-    // עיבוד מיידי
-    processSpotText(rawSpotsText);
-    setIsProcessing(false);
-  };
-
-  const processSpotText = (text: string) => {
-    if (text.trim() === '') {
-      setParkingConfig(prev => prev ? {
-        ...prev,
-        surfaceSpotIds: [],
-        totalSurfaceSpots: 0
-        // 👈 הסר את updatedAt מכאן!
-      } : null);
-      return;
-    }
-    
-    const spots = text
-      .split(/[,\n\s]+/)
-      .map(spot => spot.trim())
-      .filter(spot => spot.length > 0);
-    
-    const uniqueSpots = Array.from(new Set(spots));
-    
-    setParkingConfig(prev => prev ? {
-      ...prev,
-      surfaceSpotIds: uniqueSpots,
-      totalSurfaceSpots: uniqueSpots.length
-      // 👈 הסר את updatedAt מכאן!
-    } : null);
-    
-    // console.log('🚗 Spots updated, time updated to:', new Date().toLocaleString());
-  };
-
-  const handleSpotsBlur = () => {
-    // עיבוד מיידי בעזיבת השדה (ביטול ההשהיה)
-    if (processingTimeout) {
-      clearTimeout(processingTimeout);
-      setProcessingTimeout(null);
-    }
-    processSpotText(rawSpotsText);
-  };
-
-  // אם תרצה עיבוד רק על מקשים מסוימים:
-  
-
-  useEffect(() => {
-    return () => {
-      if (processingTimeout) {
-        clearTimeout(processingTimeout);
-      }
-    };
-  }, [processingTimeout]);
-
-  // הוסף את הפונקציות האלה לפני return:
-
-  // הוספת חניה חדשה
-  const addNewSpot = () => {
-    const spotId = newSpotId.trim();
-    
-    if (!spotId) {
-      return;
-    }
-    
-    const existingSpots = parkingConfig?.surfaceSpotIds || [];
-    
-    // 👈 הוסף בדיקת מגבלה כאן!
-    console.log('🔍 Checking limit:', existingSpots.length, 'vs', maxSpotsLimit);
-    
-    if (existingSpots.length >= maxSpotsLimit) {
-      alert(`❌ Maximum limit reached! Cannot add more than ${maxSpotsLimit} parking spots.`);
-      setNewSpotId('');
-      setShowAddSpot(false);
-      return;
-    }
-    
-    // בדוק אם החניה כבר קיימת
-    if (existingSpots.includes(spotId)) {
-      alert(`Parking spot "${spotId}" already exists!`);
-      setNewSpotId('');
-      return; // לא סוגר את הטופס במקרה של שגיאה
-    }
-    
-    // הוסף את החניה
-    setParkingConfig(prev => prev ? {
-      ...prev,
-      surfaceSpotIds: [...existingSpots, spotId],
-      totalSurfaceSpots: existingSpots.length + 1
-    } : null);
-    
-    setNewSpotId('');
-    setShowAddSpot(false);
-    
-    console.log(`✅ Added parking spot: ${spotId} (${existingSpots.length + 1}/${maxSpotsLimit})`);
-  };
-
-  // הסרת חניה
-  const removeSpot = (indexToRemove: number) => {
-    const existingSpots = parkingConfig?.surfaceSpotIds || [];
-    const spotToRemove = existingSpots[indexToRemove];
-    
-    if (window.confirm(`Remove parking spot "${spotToRemove}"?`)) {
-      const newSpots = existingSpots.filter((_, index) => index !== indexToRemove);
-      
-      setParkingConfig(prev => prev ? {
-        ...prev,
-        surfaceSpotIds: newSpots,
-        totalSurfaceSpots: newSpots.length
-        // 👈 הסר את updatedAt מכאן!
-      } : null);
-      
-      console.log(`🗑️ Removed parking spot: ${spotToRemove}`);
-    }
-  };
-
-  // טיפול במקשים בשדה החניה החדשה
-  const handleNewSpotKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      addNewSpot();
-      
-      // 👈 הוסף זה - סגור את הטופס אחרי הוספה!
-      setShowAddSpot(false);
-    }
-    
-    if (e.key === 'Escape') {
-      setNewSpotId('');
-      setShowAddSpot(false);
-    }
-  };
-
-  if (loading) return <div>Loading...</div>;
-  if (!parkingConfig || !systemSettings) return <div>Error loading configuration</div>;
 
   return (
-    <div className="admin-config container glass-effect">
-      <h1>Parking System Configuration</h1>
-      
-      {message && (
-        <div className={`message ${message.type}`}>
-          {message.text}
-        </div>
-      )}
+    <ThemeProvider theme={theme}>
+      <Container maxWidth="xl" sx={{ py: 4 }}>
+        <Paper elevation={3} sx={{ p: 4, borderRadius: 3 }}>
+          {/* Header */}
+          <Box textAlign="center" mb={4}>
+            <Typography variant="h3" component="h1" gutterBottom sx={{ 
+              fontWeight: 400, 
+              color: 'primary.main',
+              borderBottom: '2px solid',
+              borderColor: 'primary.main',
+              pb: 2,
+              mb: 4
+            }}>
+              Parking System Configuration
+            </Typography>
+          </Box>
 
-      <div className="config-grid">
-        {/* Facility Info */}
-        <div className="config-section">
-          <h2>1. Facility Information</h2>
-          <div className="form-group">
-            <label>Facility Name:</label>
-            <input
-              type="text"
-              placeholder="Enter facility name (e.g., Main Parking Center)"
-              value={parkingConfig.facilityName}
-              onChange={(e) => setParkingConfig(prev => ({
-                ...prev!,
-                facilityName: e.target.value
-                // 👈 ללא updatedAt!
-              }))}
+          {/* Success Alert Message */}
+          {message && message.type === 'success' && (
+            <Box
+              sx={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                width: '100vw',
+                height: '100vh',
+                bgcolor: 'rgba(0,0,0,0.05)', // שכבה שקופה
+                zIndex: 1999,
+                pointerEvents: 'auto'
+              }}
             />
-          </div>
-          
-          <div className="form-group">
-            <label>Lot ID:</label>
-            <input
-              type="text"
-              placeholder="Enter unique lot ID (e.g., main-lot-001)"
-              value={parkingConfig.id}
-              onChange={(e) => setParkingConfig(prev => ({
-                ...prev!,
-                id: e.target.value
-                // 👈 ללא updatedAt!
-              }))}
-            />
-          </div>
-          
-          <div className="form-group">
-            <label>Timezone:</label>
-            <select
-              value={parkingConfig.timezone}
-              onChange={(e) => setParkingConfig(prev => ({
-                ...prev!,
-                timezone: e.target.value
-                // 👈 ללא updatedAt!
-              }))}
+          )}
+
+          {/* הודעת שמירה במרכז */}
+          {message && message.type === 'success' && (
+            <Box
+              sx={{
+                position: 'fixed',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                bgcolor: 'primary.main',
+                color: 'white',
+                px: 4,
+                py: 2,
+                borderRadius: 3,
+                boxShadow: '0 8px 32px rgba(0,118,210,0.3)',
+                zIndex: 2000,
+                minWidth: 300,
+                textAlign: 'center',
+                fontSize: '1.2rem',
+                fontWeight: 600,
+                animation: 'fadeIn 0.3s'
+              }}
             >
-              <option value="Asia/Jerusalem">Asia/Jerusalem</option>
-              <option value="America/New_York">America/New_York</option>
-              <option value="Europe/London">Europe/London</option>
-            </select>
-          </div>
-        </div>
+              {message.text}
+            </Box>
+          )}
 
-        {/* Parking Settings */}
-        <div className="config-section">
-          <h2>2. Parking Settings</h2>
-          <div className="form-group">
-            <label>Surface Spots Configuration:</label>
+          {/* Overlay for Messages and Error Popup */}
+          {(message || showErrorPopup) && (
+            <Box
+              sx={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                width: '100vw',
+                height: '100vh',
+                bgcolor: 'rgba(0,0,0,0.05)',
+                zIndex: 1999,
+                pointerEvents: 'auto'
+              }}
+            />
+          )}
+
+          {/* Main Cards - 2x2 Layout */}
+          <Box sx={{ 
+            display: 'grid', 
+            gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, 
+            gap: 4, 
+            mb: 4 
+          }}>
             
-            <div className="spots-management">
-              {/* כפתור הוספת חניה */}
-              <button 
-                type="button"
-                className="add-spot-btn"
-                onClick={() => setShowAddSpot(true)}
-              >
-                + Add New Parking Spot
-              </button>
+            {/* Card 1 - Facility Information */}
+            <StyledCard>
+              <CardHeader
+                avatar={
+                  <Avatar sx={{ bgcolor: 'primary.main' }}>
+                    <InfoIcon />
+                  </Avatar>
+                }
+                title={
+                  <Typography variant="h6" component="h2">
+                    1. Facility Information
+                  </Typography>
+                }
+              />
+              <CardContent sx={{ pt: 0 }}>
+                <Stack spacing={3}>
+                  <TextField
+                    fullWidth
+                    label="Facility Name"
+                    placeholder="Enter facility name (e.g., Main Parking Center)"
+                    value={parkingConfig.facilityName}
+                    onChange={(e) => setParkingConfig(prev => ({
+                      ...prev,
+                      facilityName: e.target.value
+                    }))}
+                  />
+                  
+                  <TextField
+                    fullWidth
+                    label="Lot ID"
+                    placeholder="Enter unique lot ID (e.g., main-lot-001)"
+                    value={parkingConfig.lotId}
+                    onChange={(e) => setParkingConfig(prev => ({
+                      ...prev,
+                      lotId: e.target.value
+                    }))}
+                  />
+                  
+                  <FormControl fullWidth>
+                    <InputLabel>Timezone</InputLabel>
+                    <Select
+                      value={parkingConfig.timezone}
+                      label="Timezone"
+                      onChange={(e) => setParkingConfig(prev => ({
+                        ...prev,
+                        timezone: e.target.value as string
+                      }))}
+                    >
+                      {timezones.map((tz, index) => (
+                        <MenuItem key={`timezone-${index}-${tz}`} value={tz}>{tz}</MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Stack>
+              </CardContent>
+            </StyledCard>
 
-              {/* שדה הוספת חניה חדשה */}
-              {showAddSpot && (
-                <div className="add-spot-container">
-                  <input
-                    type="text"
-                    placeholder="Enter parking spot ID (e.g., S1, A-01, VIP-Premium)"
-                    value={newSpotId}
-                    onChange={(e) => setNewSpotId(e.target.value)}
-                    onKeyDown={handleNewSpotKeyDown}
-                    onBlur={() => {
-                      if (!newSpotId.trim()) {
-                        setShowAddSpot(false);
+            {/* Card 2 - Parking Settings */}
+            <StyledCard>
+              <CardHeader
+                avatar={
+                  <Avatar sx={{ bgcolor: 'primary.main' }}>
+                    <ParkingIcon />
+                  </Avatar>
+                }
+                title={
+                  <Typography variant="h6" component="h2">
+                    2. Parking Settings
+                  </Typography>
+                }
+              />
+              <CardContent sx={{ pt: 0 }}>
+                <Typography variant="subtitle2" gutterBottom>
+                  Surface Spots Configuration:
+                </Typography>
+                
+                {/* Add Spot Button */}
+                <Button
+                  variant="contained"
+                  color="primary"
+                  startIcon={<AddIcon />}
+                  fullWidth
+                  onClick={() => setShowAddSpot(true)}
+                  disabled={parkingConfig.surfaceSpotIds.length >= maxSpotsLimit}
+                  sx={{ mb: 2 }}
+                >
+                  {parkingConfig.surfaceSpotIds.length >= maxSpotsLimit 
+                    ? `🚫 Maximum spots reached (${maxSpotsLimit}/${maxSpotsLimit})` 
+                    : `Add Spot (${parkingConfig.surfaceSpotIds.length}/${maxSpotsLimit})`
+                  }
+                </Button>
+
+                {/* Add Spot Input */}
+                {showAddSpot && (
+                  <Box key="add-spot-input" sx={{ mb: 2 }}>
+                    <TextField
+                      fullWidth
+                      placeholder="Enter parking spot ID (e.g., S1, A-01, VIP-Premium)"
+                      value={newSpotId}
+                      onChange={(e) => setNewSpotId(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && addNewSpot()}
+                      onBlur={addNewSpot}
+                      autoFocus
+                      size="small"
+                    />
+                  </Box>
+                )}
+
+                {/* Existing Spots */}
+                <Typography variant="subtitle2" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <ParkingIcon fontSize="small" />
+                  Existing Spots ({parkingConfig.surfaceSpotIds.length} total):
+                </Typography>
+<Paper variant="outlined" sx={{ 
+  height: 150, // ← גובה קבוע
+  overflow: 'auto', 
+  p: 1 
+}}>
+  {parkingConfig.surfaceSpotIds.length > 0 ? (
+    <Stack spacing={1}>
+      {parkingConfig.surfaceSpotIds.map((spot, index) => (
+        <StyledChip
+          key={`spot-${index}-${spot}-${parkingConfig.surfaceSpotIds.length}`}
+          label={spot}
+          onDelete={() => removeSpot(index)}
+          deleteIcon={<DeleteIcon />}
+          color="primary"
+          variant="outlined"
+          sx={{ 
+            justifyContent: 'space-between', 
+            width: '100%',
+            height: 40, // ← גובה קבוע
+            '&:hover': {
+              backgroundColor: 'rgba(25, 118, 210, 0.08)' // ← רק שינוי צבע, לא גודל
+            }
+          }}
+        />
+      ))}
+    </Stack>
+  ) : (
+    <Box sx={{ textAlign: 'center', py: 3, color: 'text.secondary' }}>
+      <Typography variant="h4" component="div" sx={{ opacity: 0.3, mb: 1 }}>
+        🚗
+      </Typography>
+      <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
+        No parking spots added yet
+      </Typography>
+    </Box>
+  )}
+</Paper>
+              </CardContent>
+            </StyledCard>
+
+            {/* Card 3 - Operating Hours */}
+            <StyledCard>
+              <CardHeader
+                avatar={
+                  <Avatar sx={{ bgcolor: 'primary.main' }}>
+                    <ScheduleIcon />
+                  </Avatar>
+                }
+                title={
+                  <Typography variant="h6" component="h2">
+                    3. Operating Hours
+                  </Typography>
+                }
+              />
+              <CardContent sx={{ pt: 0 }}>
+                <Typography variant="subtitle2" gutterBottom sx={{ mb: 3 }}>
+                  Set active days and operating hours:
+                </Typography>
+                
+                {/* Days with Hours in Same Row */}
+                <Stack spacing={1.5}>
+                  {days.map((day, index) => {
+                    const dayData = parkingConfig.dailyHours[day]; // ← הוסף שורה זו שחסרה
+                    return (
+                      <Box 
+                        key={`day-hours-${index}-${day}`}
+                        sx={{ 
+                          display: 'grid',
+                          gridTemplateColumns: '120px 1fr 1fr', // checkbox | opening | closing
+                          gap: 2,
+                          alignItems: 'center',
+                          p: 2,
+                          border: '1px solid',
+                          borderColor: dayData.isActive ? 'primary.main' : 'grey.300',
+                          borderRadius: 2,
+                          bgcolor: dayData.isActive ? 'rgba(25, 118, 210, 0.04)' : 'transparent',
+                          transition: 'all 0.3s ease'
+                        }}
+                      >
+                        {/* Day Checkbox - Compact */}
+                        <Chip
+                          label={day}
+                          onClick={() => handleDayToggle(day)}
+                          variant={dayData.isActive ? "filled" : "outlined"}
+                          color={dayData.isActive ? "primary" : "default"}
+                          size="small"
+                          sx={{
+                            height: 32,
+                            fontSize: '0.75rem',
+                            fontWeight: 600,
+                            cursor: 'pointer',
+                            transition: 'all 0.3s ease',
+                            '&:hover': {
+                              transform: 'translateY(-1px)',
+                              boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                            }
+                          }}
+                        />
+                        
+                        {/* Opening Hour - Always Visible */}
+                        <TextField
+                          size="small"
+                          label="Opening"
+                          type="time"
+                          value={dayData.openingHour}
+                          onChange={(e) => handleTimeChange(day, 'openingHour', e.target.value)}
+                          InputLabelProps={{ shrink: true }}
+                          disabled={!dayData.isActive} // ← מושבת אם היום לא פעיל
+                          sx={{
+                            '& .MuiInputBase-input': {
+                              color: dayData.isActive ? 'inherit' : 'text.secondary'
+                            },
+                            '& .MuiInputLabel-root': {
+                              color: dayData.isActive ? 'inherit' : 'text.secondary'
+                            }
+                          }}
+                        />
+                        
+                        {/* Closing Hour - Always Visible */}
+                        <TextField
+                          size="small"
+                          label="Closing"
+                          type="time"
+                          value={dayData.closingHour}
+                          onChange={(e) => handleTimeChange(day, 'closingHour', e.target.value)}
+                          InputLabelProps={{ shrink: true }}
+                          disabled={!dayData.isActive} // ← מושבת אם היום לא פעיל
+                          sx={{
+                            '& .MuiInputBase-input': {
+                              color: dayData.isActive ? 'inherit' : 'text.secondary'
+                            },
+                            '& .MuiInputLabel-root': {
+                              color: dayData.isActive ? 'inherit' : 'text.secondary'
+                            }
+                          }}
+                        />
+                      </Box>
+                    );
+                  })}
+                </Stack>
+              </CardContent>
+            </StyledCard>
+
+            {/* Card 4 - Queue & Retrieval Management */}
+            <StyledCard>
+              <CardHeader
+                avatar={
+                  <Avatar sx={{ bgcolor: 'primary.main' }}>
+                    <QueueIcon />
+                  </Avatar>
+                }
+                title={
+                  <Typography variant="h6" component="h2">
+                    4. Queue & Retrieval Management
+                  </Typography>
+                }
+              />
+              <CardContent sx={{ pt: 0 }}>
+                <Stack spacing={3}>
+                  <TextField
+                    fullWidth
+                    label="Max Queue Size"
+                    type="number"
+                    value={parkingConfig.maxQueueSize}
+                    onChange={(e) => setParkingConfig(prev => ({
+                      ...prev,
+                      maxQueueSize: parseInt(e.target.value) || 0
+                    }))}
+                  />
+                  
+                  <TextField
+                    fullWidth
+                    label="Average Retrieval Time (minutes)"
+                    type="number"
+                    value={parkingConfig.avgRetrievalTime}
+                    onChange={(e) => setParkingConfig(prev => ({
+                      ...prev,
+                      avgRetrievalTime: parseInt(e.target.value) || 0
+                    }))}
+                  />
+                </Stack>
+              </CardContent>
+            </StyledCard>
+          </Box>
+
+          {/* System Settings Card */}
+          <Box sx={{ 
+            display: 'grid', 
+            gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, 
+            gap: 4, 
+            mb: 4 
+          }}>
+            <StyledCard>
+              <CardHeader
+                avatar={
+                  <Avatar sx={{ bgcolor: 'primary.main' }}>
+                    <SettingsIcon />
+                  </Avatar>
+                }
+                title={
+                  <Typography variant="h6" component="h2">
+                    5. System Settings
+                  </Typography>
+                }
+              />
+              <CardContent sx={{ pt: 0 }}>
+                <Stack spacing={2}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={parkingConfig.maintenanceMode}
+                        onChange={(e) => setParkingConfig(prev => ({
+                          ...prev,
+                          maintenanceMode: e.target.checked
+                        }))}
+                        color="primary" // ← כחול
+                      />
+                    }
+                    label="Maintenance Mode"
+                  />
+                  
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={parkingConfig.showAdminAnalytics}
+                        onChange={(e) => setParkingConfig(prev => ({
+                          ...prev,
+                          showAdminAnalytics: e.target.checked
+                        }))}
+                        color="primary" // ← כחול
+                      />
+                    }
+                    label="Show Admin Analytics"
+                  />
+                </Stack>
+              </CardContent>
+            </StyledCard>
+          </Box>
+
+          {/* Action Buttons */}
+          <Divider sx={{ my: 3 }} />
+          <Box sx={{ textAlign: 'center' }}>
+            {/* Status Display */}
+            
+            
+            <Stack direction="row" spacing={2} justifyContent="center">
+              <Button
+                variant="contained"
+                size="large"
+                onClick={saveConfig}
+                disabled={saving || !!message || showErrorPopup}
+                startIcon={saving ? <TimeIcon /> : undefined}
+                sx={{
+                  minWidth: 200,
+                  bgcolor: 'primary.main', // תמיד כחול
+                  color: 'white',
+                  cursor: 'pointer',
+                  '&:hover': {
+                    bgcolor: 'primary.dark'
+                  },
+                  '&.Mui-disabled': {
+                    bgcolor: 'grey.400',
+                    color: 'text.disabled'
+                  }
+                }}
+              >
+                {saving
+                  ? 'Saving Configuration...'
+                  : '💾 Save Configuration'
+                }
+              </Button>
+              <Button
+                variant="outlined"
+                size="large"
+                onClick={resetToDefaults}
+                disabled={saving}
+                sx={{ minWidth: 150 }}
+              >
+                🔄 Reset to Defaults
+              </Button>
+            </Stack>
+
+            {/* תאריך עדכון אחרון */}
+            {parkingConfig.updatedAt && (
+              <Typography variant="caption" color="text.secondary" sx={{ mt: 2, display: 'block' }}>
+                {(() => {
+                  const d = new Date(parkingConfig.updatedAt);
+                  const dateStr = d.toLocaleDateString('en-GB');
+                  const timeStr = d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                  return `Last updated: Date: ${dateStr} Time: ${timeStr}`;
+                })()}
+              </Typography>
+            )}
+          </Box>
+
+          {/* דיאלוג אישור מחיקה */}
+          {showDeleteConfirm && spotToDelete && (
+            <Box
+              sx={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                bgcolor: 'rgba(0, 0, 0, 0.5)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: 1400
+              }}
+            >
+              <Box
+                sx={{
+                  bgcolor: 'white',
+                  borderRadius: 2,
+                  p: 3,
+                  maxWidth: 400,
+                  width: '90%',
+                  boxShadow: '0 8px 32px rgba(0,0,0,0.3)'
+                }}
+              >
+                <Typography variant="h6" gutterBottom sx={{ 
+                  fontWeight: 600,
+                  color: '#d32f2f',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1
+                }}>
+                  ⚠️ Delete Confirmation
+                </Typography>
+                
+                <Typography variant="body1" sx={{ mb: 3, lineHeight: 1.6 }}>
+                  Are you sure you want to delete parking spot{' '}
+                  <Box component="span" sx={{ fontWeight: 600, color: 'primary.main' }}>
+                    "{spotToDelete.name}"
+                  </Box>
+                  ?
+                </Typography>
+                
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                  This action cannot be undone.
+                </Typography>
+                
+                <Stack direction="row" spacing={2} justifyContent="flex-end">
+                  <Button
+                    variant="outlined"
+                    onClick={cancelDelete}
+                    sx={{ minWidth: 100 }}
+                  >
+                    Cancel
+                  </Button>
+                  
+                  <Button
+                    variant="contained"
+                    color="error"
+                    onClick={confirmDelete}
+                    sx={{ 
+                      minWidth: 100,
+                      bgcolor: '#d32f2f',
+                      '&:hover': {
+                        bgcolor: '#b71c1c'
                       }
                     }}
-                    autoFocus
-                    className="new-spot-input"
-                  />
-                </div>
-              )}
+                  >
+                    Delete
+                  </Button>
+                </Stack>
+              </Box>
+            </Box>
+          )}
 
-              {/* רשימת החניות הקיימות */}
-              <div className="existing-spots">
-                <div className="spots-header">
-                  <strong>
-                    Existing Spots ({parkingConfig.surfaceSpotIds?.length || 0} total)
-                  </strong>
-                </div>
-                
-                <div className="spots-list">
-                  {parkingConfig.surfaceSpotIds && parkingConfig.surfaceSpotIds.length > 0 ? (
-                    parkingConfig.surfaceSpotIds.map((spot, index) => {
-                      // זיהוי סוג החניה לעיצוב מיוחד
-                      let spotType = 'regular';
-                      if (spot.toLowerCase().includes('vip')) spotType = 'vip';
-                      else if (spot.toLowerCase().includes('handicap')) spotType = 'handicap';
-                      else if (spot.toLowerCase().includes('premium')) spotType = 'premium';
-                      
-                      return (
-                        <div key={index} className="spot-item">
-                          <span 
-                            className="spot-tag"
-                            data-type={spotType}
-                            title={`Parking spot: ${spot}`}
-                          >
-                            {spot}
-                          </span>
-                          <button 
-                            className="remove-spot-btn"
-                            onClick={() => removeSpot(index)}
-                            title="Remove this spot"
-                          >
-                            ×
-                          </button>
-                        </div>
-                      );
-                    })
-                  ) : (
-                    <div className="no-spots">
-                      No parking spots added yet. Click + to add your first spot.
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+          {/* הודעת שגיאה קופצת */}
+          {showErrorPopup && currentError && (
+            <Box
+              sx={{
+                position: 'fixed',
+                bottom: 20,
+                right: 20,
+                zIndex: 1300,
+                maxWidth: 500,
+                bgcolor: 'error.main',
+                color: 'white',
+                p: 2,
+                borderRadius: 3,
+                boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                animation: 'slideIn 0.3s ease-out'
+              }}
+            >
+              <Typography variant="body1" sx={{ mr: 2 }}>
+                {currentError}
+              </Typography>
+            </Box>
+          )}
 
-        {/* Operating Hours */}
-        <div className="config-section">
-          <h2>3. Operating Hours</h2>
-          <div className="form-group">
-            <label>Opening Hour (HH:mm):</label>
-            <input
-              type="time"
-              value={parkingConfig.operatingHours.start}
-              onChange={(e) => setParkingConfig(prev => ({
-                ...prev!,
-                operatingHours: { ...prev!.operatingHours, start: e.target.value }
-                // 👈 ללא updatedAt!
-              }))}
-            />
-          </div>
-          
-          <div className="form-group">
-            <label>Closing Hour (HH:mm):</label>
-            <input
-              type="time"
-              value={parkingConfig.operatingHours.end}
-              onChange={(e) => setParkingConfig(prev => ({
-                ...prev!,
-                operatingHours: { ...prev!.operatingHours, end: e.target.value }
-                // 👈 ללא updatedAt!
-              }))}
-            />
-          </div>
-
-          <div className="form-group">
-            <label>Active Days:</label>
-            <div className="days-selector">
-              {[
-                { key: 'sunday', label: 'Sunday' },
-                { key: 'monday', label: 'Monday' },
-                { key: 'tuesday', label: 'Tuesday' },
-                { key: 'wednesday', label: 'Wednesday' },
-                { key: 'thursday', label: 'Thursday' },
-                { key: 'friday', label: 'Friday' }
-              ].map(day => (
-                <label key={day.key} className="day-checkbox">
-                  <input
-                    type="checkbox"
-                    checked={parkingConfig.activeDays?.includes(day.key) || false}
-                    onChange={(e) => {
-                      const currentDays = parkingConfig.activeDays || [];
-                      const newActiveDays = e.target.checked
-                        ? [...currentDays, day.key]
-                        : currentDays.filter(d => d !== day.key);
-                      
-                      setParkingConfig(prev => ({
-                        ...prev!,
-                        activeDays: newActiveDays
-                        // 👈 ללא updatedAt!
-                      }));
-                    }}
-                  />
-                  <span className="day-label">{day.label}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Queue & Retrieval Management */}
-        <div className="config-section">
-          <h2>4. Queue & Retrieval Management</h2>
-          <div className="form-group">
-            <label>Max Queue Size:</label>
-            <input
-              type="number"
-              min="0"
-              value={parkingConfig.maxQueueSize}
-              onChange={(e) => setParkingConfig(prev => ({
-                ...prev!,
-                maxQueueSize: parseInt(e.target.value)
-                // 👈 ללא updatedAt!
-              }))}
-            />
-          </div>
-          
-          <div className="form-group">
-            <label>Average Retrieval Time (minutes):</label>
-            <input
-              type="number"
-              step="0.5"
-              min="0"
-              value={parkingConfig.avgRetrievalTimeMinutes}
-              onChange={(e) => setParkingConfig(prev => ({
-                ...prev!,
-                avgRetrievalTimeMinutes: parseFloat(e.target.value)
-              }))}
-            />
-          </div>
-        </div>
-
-        {/* System Settings */}
-        <div className="config-section">
-          <h2>5. System Settings</h2>
-          <div className="form-group">
-            <label>Maintenance Mode:</label>
-            <input
-              type="checkbox"
-              checked={systemSettings.maintenance_mode}
-              onChange={(e) => setSystemSettings(prev => ({
-                ...prev!,
-                maintenance_mode: e.target.checked
-                // 👈 ללא updatedAt!
-              }))}
-            />
-          </div>
-          
-          <div className="form-group">
-            <label>Show Admin Analytics:</label>
-            <input
-              type="checkbox"
-              checked={systemSettings.show_admin_analytics}
-              onChange={(e) => setSystemSettings(prev => ({
-                ...prev!,
-                show_admin_analytics: e.target.checked
-                // 👈 ללא updatedAt!
-              }))}
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* כפתור שמירה ואיפוס */}
-      <div className="actions-container">
-        <button 
-          className="save-btn"
-          onClick={saveConfig}
-          disabled={saving}
-        >
-          {saving ? 'Saving...' : 'Save Configuration'}
-        </button>
-        
-        <button 
-          className="reset-btn"
-          onClick={resetToDefaults}
-          disabled={saving}
-        >
-          Reset to Defaults
-        </button>
-      </div>
-    </div>
+        </Paper>
+      </Container>
+    </ThemeProvider>
   );
 }
+
+
+
+
+
+
+
+
+

@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 /* Reset ובסיס */
 * {
   margin: 0;
@@ -336,8 +337,826 @@ body {
 }
 
 .loading {
+=======
+/* Reset & Base */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  background: #f8f9fa;
+  height: 100vh;
+  color: #333;
+  direction: ltr; /* 👈 שינוי מימין לשמאל */
+  text-align: left; /* 👈 יישור שמאל */
+  padding-top: 80px;
+  overflow-y: auto;
+}
+
+.App {
+  text-align: left; /* 👈 יישור שמאל */
+  min-height: 100vh;
+  padding-top: 0;
+}
+
+/* Admin Config - White Theme */
+.admin-config {
+  max-width: 1400px;
+  margin: 2rem auto;
+  padding: 3rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e9ecef;
+}
+
+.admin-config h1 {
+  color: #2c3e50;
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 3rem;
+  text-align: left; /* 👈 שמאל במקום מרכז */
+  border-bottom: 3px solid #007bff;
+  padding-bottom: 1rem;
+}
+
+.config-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 👈 שינוי מ-3 ל-2 עמודות */
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.config-section {
+  background: white;
+  padding: 2.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  border: 2px solid #f1f3f4;
+  transition: all 0.3s ease;
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+}
+
+.config-section:hover {
+  border-color: #007bff;
+  box-shadow: 0 4px 20px rgba(0, 123, 255, 0.15);
+  transform: translateY(-2px);
+}
+
+.config-section h2 {
+  color: #007bff;
+  font-size: 1.4rem;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #f1f3f4;
+  text-align: left; /* 👈 שמאל במקום מרכז */
+}
+
+/* Navigation Bar */
+.navbar {
+  background: rgba(0, 123, 255, 0.95);
+  padding: 1rem 2rem;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  z-index: 1000;
+  backdrop-filter: blur(10px);
+  direction: ltr; /* 👈 LTR לnavbar */
+}
+
+.nav-btn {
+  background: white;
+  color: #007bff;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+}
+
+.nav-btn:hover {
+  background: #f8f9fa;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.nav-btn.logout {
+  background: #dc3545;
+  color: white;
+  margin-left: auto; /* 👈 left במקום right */
+}
+
+.nav-btn.logout:hover {
+  background: #c82333;
+}
+
+.nav-btn.add-user {
+  background: #28a745;
+  color: white;
+}
+
+.nav-btn.add-user:hover {
+  background: #218838;
+}
+
+/* User Dashboard */
+.user-dashboard {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 3rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.user-dashboard h1 {
+  color: #2c3e50;
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.user-dashboard p {
+  color: #6c757d;
+  font-size: 1.2rem;
+}
+
+/* Forms - Clean Design */
+
+.form-group {
+  margin-bottom: 2rem;
+  width: 100%;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.75rem;
+  color: #495057;
+  font-weight: 600;
+  font-size: 1rem;
+  text-align: left; /* 👈 שמאל */
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 1rem;
+  border: 2px solid #dee2e6;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background: white;
+  text-align: left; /* 👈 שמאל */
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+  outline: none;
+}
+
+/* Checkboxes - Better Positioning */
+.form-group label:has(input[type="checkbox"]) {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border: 2px solid #e9ecef;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  text-align: left; /* 👈 שמאל */
+}
+
+.form-group label:has(input[type="checkbox"]):hover {
+  background: #e3f2fd;
+  border-color: #007bff;
+  transform: translateY(-1px);
+}
+
+.form-group input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  accent-color: #007bff;
+  margin: 0;
+}
+
+/* Days Selector - Clean Layout */
+.days-selector {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.day-checkbox {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start; /* 👈 שמאל במקום מרכז */
+  padding: 1rem;
+  background: white;
+  border: 2px solid #dee2e6;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  text-align: left; /* 👈 שמאל */
+  min-height: 60px;
+}
+
+.day-checkbox:hover {
+  background: #e3f2fd;
+  border-color: #007bff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
+}
+
+.day-checkbox:has(input[type="checkbox"]:checked) {
+  background: #007bff;
+  border-color: #0056b3;
+  color: white;
+  box-shadow: 0 4px 16px rgba(0, 123, 255, 0.4);
+}
+
+.day-checkbox input[type="checkbox"] {
+  display: none;
+}
+
+.day-label {
+  font-weight: 600;
+  color: #495057;
+  text-align: left; /* 👈 שמאל */
+  font-size: 0.95rem;
+}
+
+.day-checkbox:has(input[type="checkbox"]:checked) .day-label {
+  color: white;
+  font-weight: 700;
+}
+
+/* Spots Input */
+.spots-input-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin: 1rem 0;
+  padding: 1.5rem;
+  background: #f8f9fa;
+  border-radius: 12px;
+  border: 2px solid #dee2e6;
+}
+
+.spots-textarea {
+  width: 100%;
+  min-height: 120px;
+  padding: 1rem;
+  border: 2px solid #dee2e6;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: 'Courier New', monospace;
+  resize: vertical;
+  transition: all 0.3s ease;
+  line-height: 1.5;
+  text-align: left; /* 👈 שמאל */
+}
+
+.spots-textarea:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+  outline: none;
+}
+
+.input-help {
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: left; /* 👈 שמאל */
+}
+
+.input-help p {
+  margin: 0 0 0.5rem 0;
+  color: #495057;
+  font-weight: 600;
+  text-align: left; /* 👈 שמאל */
+}
+
+.input-help ul {
+  margin: 0;
+  padding-left: 1.2rem; /* 👈 left במקום right */
+  color: #6c757d;
+  text-align: left; /* 👈 שמאל */
+}
+
+.input-help li {
+  margin-bottom: 0.3rem;
+  font-size: 0.9rem;
+}
+
+kbd {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 3px;
+  padding: 2px 6px;
+  font-size: 0.85em;
+  font-family: monospace;
+  box-shadow: 0 1px 1px rgba(0,0,0,0.15);
+}
+
+/* Spots Preview */
+.spots-preview {
+  background: white;
+  border: 2px solid #007bff;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.preview-header {
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  color: white;
+  padding: 1rem;
+  text-align: left; /* 👈 שמאל במקום מרכז */
+  font-size: 1.1rem;
+}
+
+.spots-grid {
+  padding: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  max-height: 250px;
+  overflow-y: auto;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 2px solid #e9ecef;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+.spots-grid::-webkit-scrollbar {
+  width: 8px;
+}
+
+.spots-grid::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.spots-grid::-webkit-scrollbar-thumb {
+  background: #007bff;
+  border-radius: 10px;
+}
+
+.spots-grid::-webkit-scrollbar-thumb:hover {
+  background: #0056b3;
+}
+
+.spot-tag {
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  color: white;
+  border: 1px solid #0056b3;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  box-shadow: 0 2px 6px rgba(0, 123, 255, 0.3);
+  margin: 0.25rem;
+}
+
+.spot-tag:hover {
+  background: linear-gradient(135deg, #0056b3, #004085);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
+}
+
+.spot-tag[data-type="vip"] {
+  background: linear-gradient(135deg, #ffc107, #e0a800);
+  color: #212529;
+  border-color: #e0a800;
+  box-shadow: 0 2px 6px rgba(255, 193, 7, 0.3);
+}
+
+.spot-tag[data-type="handicap"] {
+  background: linear-gradient(135deg, #28a745, #1e7e34);
+  color: white;
+  border-color: #1e7e34;
+  box-shadow: 0 2px 6px rgba(40, 167, 69, 0.3);
+}
+
+.spot-tag[data-type="premium"] {
+  background: linear-gradient(135deg, #6f42c1, #5a2d91);
+  color: white;
+  border-color: #5a2d91;
+  box-shadow: 0 2px 6px rgba(111, 66, 193, 0.3);
+}
+
+/* Spots Management */
+.spots-management {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin: 1rem 0;
+  padding: 2rem;
+  background: #f8f9fa;
+  border-radius: 12px;
+  border: 2px solid #e9ecef;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Add Spot Button */
+.add-spot-btn {
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  align-self: flex-start;
+  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+  min-width: 200px;
+  justify-content: center;
+}
+
+.add-spot-btn:hover {
+  background: linear-gradient(135deg, #0056b3, #004085);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
+}
+
+.add-spot-btn:active {
+  transform: translateY(0px);
+  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+}
+
+/* Add Spot Container */
+.add-spot-container {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 10px;
+  border: 2px solid #007bff;
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.15);
+  margin-top: 1rem;
+}
+
+.new-spot-input {
+  width: 100%;
+  padding: 1rem;
+  border: 2px solid #007bff;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  margin-bottom: 0.5rem;
+  background: white;
+}
+
+.new-spot-input:focus {
+  border-color: #0056b3;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+  outline: none;
+}
+
+.spot-input-help {
+  color: #007bff;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-align: left;
+  margin-top: 0.5rem;
+  font-style: italic;
+}
+
+/* Existing Spots */
+.existing-spots {
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 2px solid #007bff;
+}
+
+.spots-header {
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  color: white;
+  padding: 1rem;
+  text-align: left;
+  font-size: 1.1rem;
+}
+
+.spots-list {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+/* Spot Item */
+.spot-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  background: white;
+  border: 2px solid #e9ecef;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.spot-item:hover {
+  background: #f8f9fa;
+  border-color: #007bff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 123, 255, 0.15);
+}
+
+/* Remove Spot Button */
+.remove-spot-btn {
+  background: #dc3545;
+  color: white;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  margin-left: 1rem;
+  box-shadow: 0 2px 6px rgba(220, 53, 69, 0.3);
+}
+
+.remove-spot-btn:hover {
+  background: #c82333;
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+}
+
+/* No Spots Message */
+.no-spots {
+>>>>>>> Stashed changes
   color: #6c757d;
   font-style: italic;
   text-align: center;
   padding: 2rem;
+<<<<<<< Updated upstream
+=======
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 2px dashed #dee2e6;
+}
+
+/* Scrollbar for spots list */
+.spots-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.spots-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.spots-list::-webkit-scrollbar-thumb {
+  background: #007bff;
+  border-radius: 10px;
+}
+
+.spots-list::-webkit-scrollbar-thumb:hover {
+  background: #0056b3;
+}
+
+.processing {
+  color: #ffc107;
+  font-size: 0.9rem;
+  animation: pulse 1.5s infinite;
+  font-weight: 600;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Last Update Info */
+.last-update-info {
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: left; /* 👈 שמאל במקום מרכז */
+  margin: 1.5rem 0;
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+.last-update-info p {
+  margin: 0;
+  font-weight: 500;
+}
+
+/* Action Buttons */
+.actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-start; /* 👈 שמאל במקום מרכז */
+  padding: 2rem 0;
+  border-top: 2px solid #dee2e6;
+  margin-top: 2rem;
+}
+
+.actions button {
+  padding: 0.75rem 2rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 150px;
+}
+
+.actions button:not(.secondary) {
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  color: white;
+}
+
+.actions button:not(.secondary):hover {
+  background: linear-gradient(135deg, #0056b3, #004085);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}
+
+.actions button.secondary {
+  background: #6c757d;
+  color: white;
+}
+
+.actions button.secondary:hover {
+  background: #545b62;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+}
+
+.actions button:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Messages */
+.message {
+  padding: 1.5rem;
+  border-radius: 10px;
+  margin-bottom: 2.5rem;
+  font-weight: 600;
+  text-align: left; /* 👈 שמאל במקום מרכז */
+  font-size: 1.1rem;
+}
+
+.message.success {
+  background: #d4edda;
+  border: 2px solid #28a745;
+  color: #155724;
+}
+
+.message.error {
+  background: #f8d7da;
+  border: 2px solid #dc3545;
+  color: #721c24;
+}
+
+/* Helper Text */
+.helper-text {
+  color: #6c757d;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+  text-align: left; /* 👈 שמאל */
+}
+
+/* Custom Scrollbar for Webkit Browsers */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #007bff;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #0056b3;
+}
+
+/* RTL Support - If needed in the future */
+/*
+body {
+  direction: rtl;
+  text-align: right;
+}
+
+.navbar {
+  justify-content: flex-end;
+}
+
+.config-grid {
+  direction: rtl;
+}
+
+.config-section {
+  text-align: right;
+}
+
+.form-group label {
+  text-align: right;
+}
+
+.day-checkbox {
+  justify-content: flex-end;
+}
+
+.spots-grid {
+  direction: rtl;
+}
+
+.spot-tag {
+  margin-right: 0.25rem;
+}
+
+.spot-tag[data-type="vip"] {
+  background: linear-gradient(135deg, #e0a800, #ffc107);
+}
+
+.spot-tag[data-type="handicap"] {
+  background: linear-gradient(135deg, #1e7e34, #28a745);
+}
+
+.spot-tag[data-type="premium"] {
+  background: linear-gradient(135deg, #5a2d91, #6f42c1);
+}
+*/
+
+/* הוסף גם את זה ל-App.css אם רוצה שהסקשן האחרון יהיה רחב: */
+.config-section:last-child {
+  grid-column: 1 / -1; /* ימתח על כל העמודות הזמינות */
+}
+
+/* הוסף ל-App.css: */
+.loading {
+  color: #6c757d;
+  font-style: italic;
+  animation: pulse 1.5s infinite;
+}
+
+.limit-update-time {
+  margin-top: 0.5rem;
+}
+
+.limit-update-time small {
+  color: #6c757d;
+  font-size: 0.8rem;
+>>>>>>> Stashed changes
 }

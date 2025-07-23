@@ -1,5 +1,6 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
+
 export class DatabaseService {
   private readonly tableName = 'items';
   private supabase: SupabaseClient | null = null;
@@ -25,10 +26,10 @@ export class DatabaseService {
   
 
   
+   
 
   
   // Initialize database with sample data if empty
- 
 }
 
 export const databaseService = new DatabaseService();

@@ -9,8 +9,8 @@ import { databaseService } from './services/database';
 
 
 const app = express();
-const PORT = process.env.PORT;
-const CORS_ORIGIN = process.env.CORS_ORIGIN;
+const PORT = process.env.PORT || 3001; // הוסף ברירת מחדל
+const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:3000'; // הוסף ברירת מחדל
 
 // Middleware
 app.use(cors({
@@ -21,6 +21,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api/health', healthRoutes);
+
 
 
 app.listen(PORT, async () => {
@@ -34,6 +35,7 @@ app.listen(PORT, async () => {
     try {
       databaseService.canInitialize();
       try {
+       
         console.log('✅ Database initialized successfully');  
       } catch (error) {
         console.error('❌ Database sample-data initialization failed');
@@ -45,3 +47,22 @@ app.listen(PORT, async () => {
     console.log('📝 Using mock data - Supabase not configured');
   }
 });
+
+// Test route
+app.get('/', (req, res) => {
+  res.json({ message: 'DePark Backend is running!' });
+});
+
+// Health check
+app.get('/health', (req, res) => {
+  res.json({ status: 'OK', timestamp: new Date().toISOString() });
+});
+
+console.log('🔗 Available routes:');
+console.log('   GET  /');
+console.log('   GET  /health');
+console.log('   GET  /api/auth/users');      // 👈 חשוב!
+console.log('   POST /api/auth/register');   // 👈 חשוב!
+console.log('   POST /api/auth/login');
+console.log('   GET  /api/admin/config');
+console.log('   PUT  /api/admin/config');

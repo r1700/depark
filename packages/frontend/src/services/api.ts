@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 
-const API_URL = process.env.REACT_APP_API_URL;
+// הגדרת API_URL עם ברירת מחדל
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
 
 const apiClient = axios.create({
   baseURL: API_URL,
@@ -23,12 +24,9 @@ apiClient.interceptors.response.use(
 export const apiService = {
   // Health check
   checkHealth: async () => {
-    const response = await apiClient.get('/health');
+    const response = await apiClient.get('/health'); // כעת זה ילך ל /api/health
     return response.data;
   },
-}
-  // Get all items
- 
 
-  // Get specific item
-  
+  // Get all items
+ }
