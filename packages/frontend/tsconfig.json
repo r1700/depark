@@ -1,11 +1,18 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "es6",
+    "types": [
+      "workbox-sw",
+      "node"
+    ],
     "lib": [
       "dom",
       "dom.iterable",
-      "esnext"
+      "esnext",
+      "webworker"
     ],
+    "outDir": "./dist",
+    "rootDir": "./src",
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -13,14 +20,20 @@
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
-    "module": "esnext",
+    "module": "commonjs",
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "noEmit": true,
+    "noEmit": false,
     "jsx": "react-jsx"
   },
   "include": [
-    "src"
+    "src",
+    "src/**/*.ts",
+  ],
+  "exclude": [
+    "node_modules",
+    "public",
+    "dist",
   ]
 }

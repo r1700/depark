@@ -1,26 +1,29 @@
+console.log('Service Worker script loaded');
 const CACHE_NAME = 'my-pwa-cache';
 const urlsToCache = [
   '/',
   './index.html',
-  './index.css',
-  './App.css',
-  './././types/api-types.md',
-  './././types/parking-types.md',
+  //   './index.css',
+  //   './App.css',
+  //   './././types/api-types.md',
+  //   './././types/parking-types.md',
 ];
 
-self.addEventListener('install', (event: Event) => {
-  if (event instanceof InstallEvent) {
+const scope = self as unknown as ServiceWorkerGlobalScope;
+
+scope.addEventListener('install', (event:ExtendableEvent) => {
+  // if (event instanceof InstallEvent) {
     event.waitUntil(
       caches.open(CACHE_NAME)
         .then((cache) => {
           return cache.addAll(urlsToCache);
         })
     );
-  }
+  // }
 });
 
-self.addEventListener('fetch', (event: Event) => {
-  if (event instanceof FetchEvent) {
+scope.addEventListener('fetch', (event:FetchEvent) => {
+  // if (event instanceof FetchEvent) {
     event.respondWith(
       caches.match(event.request)
         .then((cachedResponse) => {
@@ -37,7 +40,7 @@ self.addEventListener('fetch', (event: Event) => {
             });
         })
     );
-  }
+  // }
 });
 
 function fetchData() {
@@ -60,9 +63,9 @@ function fetchData() {
   });
 }
 
-self.addEventListener('activate', (event: Event) => {
+scope.addEventListener('activate', (event:ExtendableEvent) => {
   const cacheWhitelist = [CACHE_NAME];
-  if (event instanceof ActivateEvent) {
+  // if (event instanceof ActivateEvent) {
     event.waitUntil(
       caches.keys().then((cacheNames) => {
         return Promise.all(
@@ -72,9 +75,11 @@ self.addEventListener('activate', (event: Event) => {
             }
           })
         );
+      }).then(() => {
+        return (self as any).Clients.claim();
       })
     );
-  }
+  // }
 });
 
 export { };

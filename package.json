@@ -14,5 +14,14 @@
     "build:backend": "npm run build --workspace=packages/backend",
     "build:frontend": "npm run build --workspace=packages/frontend",
     "install:all": "npm install && npm install --workspace=packages/backend && npm install --workspace=packages/frontend && npm install --workspace=packages/opc"
+  },
+  "devDependencies": {
+    "@types/stack-utils": "^2.0.3",
+    "@types/workbox-sw": "^4.3.7",
+    "ts-loader": "^9.5.2",
+    "typescript": "^5.8.3",
+    "webpack": "^5.100.2",
+    "webpack-cli": "^6.0.1",
+    "workbox-sw": "^7.3.0"
   }
 }

@@ -36,7 +36,7 @@ app.listen(PORT, async () => {
     try {
       databaseService.canInitialize();
       try {
-        await databaseService.initializeSampleData();
+        // await databaseService.initializeSampleData();
         console.log('✅ Database initialized successfully');  
       } catch (error) {
         console.error('❌ Database sample-data initialization failed');
