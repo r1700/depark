@@ -20,9 +20,9 @@ import {
   Divider,
   ThemeProvider,
   createTheme,
-  Checkbox,
+  RadioGroup,
   Radio,
-  RadioGroup
+  Checkbox, // ← הוסף כאן!
 } from '@mui/material';
 
 import {
@@ -45,6 +45,13 @@ interface ParkingConfig {
   timezone: string;
   surfaceSpotIds: string[];
   totalSpots: number;
+  
+  // הסר את השעות הכלליות:
+  // openingHour: string;
+  // closingHour: string;
+  // activeDays: string[];
+  
+  // הוסף שעות לכל יום:
   dailyHours: {
     [key: string]: {
       isActive: boolean;
@@ -52,6 +59,7 @@ interface ParkingConfig {
       closingHour: string;
     };
   };
+  
   maxQueueSize: number;
   avgRetrievalTime: number;
   maxParallelRetrievals: number; // ✅ חדש!
@@ -130,7 +138,7 @@ const timezones = [
 ];
 
 const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-const maxSpotsLimit = 100;
+const maxSpotsLimit = 100; // ← שנה מ-100 ל-3
 
 export default function AdminConfigPage() {
   // Initial config
@@ -317,11 +325,7 @@ export default function AdminConfigPage() {
     if (parkingConfig.avgRetrievalTime <= 0) {
       errors.push('Please set Average Retrieval Time to a number greater than 0');
     }
-
-    if (parkingConfig.maxParallelRetrievals <= 0) {
-      errors.push('Please set Max Parallel Retrievals to a number greater than 0');
-    }
-
+    
     return {
       isValid: errors.length === 0,
       firstError: errors.length > 0 ? errors[0] : null,
