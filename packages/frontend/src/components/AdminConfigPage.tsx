@@ -457,14 +457,14 @@ export default function AdminConfigPage() {
                 left: 0,
                 width: '100vw',
                 height: '100vh',
-                bgcolor: 'rgba(0,0,0,0.05)', // שכבה שקופה
+                bgcolor: 'rgba(0,0,0,0.05)', // Transparent overlay
                 zIndex: 1999,
                 pointerEvents: 'auto'
               }}
             />
           )}
 
-          {/* הודעת שמירה במרכז */}
+          {/* Save message in center */}
           {message && message.type === 'success' && (
             <Box
               sx={{
@@ -628,7 +628,7 @@ export default function AdminConfigPage() {
                   Existing Spots ({parkingConfig.surfaceSpotIds.length} total):
                 </Typography>
 <Paper variant="outlined" sx={{ 
-  height: 150, // ← גובה קבוע
+  height: 150, // Fixed height
   overflow: 'auto', 
   p: 1 
 }}>
@@ -645,9 +645,9 @@ export default function AdminConfigPage() {
           sx={{ 
             justifyContent: 'space-between', 
             width: '100%',
-            height: 40, // ← גובה קבוע
+            height: 40, // Fixed height
             '&:hover': {
-              backgroundColor: 'rgba(25, 118, 210, 0.08)' // ← רק שינוי צבע, לא גודל
+              backgroundColor: 'rgba(25, 118, 210, 0.08)' // Only color change, not size
             }
           }}
         />
@@ -689,7 +689,7 @@ export default function AdminConfigPage() {
                 {/* Days with Hours in Same Row */}
                 <Stack spacing={1.5}>
                   {days.map((day, index) => {
-                    const dayData = parkingConfig.dailyHours[day]; // ← הוסף שורה זו שחסרה
+                    const dayData = parkingConfig.dailyHours[day]; // Add this missing line
                     return (
                       <Box 
                         key={`day-hours-${index}-${day}`}
@@ -734,7 +734,7 @@ export default function AdminConfigPage() {
                           value={dayData.openingHour}
                           onChange={(e) => handleTimeChange(day, 'openingHour', e.target.value)}
                           InputLabelProps={{ shrink: true }}
-                          disabled={!dayData.isActive} // ← מושבת אם היום לא פעיל
+                          disabled={!dayData.isActive} // Disabled if day is not active
                           sx={{
                             '& .MuiInputBase-input': {
                               color: dayData.isActive ? 'inherit' : 'text.secondary'
@@ -753,7 +753,7 @@ export default function AdminConfigPage() {
                           value={dayData.closingHour}
                           onChange={(e) => handleTimeChange(day, 'closingHour', e.target.value)}
                           InputLabelProps={{ shrink: true }}
-                          disabled={!dayData.isActive} // ← מושבת אם היום לא פעיל
+                          disabled={!dayData.isActive} // Disabled if day is not active
                           sx={{
                             '& .MuiInputBase-input': {
                               color: dayData.isActive ? 'inherit' : 'text.secondary'
@@ -842,7 +842,7 @@ export default function AdminConfigPage() {
                           ...prev,
                           maintenanceMode: e.target.checked
                         }))}
-                        color="primary" // ← כחול
+                        color="primary" // Blue
                       />
                     }
                     label="Maintenance Mode"
@@ -856,7 +856,7 @@ export default function AdminConfigPage() {
                           ...prev,
                           showAdminAnalytics: e.target.checked
                         }))}
-                        color="primary" // ← כחול
+                        color="primary" // Blue
                       />
                     }
                     label="Show Admin Analytics"
@@ -881,7 +881,7 @@ export default function AdminConfigPage() {
                 startIcon={saving ? <TimeIcon /> : undefined}
                 sx={{
                   minWidth: 200,
-                  bgcolor: 'primary.main', // תמיד כחול
+                  bgcolor: 'primary.main', // Always blue
                   color: 'white',
                   cursor: 'pointer',
                   '&:hover': {
@@ -909,7 +909,7 @@ export default function AdminConfigPage() {
               </Button>
             </Stack>
 
-            {/* תאריך עדכון אחרון */}
+            {/* Last update date */}
             {parkingConfig.updatedAt && (
               <Typography variant="caption" color="text.secondary" sx={{ mt: 2, display: 'block' }}>
                 {(() => {
@@ -922,7 +922,7 @@ export default function AdminConfigPage() {
             )}
           </Box>
 
-          {/* דיאלוג אישור מחיקה */}
+          {/* Delete confirmation dialog */}
           {showDeleteConfirm && spotToDelete && (
             <Box
               sx={{
@@ -998,7 +998,7 @@ export default function AdminConfigPage() {
             </Box>
           )}
 
-          {/* הודעת שגיאה קופצת */}
+          {/* Popup error message */}
           {showErrorPopup && currentError && (
             <Box
               sx={{
