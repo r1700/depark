@@ -1,0 +1,64 @@
+{
+    "data": [
+        {
+            "SpaceId": 1,
+            "Occupied Hours": 7,
+            "Entries": 10,
+            "Exits": 12
+        },
+        {
+            "SpaceId": 2,
+            "Occupied Hours": 6,
+            "Entries": 13,
+            "Exits": 9
+        },
+        {
+            "SpaceId": 3,
+            "Occupied Hours": 7,
+            "Entries": 10,
+            "Exits": 12
+        },
+        {
+            "SpaceId": 4,
+            "Occupied Hours": 6,
+            "Entries": 13,
+            "Exits": 9
+        },
+        {
+            "SpaceId": 5,
+            "Occupied Hours": 7,
+            "Entries": 10,
+            "Exits": 12
+        },
+        {
+            "SpaceId": 6,
+            "Occupied Hours": 6,
+            "Entries": 13,
+            "Exits": 9
+        },
+        {
+            "SpaceId": 7,
+            "Occupied Hours": 7,
+            "Entries": 10,
+            "Exits": 12
+        },
+        {
+            "SpaceId": 8,
+            "Occupied Hours": 6,
+            "Entries": 13,
+            "Exits": 9
+        },
+        {
+            "SpaceId": 9,
+            "Occupied Hours": 7,
+            "Entries": 10,
+            "Exits": 12
+        },
+        {
+            "SpaceId": 10,
+            "Occupied Hours": 6,
+            "Entries": 13,
+            "Exits": 9
+        }
+    ]
+}
