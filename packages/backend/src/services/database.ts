@@ -30,7 +30,9 @@ export class DatabaseService {
 
   async getAllItems(): Promise<Object[]> {
     try {
-      const res = await this.getClient().query(`SELECT * FROM ${this.tableName} ORDER BY created_at ASC`);
+      const res = await this.getClient().query(`SELECT * FROM "ParkingSessions" ORDER BY id ASC`);
+      console.log({res});
+      
       return res.rows || [];
     } catch (error) {
       console.error('Error in getAllItems:', error);
