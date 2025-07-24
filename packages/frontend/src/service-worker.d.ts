@@ -1,6 +1,6 @@
 /// <reference types="react-scripts" />
 /// <reference lib="webworker" />
-/// <reference types="workbox-sw" />
+// /// <reference types="workbox-sw" />
 
 declare global {
   interface Event {

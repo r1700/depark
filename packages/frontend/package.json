@@ -19,8 +19,10 @@
     "axios": "^1.4.0"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start": "concurrently \"react-scripts start\" \"webpack serve --config webpack.config.js\"",
+    "build:react": "react-scripts build",
+    "build:service-worker": "webpack --config webpack.config.js",
+    "build": "npm run build:react && npm run build:service-worker",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

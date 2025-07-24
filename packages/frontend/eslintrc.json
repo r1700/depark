@@ -1,0 +1,14 @@
+{
+  "globals": {
+    "self": "readonly"
+  },
+  "rules": {
+    "no-restricted-globals": [
+      ["error", "event", "fdescribe", "self"],
+      {
+        "name": "self",
+        "message": "Use the ServiceWorkerGlobalScope API"
+      }
+    ]
+  }
+}
