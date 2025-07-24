@@ -1,87 +1,73 @@
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { Item } from '@base-project/shared';
+import { Client } from 'pg';
 
 export class DatabaseService {
-  private readonly tableName = 'items';
-  private supabase: SupabaseClient | null = null;
+  private readonly tableName = 'ParkingSessions';
+  private client: Client | null = null;
 
-  private getClient(): SupabaseClient {
-    if (!this.supabase) {
-      const supabaseUrl = process.env.SUPABASE_URL;
-      const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
-
-      if (!supabaseUrl || !supabaseKey) {
-        throw new Error('Missing Supabase configuration. Please check your environment variables.');
+  private getClient(): Client {
+    if (!this.client) {
+      const databaseUrl = process.env.DATABASE_URL;
+      if (!databaseUrl) {
+        throw new Error('Missing PostgreSQL configuration. Please check your environment variables.');
       }
 
-      this.supabase = createClient(supabaseUrl, supabaseKey);
+      this.client = new Client({
+        connectionString: databaseUrl,
+      });
+
+      // Connect to the PostgreSQL database
+      this.client.connect().catch((err) => {
+        console.error('Failed to connect to PostgreSQL:', err);
+        throw new Error('Failed to connect to PostgreSQL database');
+      });
     }
-    return this.supabase;
+    return this.client;
   }
 
   canInitialize(): boolean {
-    return this.getClient() !== null;
+    return this.client !== null;
   }
 
-  async getAllItems(): Promise<Item[]> {
+  async getAllItems(): Promise<Object[]> {
     try {
-      const { data, error } = await this.getClient()
-        .from(this.tableName)
-        .select('*')
-        .order('created_at', { ascending: true });
-
-      if (error) {
-        console.error('Database error fetching items:', error);
-        throw new Error('Failed to fetch items from database');
-      }
-
-      return data || [];
+      const res = await this.getClient().query(`SELECT * FROM ${this.tableName} ORDER BY created_at ASC`);
+      return res.rows || [];
     } catch (error) {
       console.error('Error in getAllItems:', error);
-      throw error;
+      throw new Error('Failed to fetch items from database');
     }
   }
 
-  async getItemById(id: string): Promise<Item | null> {
+  async getItemById(id: string): Promise<Object | null> {
     try {
-      const { data, error } = await this.getClient()
-        .from(this.tableName)
-        .select('*')
-        .eq('id', id)
-        .single();
+      const res = await this.getClient().query(
+        `SELECT * FROM ${this.tableName} WHERE id = $1 LIMIT 1`,
+        [id]
+      );
 
-      if (error) {
-        if (error.code === 'PGRST116') {
-          return null; // Item not found
-        }
-        console.error('Database error fetching item:', error);
-        throw new Error('Failed to fetch item from database');
+      if (res.rowCount === 0) {
+        return null; // Item not found
       }
 
-      return data;
+      return res.rows[0];
     } catch (error) {
       console.error('Error in getItemById:', error);
-      throw error;
+      throw new Error('Failed to fetch item from database');
     }
   }
 
-  async createItem(item: Omit<Item, 'id'>): Promise<Item> {
+  async createItem(item: Omit<Object, 'id'>): Promise<Object> {
     try {
-      const { data, error } = await this.getClient()
-        .from(this.tableName)
-        .insert([item])
-        .select()
-        .single();
+      const { name, type, amount } = item as any; // Explicit casting to extract fields
+      const res = await this.getClient().query(
+        `INSERT INTO ${this.tableName} (name, type, amount) VALUES ($1, $2, $3) RETURNING *`,
+        [name, type, amount]
+      );
 
-      if (error) {
-        console.error('Database error creating item:', error);
-        throw new Error('Failed to create item in database');
-      }
-
-      return data;
+      return res.rows[0];
     } catch (error) {
       console.error('Error in createItem:', error);
-      throw error;
+      throw new Error('Failed to create item in database');
     }
   }
 
@@ -109,6 +95,19 @@ export class DatabaseService {
     } catch (error) {
       console.error('Failed to initialize sample data:', error);
       // Don't throw the error, just log it
+    }
+  }
+
+  // Close PostgreSQL connection when done
+  async closeConnection(): Promise<void> {
+    try {
+      if (this.client) {
+        await this.client.end();
+        this.client = null;
+        console.log('PostgreSQL connection closed');
+      }
+    } catch (error) {
+      console.error('Error closing connection:', error);
     }
   }
 }
