@@ -19,15 +19,15 @@ interface LoginScreenProps {
 }
 
 interface IFormInputs {
-  username: string;
+  email: string;
   password: string;
 }
 
 const schema = yup.object({
-  username: yup
+  email: yup
     .string()
-    .required("Username is required")
-    .min(3, "Username must be at least 3 characters"),
+    .email("Invalid email format")
+    .required("Email is required"),
   password: yup
     .string()
     .required("Password is required")
@@ -44,7 +44,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
     formState: { errors, isValid },
   } = useForm<IFormInputs>({
     resolver: yupResolver(schema),
-    mode: "onChange", 
+    mode: "onChange",
     reValidateMode: "onChange",
   });
 
@@ -54,10 +54,11 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
 
     setTimeout(() => {
       setLoading(false);
-      if (data.username === "admin" && data.password === "1234") {
+      // Check login credentials
+      if (data.email === "admin@example.com" && data.password === "1234") {
         onLogin();
       } else {
-        setServerError("Incorrect username or password");
+        setServerError("Incorrect email or password");
       }
     }, 1500);
   };
@@ -84,19 +85,19 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
 
         <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate sx={{ mt: 1 }}>
           <Controller
-            name="username"
+            name="email"
             control={control}
             defaultValue=""
             render={({ field }) => (
               <TextField
                 {...field}
-                label="Username"
+                label="Email"
                 variant="outlined"
                 fullWidth
                 margin="normal"
-                error={!!errors.username}
-                helperText={errors.username ? errors.username.message : ""}
-                autoComplete="username"
+                error={!!errors.email}
+                helperText={errors.email ? errors.email.message : ""}
+                autoComplete="email"
                 autoFocus
                 dir="ltr"
               />
