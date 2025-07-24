@@ -36,3 +36,6 @@ coverage/
 # Temporary files
 tmp/
 temp/
+
+package.json
+package-lock.json
