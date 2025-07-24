@@ -1,0 +1,107 @@
+.charts-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    /* background-color: #f4f6f9; */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.filter-bar {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 20px;
+}
+
+.filter-btn {
+    padding: 10px 20px;
+    margin-right: 10px;
+    background-color: #4CAF50;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.filter-btn:hover {
+    background-color: #45a049;
+}
+
+.chart-switcher {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 30px;
+}
+
+.chart-btn {
+    padding: 12px 30px;
+    font-size: 16px;
+    margin-right: 15px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-align: center;
+}
+
+.chart-btn:hover {
+    background-color: #0056b3;
+}
+
+.chart-btn.active {
+    background-color: #0056b3;
+}
+
+.chart {
+    width: 100%;
+    height: 400px;
+}
+
+.chart-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    width: 60%;  /* Adjust the chart container width */
+    height: 400px; /* Adjust the chart container height */
+    margin: 40px;
+}
+
+.pie-chart {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    width: 100%;
+    height: 100%;
+}
+
+.legend-container {
+    display: flex;
+    flex-direction: column; /* Stack the legend items vertically */
+    justify-content: flex-start;
+    align-items: flex-end;
+    padding-left: 20px; /* Space between the chart and the legend */
+    margin-top: 20px; /* Optional: add space from the chart */
+}
+
+.legend-item {
+    margin-bottom: 10px;
+}
+
+@media (max-width: 768px) {
+    .filter-bar,
+    .chart-switcher {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .filter-btn,
+    .chart-btn {
+        margin-bottom: 10px;
+    }
+}

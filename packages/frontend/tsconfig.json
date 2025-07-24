@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "types": ["node", "html2canvas"],  
     "target": "es5",
     "lib": [
       "dom",
