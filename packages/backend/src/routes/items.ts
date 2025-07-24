@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { Item, ItemsResponse, ItemResponse } from '@base-project/shared';
 import { databaseService } from '../services/database';
+import { Item, ItemResponse, ItemsResponse } from 'src/shared';
 
 const router = Router();
 
@@ -80,7 +80,8 @@ router.get('/:id', async (req, res) => {
     if (!item) {
       const response: ItemResponse = {
         success: false,
-        error: 'Item not found'
+        error: 'Item not found',
+        data: null
       };
       return res.status(404).json(response);
     }
@@ -98,7 +99,8 @@ router.get('/:id', async (req, res) => {
     if (!item) {
       const response: ItemResponse = {
         success: false,
-        error: 'Item not found'
+        error: 'Item not found',
+        data: null
       };
       return res.status(404).json(response);
     }

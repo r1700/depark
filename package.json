@@ -14,5 +14,14 @@
     "build:backend": "npm run build --workspace=packages/backend",
     "build:frontend": "npm run build --workspace=packages/frontend",
     "install:all": "npm install && npm install --workspace=packages/backend && npm install --workspace=packages/frontend && npm install --workspace=packages/opc"
+ 
+  },
+  "dependencies": {
+    "pg": "^8.16.3",
+    "react-scripts": "^0.0.0"
+  },
+  "devDependencies": {
+    "jest": "^30.0.4",
+    "supabase": "^2.30.4"
   }
 }

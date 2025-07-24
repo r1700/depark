@@ -16,7 +16,7 @@ git clone https://github.com/diversi-tech/depark
 cd depark
 
 # Install all dependencies
-npm install:all
+npm run install:all
 
 # Set up environment files
 copy packages\backend\.env.example packages\backend\.env

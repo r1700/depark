@@ -26,10 +26,19 @@ app.use('/api/items', itemsRoutes);
 
 
 app.listen(PORT, async () => {
+  // בדוק את הערכים של משתני הסביבה
+console.log('SUPABASE_URL:', process.env.SUPABASE_URL);
+console.log('SUPABASE_SERVICE_ROLE_KEY:', process.env.SUPABASE_SERVICE_ROLE_KEY);
+console.log('SUPABASE_ANON_KEY:', process.env.SUPABASE_ANON_KEY);
+
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`🌐 CORS enabled for: ${CORS_ORIGIN}`);
-  
+  // index.js או app.js
+
+
+// המשך עם הקוד שלך להתחברות למסד הנתונים
+
   // Initialize database with sample data if using Supabase
   if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
     console.log('🗄️ Initializing database...');
