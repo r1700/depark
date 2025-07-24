@@ -2,6 +2,8 @@
 dist/
 build/
 *.tsbuildinfo
+package.json
+
 
 # Environment variables
 .env
