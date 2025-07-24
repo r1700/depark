@@ -1,6 +1,5 @@
-const { Client } = require('pg');  // יש להגדיר את ה-Client רק פעם אחת
+const { Client } = require('pg');  
 
-// פונקציה לחיבור למסד הנתונים
 const connectToDB = async () => {
   const client = new Client({
     user: 'postgres',          
@@ -11,7 +10,7 @@ const connectToDB = async () => {
   });
 
   try {
-    await client.connect();  // חיבור למסד הנתונים
+    await client.connect();  
     console.log('Connected to PostgreSQL!');
 
     const res = await client.query('SELECT * FROM BaseUsers');
