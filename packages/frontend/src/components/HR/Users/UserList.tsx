@@ -94,6 +94,7 @@ export default function UserList() {
   }
 
   function handleAddVehicle(employeeId: string) {
+    setSelectedVehicle(null);
     openAddVehicleModal();
 
   }
@@ -152,11 +153,6 @@ export default function UserList() {
 
     <Fade in={showAddUserModal || showAddVehicleModal} >
       <Box sx={styleModal}>
-        {/* <AddUser
-          userToEdit={selectedUser}
-          onClose={closeAddUserModal} /> */}
-          {/* <AddOrEditUserForm userToEdit={selectedUser} */}
-          {/* onClose={closeAddUserModal}></AddOrEditUserForm> */}
 
 {showAddUserModal? <UserForm onClose={closeAddUserModal} userToEdit={selectedUser}
          ></UserForm>:<VehicleForm onClose={closeAddVehicleModal} vehicleToEdit={selectedVehicle}

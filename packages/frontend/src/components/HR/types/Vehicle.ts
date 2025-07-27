@@ -12,5 +12,11 @@ export interface Vehicle {
   createdAt: Date;
   updatedAt: Date;
   addedBy: 'user' | 'hr';
+  height?: number;
+  width?: number;
+  length?: number;
+  weight?: number;
+  dimensionsSource?: 'model_reference' | 'manual_override' | 'government_db';
 
 }
+

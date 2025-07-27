@@ -19,8 +19,12 @@ const newUsers: string[] = mockUsers.map((user) => `${user.firstName} ${user.las
 
   const VehicleFields: FieldConfig<Vehicle>[] = [
   { name: 'licensePlate', label: 'License Plate', required: true,type:'text'},
-  { name:'user',label:'User',required:true,type:'select',options: newUsers// לדוגמה, לבחור לפי שם
-}
+  { name:'user',label:'User',required:true,type:'select',options: newUsers},
+  { name:'width',label:'Width',type:'number'},
+  { name:'height',label:'Height',type:'number'},
+  { name:'length',label:'Length',type:'number'},
+  { name:'weight',label:'Weight',type:'number'},
+  { name: 'dimensionsSource', label: 'Dimensions Source', type: 'boolean'} 
 ];
 
   return (

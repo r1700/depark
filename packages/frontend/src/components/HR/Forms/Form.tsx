@@ -1,7 +1,7 @@
 // packages/frontend/src/components/HR/AddUser/GenericForm.tsx
 
 import React, { useState, useEffect } from 'react';
-import { Box, Button, TextField, Typography, Paper, MenuItem, Autocomplete } from '@mui/material';
+import { Box, Button, TextField, Typography, Paper, MenuItem, Autocomplete, Checkbox, FormControlLabel } from '@mui/material';
 
 
 export type FieldConfig<T> = {
@@ -127,10 +127,24 @@ const GenericForm = <T extends { [key: string]: any }>({
               />
             </Box>
           ) : field.type === 'boolean' ? (
-            <label>
-              <input type="checkbox" checked={isChecked} onChange={handleChange} />
-              {isChecked ? true : false}
-            </label>
+            <div>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={isChecked}
+                    onChange={handleChange}
+                    inputProps={{ 'aria-label': 'controlled' }}
+                  />
+                }
+                label={field.label}
+                sx={{
+                  '& .MuiFormControlLabel-label': {
+                    color: 'text.primary',
+                  }
+                }}
+              />
+            </div>
+
           ) :
             (
               <TextField
