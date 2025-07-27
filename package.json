@@ -7,12 +7,20 @@
     "packages/*"
   ],
   "scripts": {
-    "dev:opc": "npm run dev --workspace=packages/opc",
-    "dev:backend": "npm run dev --workspace=packages/backend",
-    "dev:frontend": "npm run start --workspace=packages/frontend",
-    "build:opc": "npm run build --workspace=packages/opc",
-    "build:backend": "npm run build --workspace=packages/backend",
-    "build:frontend": "npm run build --workspace=packages/frontend",
-    "install:all": "npm install && npm install --workspace=packages/backend && npm install --workspace=packages/frontend && npm install --workspace=packages/opc"
+    "db:migrate": "npx sequelize-cli db:migrate --migrations-path ./packages/migrations --config ./sequelize.config.js",
+    "db:migrate:undo": "npx sequelize-cli db:migrate:undo --migrations-path ./packages/migrations --config ./sequelize.config.js",
+    "migration:generate": "npx sequelize-cli migration:generate --migrations-path ./packages/migrations --config ./sequelize.config.js"
+  },
+  "devDependencies": {
+    "sequelize-cli": "^6.6.3"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.1",
+    "pg": "^8.16.3",
+    "sequelize": "^6.37.7",
+    "sequelize-typescript": "^2.1.6",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "typeorm": "^0.3.25"
   }
 }
