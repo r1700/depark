@@ -23,7 +23,9 @@ app.use(express.json());
 // Routes
 app.use('/api/health', healthRoutes);
 app.use('/api/items', itemsRoutes);
-
+app.post('/vehicle-lookup', (req, res) => {
+  res.json({ found: true, data: { licensePlate: req.body.licensePlate } });
+});
 
 app.listen(PORT, async () => {
   // בדוק את הערכים של משתני הסביבה
