@@ -108,4 +108,7 @@ Thumbs.db
 # Local environment files
 .env*.local
 package-lock.json
+package.jsonpackage-lock.json
+
+package-lock.json
 package.json
