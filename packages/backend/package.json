@@ -7,7 +7,11 @@
     "dev": "nodemon src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "sequelize-cli": "ts-node -r tsconfig-paths/register ./node_modules/.bin/sequelize-cli",
+    "db:migrate": "npx sequelize-cli db:migrate --migrations-path ./packages/migrations --config ./sequelize.config.js",
+  "db:migrate:undo": "npx sequelize-cli db:migrate:undo --migrations-path ./packages/migrations --config ./sequelize.config.js",
+  "migration:generate": "npx sequelize-cli migration:generate --migrations-path ./packages/migrations --config ./sequelize.config.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.49.8",
