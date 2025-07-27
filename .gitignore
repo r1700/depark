@@ -115,3 +115,9 @@ knexfile.js
 migrations/
 packages/frontend/src/app/
 packages/frontend/src/components/screen-login/
+
+
+package-lock.json
+package.json
+packages/backend/package.json
+.env
