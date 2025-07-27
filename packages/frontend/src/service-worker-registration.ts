@@ -1,15 +1,21 @@
 let socket: WebSocket;
+let reconnectTimeout: number | undefined = undefined;
 
 function connectWebSocket() {
   socket = new WebSocket('ws://localhost:3000');
 
   socket.onerror = (error) => {
     console.error('WebSocket error:', error);
+
+    if (reconnectTimeout) clearTimeout(reconnectTimeout);
     setTimeout(() => connectWebSocket(), 5000);
   };
 
   socket.onopen = () => {
     console.log('WebSocket connected');
+    if (reconnectTimeout) {
+      clearTimeout(reconnectTimeout);
+    }
   };
 
   socket.onmessage = (event) => {
@@ -23,6 +29,7 @@ function connectWebSocket() {
 
   socket.onclose = () => {
     console.log('WebSocket closed');
+    if (reconnectTimeout) clearTimeout(reconnectTimeout);
     setTimeout(() => connectWebSocket(), 5000);
   };
 }
@@ -32,8 +39,7 @@ connectWebSocket();
 export function register() {
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      // const swUrl = '/packages/frontend/dist/custom-service-worker.js';
-      const swUrl = '/custom-service-worker.js';
+      const swUrl = '/build/service-worker.js';
 
       navigator.serviceWorker
         .register(swUrl)
@@ -50,7 +56,9 @@ export function register() {
 export function unregister() {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.ready.then((registration) => {
-      registration.unregister();
+      registration.unregister()
+        .then(() => console.log('Service Worker unregistered'))
+        .catch((error) => console.error('Failed to unregister Service Worker:', error));
     });
   }
 }

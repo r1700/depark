@@ -11,17 +11,17 @@ declare global {
   waitUntil(promise: Promise<any>): void;
 }
 
-  // class InstallEvent extends ExtendableEvent {
+// class InstallEvent extends ExtendableEvent {
   //   waitUntil(promise: Promise<any>): void;
   // }
-
+  
   // class ActivateEvent extends ExtendableEvent {
-  //   waitUntil(promise: Promise<any>): void;
-  // }
-}
-
-// declare module 'workbox-sw' {
-//   export type ActivateEvent = Event;
-// }
-
-export {};
+    //   waitUntil(promise: Promise<any>): void;
+    // }
+  }
+  
+  // declare module 'workbox-sw' {
+    //   export type ActivateEvent = Event;
+    // }
+    
+    export {};

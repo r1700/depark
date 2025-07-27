@@ -47,9 +47,9 @@ function App() {
     // }
   };
 
-  const clearSelection = () => {
-    // setSelectedItem(null);
-  };
+  // const clearSelection = () => {
+  //    setSelectedItem(null);
+  // };
 
   // return (
   //   <div className="App">

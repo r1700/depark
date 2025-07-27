@@ -2,12 +2,11 @@ const path = require('path');
 const WorkboxPlugin = require('workbox-webpack-plugin');
 
 module.exports = {
-  mode: 'development',
+  mode: 'production',
   entry: './src/service-worker.ts',
   output: {
-    path: path.resolve(__dirname, './public'),
+    path: path.resolve(__dirname, 'build'),
     publicPath: '/',
-    clean: true,
   },
   resolve: {
     extensions: ['.ts', '.js'],
@@ -23,23 +22,23 @@ module.exports = {
   },
   devServer: {
     static: {
-      directory: path.join(__dirname, './public'),
+      directory: path.join(__dirname, 'build'),
       publicPath: '/',
-      watchContentBase: true,
-      hot: true,
-      open: true,
-      historyApiFallback: true,
     },
+    watchFiles: ['src/**/*'],
+    hot: true,
+    open: true,
+    historyApiFallback: true,
     port: 3000,
   },
   devtool: 'source-map',
   plugins: [
     new WorkboxPlugin.InjectManifest({
       swSrc: './src/service-worker.ts',
-      swDest: 'custom-service-worker.js',
+      swDest: 'service-worker.js',
     }),
   ],
   optimization: {
-    minimize: true,
+    minimize: process.env.NODE_ENV === 'production',
   },
 };
