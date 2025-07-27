@@ -5,7 +5,8 @@ dotenv.config();
 import express from 'express';
 import cors from 'cors';
 import healthRoutes from './routes/health';
-import itemsRoutes from './routes/items';
+import vehicleRoutes from './routes/vehicle';
+// import itemsRoutes from './routes/items';
 // import { databaseService } from './services/database';
 
 
@@ -22,7 +23,8 @@ app.use(express.json());
 
 // Routes
 app.use('/api/health', healthRoutes);
-app.use('/api/items', itemsRoutes);
+// app.use('/api/items', itemsRoutes);
+app.use('/api/vehicle', vehicleRoutes);
 
 
 app.listen(PORT, async () => {
@@ -42,9 +44,9 @@ app.listen(PORT, async () => {
     //     console.error('❌ Database sample-data initialization failed');
     //   }
     // } catch (error) {
-    //   console.error('❌ Database not connected');
-    // }
-  } else {
-    console.log('📝 Using mock data - Supabase not configured');
-  }
-});
+      console.error('❌ Database not connected');
+    }
+//   } else {
+//     console.log('📝 Using mock data - Supabase not configured');
+//   }
+ });
