@@ -7,8 +7,11 @@
     "packages/*"
   ],
   "scripts": {
-    "dev:opc": "npm run dev --workspace=packages/opc",
-    "dev:backend": "npm run dev --workspace=packages/backend",
+    "db:migrate": "npx sequelize-cli db:migrate --migrations-path ./packages/migrations --config ./sequelize.config.js",
+    "db:migrate:undo": "npx sequelize-cli db:migrate:undo --migrations-path ./packages/migrations --config ./sequelize.config.js",
+    "migration:generate": "npx sequelize-cli migration:generate --migrations-path ./packages/migrations --config ./sequelize.config.js",
+  "dev:opc": "npm run dev --workspace=packages/opc",
+  "dev:backend": "npm run dev --workspace=packages/backend",
     "dev:frontend": "npm run start --workspace=packages/frontend",
     "build:opc": "npm run build --workspace=packages/opc",
     "build:backend": "npm run build --workspace=packages/backend",

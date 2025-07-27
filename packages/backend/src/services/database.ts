@@ -1,5 +1,5 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { Item } from '@base-project/shared';
+// import { Item } from '@base-project/shared';
 
 export class DatabaseService {
   private readonly tableName = 'items';
@@ -23,7 +23,7 @@ export class DatabaseService {
     return this.getClient() !== null;
   }
 
-  async getAllItems(): Promise<Item[]> {
+  async getAllItems(): Promise<Object[]> {
     try {
       const { data, error } = await this.getClient()
         .from(this.tableName)
@@ -42,7 +42,7 @@ export class DatabaseService {
     }
   }
 
-  async getItemById(id: string): Promise<Item | null> {
+  async getItemById(id: string): Promise<Object | null> {
     try {
       const { data, error } = await this.getClient()
         .from(this.tableName)
@@ -65,7 +65,7 @@ export class DatabaseService {
     }
   }
 
-  async createItem(item: Omit<Item, 'id'>): Promise<Item> {
+  async createItem(item: Omit<Object, 'id'>): Promise<Object> {
     try {
       const { data, error } = await this.getClient()
         .from(this.tableName)
