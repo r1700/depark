@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const backendUrl = "https://<backend_url>/vehicle-lookup";
+const backendUrl = "http://localhost:3001/vehicle-lookup";
 
 async function sendLicensePlateToBackend(licensePlate: string) {
   try {
