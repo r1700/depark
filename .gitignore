@@ -114,3 +114,4 @@ Thumbs.db
 packages/frontend/package.json
 package.json
 package-lock.json
+packages/backend/src/config/sequelize.config.ts  
