@@ -1,17 +1,16 @@
 import path from 'path';
 
-console.log('sequelize.config.ts is running...');
-console.log(path.resolve(__dirname, '../../../migrations'));
+require('dotenv').config();
+
+const { DATA_USERNAME, PASSWORD, HOST, DATABASE }: any = process.env || 'development';
 
 
-
-// Configuration for Sequelize ORM
 export default {
   development: {
-    username: 'postgres',
-    password: 'Leah#31529',
-    database: 'depark',
-    host: 'localhost',
+    username: DATA_USERNAME || 'postgres',
+    password: PASSWORD || '1234',
+    database: DATABASE || 'depark',
+    host: HOST || 'localhost',
     dialect: 'postgres',
     migrationStorageTableName: 'sequelize_meta',
     migrations: {
