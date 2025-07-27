@@ -1,3 +1,4 @@
+
 console.log('sequelize.config.js');
 require('ts-node').register({
     transpileOnly: true,

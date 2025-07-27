@@ -5,6 +5,7 @@ console.log(path.resolve(__dirname, '../../../migrations'));
 
 
 
+// Configuration for Sequelize ORM
 export default {
   development: {
     username: 'postgres',

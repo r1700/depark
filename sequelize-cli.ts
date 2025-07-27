@@ -2,6 +2,7 @@
 console.log('sequelize-cli.ts is running...');
 
 
+
 require('ts-node').register({
     transpileOnly: true,
     compilerOptions: {
