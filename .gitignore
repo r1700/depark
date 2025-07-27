@@ -109,3 +109,7 @@ Thumbs.db
 .env*.local
 package.json
 package-lock.json
+<<<<<<< HEAD
+=======
+package.json
+>>>>>>> 7c13d823129a3596c6e873bfae9cae25d44e1260

@@ -14,10 +14,18 @@ export async function getVehicleDetailsByDegem(degem: string) {
   if (vehicleData.length > 0) {
     const vehicle = vehicleData[0];
     return {
+<<<<<<< HEAD
       mishkal_kolel: vehicle.mishkal_kolel || 'not available',
       gova: vehicle.gova || 'not available',
     };
   } else {
     throw new Error('No results found for the model');
+=======
+      mishkal_kolel: vehicle.mishkal_kolel || 'לא זמין',
+      gova: vehicle.gova || 'לא זמין',
+    };
+  } else {
+    throw new Error('לא נמצאו תוצאות עבור הדגם');
+>>>>>>> 7c13d823129a3596c6e873bfae9cae25d44e1260
   }
 }
