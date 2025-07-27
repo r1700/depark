@@ -21,6 +21,8 @@ import {
   ThemeProvider,
   createTheme,
   Checkbox,
+  Radio,
+  RadioGroup
 } from '@mui/material';
 
 import {
@@ -43,13 +45,6 @@ interface ParkingConfig {
   timezone: string;
   surfaceSpotIds: string[];
   totalSpots: number;
-
-  // Remove general hours:
-  // openingHour: string;
-  // closingHour: string;
-  // activeDays: string[];
-
-  // Add hours for each day:
   dailyHours: {
     [key: string]: {
       isActive: boolean;
@@ -57,9 +52,9 @@ interface ParkingConfig {
       closingHour: string;
     };
   };
-
   maxQueueSize: number;
   avgRetrievalTime: number;
+  maxParallelRetrievals: number; // ✅ חדש!
   maintenanceMode: boolean;
   showAdminAnalytics: boolean;
   updatedAt?: Date;
@@ -135,7 +130,7 @@ const timezones = [
 ];
 
 const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-const maxSpotsLimit = 100; // Change from 100 to 3
+const maxSpotsLimit = 100;
 
 export default function AdminConfigPage() {
   // Initial config
@@ -156,6 +151,7 @@ export default function AdminConfigPage() {
     },
     maxQueueSize: 0,
     avgRetrievalTime: 0,
+    maxParallelRetrievals:0, // ✅ ברירת מחדל
     maintenanceMode: false,
     showAdminAnalytics: false
   };
@@ -322,6 +318,10 @@ export default function AdminConfigPage() {
       errors.push('Please set Average Retrieval Time to a number greater than 0');
     }
 
+    if (parkingConfig.maxParallelRetrievals <= 0) {
+      errors.push('Please set Max Parallel Retrievals to a number greater than 0');
+    }
+
     return {
       isValid: errors.length === 0,
       firstError: errors.length > 0 ? errors[0] : null,
@@ -419,6 +419,7 @@ export default function AdminConfigPage() {
       },
       maxQueueSize: 0,
       avgRetrievalTime: 0,
+      maxParallelRetrievals: 0, // ✅ ברירת מחדל
       maintenanceMode: false,
       showAdminAnalytics: false,
       updatedAt: new Date(),
@@ -807,6 +808,18 @@ export default function AdminConfigPage() {
                       avgRetrievalTime: parseInt(e.target.value) || 0
                     }))}
                   />
+                  {/* ✅ חדש: */}
+                  <TextField
+                    fullWidth
+                    label="Max Parallel Retrievals"
+                    type="number"
+                    value={parkingConfig.maxParallelRetrievals}
+                    onChange={(e) => setParkingConfig(prev => ({
+                      ...prev,
+                      maxParallelRetrievals: parseInt(e.target.value) || 0
+                    }))}
+                    // inputProps={{ min: 1 }}
+                  />
                 </Stack>
               </CardContent>
             </StyledCard>
@@ -834,33 +847,63 @@ export default function AdminConfigPage() {
               />
               <CardContent sx={{ pt: 0 }}>
                 <Stack spacing={2}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={parkingConfig.maintenanceMode}
-                        onChange={(e) => setParkingConfig(prev => ({
+                  {/* Maintenance Mode as Radio */}
+                  <Box>
+                    <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
+                      Maintenance Mode
+                    </Typography>
+                    <RadioGroup
+                      row
+                      value={parkingConfig.maintenanceMode ? 'on' : 'off'}
+                      onChange={(e) =>
+                        setParkingConfig(prev => ({
                           ...prev,
-                          maintenanceMode: e.target.checked
-                        }))}
-                        color="primary" // Blue
+                          maintenanceMode: e.target.value === 'on'
+                        }))
+                      }
+                    >
+                      <FormControlLabel
+                        value="on"
+                        control={<Radio color="primary" />}
+                        label={<Typography color="primary">Active</Typography>}
                       />
-                    }
-                    label="Maintenance Mode"
-                  />
-                  
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={parkingConfig.showAdminAnalytics}
-                        onChange={(e) => setParkingConfig(prev => ({
-                          ...prev,
-                          showAdminAnalytics: e.target.checked
-                        }))}
-                        color="primary" // Blue
+                      <FormControlLabel
+                        value="off"
+                        control={<Radio color="primary" />}
+                        label={<Typography color="primary">off</Typography>}
                       />
-                    }
-                    label="Show Admin Analytics"
-                  />
+                    </RadioGroup>
+                  </Box>
+
+                  {/* Show Admin Analytics checkbox remains as is */}
+<Box>
+  <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
+    Show Admin Analytics
+  </Typography>
+  <RadioGroup
+    row
+    value={parkingConfig.showAdminAnalytics ? 'on' : 'off'}
+    onChange={(e) =>
+      setParkingConfig(prev => ({
+        ...prev,
+        showAdminAnalytics: e.target.value === 'on'
+      }))
+    }
+  >
+    <FormControlLabel
+      value="on"
+      control={<Radio color="primary" />}
+      label={<Typography color="primary">Active</Typography>}
+    />
+    <FormControlLabel
+      value="off"
+      control={<Radio color="primary" />}
+      label={<Typography color="primary">off</Typography>}
+    />
+  </RadioGroup>
+  
+</Box>
+
                 </Stack>
               </CardContent>
             </StyledCard>
@@ -881,15 +924,23 @@ export default function AdminConfigPage() {
                 startIcon={saving ? <TimeIcon /> : undefined}
                 sx={{
                   minWidth: 200,
-                  bgcolor: 'primary.main', // Always blue
+                  bgcolor: 'primary.main',
                   color: 'white',
-                  cursor: 'pointer',
+                  boxShadow: '0 4px 16px rgba(25, 118, 210, 0.10)',
+                  borderRadius: 3,
+                  fontWeight: 700,
+                  letterSpacing: 1,
+                  transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)',
                   '&:hover': {
-                    bgcolor: 'primary.dark'
+                    bgcolor: 'primary.dark',
+                    boxShadow: '0 8px 32px rgba(25, 118, 210, 0.18)',
+                    transform: 'translateY(-2px) scale(1.03)'
                   },
                   '&.Mui-disabled': {
                     bgcolor: 'grey.400',
-                    color: 'text.disabled'
+                    color: 'white',
+                    boxShadow: 'none',
+                    opacity: 0.7
                   }
                 }}
               >
@@ -903,7 +954,30 @@ export default function AdminConfigPage() {
                 size="large"
                 onClick={resetToDefaults}
                 disabled={saving}
-                sx={{ minWidth: 150 }}
+                sx={{
+                  minWidth: 150,
+                  color: 'primary.main',
+                  borderColor: 'primary.main',
+                  fontWeight: 700,
+                  letterSpacing: 1,
+                  borderRadius: 3,
+                  transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)',
+                  boxShadow: '0 2px 8px rgba(25, 118, 210, 0.07)',
+                  '&:hover': {
+                    bgcolor: 'primary.main',
+                    color: 'white',
+                    borderColor: 'primary.dark',
+                    boxShadow: '0 8px 32px rgba(25, 118, 210, 0.18)',
+                    transform: 'translateY(-2px) scale(1.03)'
+                  },
+                  '&.Mui-disabled': {
+                    bgcolor: 'grey.100',
+                    color: 'grey.400',
+                    borderColor: 'grey.300',
+                    boxShadow: 'none',
+                    opacity: 0.7
+                  }
+                }}
               >
                 🔄 Reset to Defaults
               </Button>

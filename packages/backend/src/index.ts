@@ -36,6 +36,7 @@ app.listen(PORT, async () => {
       databaseService.canInitialize();
       try {
        
+        
         console.log('✅ Database initialized successfully');  
       } catch (error) {
         console.error('❌ Database sample-data initialization failed');
