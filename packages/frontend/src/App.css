@@ -177,6 +177,7 @@ body {
   box-shadow: 0 4px 12px rgba(74, 144, 226, 0.4);
 }
 
+
 /* מצב נבחר + hover */
 .day-checkbox input[type="checkbox"]:checked + .day-label:hover {
   background: linear-gradient(135deg, #357ABD, #2c5aa0);
@@ -655,6 +656,9 @@ body {
   position: absolute;
   top: 5px;
   right: 8px;
+.App-header {
+  background-color: #282c34;
+  height: 5rem;
   color: white;
   font-weight: bold;
   font-size: 1.2rem;
@@ -750,4 +754,11 @@ body {
     font-size: 1rem;
     min-height: 60px;
   }
+}
+
+}
+
+.App-header h1 {
+  margin: 0 0 10px 0;
+  font-size: 2rem;
 }

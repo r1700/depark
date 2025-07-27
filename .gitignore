@@ -110,8 +110,4 @@ Thumbs.db
 # Local environment files
 .env*.local
 
-connection/
-knexfile.js
-migrations/
-packages/frontend/src/app/
-packages/frontend/src/components/screen-login/
+
