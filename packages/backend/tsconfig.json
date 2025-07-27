@@ -6,7 +6,6 @@
       "moduleResolution": "Node", 
       "lib": ["ES2020"],
       "outDir": "./dist",
-      "rootDir": "./src",
       "strict": true,
       "esModuleInterop": true,
       "skipLibCheck": true,
@@ -14,9 +13,10 @@
       "resolveJsonModule": true,
       "declaration": true,
       "declarationMap": true,
-      "sourceMap": true
+      "sourceMap": true,
+      "jsx": "react-jsx"
     },
-    "include": ["src/**/*"],
+    "include": ["src/**/*", "backend/**/*"],
     "exclude": ["node_modules", "dist"],
     "ts-node": {
       "esm": false
