@@ -6,7 +6,7 @@ import express from 'express';
 import cors from 'cors';
 import healthRoutes from './routes/health';
 import itemsRoutes from './routes/items';
-import { databaseService } from './services/database';
+// import { databaseService } from './services/database';
 
 
 const app = express();
@@ -33,17 +33,17 @@ app.listen(PORT, async () => {
   // Initialize database with sample data if using Supabase
   if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
     console.log('🗄️ Initializing database...');
-    try {
-      databaseService.canInitialize();
-      try {
-        await databaseService.initializeSampleData();
-        console.log('✅ Database initialized successfully');  
-      } catch (error) {
-        console.error('❌ Database sample-data initialization failed');
-      }
-    } catch (error) {
-      console.error('❌ Database not connected');
-    }
+    // try {
+    //   databaseService.canInitialize();
+    //   try {
+    //     await databaseService.initializeSampleData();
+    //     console.log('✅ Database initialized successfully');  
+    //   } catch (error) {
+    //     console.error('❌ Database sample-data initialization failed');
+    //   }
+    // } catch (error) {
+    //   console.error('❌ Database not connected');
+    // }
   } else {
     console.log('📝 Using mock data - Supabase not configured');
   }
