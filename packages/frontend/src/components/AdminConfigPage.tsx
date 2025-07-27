@@ -20,9 +20,15 @@ import {
   Divider,
   ThemeProvider,
   createTheme,
+<<<<<<< HEAD
   RadioGroup,
   Radio,
   Checkbox, // ← הוסף כאן!
+=======
+  Checkbox,
+  Radio,
+  RadioGroup
+>>>>>>> 0eb3f13 (finish the page without data base after merge to main)
 } from '@mui/material';
 
 import {
@@ -45,6 +51,7 @@ interface ParkingConfig {
   timezone: string;
   surfaceSpotIds: string[];
   totalSpots: number;
+<<<<<<< HEAD
   
   // הסר את השעות הכלליות:
   // openingHour: string;
@@ -52,6 +59,8 @@ interface ParkingConfig {
   // activeDays: string[];
   
   // הוסף שעות לכל יום:
+=======
+>>>>>>> 0eb3f13 (finish the page without data base after merge to main)
   dailyHours: {
     [key: string]: {
       isActive: boolean;
@@ -59,7 +68,10 @@ interface ParkingConfig {
       closingHour: string;
     };
   };
+<<<<<<< HEAD
   
+=======
+>>>>>>> 0eb3f13 (finish the page without data base after merge to main)
   maxQueueSize: number;
   avgRetrievalTime: number;
   maxParallelRetrievals: number; // ✅ חדש!
@@ -138,7 +150,11 @@ const timezones = [
 ];
 
 const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+<<<<<<< HEAD
 const maxSpotsLimit = 100; // ← שנה מ-100 ל-3
+=======
+const maxSpotsLimit = 100;
+>>>>>>> 0eb3f13 (finish the page without data base after merge to main)
 
 export default function AdminConfigPage() {
   // Initial config
@@ -325,7 +341,15 @@ export default function AdminConfigPage() {
     if (parkingConfig.avgRetrievalTime <= 0) {
       errors.push('Please set Average Retrieval Time to a number greater than 0');
     }
+<<<<<<< HEAD
     
+=======
+
+    if (parkingConfig.maxParallelRetrievals <= 0) {
+      errors.push('Please set Max Parallel Retrievals to a number greater than 0');
+    }
+
+>>>>>>> 0eb3f13 (finish the page without data base after merge to main)
     return {
       isValid: errors.length === 0,
       firstError: errors.length > 0 ? errors[0] : null,
@@ -862,6 +886,7 @@ export default function AdminConfigPage() {
                       onChange={(e) =>
                         setParkingConfig(prev => ({
                           ...prev,
+<<<<<<< HEAD
                           maintenanceMode: e.target.checked
                         }))}
                         color="primary" // ← כחול
@@ -879,10 +904,54 @@ export default function AdminConfigPage() {
                           showAdminAnalytics: e.target.checked
                         }))}
                         color="primary" // ← כחול
+=======
+                          maintenanceMode: e.target.value === 'on'
+                        }))
+                      }
+                    >
+                      <FormControlLabel
+                        value="on"
+                        control={<Radio color="primary" />}
+                        label={<Typography color="primary">Active</Typography>}
                       />
-                    }
-                    label="Show Admin Analytics"
-                  />
+                      <FormControlLabel
+                        value="off"
+                        control={<Radio color="primary" />}
+                        label={<Typography color="primary">off</Typography>}
+>>>>>>> 0eb3f13 (finish the page without data base after merge to main)
+                      />
+                    </RadioGroup>
+                  </Box>
+
+                  {/* Show Admin Analytics checkbox remains as is */}
+<Box>
+  <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
+    Show Admin Analytics
+  </Typography>
+  <RadioGroup
+    row
+    value={parkingConfig.showAdminAnalytics ? 'on' : 'off'}
+    onChange={(e) =>
+      setParkingConfig(prev => ({
+        ...prev,
+        showAdminAnalytics: e.target.value === 'on'
+      }))
+    }
+  >
+    <FormControlLabel
+      value="on"
+      control={<Radio color="primary" />}
+      label={<Typography color="primary">Active</Typography>}
+    />
+    <FormControlLabel
+      value="off"
+      control={<Radio color="primary" />}
+      label={<Typography color="primary">off</Typography>}
+    />
+  </RadioGroup>
+  
+</Box>
+
                 </Stack>
               </CardContent>
             </StyledCard>
@@ -903,7 +972,11 @@ export default function AdminConfigPage() {
                 startIcon={saving ? <TimeIcon /> : undefined}
                 sx={{
                   minWidth: 200,
+<<<<<<< HEAD
                   bgcolor: 'primary.main', // תמיד כחול
+=======
+                  bgcolor: 'primary.main',
+>>>>>>> 0eb3f13 (finish the page without data base after merge to main)
                   color: 'white',
                   boxShadow: '0 4px 16px rgba(25, 118, 210, 0.10)',
                   borderRadius: 3,
