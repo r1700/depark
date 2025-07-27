@@ -5,7 +5,7 @@ import { databaseService } from '../services/database';
 const router = Router();
 
 // Fallback mock data (used if database is not available)
-const mockItems: Item[] = [
+const mockItems: Object[] = [
   {
     id: '1',
     name: 'Laptop',
