@@ -107,3 +107,8 @@ Thumbs.db
 
 # Local environment files
 .env*.local
+
+
+packages/backend/app.ts
+packages/backend/config/
+packages/backend/models/
