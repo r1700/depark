@@ -1,12 +1,32 @@
-import React from 'react';
-import { Provider } from 'react-redux';
-import { store } from './app/store';
-import ParkingDashboard from './app/pages/adminDashBoard/parkingDashboard';
+import React, { useState } from "react";
+import LoginScreen from './components/screen-login/LoginScreen';
+import { Box, Button, Container, Typography } from "@mui/material";
 
-export default function App() {
+const App: React.FC = () => {
+  const [loggedIn, setLoggedIn] = useState<boolean>(false);
+
+  const handleLogin = React.useCallback(() => {
+    setLoggedIn(true);
+  }, []);
+
+  const handleLogout = () => setLoggedIn(false);
+
   return (
-    <Provider store={store}>
-      <ParkingDashboard />
-    </Provider>
+    <Container maxWidth="sm" sx={{ mt: 8, textAlign: "center", direction: "ltr" }}>
+      {loggedIn ? (
+        <Box>
+          <Typography variant="h4" gutterBottom>
+            Welcome!
+          </Typography>
+          <Button variant="contained" onClick={handleLogout}>
+            Logout
+          </Button>
+        </Box>
+      ) : (
+        <LoginScreen onLogin={handleLogin} />
+      )}
+    </Container>
   );
-}
+};
+
+export default App;
