@@ -157,7 +157,7 @@ interface SystemSettings {
   key: string;
   value: string | number | boolean;
   description: string;
-  category: 'parking' | 'auth' | 'notifications' | 'integration' | 'government_db';
+  category: 'parking' | '' | 'notifications' | 'integration' | 'government_db';
   updatedAt: Date;
   updatedBy: string;
 }
@@ -281,7 +281,7 @@ interface OPCSystemStatus {
 }
 ```
 
-## Authentication & Sessions
+## entication & Sessions
 
 ```typescript
 interface UserSession {
@@ -298,10 +298,10 @@ interface UserSession {
   lastActivity: Date;
 }
 
-interface GoogleAuthState {
+interface GoogleState {
   id: string;
   state: string;
-  userId?: string; // set after successful auth
+  userId?: string; // set after successful 
   email: string;
   firstName: string;
   lastName: string;
