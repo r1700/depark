@@ -4,7 +4,7 @@ dotenv.config();
 import express from 'express';
 import cors from 'cors';
 import healthRoutes from './routes/health';
-import passwordRoutes from './routes/user.routes'; // ← הנתיב הנכון מהקוד הישן!
+import passwordRoutes from './routes/user.routes';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
