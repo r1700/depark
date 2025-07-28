@@ -1,5 +1,4 @@
 import path from 'path';
-
 require('dotenv').config();
 
 const { DATA_USERNAME, PASSWORD, HOST, DATABASE }: any = process.env || 'development';
@@ -14,7 +13,7 @@ export default {
     dialect: 'postgres',
     migrationStorageTableName: 'sequelize_meta',
     migrations: {
-      path: path.resolve(__dirname, '../../../migrations'), // ודא הנתיב נכון
+      path: path.resolve(__dirname, '../../../migrations'), 
       pattern: /\.js|ts$/
     }
   }
