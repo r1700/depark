@@ -7,7 +7,7 @@ const { DATA_USERNAME, PASSWORD, HOST, DATABASE }: any = process.env || 'develop
 export default {
   development: {
     username: DATA_USERNAME || 'postgres',
-    password: PASSWORD || '9181',
+    password: PASSWORD || '5432',
     database: DATABASE || 'depark',
     host: HOST || 'localhost',
     dialect: 'postgres',
