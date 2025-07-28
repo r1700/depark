@@ -28,7 +28,11 @@ export class DatabaseService {
   }
 
   canInitialize(): boolean {
-    return this.getClient() !== null;
+    try {
+      return this.getClient() !== null;
+    } catch {
+      return false;
+    }
   }
 
   async getAllItems(): Promise<Item[]> {
@@ -73,7 +77,7 @@ export class DatabaseService {
     }
   }
 
-  async createItem(item: Omit<Item, 'id'>): Promise<Item> {
+  async createItem(item: Omit<Item, 'id' | 'created_at'>): Promise<Item> {
     try {
       const { data, error } = await this.getClient()
         .from(this.tableName)
@@ -101,7 +105,7 @@ export class DatabaseService {
       if (items.length === 0) {
         console.log('Initializing database with sample data...');
         
-        const sampleItems = [
+        const sampleItems: Omit<Item, 'id' | 'created_at'>[] = [
           { name: 'Laptop', type: 'Electronics', amount: 1200 },
           { name: 'Coffee Beans', type: 'Food', amount: 25 },
           { name: 'Office Chair', type: 'Furniture', amount: 350 },

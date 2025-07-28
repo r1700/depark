@@ -1,0 +1,24 @@
+{
+  "development": {
+    "username": "postgres",
+    "password": "rosen4398",
+    "database": "depark",
+    "host": "localhost",
+    "dialect": "postgres"
+  },
+  "test": {
+    "username": "postgres",
+    "password": "rosen4398",
+    "database": "depark",
+    "host": "localhost",
+    "dialect": "postgres"
+  },
+  "production": {
+    "username": "postgres",
+    "password": "rosen4398",
+    "database": "depark",
+    "host": "localhost",
+    "dialect": "postgres"
+  }
+}
+

@@ -1,6 +1,6 @@
-// import { Router } from 'express';
+import { Router } from 'express';
 // import { Item, ItemsResponse, ItemResponse } from '@base-project/shared';
-// import { databaseService } from '../services/database';
+import { databaseService } from '../services/database';
 
 // const router = Router();
 

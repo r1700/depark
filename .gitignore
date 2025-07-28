@@ -34,12 +34,6 @@ coverage/
 logs
 *.log
 
-# Runtime data
-pids
-*.pid
-*.seed
-*.pid.lock
-
 # Optional npm cache directory
 .npm
 
@@ -108,8 +102,24 @@ Thumbs.db
 # Local environment files
 .env*.local
 
-# config files
+# Specific config files to ignore
 config/config.json
 
 # models
 models/index.js
+
+# migrations
+migrations/*.js
+
+# Specific JSON files to ignore (NOT all JSON!)
+config/database.json
+temp/*.json
+
+# Keep important JSON files
+packages/backend/package.json
+package.json
+package-lock.json
+!package.json
+!package-lock.json
+!tsconfig.json
+!*.config.json
