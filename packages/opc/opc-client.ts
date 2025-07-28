@@ -1,43 +1,103 @@
-import { OPCUAClient } from "node-opcua";
-import dotenv from "dotenv";
+import express, { Request, Response } from 'express';
+import {
+  OPCUAClient,
+  AttributeIds,
+  DataType,
+  ClientSession,
+  ReadValueIdOptions,
+  DataValue
+} from 'node-opcua';
 
-dotenv.config();
+const app = express();
+app.use(express.json());
 
-const endpointUrl = process.env.OPCUA_ENDPOINT || "opc.tcp://localhost:5000";
-const client = OPCUAClient.create({ endpointMustExist: false });
+const endpointUrl: string = "opc.tcp://localhost:4080/UA/PLC";
 
-// Creates an OPC-UA client instance with the ability to verify the existence of the server address.
-async function main() {
+// Multiple nodeIds read
+export async function readNodeValues(
+  session: ClientSession,
+  nodeIds: string[]
+): Promise<{ nodeId: string; value: any }[]> {
+  const nodesToRead: ReadValueIdOptions[] = nodeIds.map(nodeId => ({
+    nodeId,
+    attributeId: AttributeIds.Value
+  }));
+
+  const results: DataValue[] = await session.read(nodesToRead);
+
+  return results.map((res, i) => ({
+    nodeId: nodeIds[i],
+    value: res.value?.value
+  }));
+}
+
+// Multiple nodeIds write
+interface WriteItem {
+  nodeId: string;
+  value: boolean;
+}
+
+export async function writeNodeValues(
+  session: ClientSession,
+  writeItems: WriteItem[]
+): Promise<void> {
+  const nodesToWrite = writeItems.map(item => ({
+    nodeId: item.nodeId,
+    attributeId: AttributeIds.Value,
+    value: {
+      value: {
+        dataType: DataType.Boolean,
+        value: item.value
+      }
+    }
+  }));
+
+  await session.write(nodesToWrite);
+}
+
+// GET /plc/read?ids=...
+app.get('/plc/read', async (req: Request, res: Response) => {
+  const idsParam = req.query.ids?.toString();
+  const nodeIds: string[] = idsParam ? idsParam.split(',') : [];
+
+  const client = OPCUAClient.create({ endpointMustExist: false });
+
   try {
-    console.log("🔄 Connecting to OPC-UA server:", endpointUrl);
-    
     await client.connect(endpointUrl);
-    
-    console.log("✅ Connected to OPC-UA server:", endpointUrl);
+    const session: ClientSession = await client.createSession();
 
+    const values = await readNodeValues(session, nodeIds);
 
+    await session.close();
     await client.disconnect();
-    console.log("🔌 Disconnected from OPC-UA server");
-  } catch (err) {
-    console.error("❌ OPC-UA connection error:", err);
+
+    res.json(values);
+  } catch (err: any) {
+    res.status(500).send(err.message || "Unknown error");
   }
-}
-
-
-
-import axios from 'axios';
-
-async function readPLCState() {
-  const res = await axios.get('http://localhost:4080/plc/inputs');
-  console.log(res.data);
-}
-async function postPLCState() {
-   await axios.post('http://localhost:4080/plc/output', {
-
 });
-}
 
-main().catch(console.error);
-export { readPLCState }; 
-export { postPLCState }; 
-   
+// POST /plc/write
+app.post('/plc/write', async (req: Request, res: Response) => {
+  const writeItems: WriteItem[] = req.body;
+
+  const client = OPCUAClient.create({ endpointMustExist: false });
+
+  try {
+    await client.connect(endpointUrl);
+    const session: ClientSession = await client.createSession();
+
+    await writeNodeValues(session, writeItems);
+
+    await session.close();
+    await client.disconnect();
+
+    res.send("Values updated");
+  } catch (err: any) {
+    res.status(500).send(err.message || "Unknown error");
+  }
+});
+
+app.listen(5000, () => {
+  console.log("Server is running at http://localhost:5000");
+});

@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "ts-node app.ts",
     "test": "jest",
-    "start-server": "ts-node server.ts"
+    "start-server": "ts-node ./src/opc-server.ts",
+    "start:all": "ts-node index.ts"
   },
   "keywords": [],
   "author": "",
