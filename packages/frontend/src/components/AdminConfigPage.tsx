@@ -168,6 +168,8 @@ export default function AdminConfigPage() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [spotToDelete, setSpotToDelete] = useState<{index: number, name: string} | null>(null);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [updateLotId, setUpdateLotId] = useState('');
+  const [loadingUpdate, setLoadingUpdate] = useState(false);
 
   // Auto-hide error popup after 3 seconds
   useEffect(() => {
@@ -423,8 +425,8 @@ export default function AdminConfigPage() {
     setSaving(true);
     try {
       const now = new Date();
-      await fetch('/api/admin/config', {
-        method: 'PUT',
+      await fetch('/api/admin', {
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           parkingConfig: {
@@ -494,6 +496,61 @@ export default function AdminConfigPage() {
       text: '🔄 Configuration reset to defaults!'
     });
   };
+
+  const handleLoadForUpdate = async () => {
+    if (!updateLotId.trim()) {
+      setCurrentError('❌ Please enter a Lot ID to load.');
+      setShowErrorPopup(true);
+      return;
+    }
+    setLoadingUpdate(true);
+    try {
+      const res = await fetch(`/api/admin/${encodeURIComponent(updateLotId.trim())}`);
+      const data = await res.json();
+      if (!data.success || !data.parkingConfig) {
+        setCurrentError('❌ Lot ID not found.');
+        setShowErrorPopup(true);
+      } else {
+        setParkingConfig({
+          ...data.parkingConfig,
+          lotId: updateLotId.trim(), // ← ודאי שה־Lot ID נכנס
+          dailyHours: convertOperatingHoursToDailyHours(data.parkingConfig.operatingHours),
+          updatedAt: data.parkingConfig.updatedAt ? new Date(data.parkingConfig.updatedAt) : undefined,
+        });
+        setLastSavedConfig({
+          ...data.parkingConfig,
+          dailyHours: convertOperatingHoursToDailyHours(data.parkingConfig.operatingHours),
+          updatedAt: data.parkingConfig.updatedAt ? new Date(data.parkingConfig.updatedAt) : undefined,
+        });
+        setMessage({ type: 'success', text: '✅ Lot loaded for update!' });
+      }
+    } catch (err) {
+      setCurrentError('❌ Error loading lot for update.');
+      setShowErrorPopup(true);
+    } finally {
+      setLoadingUpdate(false);
+    }
+  };
+
+  // Convert operating hours from various formats to the unified dailyHours structure
+  function convertOperatingHoursToDailyHours(operatingHours: any): ParkingConfig['dailyHours'] {
+    // אם כבר פורמט ימים מלא, החזר כמו שהוא
+    if (operatingHours && typeof operatingHours === 'object' && operatingHours.Sunday) {
+      return operatingHours;
+    }
+    // אם זה פורמט start/end, המר לכל הימים
+    const start = operatingHours?.start || '00:00';
+    const end = operatingHours?.end || '00:00';
+    const daily: ParkingConfig['dailyHours'] = {};
+    for (const day of days) {
+      daily[day] = {
+        isActive: true,
+        openingHour: start,
+        closingHour: end
+      };
+    }
+    return daily;
+  }
 
   return (
     <ThemeProvider theme={theme}>
@@ -1047,6 +1104,27 @@ export default function AdminConfigPage() {
               </Typography>
             )}
           </Box>
+          {/* Load for Update Section */}
+<Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 4 }}>
+  <TextField
+    label="Lot ID to Update"
+    size="small"
+    value={updateLotId}
+    onChange={e => setUpdateLotId(e.target.value)}
+    disabled={loadingUpdate}
+    sx={{ width: 220 }}
+  />
+  <Button
+    variant="contained"
+    color="secondary"
+    onClick={handleLoadForUpdate}
+    disabled={loadingUpdate || !updateLotId.trim()}
+    sx={{ minWidth: 120 }}
+  >
+    {loadingUpdate ? 'Loading...' : 'Load for Update'}
+  </Button>
+</Box>
+
           {showDeleteConfirm && spotToDelete && (
             <Box
               sx={{
