@@ -9,7 +9,7 @@ import exportToCSV from'./routes/exportToCSV'// Import the exportToCSV route
 
 const app = express();
 const PORT = process.env.PORT || 3001; // הוסף ברירת מחדל
-const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:3000'; // הוסף ברירת מחדל
+const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:3001'; // הוסף ברירת מחדל
 
 app.use(cors({
   origin: CORS_ORIGIN,

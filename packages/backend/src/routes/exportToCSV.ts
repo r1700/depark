@@ -5,7 +5,7 @@ import { saveCSV } from '../utils/ExportToCSV';
 const router = Router();
 
 router.post('/save-csv', (req: Request, res: Response) => {
-    console.log("save-csv");
+   
     
     const { jsonData, filename } = req.body;
     if (!jsonData || !filename) {
@@ -21,6 +21,7 @@ router.post('/save-csv', (req: Request, res: Response) => {
             res.status(500).send('Error saving CSV: Unknown error');
         }
     }
+     console.log("save-csv");
 });
 
 // הוסף את השורה הזו לייצוא ברירת מחדל
