@@ -1,21 +1,12 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import supabase from './connectToDB'
 
 export class DatabaseService {
   private readonly tableName = 'BaseUser';
   private supabase: SupabaseClient | null = null;
 
   private getClient(): SupabaseClient {
-    if (!this.supabase) {
-      const supabaseUrl = process.env.SUPABASE_URL;
-      const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
-
-      if (!supabaseUrl || !supabaseKey) {
-        throw new Error('Missing Supabase configuration. Please check your environment variables.');
-      }
-
-      this.supabase = createClient(supabaseUrl, supabaseKey);
-    }
-    return this.supabase;
+    return supabase
   }
 
   canInitialize(): boolean {
@@ -24,7 +15,7 @@ export class DatabaseService {
 
   async getAllItems(): Promise<Object[]> {
     try {
-      const { data, error } = await this.getClient()
+      const { data, error } = await supabase
         .from(this.tableName)
         .select('*')
         .order('firstName', { ascending: true });
@@ -87,9 +78,7 @@ export class DatabaseService {
   // Initialize database with sample data if empty
   async initializeSampleData(): Promise<void> {
     try {
-      const items = await this.getAllItems();
-      console.log({items});
-      
+      const items = await this.getAllItems();      
       if (items.length === 0) {
         console.log('Initializing database with sample data...');
         
