@@ -1,15 +1,15 @@
-# API Request/Response Types
+ים# API Request/Response Types
 
-## Authentication & Authorization
+## entication & orization
 
 ```typescript
-// Google OAuth (for Employees)
-interface GoogleAuthRequest {
+// Google O (for Employees)
+interface GoogleRequest {
   code: string;
   redirect_uri: string;
 }
 
-interface GoogleAuthResponse {
+interface GoogleResponse {
   user: {
     id: string;
     email: string;
@@ -23,7 +23,7 @@ interface GoogleAuthResponse {
   status: 'pending_approval' | 'approved' | 'declined';
 }
 
-// Username/Password Auth (for HR/Admin)
+// Username/Password  (for HR/Admin)
 interface AdminLoginRequest {
   email: string;
   password: string;
@@ -690,7 +690,7 @@ interface ErrorResponse {
 
 // Common Error Codes
 type ErrorCode = 
-  | 'UNAUTHORIZED'
+  | 'UNORIZED'
   | 'FORBIDDEN' 
   | 'NOT_FOUND'
   | 'VALIDATION_ERROR'

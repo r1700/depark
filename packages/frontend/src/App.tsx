@@ -1,12 +1,65 @@
-import React from 'react';
-import { Provider } from 'react-redux';
-import { store } from './app/store';
-import ParkingDashboard from './app/pages/adminDashBoard/parkingDashboard';
+import React, { useState, useEffect } from 'react';
 
-export default function App() {
+import { apiService } from './services/api';
+
+import './App.css';
+import AdminConfigPage from './components/AdminConfigPage';
+
+
+  
+ 
+
+    
+function App() {
   return (
-    <Provider store={store}>
-      <ParkingDashboard />
-    </Provider>
+    // <Router>
+    //   <div className="App">
+    //     <Navigation />
+        
+    //     <Routes>
+    //       {/* Home page */}
+    //       <Route path="/" element={<ProtectedHome />} />
+          
+    //       {/* Login page */}
+    //       <Route path="/login" element={<LoginPage />} />
+          
+    //       {/* Admin pages - protected */}
+    //       <Route 
+    //         path="/admin/config" 
+    //         element={
+    //           <AdminRoute>
+    //             <AdminConfigPage />
+    //           </AdminRoute>
+    //         } 
+    //       />
+          
+    //       <Route 
+    //         path="/register" 
+    //         element={
+    //           <AdminRoute>
+    //             <RegisterPage />
+    //           </AdminRoute>
+    //         } 
+    //       />
+          
+    //       <Route 
+    //         path="/users" 
+    //         element={
+    //           <AdminRoute>
+    //             <UsersPage />
+    //           </AdminRoute>
+    //         } 
+    //       />
+          
+    //       {/* 404 page */}
+    //       <Route path="*" element={<Navigate to="/" replace />} />
+    //     </Routes>
+    //   </div>
+    // </Router>
+    <>
+    <AdminConfigPage/>
+    </>
   );
 }
+
+export default App;
