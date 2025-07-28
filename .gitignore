@@ -109,18 +109,10 @@ Thumbs.db
 
 # Local environment files
 .env*.local
-
+package.json
+package-lock.json
 connection/
 knexfile.js
 migrations/
-packages/frontend/src/app/
-packages/frontend/src/components/screen-login/
-
-
-package-lock.json
-package.json
 packages/backend/package.json
 .env
-# Ignore package.json and package-lock.json
-package.json
-package-lock.json
