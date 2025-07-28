@@ -10,8 +10,8 @@
     "db:migrate": "npx sequelize-cli db:migrate --migrations-path ./packages/migrations --config ./sequelize.config.js",
     "db:migrate:undo": "npx sequelize-cli db:migrate:undo --migrations-path ./packages/migrations --config ./sequelize.config.js",
     "migration:generate": "npx sequelize-cli migration:generate --migrations-path ./packages/migrations --config ./sequelize.config.js",
-  "dev:opc": "npm run dev --workspace=packages/opc",
-  "dev:backend": "npm run dev --workspace=packages/backend",
+    "dev:opc": "npm run dev --workspace=packages/opc",
+    "dev:backend": "npm run dev --workspace=packages/backend",
     "dev:frontend": "npm run start --workspace=packages/frontend",
     "build:opc": "npm run build --workspace=packages/opc",
     "build:backend": "npm run build --workspace=packages/backend",
@@ -25,6 +25,7 @@
     "react-redux": "^9.2.0"
   },
   "devDependencies": {
-    "@types/react-redux": "^7.1.34"
+    "@types/react-redux": "^7.1.34",
+    "supabase": "^2.31.8"
   }
 }

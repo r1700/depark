@@ -1,7 +1,7 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 export class DatabaseService {
-  private readonly tableName = 'items';
+  private readonly tableName = 'BaseUser';
   private supabase: SupabaseClient | null = null;
 
   private getClient(): SupabaseClient {
@@ -27,7 +27,7 @@ export class DatabaseService {
       const { data, error } = await this.getClient()
         .from(this.tableName)
         .select('*')
-        .order('created_at', { ascending: true });
+        .order('firstName', { ascending: true });
 
       if (error) {
         console.error('Database error fetching items:', error);
@@ -88,15 +88,15 @@ export class DatabaseService {
   async initializeSampleData(): Promise<void> {
     try {
       const items = await this.getAllItems();
+      console.log({items});
       
       if (items.length === 0) {
         console.log('Initializing database with sample data...');
         
         const sampleItems = [
-          { name: 'Laptop', type: 'Electronics', amount: 1200 },
-          { name: 'Coffee Beans', type: 'Food', amount: 25 },
-          { name: 'Office Chair', type: 'Furniture', amount: 350 },
-          { name: 'Notebook', type: 'Stationery', amount: 15 }
+          { id: 4, created_at: '2025-07-24T08:26:54+00:00' },
+          { id: 5, created_at: '2025-07-22T08:27:18+00:00' },
+          { id: 3, created_at: '2025-07-20T08:27:29+00:00' }
         ];
 
         for (const item of sampleItems) {
