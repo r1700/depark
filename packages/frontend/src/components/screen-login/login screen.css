@@ -1,0 +1,137 @@
+/* כלליות */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Roboto', sans-serif;
+}
+
+body {
+  background: linear-gradient(45deg, #ff0066, #ff6600);
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* מיכל מרכזי */
+.app-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100%;
+}
+
+.welcome-container {
+  text-align: center;
+  background: #fff;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+button {
+  background: #ff0066;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 1.1em;
+  transition: background 0.3s ease;
+}
+
+button:hover {
+  background: #ff6600;
+}
+
+/* מסך התחברות */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+}
+
+.form-container {
+  background: rgba(255, 255, 255, 0.9);
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  width: 350px;
+  text-align: center;
+}
+
+h2 {
+  font-size: 2em;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.input-group {
+  margin-bottom: 20px;
+}
+
+.input-group label {
+  display: block;
+  font-size: 1.1em;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 10px;
+  border: 2px solid #ddd;
+  border-radius: 5px;
+  font-size: 1.1em;
+  margin-top: 5px;
+  transition: border-color 0.3s ease;
+}
+
+.input-group input:focus {
+  border-color: #ff0066;
+}
+
+button.login-button {
+  width: 100%;
+  padding: 15px;
+  background: #ff0066;
+  color: white;
+  font-size: 1.2em;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+button.login-button:hover {
+  background: #ff6600;
+}
+
+/* הודעת שגיאה */
+.error-message {
+  color: #ff0000;
+  margin-top: 10px;
+  font-size: 0.9em;
+}
+
+/* קישורים */
+.links {
+  margin-top: 20px;
+}
+
+.links a {
+  color: #ff0066;
+  text-decoration: none;
+  font-size: 1em;
+  display: inline-block;
+  margin: 5px;
+  transition: color 0.3s ease;
+}
+
+.links a:hover {
+  color: #ff6600;
+}

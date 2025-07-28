@@ -4,6 +4,8 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+package.json
+package-lock.json
 
 # Environment variables
 .env
@@ -123,3 +125,16 @@ package-lock.json
 !package-lock.json
 !tsconfig.json
 !*.config.json
+
+
+connection/
+knexfile.js
+migrations/
+packages/frontend/src/app/
+packages/frontend/src/components/screen-login/
+
+# Miscellaneous
+package.json
+package-lock.json
+packages/backend/package.json
+ 

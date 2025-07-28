@@ -1,4 +1,5 @@
 'use strict';
+console.log('lllllllllllll');
 
 module.exports = {
     up: async (queryInterface, Sequelize) => {
