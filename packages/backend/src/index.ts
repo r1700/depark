@@ -5,6 +5,7 @@ import express from 'express';
 import cors from 'cors';
 import healthRoutes from './routes/health';
 import vehicleRoutes from './routes/vehicle';
+import exportToCSV from'./routes/exportToCSV'// Import the exportToCSV route
 
 const app = express();
 const PORT = process.env.PORT || 3001; // הוסף ברירת מחדל
@@ -18,6 +19,7 @@ app.use(express.json());
 
 app.use('/api/health', healthRoutes);
 app.use('/api/vehicle', vehicleRoutes);
+app.use('/api/exportToCSV', exportToCSV);
 
 app.listen(PORT, async () => {
   console.log(`🚀 Server running on port ${PORT}`);
