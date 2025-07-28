@@ -1,6 +1,14 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { Item } from '@base-project/shared';
+// import { Item } from '@base-project/shared';
 
+interface Item {
+  id: string;
+  name: string;
+  type: string;
+  amount: number;
+  created_at?: string;
+  updated_at?: string;
+}
 export class DatabaseService {
   private readonly tableName = 'items';
   private supabase: SupabaseClient | null = null;
