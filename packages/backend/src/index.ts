@@ -8,11 +8,15 @@ import passwordRoutes from './routes/user.routes';
 
 
 const app = express();
+
+
+
 const PORT = process.env.PORT || 3001;
 const CORS_ORIGIN = process.env.CORS_ORIGIN || '*';
 
 import vehicleRoutes from './routes/vehicle';
 import exportToCSV from'./routes/exportToCSV'// Import the exportToCSV route
+
 
 app.use(cors({
   origin: CORS_ORIGIN,
@@ -37,12 +41,12 @@ app.listen(PORT, () => {
  
   if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
     console.log('🗄️ Initializing database...');
-<<<<<<< HEAD
+
     } else {
-=======
+
     
   } else {
->>>>>>> 5d54def5 (add)
+ (add)
     console.log('📝 Using mock data - Supabase not configured');
   }
 });

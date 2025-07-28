@@ -1,4 +1,5 @@
 import fs from "fs";
+import path from "path";
 
 export function jsonToCSV(jsonData: any[]): string {
     const csvRows: string[] = [];
@@ -15,12 +16,17 @@ export function jsonToCSV(jsonData: any[]): string {
     return csvRows.join('\n');
 }
 
-// שיניתי את הייצוא של saveCSV לייצוא שמי
 export const saveCSV = (jsonData: any[], filename: string): void => {
     if (!filename.endsWith('.csv')) {
         filename += '.csv';
     }
+    
+    const dirPath = path.join(process.cwd(), './CSVExplor'); 
+    if (!fs.existsSync(dirPath)) {
+        fs.mkdirSync(dirPath, { recursive: true }); 
+    }
+    
     const csvString: string = jsonToCSV(jsonData);
-    const fullPath: string = `C:\\Depark\\depark\\packages\\backend\\CSVExplor\\${filename}`;
+    const fullPath: string = path.join(dirPath, filename); 
     fs.writeFileSync(fullPath, csvString, 'utf8');
 };
