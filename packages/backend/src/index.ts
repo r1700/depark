@@ -5,7 +5,8 @@ dotenv.config();
 import express from 'express';
 import cors from 'cors';
 import healthRoutes from './routes/health';
-import { databaseService } from './services/database';
+import adminConfigRouter from './routes/adminConfig';
+//import { databaseService } from './services/db/connection';
 
 
 const app = express();
@@ -21,6 +22,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api/health', healthRoutes);
+app.use('/api/admin', adminConfigRouter); // הוסף את זה
 
 
 
@@ -33,7 +35,7 @@ app.listen(PORT, async () => {
   if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
     console.log('🗄️ Initializing database...');
     try {
-      databaseService.canInitialize();
+      ///databaseService.canInitialize();
       try {
        
         
@@ -65,5 +67,4 @@ console.log('   GET  /health');
 console.log('   GET  /api/auth/users');      // 👈 חשוב!
 console.log('   POST /api/auth/register');   // 👈 חשוב!
 console.log('   POST /api/auth/login');
-console.log('   GET  /api/admin/config');
 console.log('   PUT  /api/admin/config');

@@ -44,7 +44,7 @@ interface ParkingConfig {
   lotId: string;
   timezone: string;
   surfaceSpotIds: string[];
-  totalSpots: number;
+  totalSurfaceSpots: number;
   dailyHours: {
     [key: string]: {
       isActive: boolean;
@@ -54,7 +54,7 @@ interface ParkingConfig {
   };
   maxQueueSize: number;
   avgRetrievalTime: number;
-  maxParallelRetrievals: number; // ✅ חדש!
+  maxParallelRetrievals: number; 
   maintenanceMode: boolean;
   showAdminAnalytics: boolean;
   updatedAt?: Date;
@@ -139,7 +139,7 @@ export default function AdminConfigPage() {
     lotId: '',
     timezone: 'Asia/Jerusalem',
     surfaceSpotIds: [],
-    totalSpots: 0,
+    totalSurfaceSpots: 0,
     dailyHours: {
       Sunday: { isActive: false, openingHour: '00:00', closingHour: '00:00' },
       Monday: { isActive: false, openingHour: '00:00', closingHour: '00:00' },
@@ -167,6 +167,7 @@ export default function AdminConfigPage() {
   const [currentError, setCurrentError] = useState<string | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [spotToDelete, setSpotToDelete] = useState<{index: number, name: string} | null>(null);
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
 
   // Auto-hide error popup after 3 seconds
   useEffect(() => {
@@ -218,22 +219,33 @@ export default function AdminConfigPage() {
     }));
   };
 
+  // דוגמה לפונקציה שמוסיפה spot ושולחת לשרת
   const addNewSpot = () => {
-    if (newSpotId.trim() && parkingConfig.surfaceSpotIds.length < maxSpotsLimit) {
-      if (!parkingConfig.surfaceSpotIds.includes(newSpotId.trim())) {
-        const newSpot = newSpotId.trim();
-        setParkingConfig(prev => ({
-          ...prev,
-          surfaceSpotIds: [...prev.surfaceSpotIds, newSpot],
-          totalSpots: prev.surfaceSpotIds.length + 1
-        }));
-        setNewSpotId('');
-        setShowAddSpot(false);
-      } else {
-        setCurrentError('❌ Spot ID already exists');
-        setShowErrorPopup(true);
-      }
+    const trimmedSpot = newSpotId.trim();
+    if (!trimmedSpot) {
+      setCurrentError('❌ Please enter a valid parking spot ID.');
+      setShowErrorPopup(true);
+      return;
     }
+    if (parkingConfig.surfaceSpotIds.length >= maxSpotsLimit) {
+      setCurrentError(`❌ You cannot add more than ${maxSpotsLimit} parking spots.`);
+      setShowErrorPopup(true);
+      return;
+    }
+    if (parkingConfig.surfaceSpotIds.includes(trimmedSpot)) {
+      setCurrentError('❌ This parking spot ID already exists.');
+      setShowErrorPopup(true);
+      return;
+    }
+
+    // עדכון ה-state בלבד
+    setParkingConfig(prev => ({
+      ...prev,
+      surfaceSpotIds: [...prev.surfaceSpotIds, trimmedSpot],
+      totalSurfaceSpots: prev.surfaceSpotIds.length + 1
+    }));
+    setNewSpotId('');
+    setShowAddSpot(false);
   };
 
   const removeSpot = (index: number) => {
@@ -247,7 +259,7 @@ export default function AdminConfigPage() {
       setParkingConfig(prev => ({
         ...prev,
         surfaceSpotIds: prev.surfaceSpotIds.filter((_, i) => i !== spotToDelete.index),
-        totalSpots: prev.surfaceSpotIds.length - 1
+        totalSurfaceSpots: prev.surfaceSpotIds.length - 1
       }));
     }
     setShowDeleteConfirm(false);
@@ -257,6 +269,19 @@ export default function AdminConfigPage() {
   const cancelDelete = () => {
     setShowDeleteConfirm(false);
     setSpotToDelete(null);
+  };
+
+  const handleResetClick = () => {
+    setShowResetConfirm(true);
+  };
+
+  const confirmReset = () => {
+    setShowResetConfirm(false);
+    resetToDefaults();
+  };
+
+  const cancelReset = () => {
+    setShowResetConfirm(false);
   };
 
   // Validate required fields with priority order
@@ -329,7 +354,7 @@ export default function AdminConfigPage() {
     };
   };
 
-  // Check if configuration has changes
+  // Check if configuration has changes (לא משווה updatedAt/updatedBy)
   const hasChanges = () => {
     const current = {
       facilityName: parkingConfig.facilityName,
@@ -339,8 +364,10 @@ export default function AdminConfigPage() {
       dailyHours: parkingConfig.dailyHours,
       maxQueueSize: parkingConfig.maxQueueSize,
       avgRetrievalTime: parkingConfig.avgRetrievalTime,
+      maxParallelRetrievals: parkingConfig.maxParallelRetrievals,
       maintenanceMode: parkingConfig.maintenanceMode,
-      showAdminAnalytics: parkingConfig.showAdminAnalytics
+      showAdminAnalytics: parkingConfig.showAdminAnalytics,
+      totalSurfaceSpots: parkingConfig.totalSurfaceSpots
     };
 
     const lastSaved = {
@@ -351,14 +378,32 @@ export default function AdminConfigPage() {
       dailyHours: lastSavedConfig.dailyHours,
       maxQueueSize: lastSavedConfig.maxQueueSize,
       avgRetrievalTime: lastSavedConfig.avgRetrievalTime,
+      maxParallelRetrievals: lastSavedConfig.maxParallelRetrievals,
       maintenanceMode: lastSavedConfig.maintenanceMode,
-      showAdminAnalytics: lastSavedConfig.showAdminAnalytics
+      showAdminAnalytics: lastSavedConfig.showAdminAnalytics,
+      totalSurfaceSpots: lastSavedConfig.totalSurfaceSpots
     };
 
     return JSON.stringify(current) !== JSON.stringify(lastSaved);
   };
 
   const saveConfig = async () => {
+    // בדוק אם lotId קיים בשרת
+    // try {
+    //   const res = await fetch(`/api/admin/lot-exists/${encodeURIComponent(parkingConfig.lotId)}`);
+    //   const data = await res.json();
+    //   if (data.exists) {
+    //     setCurrentError('❌ This Lot ID already exists in the database.');
+    //     setShowErrorPopup(true);
+    //     return;
+    //   }
+    // } catch (err) {
+    //   setCurrentError('❌ Could not verify Lot ID in database.');
+    //   setShowErrorPopup(true);
+    //   return;
+    // }
+
+    // המשך שמירה רגילה...
     // Check - are there any changes at all
     if (!hasChanges()) {
       setCurrentError('⚠️ No changes detected. Please make some changes before saving.');
@@ -377,18 +422,37 @@ export default function AdminConfigPage() {
     // Only if both checks passed - save
     setSaving(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const now = new Date();
+      await fetch('/api/admin/config', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          parkingConfig: {
+            ...parkingConfig,
+            totalSurfaceSpots: parkingConfig.surfaceSpotIds.length,
+            avgRetrievalTimeMinutes: parkingConfig.avgRetrievalTime,
+            operatingHours: parkingConfig.dailyHours,
+            updatedAt: now,
+            updatedBy: 'admin'
+          }
+        })
+      });
 
-      const updatedConfig = {
-        ...parkingConfig,
-        totalSpots: parkingConfig.surfaceSpotIds.length,
-        updatedAt: new Date(),
+      // עדכן גם את parkingConfig וגם את lastSavedConfig עם אותם ערכים בדיוק
+      setParkingConfig(prev => ({
+        ...prev,
+        totalSurfaceSpots: prev.surfaceSpotIds.length,
+        updatedAt: now,
         updatedBy: 'admin'
-      };
+      }));
 
-      setParkingConfig(updatedConfig);
-      setLastSavedConfig(updatedConfig);
+      setLastSavedConfig({
+        ...parkingConfig,
+        totalSurfaceSpots: parkingConfig.surfaceSpotIds.length,
+        updatedAt: now,
+        updatedBy: 'admin'
+      });
+
       setMessage({
         type: 'success',
         text: '✅ Configuration saved successfully!'
@@ -407,7 +471,7 @@ export default function AdminConfigPage() {
       lotId: '',
       timezone: 'Asia/Jerusalem',
       surfaceSpotIds: [],
-      totalSpots: 0,
+      totalSurfaceSpots: 0,
       dailyHours: {
         Sunday: { isActive: false, openingHour: '00:00', closingHour: '00:00' },
         Monday: { isActive: false, openingHour: '00:00', closingHour: '00:00' },
@@ -419,7 +483,7 @@ export default function AdminConfigPage() {
       },
       maxQueueSize: 0,
       avgRetrievalTime: 0,
-      maxParallelRetrievals: 0, // ✅ ברירת מחדל
+      maxParallelRetrievals: 0, 
       maintenanceMode: false,
       showAdminAnalytics: false,
       updatedAt: new Date(),
@@ -808,7 +872,6 @@ export default function AdminConfigPage() {
                       avgRetrievalTime: parseInt(e.target.value) || 0
                     }))}
                   />
-                  {/* ✅ חדש: */}
                   <TextField
                     fullWidth
                     label="Max Parallel Retrievals"
@@ -818,14 +881,11 @@ export default function AdminConfigPage() {
                       ...prev,
                       maxParallelRetrievals: parseInt(e.target.value) || 0
                     }))}
-                    // inputProps={{ min: 1 }}
                   />
                 </Stack>
               </CardContent>
             </StyledCard>
           </Box>
-
-          {/* System Settings Card */}
           <Box sx={{ 
             display: 'grid', 
             gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, 
@@ -874,8 +934,6 @@ export default function AdminConfigPage() {
                       />
                     </RadioGroup>
                   </Box>
-
-                  {/* Show Admin Analytics checkbox remains as is */}
 <Box>
   <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
     Show Admin Analytics
@@ -912,9 +970,6 @@ export default function AdminConfigPage() {
           {/* Action Buttons */}
           <Divider sx={{ my: 3 }} />
           <Box sx={{ textAlign: 'center' }}>
-            {/* Status Display */}
-            
-            
             <Stack direction="row" spacing={2} justifyContent="center">
               <Button
                 variant="contained"
@@ -922,8 +977,7 @@ export default function AdminConfigPage() {
                 onClick={saveConfig}
                 disabled={saving || !!message || showErrorPopup}
                 startIcon={saving ? <TimeIcon /> : undefined}
-                sx={{
-                  minWidth: 200,
+                sx={{ minWidth: 200,
                   bgcolor: 'primary.main',
                   color: 'white',
                   boxShadow: '0 4px 16px rgba(25, 118, 210, 0.10)',
@@ -952,7 +1006,7 @@ export default function AdminConfigPage() {
               <Button
                 variant="outlined"
                 size="large"
-                onClick={resetToDefaults}
+                onClick={handleResetClick} // ← שינוי כאן
                 disabled={saving}
                 sx={{
                   minWidth: 150,
@@ -982,8 +1036,6 @@ export default function AdminConfigPage() {
                 🔄 Reset to Defaults
               </Button>
             </Stack>
-
-            {/* Last update date */}
             {parkingConfig.updatedAt && (
               <Typography variant="caption" color="text.secondary" sx={{ mt: 2, display: 'block' }}>
                 {(() => {
@@ -995,8 +1047,6 @@ export default function AdminConfigPage() {
               </Typography>
             )}
           </Box>
-
-          {/* Delete confirmation dialog */}
           {showDeleteConfirm && spotToDelete && (
             <Box
               sx={{
@@ -1071,8 +1121,57 @@ export default function AdminConfigPage() {
               </Box>
             </Box>
           )}
-
-          {/* Popup error message */}
+          {showResetConfirm && (
+            <Box
+              sx={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                bgcolor: 'rgba(0, 0, 0, 0.5)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: 1500
+              }}
+            >
+              <Box
+                sx={{
+                  bgcolor: 'white',
+                  borderRadius: 2,
+                  p: 3,
+                  maxWidth: 400,
+                  width: '90%',
+                  boxShadow: '0 8px 32px rgba(0,0,0,0.3)'
+                }}
+              >
+                <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: '#1976d2' }}>
+                  ⚠️ Reset Confirmation
+                </Typography>
+                <Typography variant="body1" sx={{ mb: 3 }}>
+                  Are you sure you want to reset all configuration to defaults?
+                </Typography>
+                <Stack direction="row" spacing={2} justifyContent="flex-end">
+                  <Button variant="outlined" onClick={cancelReset} sx={{ minWidth: 100 }}>
+                    Cancel
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="error"
+                    onClick={confirmReset}
+                    sx={{
+                      minWidth: 100,
+                      bgcolor: '#d32f2f',
+                      '&:hover': { bgcolor: '#b71c1c' }
+                    }}
+                  >
+                    Reset
+                  </Button>
+                </Stack>
+              </Box>
+            </Box>
+          )}
           {showErrorPopup && currentError && (
             <Box
               sx={{
