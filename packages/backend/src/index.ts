@@ -4,12 +4,19 @@ dotenv.config();
 import express from 'express';
 import cors from 'cors';
 import healthRoutes from './routes/health';
+import passwordRoutes from './routes/user.routes';
+
+
+const app = express();
+
+
+
+const PORT = process.env.PORT || 3001;
+const CORS_ORIGIN = process.env.CORS_ORIGIN || '*';
+
 import vehicleRoutes from './routes/vehicle';
 import exportToCSV from'./routes/exportToCSV'// Import the exportToCSV route
 
-const app = express();
-const PORT = process.env.PORT || 3001; 
-const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:3001'; 
 
 app.use(cors({
   origin: CORS_ORIGIN,
@@ -18,18 +25,28 @@ app.use(cors({
 app.use(express.json());
 
 app.use('/api/health', healthRoutes);
+app.use('/api/password', passwordRoutes);
+
 app.use('/api/vehicle', vehicleRoutes);
 app.use('/api/exportToCSV', exportToCSV);
 
-app.listen(PORT, async () => {
+app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`🌐 CORS enabled for: ${CORS_ORIGIN}`);
+  console.log('✅ Password reset API ready!');
+});
+
   
  
   if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
     console.log('🗄️ Initializing database...');
+
     } else {
+
+    
+  } else {
+ (add)
     console.log('📝 Using mock data - Supabase not configured');
   }
 });
@@ -52,3 +69,4 @@ console.log('   POST /api/auth/register');   // 👈 חשוב!
 console.log('   POST /api/auth/login');
 console.log('   GET  /api/admin/config');
 console.log('   PUT  /api/admin/config');
+
