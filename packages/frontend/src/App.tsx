@@ -1,12 +1,19 @@
-import React from 'react';
-import { Provider } from 'react-redux';
-import { store } from './app/store';
-import ParkingDashboard from './app/pages/adminDashBoard/parkingDashboard';
+import React, { useState, useEffect } from 'react';
 
-export default function App() {
+
+import './App.css';
+import AdminConfigPage from './components/AdminConfigPage';
+
+
+  
+ 
+
+    
+function App() {
   return (
-    <Provider store={store}>
-      <ParkingDashboard />
-    </Provider>
+ <>
+    </>
   );
 }
+
+export default App;
