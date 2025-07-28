@@ -8,8 +8,8 @@ import vehicleRoutes from './routes/vehicle';
 import exportToCSV from'./routes/exportToCSV'// Import the exportToCSV route
 
 const app = express();
-const PORT = process.env.PORT || 3001; // הוסף ברירת מחדל
-const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:3001'; // הוסף ברירת מחדל
+const PORT = process.env.PORT || 3001; 
+const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:3001'; 
 
 app.use(cors({
   origin: CORS_ORIGIN,

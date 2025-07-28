@@ -24,5 +24,5 @@ router.post('/save-csv', (req: Request, res: Response) => {
      console.log("save-csv");
 });
 
-// הוסף את השורה הזו לייצוא ברירת מחדל
+
 export default router; 
