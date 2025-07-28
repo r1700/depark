@@ -6,6 +6,7 @@ import cors from 'cors';
 import healthRoutes from './routes/health';
 import passwordRoutes from './routes/user.routes';
 
+
 const app = express();
 const PORT = process.env.PORT || 3001;
 const CORS_ORIGIN = process.env.CORS_ORIGIN || '*';
@@ -36,7 +37,12 @@ app.listen(PORT, () => {
  
   if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
     console.log('🗄️ Initializing database...');
+<<<<<<< HEAD
     } else {
+=======
+    
+  } else {
+>>>>>>> 5d54def5 (add)
     console.log('📝 Using mock data - Supabase not configured');
   }
 });
@@ -59,3 +65,4 @@ console.log('   POST /api/auth/register');   // 👈 חשוב!
 console.log('   POST /api/auth/login');
 console.log('   GET  /api/admin/config');
 console.log('   PUT  /api/admin/config');
+

@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { TextField, Button, Alert, Container, Typography, Box } from '@mui/material';
 
 function Otp() {
+    console.log('React runtime version:', React.version);
+
     const [contact, setContact] = useState('');
     const [otp, setOtp] = useState('');
     const [otpSent, setOtpSent] = useState(false);
