@@ -10,7 +10,6 @@ app.listen(PORT, () => {
 });
 
 
-import { connectToOpc } from "./opcClient";
+import { subscribeToPlcMock } from "./opcClient";
 
-// הפעלת החיבור
-connectToOpc();
+subscribeToPlcMock();
