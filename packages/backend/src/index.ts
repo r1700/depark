@@ -29,10 +29,13 @@ app.use('/api/vehicle', vehicleRoutes);
 app.use('/api/exportToCSV', exportToCSV);
 
 app.get('/', (req, res) => {
-  res.json({ message: 'DePark Backend is running!' });
+  res.json({ message: 'DePark Backend is running!' })
+});
+app.use('/api/items', itemsRoutes);
+app.post('/vehicle-lookup', (req, res) => {
+  res.json({ found: true, data: { licensePlate: req.body.licensePlate } });
 });
 
-<<<<<<< HEAD
 app.get('/health', (req, res) => {
   res.json({
     status: 'OK',
@@ -58,37 +61,4 @@ app.listen(PORT, () => {
   console.log('   POST /api/auth/login');
   console.log('   GET  /api/admin/config');
   console.log('   PUT  /api/admin/config');
-=======
-app.listen(PORT, async () => {
-  // בדוק את הערכים של משתני הסביבה
-console.log('SUPABASE_URL:', process.env.SUPABASE_URL);
-console.log('SUPABASE_SERVICE_ROLE_KEY:', process.env.SUPABASE_SERVICE_ROLE_KEY);
-console.log('SUPABASE_ANON_KEY:', process.env.SUPABASE_ANON_KEY);
-
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`🌐 CORS enabled for: ${CORS_ORIGIN}`);
-  // index.js או app.js
-
-
-// המשך עם הקוד שלך להתחברות למסד הנתונים
-
-  // Initialize database with sample data if using Supabase
-  if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
-    console.log('🗄️ Initializing database...');
-    try {
-      databaseService.canInitialize();
-      try {
-        await databaseService.initializeSampleData();
-        console.log('✅ Database initialized successfully');  
-      } catch (error) {
-        console.error('❌ Database sample-data initialization failed');
-      }
-    } catch (error) {
-      console.error('❌ Database not connected');
-    }
-  } else {
-    console.log('📝 Using mock data - Supabase not configured');
-  }
->>>>>>> 414aa1fb (start Subscribe to PLC Data Changes in OPC-UA)
 });
