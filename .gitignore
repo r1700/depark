@@ -4,6 +4,8 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+package.json
+package-lock.json
 
 # Environment variables
 .env
@@ -33,12 +35,6 @@ coverage/
 # Logs
 logs
 *.log
-
-# Runtime data
-pids
-*.pid
-*.seed
-*.pid.lock
 
 # Optional npm cache directory
 .npm
@@ -107,3 +103,42 @@ Thumbs.db
 
 # Local environment files
 .env*.local
+
+# Specific config files to ignore
+config/config.json
+
+# models
+models/index.js
+
+# migrations
+migrations/*.js
+
+# Specific JSON files to ignore (NOT all JSON!)
+config/database.json
+temp/*.json
+
+# Keep important JSON files
+packages/backend/package.json
+package.json
+package-lock.json
+!package.json
+!package-lock.json
+!tsconfig.json
+!*.config.json
+
+
+connection/
+knexfile.js
+migrations/
+packages/frontend/src/app/
+packages/frontend/src/components/screen-login/
+
+# Miscellaneous
+package.json
+package-lock.json
+packages/backend/package.json
+
+packages/mobile/package.json
+.env
+
+
