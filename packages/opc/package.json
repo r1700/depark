@@ -3,7 +3,6 @@
     "version": "1.0.0",
     "main": "index.js",
     "scripts": {
-        // "dev": "ts-node app.ts",
         "test": "jest",
         "dev": "nodemon ./src/index.ts",
         "start-server": "ts-node ./src/opc-server.ts",
