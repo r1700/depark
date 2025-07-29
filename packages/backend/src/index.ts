@@ -31,7 +31,6 @@ app.use('/api/exportToCSV', exportToCSV);
 app.get('/', (req, res) => {
   res.json({ message: 'DePark Backend is running!' })
 });
-app.use('/api/items', itemsRoutes);
 app.post('/vehicle-lookup', (req, res) => {
   res.json({ found: true, data: { licensePlate: req.body.licensePlate } });
 });
