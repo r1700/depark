@@ -151,7 +151,7 @@ export default function AdminConfigPage() {
     },
     maxQueueSize: 0,
     avgRetrievalTime: 0,
-    maxParallelRetrievals:0, // ✅ ברירת מחדל
+    maxParallelRetrievals:0, 
     maintenanceMode: false,
     showAdminAnalytics: false
   };
@@ -222,7 +222,6 @@ export default function AdminConfigPage() {
     }));
   };
 
-  // דוגמה לפונקציה שמוסיפה spot ושולחת לשרת
   const addNewSpot = () => {
     const trimmedSpot = newSpotId.trim();
     if (!trimmedSpot) {
@@ -240,8 +239,6 @@ export default function AdminConfigPage() {
       setShowErrorPopup(true);
       return;
     }
-
-    // עדכון ה-state בלבד
     setParkingConfig(prev => ({
       ...prev,
       surfaceSpotIds: [...prev.surfaceSpotIds, trimmedSpot],
@@ -356,8 +353,6 @@ export default function AdminConfigPage() {
       allErrors: errors
     };
   };
-
-  // Check if configuration has changes (לא משווה updatedAt/updatedBy)
   const hasChanges = () => {
     const current = {
       facilityName: parkingConfig.facilityName,
@@ -391,23 +386,6 @@ export default function AdminConfigPage() {
   };
 
   const saveConfig = async () => {
-    // בדוק אם lotId קיים בשרת
-    // try {
-    //   const res = await fetch(`/api/admin/lot-exists/${encodeURIComponent(parkingConfig.lotId)}`);
-    //   const data = await res.json();
-    //   if (data.exists) {
-    //     setCurrentError('❌ This Lot ID already exists in the database.');
-    //     setShowErrorPopup(true);
-    //     return;
-    //   }
-    // } catch (err) {
-    //   setCurrentError('❌ Could not verify Lot ID in database.');
-    //   setShowErrorPopup(true);
-    //   return;
-    // }
-
-    // המשך שמירה רגילה...
-    // Check - are there any changes at all
     if (!hasChanges()) {
       setCurrentError('⚠️ No changes detected. Please make some changes before saving.');
       setShowErrorPopup(true);
@@ -426,13 +404,11 @@ export default function AdminConfigPage() {
     setSaving(true);
     try {
       const now = new Date();
-
-      // אם את במצב "הוספת חניון חדש" (לא עדכון)
       const isNewLot = addingNewLot && (!lastSavedConfig.lotId || lastSavedConfig.lotId === '');
 
       const url = isNewLot
-        ? '/api/admin' // POST - הוספה
-        : `/api/admin/${parkingConfig.lotId}`; // PUT - עדכון
+        ? '/api/admin'
+        : `/api/admin/${parkingConfig.lotId}`; 
 
       const method = isNewLot ? 'POST' : 'PUT';
 
@@ -534,13 +510,15 @@ export default function AdminConfigPage() {
       } else {
         setParkingConfig({
           ...data.parkingConfig,
-          lotId: updateLotId.trim(), // ← ודאי שה־Lot ID נכנס
+          lotId: updateLotId.trim(),
           dailyHours: convertOperatingHoursToDailyHours(data.parkingConfig.operatingHours),
+          avgRetrievalTime: data.parkingConfig.avgRetrievalTimeMinutes ?? 0,
           updatedAt: data.parkingConfig.updatedAt ? new Date(data.parkingConfig.updatedAt) : undefined,
         });
         setLastSavedConfig({
           ...data.parkingConfig,
           dailyHours: convertOperatingHoursToDailyHours(data.parkingConfig.operatingHours),
+          avgRetrievalTime: data.parkingConfig.avgRetrievalTimeMinutes ?? 0,
           updatedAt: data.parkingConfig.updatedAt ? new Date(data.parkingConfig.updatedAt) : undefined,
         });
         setMessage({ type: 'success', text: '✅ Lot loaded for update!' });
@@ -555,11 +533,9 @@ export default function AdminConfigPage() {
 
   // Convert operating hours from various formats to the unified dailyHours structure
   function convertOperatingHoursToDailyHours(operatingHours: any): ParkingConfig['dailyHours'] {
-    // אם כבר פורמט ימים מלא, החזר כמו שהוא
     if (operatingHours && typeof operatingHours === 'object' && operatingHours.Sunday) {
       return operatingHours;
     }
-    // אם זה פורמט start/end, המר לכל הימים
     const start = operatingHours?.start || '00:00';
     const end = operatingHours?.end || '00:00';
     const daily: ParkingConfig['dailyHours'] = {};
@@ -1084,7 +1060,7 @@ export default function AdminConfigPage() {
               <Button
                 variant="outlined"
                 size="large"
-                onClick={handleResetClick} // ← שינוי כאן
+                onClick={handleResetClick}
                 disabled={saving}
                 sx={{
                   minWidth: 150,
