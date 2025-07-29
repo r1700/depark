@@ -1,0 +1,22 @@
+services:
+  app:
+    build: ./packages/backend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USER=myuser
+      - DB_PASSWORD=mypassword
+      - DB_NAME=mydatabase
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: mydatabase
+    ports:
+      - "5434:5432"

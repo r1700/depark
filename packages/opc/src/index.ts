@@ -10,3 +10,7 @@ app.listen(PORT, () => {
 });
 
 
+import { connectToOpc } from "./opcClient";
+
+// הפעלת החיבור
+connectToOpc();
