@@ -137,8 +137,12 @@ packages/frontend/src/components/screen-login/
 package.json
 package-lock.json
 packages/backend/package.json
+packages/frontend/package.json
+packages/frontend/package-lock.json
+packages/opc/package.json
 
 packages/mobile/package.json
+
 .env
 
 

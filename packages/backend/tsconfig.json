@@ -1,14 +1,19 @@
 {
-<<<<<<< HEAD
-
   "compilerOptions": {
     "target": "ES2020",
     "module": "commonjs",
     "moduleResolution": "node",
+    "baseUrl": ".",
+    "paths": {
+      "@base-project/shared": [
+        "src/shared/index.ts"
+      ],
+    },
     "lib": [
       "ES2020"
     ],
     "outDir": "./dist",
+    "rootDir": "./src",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -31,33 +36,3 @@
     "esm": false
   }
 }
-=======
-    "compilerOptions": {
-      "baseUrl": ".",  // מציין את המיקום הבסיסי
-      "paths": {
-      "@base-project/shared": ["src/shared/index.ts"],
-      },
-      "target": "ES2020",
-      "module": "commonjs",
-      "lib": ["ES2020"],
-      "outDir": "./dist",
-      "rootDir": "./src",
-      "strict": true,
-      "esModuleInterop": true,
-      "skipLibCheck": true,
-      "forceConsistentCasingInFileNames": true,
-      "resolveJsonModule": true,
-      "declaration": true,
-      "declarationMap": true,
-      "sourceMap": true,
-    
-    },
-    "include": ["src/**/*"],
-    "exclude": ["node_modules", "dist"],
-    "ts-node": {
-      "esm": false
-    }
-  }
-
-  
->>>>>>> 414aa1fb (start Subscribe to PLC Data Changes in OPC-UA)
