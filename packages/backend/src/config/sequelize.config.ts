@@ -17,5 +17,19 @@ export default {
       path: path.resolve(__dirname, '../../../migrations'),
       pattern: /\.js|ts$/
     }
-  }
+  },
+  test: {
+    username:DB_NAME,
+    password: DB_PASSWORD,
+    database: DB_USER,
+    host:DB_HOST,
+     dialect: 'postgres' ,
+    migrationStorageTableName: 'sequelize_meta',
+
+    migrations: {
+      path: path.resolve(__dirname, '../../../migrations'),
+      pattern: /\.js|ts$/
+    },
+    // connectionString: DATABASE_URL || 'postgres://postgres:9181@localhost:5432/depark_test',
+  },
 };
