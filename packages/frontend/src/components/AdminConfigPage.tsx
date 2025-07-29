@@ -230,9 +230,11 @@ export default function AdminConfigPage() {
       return;
     }
     if (parkingConfig.surfaceSpotIds.length >= maxSpotsLimit) {
-      setCurrentError(`❌ You cannot add more than ${maxSpotsLimit} parking spots.`);
+      setCurrentError(`❌ You cannot add more than ${maxSpotsLimit} parking spots`);
       setShowErrorPopup(true);
       return;
+
+
     }
     if (parkingConfig.surfaceSpotIds.includes(trimmedSpot)) {
       setCurrentError('❌ This parking spot ID already exists.');
