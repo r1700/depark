@@ -1,5 +1,5 @@
 
-import { 
+import {
   isLicensePlateExists,
   isParkingLotActive,
   isUserAuthorizedNow,
@@ -29,57 +29,61 @@ describe('Parking Service Tests', () => {
   });
   describe('לוחית רישוי/בדיקת מספר רישוי', () => {
 
-        test('מספר רישוי לא נמצא', async () => {
-            const exists = await isLicensePlateExists('NOT_EXIST');
-            expect(exists).toBe(false);
-        });
-        test('מספר קצר מידי, לא תקין', async () => {
-            const exists = await isLicensePlateExists('123');
+    test('מספר רישוי לא נמצא', async () => {
+      const exists = await isLicensePlateExists('NOT_EXIST');
+      expect(exists).toBe(false);
+    });
+    test('מספר קצר מידי, לא תקין', async () => {
+      const exists = await isLicensePlateExists('123');
 
-            expect(exists).toBe(false);
-        });
-        test('מספר רישוי ריק', async () => {
-            const exists = await isLicensePlateExists('');
-            expect(exists).toBe(false);
-        });
-        test('License number is null', async () => {
-            const exists = await isLicensePlateExists(null);
-            expect(exists).toBe(false);
-        });
-        test('לוחית עם רווחים מיותרים', async () => {
-            const exists = await isLicensePlateExists(' 1234 56789 ');
-            expect(exists).toBe(false);
-        });
-         test('   מספר רישוי כבר קיים בחניון', async () => {
-        const exists = await isLicensePlateExists('987654321');
-        expect(exists).toBe(false);
-        });
-        test('מספר רישוי תקין', async () => {
-            const exists = await isLicensePlateExists('123456789');
-            expect(exists).toBe(true);
-        });
-         test('לא ניתן לקרוא לוחית רישוי', async () => {
-            const exists = await isLicensePlateExists('INVALID_PLATE');
-            expect(exists).toBe(false);
-         });
+      expect(exists).toBe(false);
+    });
+    test('מספר רישוי ריק', async () => {
+      const exists = await isLicensePlateExists('');
+      expect(exists).toBe(false);
+    });
+    test('License number is null', async () => {
+      const exists = await isLicensePlateExists(null);
+      expect(exists).toBe(false);
+    });
+    test('לוחית עם רווחים מיותרים', async () => {
+      const exists = await isLicensePlateExists(' 1234 56789 ');
+      expect(exists).toBe(false);
+    });
+    test('   מספר רישוי כבר קיים בחניון', async () => {
+      const exists = await isLicensePlateExists('987654321');
+      expect(exists).toBe(false);
+    });
+    test('מספר רישוי תקין', async () => {
+      const exists = await isLicensePlateExists('123456789');
+      expect(exists).toBe(true);
+    });
+    test('לא ניתן לקרוא לוחית רישוי', async () => {
+      const exists = await isLicensePlateExists('INVALID_PLATE');
+      expect(exists).toBe(false);
+    });
   });
   describe('חניון לא פעיל', () => {
-        test('תאריך שגוי', async () => {
-        const active = await isParkingLotActive("00/00/0000");
-        expect(active).toBe(false);
-        });
-        test('תאריך לא נכון', async () => {
-        const active = await isParkingLotActive("40/02/2025");
-        expect(active).toBe(false);
-        })
-        test('אין תאריך', async () => {
-        const active = await isParkingLotActive("");
-        expect(active).toBe(false);
-        })
-        test('חניון לא פעיל מחזיר false', async () => {
-        const active = await isParkingLotActive("00/00/0000");
-        expect(active).toBe(false);
-        })
+    test('שעה שגויה', async () => {
+      const active = await isParkingLotActive("10:80.3");
+      expect(active).toBe(false);
+    });
+    test('שעה לא נכונה', async () => {
+      const active = await isParkingLotActive("10:80");
+      expect(active).toBe(false);
+    })
+    test('אין שעה', async () => {
+      const active = await isParkingLotActive("");
+      expect(active).toBe(false);
+    })
+    test('חניון לא פעיל מחזיר false', async () => {
+      const active = await isParkingLotActive("00:00");
+      expect(active).toBe(false);
+    })
+    test('חניון לא פעיל מחזיר false', async () => {
+      const active = await isParkingLotActive("00:00");
+      expect(active).toBe(false);
+    })
   })
   describe('בדיקת הרשאות משתמש', () => {//userId
     test('משתמש לא מורשה', async () => {
@@ -102,118 +106,106 @@ describe('Parking Service Tests', () => {
     test('משתמש חסום', async () => {
       const authorized = await isUserAuthorizedNow('1234');
       expect(authorized).toBe(false);
-    }); 
-});
-
-describe('בדיקת מקום בחניון בגודל מתאים', () => {
-
-   test('יש מקום בגודל מתאים', async () => {
-       const available = await isParkingAvailableForSize({
-           height: 10,
-           width:  10,
-           length: 10,
-           weight: 10
-       }); // גודל תקין
-       expect(available).toBe(true);
-   });
-   test('אין מידע מספק על גודל רכב', async () => {
-       const available = await isParkingAvailableForSize({
-           height: null,
-           width:  10,
-           length: 10,
-           weight: 10
-       });
-       expect(available).toBe(false);
-   });
-
-   test('אין מקום בגודל מתאים', async () => {
-       const available = await isParkingAvailableForSize({
-           height: 100,
-           width:  100,
-           length: 100,
-           weight: 100
-       });
-       expect(available).toBe(false);
-   });
-   test('חסרים נתונים', async () => {
-       const available = await isParkingAvailableForSize({
-           height: 100,
-           width:  100,
-           
-       });
-       expect(available).toBe(false);
-   });
-    test(' נתונים לא תואמים לtype', async () => {
-        const available = await isParkingAvailableForSize({
-            height: "100",
-            width:  "מאה",
-            length: "מאה",
-            weight: "מאה"
-        });
-        expect(available).toBe(false);
-    });  
-    test(' נתונים  תואמים לtype', async () => {
-        const available = await isParkingAvailableForSize({
-            height: 100,
-            width:  20.3,
-            length: 4.2,
-            weight: 70.3
-        });
-        expect(available).toBe(true);
     });
-     test(' אין ערכים שלילים', async () => {
-        const available = await isParkingAvailableForSize({
-            height: -100,
-            width: -20.3,
-            length: -4.2,
-            weight: -70.3
-        });
-        expect(available).toBe(false);
-   }); 
-     test(' אין ערכים שלילים', async () => {
-        const available = await isParkingAvailableForSize({
-            height: -100,
-            width: -20.3,
-            length: -4.2,
-            weight: -70.3
-        });
-        expect(available).toBe(false);
-   }); 
-      test(' אין ערכים שלילים', async () => {
-        const available = await isParkingAvailableForSize({
-            height: -100,
-            width: -20.3,
-            length: -4.2,
-            weight: -70.3
-        });
-        expect(available).toBe(false);
-   });
+  });
 
-   test('אין מקום בחניון', async () => {
-       const full = await isLotFull();
-       expect(full).toBe(true);
-   });
-   
-});
-
-
-
-
-
-
+  describe('בדיקת מקום בחניון בגודל מתאים', () => {
 
     test('יש מקום בגודל מתאים', async () => {
-        const available = await isParkingAvailableForSize('SMALL');
-        expect(available).toBe(true);
+      const available = await isParkingAvailableForSize({
+        height: 10,
+        width: 10,
+        length: 10,
+        weight: 10
+      }); // גודל תקין
+      expect(available).toBe(true);
+    });
+    test('אין מידע מספק על גודל רכב', async () => {
+      const available = await isParkingAvailableForSize({
+        height: null,
+        width: 10,
+        length: 10,
+        weight: 10
+      });
+      expect(available).toBe(false);
     });
 
-  test('אין מקום בגודל מתאים', async () => {
-    const available = await isParkingAvailableForSize('LARGE');
-    expect(available).toBe(false);
+    test('אין מקום בגודל מתאים', async () => {
+      const available = await isParkingAvailableForSize({
+        height: 100,
+        width: 100,
+        length: 100,
+        weight: 100
+      });
+      expect(available).toBe(false);
+    });
+    test('חסרים נתונים', async () => {
+      const available = await isParkingAvailableForSize({
+        height: 100,
+        width: 100,
+
+      });
+      expect(available).toBe(false);
+    });
+    test(' נתונים לא תואמים לtype', async () => {
+      const available = await isParkingAvailableForSize({
+        height: "100",
+        width: "מאה",
+        length: "מאה",
+        weight: "מאה"
+      });
+      expect(available).toBe(false);
+    });
+    test(' נתונים  תואמים לtype', async () => {
+      const available = await isParkingAvailableForSize({
+        height: 100,
+        width: 20.3,
+        length: 4.2,
+        weight: 70.3
+      });
+      expect(available).toBe(true);
+    });
+    test(' אין ערכים שלילים', async () => {
+      const available = await isParkingAvailableForSize({
+        height: -100,
+        width: -20.3,
+        length: -4.2,
+        weight: -70.3
+      });
+      expect(available).toBe(false);
+    });
+    test(' אין ערכים שלילים', async () => {
+      const available = await isParkingAvailableForSize({
+        height: -100,
+        width: -20.3,
+        length: -4.2,
+        weight: -70.3
+      });
+      expect(available).toBe(false);
+    });
+    test(' אין ערכים שלילים', async () => {
+      const available = await isParkingAvailableForSize({
+        height: -100,
+        width: -20.3,
+        length: -4.2,
+        weight: -70.3
+      });
+      expect(available).toBe(false);
+    });
+
+  
+    
   });
 
-  test('אין מקום בחניון', async () => {
-    const full = await isLotFull();
-    expect(full).toBe(true);
+  describe('בדיקת מקום בחניון', () => {
+    test('יש מקום בחניון', async () => {
+      const full = await isLotFull();
+      expect(full).toBe(true);
+    });
+    test('אין מקום בחניון', async () => {
+      const full = await isLotFull();
+      expect(full).toBe(false);
+    });
   });
 });
+
