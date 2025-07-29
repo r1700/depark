@@ -3,88 +3,89 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('UserSessions', {
+    await queryInterface.createTable('usersessions', {
       id: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
         primaryKey: true,
         allowNull: false,
+        autoIncrement: true,
       },
-      userId: {
-        type: Sequelize.STRING,
+      baseuser_id: {
+        type: Sequelize.INTEGER,
         allowNull: false,
       },
-      userType: {
-        type: Sequelize.ENUM('user', 'admin'),
+      user_type: {
+        type: Sequelize.INTEGER,
         allowNull: false,
+        comment: '1=user, 2=admin',
       },
       token: {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      refreshToken: {
+      refresh_token: {
         type: Sequelize.STRING,
         allowNull: true,
       },
-      expiresAt: {
+      expires_at: {
         type: Sequelize.DATE,
         allowNull: false,
       },
-      isActive: {
+      is_active: {
         type: Sequelize.BOOLEAN,
         allowNull: false,
         defaultValue: true,
       },
-      ipAddress: {
+      ip_address: {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      userAgent: {
+      user_agent: {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      createdAt: {
+      created_at: {
         type: Sequelize.DATE,
         allowNull: false,
         defaultValue: Sequelize.NOW,
       },
-      lastActivity: {
+      last_activity: {
         type: Sequelize.DATE,
         allowNull: false,
         defaultValue: Sequelize.NOW,
       },
     });
 
-    await queryInterface.bulkInsert('UserSessions', [
+    await queryInterface.bulkInsert('usersessions', [
       {
-        id: 'session1',
-        userId: 'user1',
-        userType: 'user',
+
+        baseuser_id: 1,
+        user_type: 1,
         token: 'token12345',
-        refreshToken: 'refreshToken123',
-        expiresAt: new Date(Date.now() + 3600 * 1000),  
-        isActive: true,
-        ipAddress: '192.168.1.1',
-        userAgent: 'Mozilla/5.0',
-        createdAt: new Date(),
-        lastActivity: new Date(),
+        refresh_token: 'refreshToken123',
+        expires_at: new Date(Date.now() + 3600 * 1000),
+        is_active: true,
+        ip_address: '192.168.1.1',
+        user_agent: 'Mozilla/5.0',
+        created_at: new Date(),
+        last_activity: new Date(),
       },
       {
-        id: 'session2',
-        userId: 'admin1',
-        userType: 'admin',
+        baseuser_id: 2,
+        user_type: 2,
         token: 'token67890',
-        refreshToken: 'refreshToken456',
-        expiresAt: new Date(Date.now() + 3600 * 1000),  
-        isActive: true,
-        ipAddress: '192.168.1.2',
-        userAgent: 'Chrome/91.0',
-        createdAt: new Date(),
-        lastActivity: new Date(),
+        refresh_token: 'refreshToken456',
+        expires_at: new Date(Date.now() + 3600 * 1000),
+        is_active: true,
+        ip_address: '192.168.1.2',
+        user_agent: 'Chrome/91.0',
+        created_at: new Date(),
+        last_activity: new Date(),
       },
     ]);
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('UserSessions');
-  }
+    await queryInterface.dropTable('usersessions');
+  },
 };

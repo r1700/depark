@@ -3,88 +3,76 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('SystemHealths', {
+    await queryInterface.createTable('systemhealths', {
       id: {
-        type: Sequelize.STRING, 
+        type: Sequelize.INTEGER,
         primaryKey: true,
         allowNull: false,
+        autoIncrement: true,
       },
       component: {
-        type: Sequelize.ENUM('opc_bridge', 'api_server', 'database', 'websocket_server', 'government_sync'),  
+        type: Sequelize.INTEGER,
         allowNull: false,
+        comment: '1=opc_bridge, 2=api_server, 3=database, 4=websocket_server, 5=government_sync',
       },
       status: {
-        type: Sequelize.ENUM('healthy', 'warning', 'error'),  
+        type: Sequelize.INTEGER,
         allowNull: false,
+        comment: '1=healthy, 2=warning, 3=error',
       },
       message: {
-        type: Sequelize.STRING,  
+        type: Sequelize.STRING,
         allowNull: true,
       },
       metrics: {
-        type: Sequelize.JSONB,  
+        type: Sequelize.JSONB,
         allowNull: true,
       },
       timestamp: {
-        type: Sequelize.DATE,  
-        allowNull: false,
-      },
-      createdAt: {
         type: Sequelize.DATE,
         allowNull: false,
-        defaultValue: Sequelize.NOW,  
-      },
-      updatedAt: {
-        type: Sequelize.DATE,
-        allowNull: false,
-        defaultValue: Sequelize.NOW,  
       },
     });
 
-    await queryInterface.bulkInsert('SystemHealths', [
-      {
-        id: '1',
-        component: 'api_server',
-        status: 'healthy',
-        message: 'API server is running smoothly.',
-        metrics: JSON.stringify({
-          memoryUsage: 50,
-          responseTime: 200,
-        }),
-        timestamp: new Date(),
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        id: '2',
-        component: 'websocket_server',
-        status: 'warning',
-        message: 'WebSocket server is experiencing high latency.',
-        metrics: JSON.stringify({
-          memoryUsage: 70,
-          responseTime: 500,
-        }),
-        timestamp: new Date(),
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        id: '3',
-        component: 'database',
-        status: 'error',
-        message: 'Database connection failed.',
-        metrics: JSON.stringify({
-          memoryUsage: 90,
-          responseTime: 1000,
-        }),
-        timestamp: new Date(),
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-    ]);
+  await queryInterface.bulkInsert('systemhealths', [
+  {
+    component: 2, 
+    status: 1, 
+    message: 'API server is running smoothly.',
+    metrics: JSON.stringify({
+      memoryUsage: 50,
+      responseTime: 200,
+    }),
+    timestamp: new Date(),
+ 
   },
+  {
+    component: 4, 
+    status: 2, 
+    message: 'WebSocket server is experiencing high latency.',
+    metrics: JSON.stringify({
+      memoryUsage: 70,
+      responseTime: 500,
+    }),
+    timestamp: new Date(),
+    
+  },
+  {
+    component: 3, 
+    status: 3,
+    message: 'Database connection failed.',
+    metrics: JSON.stringify({
+      memoryUsage: 90,
+      responseTime: 1000,
+    }),
+    timestamp: new Date(),
+   
+  },
+]);
+  }
+, 
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('SystemHealths');  
+    await queryInterface.dropTable('systemhealths');
   }
 };
