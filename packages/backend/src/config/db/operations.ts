@@ -2,19 +2,20 @@ import client from './connection'
 
 
 //Get once
-const getRole = async (id: string) => {
+const getRoleById = async (id: string) => {
   try {
-    const result = await client.query(`SELECT role FROM "AdminUsers" WHERE id = $1`, [id]);
+    console.log("hello from getRole");
+    const result = await client.query(`SELECT role FROM adminusers WHERE baseuser_id = $1`, [id]);
     console.log(result.rows);
     return result.rows[0].role;
-  } catch (err) {
-    console.error('Query error');
+  } catch (error) {
+    console.error(error);
   }
 };
 
-const getId = async (email: string) => {
+const getIdByEmail = async (email: string) => {
   try {
-    const result = await client.query(`SELECT id FROM "BaseUser" WHERE email = $1`, [email]);
+    const result = await client.query(`SELECT id FROM baseuser WHERE email = $1`, [email]);
     console.log(result.rows);
     return result.rows[0].id;
   } catch (err) {
@@ -23,4 +24,4 @@ const getId = async (email: string) => {
 };
 
 
-export {getRole, getId}
+export {getRoleById, getIdByEmail}

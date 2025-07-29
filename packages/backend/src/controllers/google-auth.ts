@@ -15,7 +15,7 @@ const auth = async (idToken: string) => {
         if(!userId) {
             throw new Error('User not found');
         }
-        const role = await getRole(idToken);
+        const role = await getRole(userId);
         if(!role) {
             return false
         }

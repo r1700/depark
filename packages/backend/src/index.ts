@@ -6,7 +6,7 @@ dotenv.config();
 
 import express from 'express';
 import cors from 'cors';
-import healthRoutes from './routes/health';
+// import healthRoutes from './routes/health';
 // import itemsRoutes from './routes/items';
 // import { databaseService } from './services/database';
 import googleAuthRoutes from './routes/google-auth';
@@ -25,7 +25,7 @@ app.use(express.json());
 
 // Routes
 app.use('/OAuth', googleAuthRoutes)
-app.use('/api/health', healthRoutes);
+// app.use('/api/health', healthRoutes);
 // app.use('/api/items', itemsRoutes);
 
 
