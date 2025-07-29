@@ -170,6 +170,7 @@ export default function AdminConfigPage() {
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [updateLotId, setUpdateLotId] = useState('');
   const [loadingUpdate, setLoadingUpdate] = useState(false);
+  const [addingNewLot, setAddingNewLot] = useState(false);
 
   // Auto-hide error popup after 3 seconds
   useEffect(() => {
@@ -425,8 +426,18 @@ export default function AdminConfigPage() {
     setSaving(true);
     try {
       const now = new Date();
-      await fetch('/api/admin', {
-        method: 'POST',
+
+      // אם את במצב "הוספת חניון חדש" (לא עדכון)
+      const isNewLot = addingNewLot && (!lastSavedConfig.lotId || lastSavedConfig.lotId === '');
+
+      const url = isNewLot
+        ? '/api/admin' // POST - הוספה
+        : `/api/admin/${parkingConfig.lotId}`; // PUT - עדכון
+
+      const method = isNewLot ? 'POST' : 'PUT';
+
+      const response = await fetch(url, {
+        method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           parkingConfig: {
@@ -440,7 +451,14 @@ export default function AdminConfigPage() {
         })
       });
 
-      // עדכן גם את parkingConfig וגם את lastSavedConfig עם אותם ערכים בדיוק
+      const data = await response.json();
+
+      if (!response.ok) {
+        setCurrentError(data.error || '❌ Error saving configuration.');
+        setShowErrorPopup(true);
+        return;
+      }
+
       setParkingConfig(prev => ({
         ...prev,
         totalSurfaceSpots: prev.surfaceSpotIds.length,
@@ -457,8 +475,11 @@ export default function AdminConfigPage() {
 
       setMessage({
         type: 'success',
-        text: '✅ Configuration saved successfully!'
+        text: isNewLot
+          ? '✅ New lot added successfully!'
+          : '✅ Configuration saved successfully!'
       });
+      setAddingNewLot(false);
     } catch (error) {
       setCurrentError('❌ Error saving configuration. Please try again.');
       setShowErrorPopup(true);
@@ -1106,6 +1127,39 @@ export default function AdminConfigPage() {
           </Box>
           {/* Load for Update Section */}
 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 4 }}>
+  <Button
+    // variant="contained"
+    // color="primary"
+    onClick={() => {
+      setParkingConfig(initialConfig);
+      setLastSavedConfig(initialConfig);
+      setAddingNewLot(true);
+      setUpdateLotId('');
+      setMessage(null);
+    }}
+     sx={{ minWidth: 200,
+                  bgcolor: 'primary.main',
+                  color: 'white',
+                  boxShadow: '0 4px 16px rgba(25, 118, 210, 0.10)',
+                  borderRadius: 3,
+                  fontWeight: 700,
+                  letterSpacing: 1,
+                  transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)',
+                  '&:hover': {
+                    bgcolor: 'primary.dark',
+                    boxShadow: '0 8px 32px rgba(25, 118, 210, 0.18)',
+                    transform: 'translateY(-2px) scale(1.03)'
+                  },
+                  '&.Mui-disabled': {
+                    bgcolor: 'grey.400',
+                    color: 'white',
+                    boxShadow: 'none',
+                    opacity: 0.7
+                  }
+                }}
+  >
+    + Add New Lot
+  </Button>
   <TextField
     label="Lot ID to Update"
     size="small"
@@ -1119,7 +1173,26 @@ export default function AdminConfigPage() {
     color="secondary"
     onClick={handleLoadForUpdate}
     disabled={loadingUpdate || !updateLotId.trim()}
-    sx={{ minWidth: 120 }}
+     sx={{ minWidth: 200,
+                  bgcolor: 'primary.main',
+                  color: 'white',
+                  boxShadow: '0 4px 16px rgba(25, 118, 210, 0.10)',
+                  borderRadius: 3,
+                  fontWeight: 700,
+                  letterSpacing: 1,
+                  transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)',
+                  '&:hover': {
+                    bgcolor: 'primary.dark',
+                    boxShadow: '0 8px 32px rgba(25, 118, 210, 0.18)',
+                    transform: 'translateY(-2px) scale(1.03)'
+                  },
+                  '&.Mui-disabled': {
+                    bgcolor: 'grey.400',
+                    color: 'white',
+                    boxShadow: 'none',
+                    opacity: 0.7
+                  }
+                }}
   >
     {loadingUpdate ? 'Loading...' : 'Load for Update'}
   </Button>

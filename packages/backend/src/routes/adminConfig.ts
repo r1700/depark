@@ -16,6 +16,7 @@ router.post('/', async (req, res) => {
       [parkingConfig.lotId]
     );
     if (exists.rowCount && exists.rowCount > 0) {
+      // מחזירים שגיאה תקינה, לא קריסה
       return res.status(409).json({ success: false, error: 'Lot ID already exists' });
     }
 
@@ -111,6 +112,16 @@ router.get('/:id', async (req, res) => {
     res.json({ success: true, parkingConfig: result.rows[0] });
   } catch (error) {
     console.error('Error fetching parking config:', error);
+    res.status(500).json({ success: false, error: 'Internal server error' });
+  }
+});
+// קבלת כל החניונים
+router.get('/', async (req, res) => { 
+  try {
+    const result = await client.query(`SELECT * FROM "ParkingConfigurations"`);
+    res.json({ success: true, parkingConfigs: result.rows });
+  } catch (error) {
+    console.error('Error fetching parking configs:', error);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });
