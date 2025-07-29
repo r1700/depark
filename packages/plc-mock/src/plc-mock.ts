@@ -55,7 +55,7 @@ export async function createPlcOpcServer() {
   browseName: "carInParking",
    nodeId: "ns=1;s=carInParking",
   dataType: "Boolean",
-  minimumSamplingInterval: 1000, // ← נדרש בעת שימוש ב-get
+  minimumSamplingInterval: 1000, // ← נדרש בעת שימgוש ב-get
   value: {
     get: () => {
       const value = true;
@@ -104,4 +104,3 @@ namespace.addVariable({
   await server.start();
   console.log(":white_check_mark: OPC-UA server running at:", server.endpoints[0].endpointDescriptions()[0].endpointUrl);
 }
-
