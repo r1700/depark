@@ -3,105 +3,79 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Users', {
+    await queryInterface.createTable('users', {
       id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
         allowNull: false,
         autoIncrement: true,
       },
-      email: {
-        type: Sequelize.STRING,
-        allowNull: false,
-        unique: true,
-      },
-      firstName: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-      lastName: {
-        type: Sequelize.STRING,
+      baseuser_id: {
+        type: Sequelize.INTEGER,
         allowNull: false,
       },
       department: {
         type: Sequelize.STRING,
         allowNull: true,
       },
-      employeeId: {
+      employee_id: {
         type: Sequelize.STRING,
         allowNull: true,
       },
-      googleId: {
+      google_id: {
         type: Sequelize.STRING,
         allowNull: true,
       },
       status: {
-        type: Sequelize.ENUM('pending', 'approved', 'declined', 'suspended'),
+        type: Sequelize.INTEGER,
         allowNull: false,
+        comment: '1=pending, 2=approved, 3=declined, 4=suspended',
       },
-      maxCarsAllowedParking: {
+      max_cars_allowed_parking: {
         type: Sequelize.INTEGER,
         allowNull: true,
       },
-      createdBy: {
+      created_by: {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      approvedBy: {
+      approved_by: {
         type: Sequelize.STRING,
         allowNull: true,
       },
-      approvedAt: {
+      approved_at: {
         type: Sequelize.DATE,
         allowNull: true,
-      },
-      createdAt: {
-        type: Sequelize.DATE,
-        allowNull: false,
-        defaultValue: Sequelize.NOW,
-      },
-      updatedAt: {
-        type: Sequelize.DATE,
-        allowNull: false,
-        defaultValue: Sequelize.NOW,
       },
     });
 
-    await queryInterface.bulkInsert('Users', [
+    await queryInterface.bulkInsert('users', [
       {
-        email: 'john.doe@example.com',
-        firstName: 'John',
-        lastName: 'Doe',
+        baseuser_id: 1,
         department: 'Engineering',
-        employeeId: 'E12345',
-        googleId: 'google-id-12345',
-        status: 'approved',
-        maxCarsAllowedParking: 2,
-        createdBy: 'admin',
-        approvedBy: 'admin',
-        approvedAt: new Date(),
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        employee_id: 'E12345',
+        google_id: 'google-id-12345',
+        status: 2, 
+        max_cars_allowed_parking: 2,
+        created_by: 'admin',
+        approved_by: 'admin',
+        approved_at: new Date(),
       },
       {
-        email: 'jane.smith@example.com',
-        firstName: 'Jane',
-        lastName: 'Smith',
+        baseuser_id: 2,
         department: 'Sales',
-        employeeId: 'E67890',
-        googleId: 'google-id-67890',
-        status: 'pending',
-        maxCarsAllowedParking: 1,
-        createdBy: 'admin',
-        approvedBy: null,
-        approvedAt: null,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        employee_id: 'E67890',
+        google_id: 'google-id-67890',
+        status: 1,
+        max_cars_allowed_parking: 1,
+        created_by: 'admin',
+        approved_by: null,
+        approved_at: null,
       },
     ]);
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Users');
+    await queryInterface.dropTable('users');
   }
 };

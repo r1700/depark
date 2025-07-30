@@ -3,23 +3,26 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('NotificationLogs', {
+    await queryInterface.createTable('notificationlogs', {
       id: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
         primaryKey: true,
         allowNull: false,
+        autoIncrement: true,
       },
-      userId: {
-        type: Sequelize.STRING,
-        allowNull: true,
+      baseuser_id: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
       },
       type: {
-        type: Sequelize.ENUM('queue_update', 'retrieval_ready', 'parking_full', 'system_maintenance'),
+        type: Sequelize.INTEGER,
         allowNull: false,
+        comment: '1=queue_update, 2=retrieval_ready, 3=parking_full, 4=system_maintenance',
       },
       channel: {
-        type: Sequelize.ENUM('websocket', 'push_notification'),
+        type: Sequelize.INTEGER,
         allowNull: false,
+        comment: '1=websocket, 2=push_notification',
       },
       message: {
         type: Sequelize.STRING,
@@ -30,7 +33,7 @@ module.exports = {
         allowNull: false,
         defaultValue: false,
       },
-      deliveredAt: {
+      delivered_at: {
         type: Sequelize.DATE,
         allowNull: true,
       },
@@ -43,75 +46,56 @@ module.exports = {
         allowNull: false,
         defaultValue: Sequelize.NOW,
       },
-      createdAt: {
-        type: Sequelize.DATE,
-        allowNull: false,
-        defaultValue: Sequelize.NOW,
-      },
-      updatedAt: {
-        type: Sequelize.DATE,
-        allowNull: false,
-        defaultValue: Sequelize.NOW,
-      },
     });
 
-    await queryInterface.bulkInsert('NotificationLogs', [
+    await queryInterface.bulkInsert('notificationlogs', [
       {
-        id: '1',
-        userId: 'user123',
-        type: 'queue_update',
-        channel: 'websocket',
+        baseuser_id: 1,
+        type: 1,
+        channel: 1,
         message: 'Queue has been updated.',
         delivered: true,
-        deliveredAt: new Date(),
+        delivered_at: new Date(),
         error: null,
         timestamp: new Date(),
-        createdAt: new Date(),
-        updatedAt: new Date(),
+      
       },
       {
-        id: '2',
-        userId: 'user456',
-        type: 'retrieval_ready',
-        channel: 'push_notification',
+        baseuser_id: 2,
+        type: 2,
+        channel: 2,
         message: 'Your vehicle is ready for retrieval.',
         delivered: false,
-        deliveredAt: null,
+        delivered_at: null,
         error: 'Failed to deliver',
         timestamp: new Date(),
-        createdAt: new Date(),
-        updatedAt: new Date(),
+      
       },
       {
-        id: '3',
-        userId: 'user789',
-        type: 'parking_full',
-        channel: 'websocket',
+        baseuser_id: 3,
+        type: 3,
+        channel: 1,
         message: 'Parking is full. Please try again later.',
         delivered: true,
-        deliveredAt: new Date(),
+        delivered_at: new Date(),
         error: null,
         timestamp: new Date(),
-        createdAt: new Date(),
-        updatedAt: new Date(),
+       
       },
       {
-        id: '4',
-        userId: null,  
-        type: 'system_maintenance',
-        channel: 'push_notification',
+        baseuser_id: 4,
+        type: 4,
+        channel: 2,
         message: 'Scheduled system maintenance at 2 AM.',
         delivered: true,
-        deliveredAt: new Date(),
+        delivered_at: new Date(),
         error: null,
         timestamp: new Date(),
-        createdAt: new Date(),
-        updatedAt: new Date(),
+      
       },
     ]);
   },
-
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('NotificationLogs');  
+    await queryInterface.dropTable('notificationlogs');
   }
 };

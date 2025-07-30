@@ -3,25 +3,27 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('UsageReports', { 
+    await queryInterface.createTable('usagereports', {
       id: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
         primaryKey: true,
         allowNull: false,
+        autoIncrement: true,
       },
-      reportType: {
-        type: Sequelize.ENUM('daily', 'weekly', 'monthly', 'custom'),
+      report_type: {
+        type: Sequelize.INTEGER,
         allowNull: false,
+        comment: '1=daily, 2=weekly, 3=monthly, 4=custom',
       },
-      startDate: {
+      start_date: {
         type: Sequelize.DATE,
         allowNull: false,
       },
-      endDate: {
+      end_date: {
         type: Sequelize.DATE,
         allowNull: false,
       },
-      generatedBy: {
+      generated_by: {
         type: Sequelize.STRING,
         allowNull: false,
       },
@@ -30,27 +32,27 @@ module.exports = {
         allowNull: false,
       },
       format: {
-        type: Sequelize.ENUM('json', 'csv', 'pdf'),
+        type: Sequelize.INTEGER,
         allowNull: false,
+        comment: '1=json, 2=csv, 3=pdf',
       },
-      filePath: {
+      file_path: {
         type: Sequelize.STRING,
         allowNull: true,
       },
-      generatedAt: {
+      generated_at: {
         type: Sequelize.DATE,
         allowNull: false,
         defaultValue: Sequelize.NOW,
       },
     });
 
-    await queryInterface.bulkInsert('UsageReports', [
+    await queryInterface.bulkInsert('usagereports', [
       {
-        id: '1',
-        reportType: 'daily',
-        startDate: new Date('2025-07-01'),
-        endDate: new Date('2025-07-01'),
-        generatedBy: 'user1',
+        report_type: 1,
+        start_date: new Date('2025-07-01'),
+        end_date: new Date('2025-07-01'),
+        generated_by: 'user1',
         data: JSON.stringify({
           totalSessions: 100,
           avgParkingDuration: 15,
@@ -63,36 +65,56 @@ module.exports = {
           totalEntries: 200,
           totalExits: 190,
         }),
-        format: 'json',
-        filePath: 'path/to/file1.json',
-        generatedAt: new Date(),
+        format: 1,
+        file_path: 'path/to/file1.json',
+        generated_at: new Date(),
       },
       {
-        id: '2',
-        reportType: 'monthly',
-        startDate: new Date('2025-07-01'),
-        endDate: new Date('2025-07-31'),
-        generatedBy: 'user2',
+        report_type: 2,
+        start_date: new Date('2025-07-01'),
+        end_date: new Date('2025-07-07'),
+        generated_by: 'user2',
         data: JSON.stringify({
-          totalSessions: 3000,
+          totalSessions: 700,
           avgParkingDuration: 20,
           avgRetrievalTime: 12,
           peakHours: [
-            { hour: 12, sessions: 300 },
-            { hour: 18, sessions: 250 },
+            { hour: 8, sessions: 100 },
+            { hour: 9, sessions: 90 },
+          ],
+          utilizationRate: 80,
+          totalEntries: 1400,
+          totalExits: 1350,
+        }),
+        format: 2,
+        file_path: 'path/to/file2.csv',
+        generated_at: new Date(),
+      },
+      {
+        report_type: 3,
+        start_date: new Date('2025-07-01'),
+        end_date: new Date('2025-07-31'),
+        generated_by: 'user3',
+        data: JSON.stringify({
+          totalSessions: 3000,
+          avgParkingDuration: 18,
+          avgRetrievalTime: 14,
+          peakHours: [
+            { hour: 8, sessions: 400 },
+            { hour: 9, sessions: 350 },
           ],
           utilizationRate: 85,
           totalEntries: 6000,
           totalExits: 5800,
         }),
-        format: 'csv',
-        filePath: 'path/to/file2.csv',
-        generatedAt: new Date(),
+        format: 3,
+        file_path: 'path/to/file3.pdf',
+        generated_at: new Date(),
       },
-    ]);
+    ], {});
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('UsageReports');
-  }
+    await queryInterface.dropTable('usagereports');
+  },
 };

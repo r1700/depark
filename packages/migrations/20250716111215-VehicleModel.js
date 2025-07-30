@@ -3,75 +3,73 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('VehicleModels', {
+    await queryInterface.createTable('vehiclemodels', {
       id: {
-        type: Sequelize.STRING,  
+        type: Sequelize.INTEGER,
         primaryKey: true,
         allowNull: false,
+        autoIncrement: true,
       },
       make: {
-        type: Sequelize.STRING,  
+        type: Sequelize.STRING,
         allowNull: false,
       },
       model: {
-        type: Sequelize.STRING,  
+        type: Sequelize.STRING,
         allowNull: false,
       },
-      yearRange: {
-        type: Sequelize.JSONB,  
+      year_range: {
+        type: Sequelize.JSONB,
         allowNull: false,
       },
       dimensions: {
-        type: Sequelize.JSONB,  
+        type: Sequelize.JSONB,
         allowNull: false,
       },
       source: {
-        type: Sequelize.ENUM('manual', 'government_db', 'hr_input'),  
+        type: Sequelize.INTEGER,
         allowNull: false,
+        comment: '1=manual, 2=government_db, 3=hr_input',
       },
-      createdAt: {
-        type: Sequelize.DATE,  
+      created_at: {
+        type: Sequelize.DATE,
         allowNull: false,
-        defaultValue: Sequelize.NOW,  
+        defaultValue: Sequelize.NOW,
       },
-      updatedAt: {
-        type: Sequelize.DATE,  
+      updated_at: {
+        type: Sequelize.DATE,
         allowNull: false,
-        defaultValue: Sequelize.NOW,  
+        defaultValue: Sequelize.NOW,
       },
-      updatedBy: {
-        type: Sequelize.STRING,  
+      updated_by: {
+        type: Sequelize.STRING,
         allowNull: true,
       },
     });
 
-    await queryInterface.bulkInsert('VehicleModels', [
-      {
-        id: '1',
-        make: 'Toyota',
-        model: 'Corolla',
-        yearRange: JSON.stringify({ start: 2000, end: 2020 }), 
-        dimensions: JSON.stringify({ length: 4.63, width: 1.78, height: 1.43 }), 
-        source: 'manual',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        updatedBy: 'admin',
-      },
-      {
-        id: '2',
-        make: 'Ford',
-        model: 'Focus',
-        yearRange: JSON.stringify({ start: 2005, end: 2021 }), 
-        dimensions: JSON.stringify({ length: 4.37, width: 1.82, height: 1.46 }), 
-        source: 'government_db',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        updatedBy: 'admin',
-      },
-    ]);
+   await queryInterface.bulkInsert('vehiclemodels', [
+  {
+    make: 'Toyota',
+    model: 'Corolla',
+    year_range: JSON.stringify({ start: 2000, end: 2020 }),
+    dimensions: JSON.stringify({ length: 4.63, width: 1.78, height: 1.43 }),
+    source: 1,
+    created_at: new Date(),
+    updated_at: new Date(),
+  },
+  {
+    make: 'Ford',
+    model: 'Focus',
+    year_range: JSON.stringify({ start: 2005, end: 2021 }),
+    dimensions: JSON.stringify({ length: 4.37, width: 1.82, height: 1.46 }),
+    source: 2,
+    created_at: new Date(),
+    updated_at: new Date(),
+  },
+]);
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('VehicleModels');
-  }
+    await queryInterface.dropTable('vehiclemodels');
+  },
 };

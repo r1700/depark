@@ -3,68 +3,67 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('VehicleReports', {
+    await queryInterface.createTable('vehiclereports', {
       id: {
-        type: Sequelize.STRING,  
+        type: Sequelize.INTEGER,  
         primaryKey: true,
         allowNull: false,
+        autoIncrement: true,
       },
-      totalVehicles: {
+      total_vehicles: {
         type: Sequelize.INTEGER,  
         allowNull: false,
       },
-      activeVehicles: {
+      active_vehicles: {
         type: Sequelize.INTEGER,  
         allowNull: false,
       },
-      unknownModels: {
+      unknown_models: {
         type: Sequelize.INTEGER,  
         allowNull: false,
       },
-      dimensionSources: {
+      dimension_sources: {
         type: Sequelize.JSONB,  
         allowNull: false,
       },
-      topMakes: {
+      top_makes: {
         type: Sequelize.JSONB,  
         allowNull: false,
       },
-      generatedBy: {
+      generated_by: {
         type: Sequelize.STRING,  
         allowNull: false,
       },
-      generatedAt: {
+      generated_at: {
         type: Sequelize.DATE,  
         allowNull: false,
         defaultValue: Sequelize.NOW,  
       },
     });
 
-    await queryInterface.bulkInsert('VehicleReports', [
+    await queryInterface.bulkInsert('vehiclereports', [
       {
-        id: '1',
-        totalVehicles: 500,
-        activeVehicles: 400,
-        unknownModels: 50,
-        dimensionSources: JSON.stringify({ manual: 100, government_db: 200, model_default: 50 }),
-        topMakes: JSON.stringify([{ make: 'Toyota', count: 100 }, { make: 'Honda', count: 80 }]),
-        generatedBy: 'admin',
-        generatedAt: new Date(),
+        total_vehicles: 500,
+        active_vehicles: 400,
+        unknown_models: 50,
+        dimension_sources: JSON.stringify({ manual: 100, government_db: 200, model_default: 50 }),
+        top_makes: JSON.stringify([{ make: 'Toyota', count: 100 }, { make: 'Honda', count: 80 }]),
+        generated_by: 'admin',
+        generated_at: new Date(),
       },
       {
-        id: '2',
-        totalVehicles: 450,
-        activeVehicles: 350,
-        unknownModels: 30,
-        dimensionSources: JSON.stringify({ manual: 120, government_db: 150, model_default: 40 }),
-        topMakes: JSON.stringify([{ make: 'Ford', count: 90 }, { make: 'BMW', count: 60 }]),
-        generatedBy: 'admin',
-        generatedAt: new Date(),
+        total_vehicles: 450,
+        active_vehicles: 350,
+        unknown_models: 30,
+        dimension_sources: JSON.stringify({ manual: 120, government_db: 150, model_default: 40 }),
+        top_makes: JSON.stringify([{ make: 'Ford', count: 90 }, { make: 'BMW', count: 60 }]),
+        generated_by: 'admin',
+        generated_at: new Date(),
       },
     ]);
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('VehicleReports');
+    await queryInterface.dropTable('vehiclereports');
   }
 };

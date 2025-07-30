@@ -3,99 +3,85 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('RetrievalQueues', {
+    await queryInterface.createTable('retrievalqueues', {
       id: {
-        type: Sequelize.STRING,  
+        type: Sequelize.INTEGER,
         primaryKey: true,
         allowNull: false,
+        autoIncrement: true,
       },
-      sessionId: {
-        type: Sequelize.STRING,  
+      baseuser_id: {
+        type: Sequelize.INTEGER,
         allowNull: false,
       },
-      userId: {
-        type: Sequelize.STRING,  
-        allowNull: true,
-      },
-      licensePlate: {
-        type: Sequelize.STRING,  
+      parking_session_id: {
+        type: Sequelize.INTEGER,
         allowNull: false,
       },
-      undergroundSpot: {
-        type: Sequelize.STRING,  
+      license_plate: {
+        type: Sequelize.STRING,
         allowNull: false,
       },
-      requestedAt: {
-        type: Sequelize.DATE,  
+      underground_spot: {
+        type: Sequelize.STRING,
         allowNull: false,
       },
-      estimatedTime: {
-        type: Sequelize.DATE,  
+      requested_at: {
+        type: Sequelize.DATE,
+        allowNull: false,
+      },
+      estimated_time: {
+        type: Sequelize.DATE,
         allowNull: false,
       },
       position: {
-        type: Sequelize.INTEGER,  
+        type: Sequelize.INTEGER,
         allowNull: false,
       },
       status: {
-        type: Sequelize.ENUM('queued', 'processing', 'ready', 'completed'),  
+        type: Sequelize.INTEGER,
         allowNull: false,
+        comment: '1=queued, 2=processing, 3=ready, 4=completed',
       },
-      assignedPickupSpot: {
-        type: Sequelize.STRING,  
+      assigned_pickup_spot: {
+        type: Sequelize.STRING,
         allowNull: true,
       },
-      requestSource: {
-        type: Sequelize.ENUM('mobile', 'tablet'),  
+      request_source: {
+        type: Sequelize.INTEGER,
         allowNull: false,
-      },
-      createdAt: {
-        type: Sequelize.DATE,
-        allowNull: false,
-        defaultValue: Sequelize.NOW,
-      },
-      updatedAt: {
-        type: Sequelize.DATE,
-        allowNull: false,
-        defaultValue: Sequelize.NOW,
+        comment: '1=mobile, 2=tablet',
       },
     });
 
-    await queryInterface.bulkInsert('RetrievalQueues', [
+    await queryInterface.bulkInsert('retrievalqueues', [
       {
-        id: '1',
-        sessionId: 'session123',
-        userId: 'user001',
-        licensePlate: 'ABC123',
-        undergroundSpot: 'B1',
-        requestedAt: new Date('2025-07-15T08:00:00'),
-        estimatedTime: new Date('2025-07-15T08:15:00'),
+        baseuser_id: 1,
+        parking_session_id: 1,
+        license_plate: 'ABC123',
+        underground_spot: 'B1',
+        requested_at: new Date('2025-07-15T08:00:00'),
+        estimated_time: new Date('2025-07-15T08:15:00'),
         position: 1,
-        status: 'queued',
-        assignedPickupSpot: 'A1',
-        requestSource: 'mobile',
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        status: 1,
+        assigned_pickup_spot: 'A1',
+        request_source: 1,
       },
       {
-        id: '2',
-        sessionId: 'session124',
-        userId: 'user002',
-        licensePlate: 'XYZ456',
-        undergroundSpot: 'B2',
-        requestedAt: new Date('2025-07-15T08:30:00'),
-        estimatedTime: new Date('2025-07-15T08:45:00'),
+        baseuser_id: 2,
+        parking_session_id: 2,
+        license_plate: 'XYZ456',
+        underground_spot: 'B2',
+        requested_at: new Date('2025-07-15T08:30:00'),
+        estimated_time: new Date('2025-07-15T08:45:00'),
         position: 2,
-        status: 'processing',
-        assignedPickupSpot: 'A2',
-        requestSource: 'tablet',
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        status: 2,
+        assigned_pickup_spot: 'A2',
+        request_source: 2,
       },
     ]);
   },
-
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('RetrievalQueues');  
+    await queryInterface.dropTable('retrievalqueues');
   }
 };

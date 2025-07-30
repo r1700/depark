@@ -3,93 +3,78 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('ParkingUsageStats', {
+    await queryInterface.createTable('parkingusagestats', {
       id: {
-        type: Sequelize.STRING,  
+        type: Sequelize.INTEGER,
         primaryKey: true,
         allowNull: false,
+        autoIncrement: true,
       },
       date: {
-        type: Sequelize.DATE,  
+        type: Sequelize.DATE,
         allowNull: false,
       },
       hour: {
-        type: Sequelize.INTEGER,  
+        type: Sequelize.INTEGER,
         allowNull: false,
       },
-      totalParkedCars: {
-        type: Sequelize.INTEGER,  
+      total_parked_cars: {
+        type: Sequelize.INTEGER,
         allowNull: false,
       },
-      avgRetrievalTime: {
-        type: Sequelize.INTEGER,  
+      avg_retrieval_time: {
+        type: Sequelize.INTEGER,
         allowNull: false,
       },
-      maxQueueLength: {
-        type: Sequelize.INTEGER,  
+      max_queue_length: {
+        type: Sequelize.INTEGER,
         allowNull: false,
       },
-      peakUsageTime: {
-        type: Sequelize.STRING,  
+      peak_usage_time: {
+        type: Sequelize.STRING,
         allowNull: false,
       },
-      utilizationPercentage: {
-        type: Sequelize.FLOAT,  
+      utilization_percentage: {
+        type: Sequelize.FLOAT,
         allowNull: false,
       },
-      totalEntries: {
-        type: Sequelize.INTEGER,  
+      total_entries: {
+        type: Sequelize.INTEGER,
         allowNull: false,
       },
-      totalExits: {
-        type: Sequelize.INTEGER,  
+      total_exits: {
+        type: Sequelize.INTEGER,
         allowNull: false,
-      },
-      createdAt: {
-        type: Sequelize.DATE,
-        allowNull: false,
-        defaultValue: Sequelize.NOW,  
-      },
-      updatedAt: {
-        type: Sequelize.DATE,
-        allowNull: false,
-        defaultValue: Sequelize.NOW,  
       },
     });
 
-    await queryInterface.bulkInsert('ParkingUsageStats', [
+    await queryInterface.bulkInsert('parkingusagestats', [
       {
-        id: '1',
         date: new Date('2025-07-15'),
         hour: 7,
-        totalParkedCars: 30,
-        avgRetrievalTime: 5,
-        maxQueueLength: 10,
-        peakUsageTime: '08:00',
-        utilizationPercentage: 85.5,
-        totalEntries: 50,
-        totalExits: 40,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        total_parked_cars: 30,
+        avg_retrieval_time: 5,
+        max_queue_length: 10,
+        peak_usage_time: '08:00',
+        utilization_percentage: 85.5,
+        total_entries: 50,
+        total_exits: 40,
       },
       {
-        id: '2',
         date: new Date('2025-07-15'),
         hour: 8,
-        totalParkedCars: 35,
-        avgRetrievalTime: 7,
-        maxQueueLength: 12,
-        peakUsageTime: '09:00',
-        utilizationPercentage: 90.3,
-        totalEntries: 60,
-        totalExits: 55,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        total_parked_cars: 35,
+        avg_retrieval_time: 7,
+        max_queue_length: 12,
+        peak_usage_time: '09:00',
+        utilization_percentage: 90.3,
+        total_entries: 60,
+        total_exits: 55,
       },
     ]);
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('ParkingUsageStats');
-  }
+    await queryInterface.dropTable('parkingusagestats');
+  },
 };

@@ -3,76 +3,64 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('WebSocketConnections', {
+    await queryInterface.createTable('websocketconnections', {
       id: {
-        type: Sequelize.STRING,  
+        type: Sequelize.INTEGER,
         primaryKey: true,
         allowNull: false,
+        autoIncrement: true,
       },
-      userId: {
-        type: Sequelize.STRING,  
+      baseuser_id: {
+        type: Sequelize.INTEGER,
         allowNull: true,
       },
-      connectionType: {
-        type: Sequelize.ENUM('mobile', 'tablet'),  
+      connection_type: {
+        type: Sequelize.INTEGER,
         allowNull: false,
+        comment: '1=mobile, 2=tablet',
       },
-      isActive: {
-        type: Sequelize.BOOLEAN,  
+      is_active: {
+        type: Sequelize.BOOLEAN,
         allowNull: false,
-        defaultValue: true,  
+        defaultValue: true,
       },
-      connectedAt: {
-        type: Sequelize.DATE,  
-        allowNull: false,
-      },
-      lastActivity: {
-        type: Sequelize.DATE,  
-        allowNull: false,
-      },
-      ipAddress: {
-        type: Sequelize.STRING,  
-        allowNull: false,
-      },
-      createdAt: {
+      connected_at: {
         type: Sequelize.DATE,
         allowNull: false,
-        defaultValue: Sequelize.NOW,  
       },
-      updatedAt: {
+      last_activity: {
         type: Sequelize.DATE,
         allowNull: false,
-        defaultValue: Sequelize.NOW,  
+      },
+      ip_address: {
+        type: Sequelize.STRING,
+        allowNull: false,
       },
     });
 
-    await queryInterface.bulkInsert('WebSocketConnections', [
+    await queryInterface.bulkInsert('websocketconnections', [
       {
-        id: 'connection1',
-        userId: 'user123',
-        connectionType: 'mobile',
-        isActive: true,
-        connectedAt: new Date(),
-        lastActivity: new Date(),
-        ipAddress: '192.168.1.1',
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        baseuser_id: 1,
+        connection_type: 1,
+        is_active: true,
+        connected_at: new Date(),
+        last_activity: new Date(),
+        ip_address: '192.168.1.1',
+ 
       },
       {
-        id: 'connection2',
-        userId: null,  
-        connectionType: 'tablet',
-        isActive: true,
-        connectedAt: new Date(),
-        lastActivity: new Date(),
-        ipAddress: '192.168.1.2',
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        baseuser_id: 2,
+        connection_type: 2,
+        is_active: true,
+        connected_at: new Date(),
+        last_activity: new Date(),
+        ip_address: '192.168.1.2',
+ 
       },
     ]);
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('WebSocketConnections');
+    await queryInterface.dropTable('websocketconnections');
   }
 };

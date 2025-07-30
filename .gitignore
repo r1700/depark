@@ -71,3 +71,12 @@ packages/frontend/src/components/screen-login/
 # package-lock.json ✅  
 # yarn.lock ✅
 # migrations/ ✅ - DON'T IGNORE MIGRATIONS!
+# Miscellaneous
+package.json
+package-lock.json
+packages/backend/package.json
+
+packages/mobile/package.json
+.env
+
+
