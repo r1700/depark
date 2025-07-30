@@ -1,8 +1,9 @@
 
 import React, { useState } from 'react';
 import Sidebar from '../components/Menu/Sidebar';
-import { Button, Box, Typography, Modal, Fade, Backdrop } from '@mui/material';
-import UserForm from '../app/pages/user/UserForm/UserForm';
+import { Vehicle } from '../app/types/Vehicle';
+import {  Button, Box, Typography, Modal, Fade, Backdrop } from '@mui/material';
+import VehicleForm from '../app/pages/vehicle/VehicleForm/VehicleForm';
 
 
 
@@ -17,18 +18,17 @@ const styleModal = {
   align: 'center',
 };
 
-const UsersPage: React.FC = () => {
+const VehiclePage: React.FC = () => {
 
-const [showAddUserModal, setShowAddUserModal] = useState(false);
+const [showAddVehicleModal, setShowAddVehicleModal] = useState(false);
 
-  const openAddUserModal = () => {
-    setShowAddUserModal(true);
+  const openAddVehicleModal = () => {
+    setShowAddVehicleModal(true);
   };
 
-  const closeAddUserModal = () => {
-    setShowAddUserModal(false);
+  const closeAddVehicleModal = () => {    
+    setShowAddVehicleModal(false);
   };
-
 
 
   const handleLogout = () => {
@@ -55,16 +55,16 @@ const [showAddUserModal, setShowAddUserModal] = useState(false);
             textAlign: 'center',    
           }}
         >
-          Users
+          Vehicles
         </Typography>
        
         <Button
           variant="contained"
-           onClick={openAddUserModal}
+           onClick={openAddVehicleModal}
           color="primary"
           sx={{ marginRight: 2 }}
         >
-          add user
+          add vehicle
         </Button>
 
         
@@ -80,10 +80,10 @@ const [showAddUserModal, setShowAddUserModal] = useState(false);
 
 
         <Modal
-          open={showAddUserModal}
-          onClose={closeAddUserModal}
-          aria-labelledby="add-user-modal-title"
-          aria-describedby="add-user-modal-description"
+          open={showAddVehicleModal}
+          onClose={closeAddVehicleModal}
+          aria-labelledby="add-vehicle-modal-title"
+          aria-describedby="add-vehicle-modal-description"
           closeAfterTransition
           keepMounted
           slots={{ backdrop: Backdrop }}
@@ -94,11 +94,11 @@ const [showAddUserModal, setShowAddUserModal] = useState(false);
             },
           }}
         >
-          <Fade in={showAddUserModal}>
+          <Fade in={showAddVehicleModal}>
             <Box sx={styleModal}>
-              <UserForm
-              onClose={closeAddUserModal}
-              ></UserForm>
+              <VehicleForm
+              onClose={closeAddVehicleModal}
+              ></VehicleForm>
             </Box>
           </Fade>
         </Modal>
@@ -106,4 +106,4 @@ const [showAddUserModal, setShowAddUserModal] = useState(false);
   );
 };
 
-export default UsersPage;
+export default VehiclePage;
