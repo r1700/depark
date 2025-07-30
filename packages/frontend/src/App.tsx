@@ -1,65 +1,44 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from "react";
+import LoginScreen from './components/screen-login/LoginScreen';
+import { Box, Button, Container, Typography } from "@mui/material";
 
-import { apiService } from './services/api';
+const App: React.FC = () => {
+  // קריאה ראשונית מה־localStorage כדי לטעון אם המשתמש כבר מחובר
+  const [loggedIn, setLoggedIn] = useState<boolean>(() => {
+    return !!localStorage.getItem("token");
+  });
 
-import './App.css';
-import AdminConfigPage from './components/AdminConfigPage';
+  // הפונקציה לטיפול בכניסה מוצלחת, מקבלת טוקן
+  const handleLogin = useCallback((token?: string) => {
+    if (token) {
+      localStorage.setItem("token", token);
+    }
+    setLoggedIn(true);
+  }, []);
 
+  // פונקצית logout מוחקת את הטוקן ומעדכנת מצב
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    setLoggedIn(false);
+  };
 
-  
- 
-
-    
-function App() {
   return (
-    // <Router>
-    //   <div className="App">
-    //     <Navigation />
-        
-    //     <Routes>
-    //       {/* Home page */}
-    //       <Route path="/" element={<ProtectedHome />} />
-          
-    //       {/* Login page */}
-    //       <Route path="/login" element={<LoginPage />} />
-          
-    //       {/* Admin pages - protected */}
-    //       <Route 
-    //         path="/admin/config" 
-    //         element={
-    //           <AdminRoute>
-    //             <AdminConfigPage />
-    //           </AdminRoute>
-    //         } 
-    //       />
-          
-    //       <Route 
-    //         path="/register" 
-    //         element={
-    //           <AdminRoute>
-    //             <RegisterPage />
-    //           </AdminRoute>
-    //         } 
-    //       />
-          
-    //       <Route 
-    //         path="/users" 
-    //         element={
-    //           <AdminRoute>
-    //             <UsersPage />
-    //           </AdminRoute>
-    //         } 
-    //       />
-          
-    //       {/* 404 page */}
-    //       <Route path="*" element={<Navigate to="/" replace />} />
-    //     </Routes>
-    //   </div>
-    // </Router>
-    <>
-    <AdminConfigPage/>
-    </>
+    <Container maxWidth="sm" sx={{ mt: 8, textAlign: "center", direction: "ltr" }}>
+      {loggedIn ? (
+        <Box>
+          <Typography variant="h4" gutterBottom>
+            Welcome!
+          </Typography>
+          <Button variant="contained" onClick={handleLogout}>
+            Logout
+          </Button>
+        </Box>
+      ) : (
+        // כאן מוסיפים פרופס של onLogin שמקבלת טוקן
+        <LoginScreen onLogin={handleLogin} />
+      )}
+    </Container>
   );
-}
+};
 
 export default App;

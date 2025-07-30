@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Box,
     Drawer,
@@ -11,6 +11,7 @@ import {
     Button,
     Divider,
     IconButton,
+    Collapse,
 } from '@mui/material';
 
 import { useNavigate } from 'react-router-dom';
@@ -20,7 +21,8 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import PeopleIcon from '@mui/icons-material/People';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import AssessmentIcon from '@mui/icons-material/Assessment';
-import path from 'path';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 
 const drawerWidth = 240;
 
@@ -36,8 +38,15 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
     const [open, setOpen] = useState<boolean>(true);
-  const navigate = useNavigate();
+    const [reportsOpen, setReportsOpen] = useState<boolean>(false);
+    const navigate = useNavigate();
 
+
+    useEffect(() => {
+        if (!open) {
+            setReportsOpen(false);
+        }
+    }, [open]);
 
     const getUserInitials = (): string => {
         return `${user.firstName[0] ?? ''}${user.lastName[0] ?? ''}`.toUpperCase();
@@ -45,8 +54,17 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
 
     const menuItems = [
         { text: 'Users', icon: <PeopleIcon />, path: '/users' },
-        { text: 'Vehicles', icon: <DirectionsCarIcon />, path: '' },
-        { text: 'Reports', icon: <AssessmentIcon />, path: '' },
+        { text: 'Vehicles', icon: <DirectionsCarIcon />, path: '/vehicles' },
+        {
+            text: 'Reports',
+            icon: <AssessmentIcon />,
+            path: '',
+            subMenu: [
+                { text: 'Report 1', path: '/reports/report1' },
+                { text: 'Report 2', path: '/reports/report2' },
+                { text: 'Report 3', path: '/reports/report3' }
+            ]
+        },
     ];
 
     return (
@@ -69,11 +87,20 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
                     paddingBottom: 2,
                     overflowX: 'hidden',
                     transition: 'width 0.3s ease',
+
+                    '&::-webkit-scrollbar': {
+                        width: '8px',
+                    },
+                    '&::-webkit-scrollbar-thumb': {
+                        backgroundColor: 'rgba(255, 255, 255, 0.5)',
+                        borderRadius: '4px',
+                    },
+                    '&::-webkit-scrollbar-track': {
+                        backgroundColor: '#1976d2',
+                    },
                 },
             }}
         >
-
-            
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', px: 1 }}>
                 <IconButton
                     size="small"
@@ -88,33 +115,67 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
                 </IconButton>
             </Box>
 
-            
-{open && (
-  <Box sx={{ px: 2, mb: 3 }}>
-    <img src="/image.png" alt="DEPARK" style={{ width: '100%', height: 'auto' }} />
-  </Box>
-)}
+            {open && (
+                <Box sx={{ px: 2, mb: 3, display: 'flex', justifyContent: 'center' }}>
+                    <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#fff' }}>
+                        DEPARK
+                    </Typography>
+                </Box>
+            )}
 
-           
             <List>
                 {menuItems.map((item) => (
-                    <ListItemButton
-                        key={item.text}
-                        onClick={() => navigate(item.path)}
-                        sx={{
-                            color: '#fff',
-                            '&:hover': {
-                                backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                            },
-                        }}
-                    >
-                        {item.icon}
-                        {open && <ListItemText primary={item.text} sx={{ ml: 2 }} />}
-                    </ListItemButton>
+                    <React.Fragment key={item.text}>
+                        <ListItemButton
+                            onClick={() => {
+                                if (item.text === 'Reports') {
+                                    setReportsOpen(!reportsOpen);
+                                } else {
+                                    navigate(item.path);
+                                }
+                            }}
+                            sx={{
+                                color: '#fff',
+                                '&:hover': {
+                                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                                },
+                            }}
+                        >
+                            {item.icon}
+                            {open && <ListItemText primary={item.text} sx={{ ml: 2 }} />}
+                            {item.text === 'Reports' && (
+                                <IconButton sx={{ color: '#fff', ml: 2 }}>
+                                    {reportsOpen ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />}
+                                </IconButton>
+                            )}
+                        </ListItemButton>
+
+
+                        {item.subMenu && (
+                            <Collapse in={reportsOpen} timeout="auto" unmountOnExit>
+                                <List component="div" disablePadding>
+                                    {item.subMenu.map((subItem) => (
+                                        <ListItemButton
+                                            key={subItem.text}
+                                            onClick={() => navigate(subItem.path)}
+                                            sx={{
+                                                color: '#fff',
+                                                pl: 4,
+                                                '&:hover': {
+                                                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                                                },
+                                            }}
+                                        >
+                                            <ListItemText primary={subItem.text} />
+                                        </ListItemButton>
+                                    ))}
+                                </List>
+                            </Collapse>
+                        )}
+                    </React.Fragment>
                 ))}
             </List>
 
-           
             <Box sx={{ px: 2 }}>
                 <Divider sx={{ borderColor: 'rgba(255,255,255,0.3)', mb: 2 }} />
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
@@ -151,5 +212,3 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
 };
 
 export default Sidebar;
-
-

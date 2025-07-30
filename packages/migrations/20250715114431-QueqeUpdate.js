@@ -3,82 +3,72 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('QueueUpdates', {
+    await queryInterface.createTable('queueupdates', {
       id: {
-        type: Sequelize.STRING,  
+        type: Sequelize.INTEGER,
         primaryKey: true,
         allowNull: false,
+        autoIncrement: true,
       },
-      retrievalQueueId: {
-        type: Sequelize.STRING,  
+      retrieval_queue_id: {
+        type: Sequelize.INTEGER,
         allowNull: false,
       },
       position: {
-        type: Sequelize.INTEGER,  
+        type: Sequelize.INTEGER,
         allowNull: false,
       },
-      estimatedTime: {
-        type: Sequelize.DATE,  
+      estimated_time: {
+        type: Sequelize.DATE,
         allowNull: false,
       },
       status: {
-        type: Sequelize.ENUM('queued', 'processing', 'ready'),  
+        type: Sequelize.INTEGER,
         allowNull: false,
+        comment: '1=queued, 2=processing, 3=ready',
       },
       message: {
-        type: Sequelize.STRING,  
+        type: Sequelize.STRING,
         allowNull: true,
       },
       timestamp: {
-        type: Sequelize.DATE,  
-        allowNull: false,
-        defaultValue: Sequelize.NOW,  
-      },
-      broadcastTo: {
-        type: Sequelize.ENUM('specific_user', 'all_tablets', 'all_connected'),  
-        allowNull: false,
-      },
-      createdAt: {
         type: Sequelize.DATE,
         allowNull: false,
-        defaultValue: Sequelize.NOW,  
+        defaultValue: Sequelize.NOW,
       },
-      updatedAt: {
-        type: Sequelize.DATE,
+      broadcast_to: {
+        type: Sequelize.INTEGER,
         allowNull: false,
-        defaultValue: Sequelize.NOW,  
+        comment: '1=specific_user, 2=all_tablets, 3=all_connected',
       },
+  
     });
 
-    await queryInterface.bulkInsert('QueueUpdates', [
+    await queryInterface.bulkInsert('queueupdates', [
       {
-        id: '1',
-        retrievalQueueId: 'queue001',
+        retrieval_queue_id: 1,
         position: 1,
-        estimatedTime: new Date('2025-07-15T08:00:00'),
-        status: 'queued',
+        estimated_time: new Date('2025-07-15T08:00:00'),
+        status: 1,
         message: 'The queue is processing your request.',
         timestamp: new Date(),
-        broadcastTo: 'all_connected',
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        broadcast_to: 3,
+      
       },
       {
-        id: '2',
-        retrievalQueueId: 'queue002',
+        retrieval_queue_id: 2,
         position: 2,
-        estimatedTime: new Date('2025-07-15T09:00:00'),
-        status: 'processing',
+        estimated_time: new Date('2025-07-15T09:00:00'),
+        status: 2, 
         message: 'Request is being processed.',
         timestamp: new Date(),
-        broadcastTo: 'all_tablets',
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        broadcast_to: 2, 
+     
       },
     ]);
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('QueueUpdates');  
+    await queryInterface.dropTable('queueupdates');
   }
 };

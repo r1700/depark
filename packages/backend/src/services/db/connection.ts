@@ -4,11 +4,11 @@ import dotenv from 'dotenv';
 dotenv.config();
 // Create a client object to connect to the database
 const client = new Client({
- user: "postgres",
-  host: "localhost",
-  database: "depark",
-  password: "1333",
-  port: 5432
+user: process.env.DB_USER || "postgres",
+  host: process.env.DB_HOST || "localhost",
+  database: process.env.DB_DATABASE || "depark",
+  password: process.env.DB_PASSWORD || "1333",
+  port:process.env.DB_PORT ? parseInt(process.env.DB_PORT) : 5432
 });
 // Connection to db 
 client.connect()
