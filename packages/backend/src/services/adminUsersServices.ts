@@ -1,4 +1,4 @@
-import pool from '../config/database';
+import pool from '../db/pool';
 import { AdminUser } from '../model/user/adminUser';
 
 async function checkUniqueBaseUser(

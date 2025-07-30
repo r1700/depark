@@ -21,6 +21,7 @@ interface LoginScreenProps {
 interface IFormInputs {
   email: string;
   password: string;
+  
 }
 
 const schema = yup.object({
@@ -52,15 +53,38 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
     setServerError("");
     setLoading(true);
 
-    setTimeout(() => {
+    try {
+      const response = await fetch('https://your-api-url.com/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
       setLoading(false);
-      // Check login credentials
-      if (data.email === "admin@example.com" && data.password === "1234") {
+
+      if (!response.ok) {
+        // אם הסטטוס אינו 200-299, נקבל שגיאה מהשרת
+        const errorData = await response.json();
+        setServerError(errorData.message || "Login failed");
+        return;
+      }
+
+      const result = await response.json();
+
+      // נניח שה-API מחזיר טוקן כניסה; תתאים לפי מה שקיבלת מה-API
+      if (result && result.token) {
+        // ייתכן שתרצה לשמור את הטוקן ב-localStorage
+        // localStorage.setItem('token', result.token);
         onLogin();
       } else {
         setServerError("Incorrect email or password");
       }
-    }, 1500);
+    } catch (error) {
+      setLoading(false);
+      setServerError("Network error: " + (error as Error).message);
+    }
   };
 
   return (
