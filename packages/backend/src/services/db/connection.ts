@@ -7,11 +7,17 @@ const client = new Client({
  user: "postgres",
   host: "localhost",
   database: "depark",
-  password: "1333",
+  password: "1234",
   port: 5432
 });
 // Connection to db 
 client.connect()
   .then(() => console.log('Connected to PostgreSQL'))
-  .catch((err) => console.error('Connection error', err.stack));
+  .catch((err: unknown) => {
+    if (err instanceof Error) {
+      console.error('Connection error', err.stack);
+    } else {
+      console.error('Connection error', err);
+    }
+  });
 export default client

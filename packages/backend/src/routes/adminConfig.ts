@@ -2,6 +2,7 @@ import { Router } from 'express';
 import client from '../services/db/connection'; 
 const router = Router();
 
+// יצירה (INSERT בלבד)
 router.post('/', async (req, res) => {
   try {
     const { parkingConfig } = req.body;
@@ -9,7 +10,7 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ success: false, error: 'Missing parkingConfig or lotId' });
     }
 
-
+    // בדוק אם כבר קיים
     const exists = await client.query(
       `SELECT 1 FROM "ParkingConfigurations" WHERE "id" = $1 LIMIT 1`,
       [parkingConfig.lotId]
@@ -45,7 +46,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-
+// עדכון (UPDATE בלבד)
 router.put('/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -54,7 +55,7 @@ router.put('/:id', async (req, res) => {
       return res.status(400).json({ success: false, error: 'Missing parkingConfig' });
     }
 
- 
+    // בדוק אם קיים
     const exists = await client.query(
       `SELECT 1 FROM "ParkingConfigurations" WHERE "id" = $1 LIMIT 1`,
       [id]
@@ -97,7 +98,7 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-
+// קבלת חניון לפי מזהה (ID)
 router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -114,7 +115,7 @@ router.get('/:id', async (req, res) => {
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });
-
+// קבלת כל החניונים
 router.get('/', async (req, res) => { 
   try {
     const result = await client.query(`SELECT * FROM "ParkingConfigurations"`);
