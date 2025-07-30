@@ -16,7 +16,9 @@ router.post('/verify-google-token', async (req: Request, res: Response) => {
     if(!response) {
       throw new Error('you dont have permission to access this system');
     }
-    res.send({success: true, token: idToken});
+    res.setHeader('Access-Control-Expose-Headers', 'idtoken');
+    res.setHeader('idtoken', idToken)    
+    res.send({success: true});
   } catch (error:Error | any) {
     res.status(400).send({success:false, error:error.message});
   }
