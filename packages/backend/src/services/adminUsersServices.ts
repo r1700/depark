@@ -1,421 +1,271 @@
-import pool from '../config/database';
-import { AdminUser } from '../model/user/adminUser';
+import sequelize from '../config/database';
+import { Permission, PermissionLabels } from '../enums/permissions';
+import { QueryTypes } from 'sequelize';
 
-async function checkUniqueBaseUser(
-  idNumber: string,
-  email: string,
-  excludeBaseUserId?: number
-): Promise<void> {
-  let query = `
-    SELECT 1 FROM "BaseUser"
-    WHERE ("idNumber" = $1 OR "email" = $2)
-  `;
-  const params: (string | number)[] = [idNumber, email];
+function permissionStringsToNumbers(permissionStrings: string[]): number[] {
+  return permissionStrings
+    .map((p) => {
+      const key = p.toLowerCase();
+      switch (key) {
+        case 'reportes': return Permission.Reportes;
+        case 'admin': return Permission.Admin;
+        case 'vehicle': return Permission.Vehicle;
+        default: return null;
+      }
+    })
+    .filter((num): num is number => num !== null);
+}
 
-  if (excludeBaseUserId) {
-    query += ' AND id <> $3';
-    params.push(excludeBaseUserId);
+function permissionNumbersToInt(permissionNumbers: number[]): number {
+  return permissionNumbers.reduce((acc, digit, index) => {
+    const power = 7 - index - 1;
+    return acc + digit * Math.pow(10, power);
+  }, 0);
+}
+
+function intToPermissionNumbers(permInt: number): number[] {
+  return permInt.toString().padStart(7, '0').split('').map(Number);
+}
+
+function intToPermissionStrings(permInt: number): string[] {
+  return intToPermissionNumbers(permInt)
+    .filter(n => n !== 0)
+    .map(n => PermissionLabels[n])
+    .filter((s): s is string => s !== undefined);
+}
+
+export async function checkUniqueBaseUser(idNumber: string, email: string, excludeBaseUserId?: number): Promise<void> {
+  const replacements: Record<string, unknown> = { idNumber, email };
+  let query = `SELECT id FROM "BaseUser" WHERE ("idNumber" = :idNumber OR "email" = :email)`;
+
+  if (excludeBaseUserId !== undefined) {
+    query += ' AND id != :excludeBaseUserId';
+    replacements.excludeBaseUserId = excludeBaseUserId;
   }
 
-  query += ' LIMIT 1';
+  const existing = await sequelize.query<{ id: number }>(query, {
+    replacements,
+    type: QueryTypes.SELECT,
+  });
 
-  const { rowCount } = await pool.query(query, params);
-  if ((rowCount ?? 0) > 0) {
+  if (existing.length > 0) {
     throw new Error('User with same idNumber or email already exists');
   }
 }
 
-async function getAdminUserById(id: number): Promise<AdminUser> {
-  const query = `
-    SELECT 
-      a.id,
-      a."baseUserId",
-      b."idNumber",
-      b."email",
-      b."firstName",
-      b."lastName",
-      a."passwordHash",
-      a."role",
-      a."permissions",
-      a."lastLoginAt",
-      a."createdAt",
-      a."updatedAt"
+export async function addAdminUser(data: any): Promise<any> {
+  await checkUniqueBaseUser(data.idNumber, data.email);
+
+  return await sequelize.transaction(async (t) => {
+    await sequelize.query(`
+      INSERT INTO "BaseUser" ("idNumber", "email", "firstName", "lastName", "createdAt", "updatedAt")
+      VALUES (:idNumber, :email, :firstName, :lastName, NOW(), NOW())
+    `, {
+      replacements: data,
+      transaction: t,
+      type: QueryTypes.INSERT,
+    });
+
+    const baseUserResult = await sequelize.query<{ id: number }>(
+      `SELECT id FROM "BaseUser" WHERE "email" = :email`,
+      {
+        replacements: { email: data.email },
+        transaction: t,
+        type: QueryTypes.SELECT,
+      }
+    );
+
+    const baseUserId = baseUserResult[0].id;
+
+    const permissionsInt = permissionNumbersToInt(permissionStringsToNumbers(data.permissions));
+
+    await sequelize.query(`
+      INSERT INTO "AdminUsers" ("baseUserId", "passwordHash", "role", "permissions", "lastLoginAt", "createdAt", "updatedAt")
+      VALUES (:baseUserId, :passwordHash, :role, :permissions, :lastLoginAt, NOW(), NOW())
+    `, {
+      replacements: {
+        baseUserId,
+        passwordHash: data.passwordHash,
+        role: data.role,
+        permissions: permissionsInt,
+        lastLoginAt: data.lastLoginAt || null,
+      },
+      transaction: t,
+      type: QueryTypes.INSERT,
+    });
+
+    const adminResult = await sequelize.query<{ id: number }>(`
+      SELECT id FROM "AdminUsers" WHERE "baseUserId" = :baseUserId
+    `, {
+      replacements: { baseUserId },
+      transaction: t,
+      type: QueryTypes.SELECT,
+    });
+
+    const adminUserId = adminResult[0].id;
+    console.log('Admin user added:', adminResult);
+
+    return getAdminUserById(adminUserId, t);
+  });
+}
+
+export async function getAdminUserById(id: number, transaction?: any): Promise<any | null> {
+  const result = await sequelize.query<any>(`
+    SELECT a.*, b."idNumber", b.email, b."firstName", b."lastName"
     FROM "AdminUsers" a
     JOIN "BaseUser" b ON a."baseUserId" = b.id
-    WHERE a.id = $1;
-  `;
-  const { rows } = await pool.query(query, [id]);
-  if (rows.length === 0) throw new Error(`AdminUser with id ${id} not found`);
-
-  if (typeof rows[0].permissions === 'string') {
-    try {
-      rows[0].permissions = JSON.parse(rows[0].permissions);
-    } catch {
-      rows[0].permissions = [];
-    }
-  }
-  const { baseUserId, ...dataWithoutBaseUserId } = rows[0];
-
-  return AdminUser.create(dataWithoutBaseUserId);
-}
-
-export async function addAdminUser(data: any): Promise<AdminUser> {
-  const now = new Date();
-  const adminUser = AdminUser.create({
-    ...data,
-    createdAt: now,
-    updatedAt: now,
-    lastLoginAt: now, 
+    WHERE a.id = :id
+  `, {
+    replacements: { id },
+    transaction,
+    type: QueryTypes.SELECT,
   });
 
-  await checkUniqueBaseUser(adminUser.idNumber, adminUser.email);
+  if (result.length === 0) return null;
 
-  const baseUserQuery = `
-    INSERT INTO "BaseUser"
-    ("idNumber", "email", "firstName", "lastName", "createdAt", "updatedAt")
-    VALUES ($1, $2, $3, $4, $5, $6)
-    RETURNING id
-  `;
-  const baseUserValues = [
-    adminUser.idNumber,
-    adminUser.email,
-    adminUser.firstName,
-    adminUser.lastName,
-    adminUser.createdAt,
-    adminUser.updatedAt,
-  ];
-  const baseUserResult = await pool.query(baseUserQuery, baseUserValues);
-  const baseUserId = baseUserResult.rows[0].id;
-
-  const adminUserQuery = `
-    INSERT INTO "AdminUsers" (
-      "baseUserId", "passwordHash", "role", "permissions", "lastLoginAt", "createdAt", "updatedAt"
-    ) VALUES ($1, $2, $3, $4, $5, $6, $7)
-    RETURNING id
-  `;
-  const adminUserValues = [
-    baseUserId,
-    adminUser.passwordHash,
-    adminUser.role,
-    JSON.stringify(adminUser.permissions),
-    adminUser.lastLoginAt,
-    adminUser.createdAt,
-    adminUser.updatedAt,
-  ];
-  const adminUserResult = await pool.query(adminUserQuery, adminUserValues);
-  const newAdminUserId = adminUserResult.rows[0].id;
-
-  return await getAdminUserById(newAdminUserId);
+  const admin = result[0];
+  admin.permissions = intToPermissionStrings(admin.permissions);
+  return admin;
 }
 
-export async function updateAdminUser(id: number, data: any): Promise<AdminUser> {
-  const updatedAt = new Date();
+export async function updateAdminUser(id: number, data: any): Promise<any | null> {
+  return await sequelize.transaction(async (t) => {
+    const adminResult = await sequelize.query<any>(`
+      SELECT * FROM "AdminUsers" WHERE id = :id
+    `, {
+      replacements: { id },
+      transaction: t,
+      type: QueryTypes.SELECT,
+    });
 
-  // תחילה, קבלת המשתמש הקיים (כולל כל השדות הדרושים)
-  const existingAdminUser = await getAdminUserById(id);
+    if (adminResult.length === 0) return null;
 
-  if (!existingAdminUser) {
-    throw new Error(`AdminUser with id ${id} not found`);
-  }
+    const admin = adminResult[0];
+    const baseUserId = admin.baseUserId;
 
-  // מיזוג השדות המעודכנים (data) לשדות הקיימים
-  const mergedData = {
-    ...existingAdminUser,
-    ...data,
-    updatedAt,        // עדכון שדה זמן העדכון
-  };
+    const baseUserResult = await sequelize.query<any>(`
+      SELECT * FROM "BaseUser" WHERE id = :baseUserId
+    `, {
+      replacements: { baseUserId },
+      transaction: t,
+      type: QueryTypes.SELECT,
+    });
 
-  const adminUser = AdminUser.create(mergedData);
+    if (baseUserResult.length === 0) return null;
 
-  // המשך הכתיבה ל-DB (כדוגמה שלך)
-  // קודם כל למצוא baseUserId - אם אין אותו ב mergedData, נשאל מה-DB
-  const baseUserIdResult = await pool.query(`SELECT "baseUserId" FROM "AdminUsers" WHERE id = $1`, [id]);
-  if (baseUserIdResult.rowCount === 0) {
-    throw new Error(`AdminUser with id ${id} not found`);
-  }
-  const baseUserId = baseUserIdResult.rows[0].baseUserId;
+    const baseUser = baseUserResult[0];
 
-  // בדיקת ייחודיות idNumber ו-email
-  await checkUniqueBaseUser(adminUser.idNumber, adminUser.email, baseUserId);
+    const mergedBaseUserData = {
+      idNumber: data.idNumber || baseUser.idNumber,
+      email: data.email || baseUser.email,
+      firstName: data.firstName || baseUser.firstName,
+      lastName: data.lastName || baseUser.lastName,
+    };
 
-  // עדכון טבלת BaseUser
-  const baseUserUpdateQuery = `
-    UPDATE "BaseUser"
-    SET "idNumber"=$1, "email"=$2, "firstName"=$3, "lastName"=$4, "updatedAt"=$5
-    WHERE id = $6
-  `;
-  const baseUserValues = [
-    adminUser.idNumber,
-    adminUser.email,
-    adminUser.firstName,
-    adminUser.lastName,
-    updatedAt,
-    baseUserId,
-  ];
-  await pool.query(baseUserUpdateQuery, baseUserValues);
+    await checkUniqueBaseUser(mergedBaseUserData.idNumber, mergedBaseUserData.email, baseUserId);
 
-  // עדכון טבלת AdminUsers
-  const adminUserUpdateQuery = `
-    UPDATE "AdminUsers"
-    SET "passwordHash"=$1, "role"=$2, "permissions"=$3, "lastLoginAt"=$4, "updatedAt"=$5
-    WHERE id = $6
-  `;
-  const adminUserValues = [
-    adminUser.passwordHash,
-    adminUser.role,
-    JSON.stringify(adminUser.permissions),
-    adminUser.lastLoginAt ?? null,
-    updatedAt,
-    id,
-  ];
-  const result = await pool.query(adminUserUpdateQuery, adminUserValues);
+    await sequelize.query(`
+      UPDATE "BaseUser"
+      SET "idNumber" = :idNumber, "email" = :email, "firstName" = :firstName,
+          "lastName" = :lastName, "updatedAt" = NOW()
+      WHERE id = :id
+    `, {
+      replacements: { ...mergedBaseUserData, id: baseUserId },
+      transaction: t,
+      type: QueryTypes.UPDATE,
+    });
 
-  if (result.rowCount === 0) {
-    throw new Error(`AdminUser with id ${id} not found`);
-  }
+    const permissionsInt = data.permissions
+      ? permissionNumbersToInt(permissionStringsToNumbers(data.permissions))
+      : admin.permissions;
 
-  return await getAdminUserById(id);
+    const replacements = {
+      id,
+      passwordHash: data.passwordHash || admin.passwordHash, // אם אין passwordHash ב־data, השתמש בישן
+      role: data.role || admin.role,
+      permissions: permissionsInt,
+      lastLoginAt: data.lastLoginAt || null,
+    };
+
+    await sequelize.query(`
+      UPDATE "AdminUsers"
+      SET "passwordHash" = :passwordHash, "role" = :role, "permissions" = :permissions,
+          "lastLoginAt" = :lastLoginAt, "updatedAt" = NOW()
+      WHERE id = :id
+    `, {
+      replacements,  
+      transaction: t,
+      type: QueryTypes.UPDATE,
+    });
+    return getAdminUserById(id);
+  });
 }
 
 export async function deleteAdminUser(id: number): Promise<void> {
-  const deleteResult = await pool.query(`DELETE FROM "AdminUsers" WHERE id = $1`, [id]);
-  if (deleteResult.rowCount === 0) {
-    throw new Error(`AdminUser with id ${id} not found`);
-  }
-  // מחיקת BaseUser מתבצעת אוטומטית על ידי FK עם ON DELETE CASCADE בבסיס הנתונים
-}
-
-interface AdminUserFilters {
-  lastNameStartsWith?: string;
-  roles?: string[];
-  permissionsInclude?: string[];
-  lastLoginAfter?: Date;
-  lastLoginBefore?: Date;        
-
-
-  createdAfter?: Date;           
-  createdBefore?: Date;           
-
-  updatedAfter?: Date;           
-  updatedBefore?: Date;            
-
-  lastActivityAfter?: Date;      
-  lastActivityBefore?: Date;    
-
-
-  activeLastNDays?: number;
-
-  sortBy?: 'lastLoginAt' | 'lastName' | 'createdAt' | 'permissions';
-  sortDirection?: 'asc' | 'desc';
-  limit?: number;
-  offset?: number;
-}
-
-export async function getFilteredAdminUsers(filters: AdminUserFilters = {}) {
-  const {
-    lastNameStartsWith,
-    roles,
-    permissionsInclude,
-    lastLoginAfter,
-    lastLoginBefore,
-    createdAfter,
-    createdBefore,
-    updatedAfter,
-    updatedBefore,
-    lastActivityAfter,
-    lastActivityBefore,
-    activeLastNDays,
-    sortBy,
-    sortDirection = 'asc',
-    limit,
-    offset,
-  } = filters;
-
-  const selectFields = [
-    'a.id',
-    'a."baseUserId"',
-    'b."idNumber"',
-    'b."email"',
-    'b."firstName"',
-    'b."lastName"',
-    'a."passwordHash"',
-    'a."role"',
-    'a."permissions"',
-    'a."lastLoginAt"',
-    'a."createdAt"',
-    'a."updatedAt"',
-    `
-    s."id" AS "sessionId",
-    s."expiresAt" AS "sessionExpiresAt",
-    s."ipAddress" AS "sessionIpAddress",
-    s."userAgent" AS "sessionUserAgent",
-    s."isActive" AS "sessionIsActive"
-    `,
-    `
-    ua."lastActivityTimestamp",
-    ua."lastAction"
-    `
-  ].join(',\n');
-
-  let baseQuery = `
-  SELECT
-    ${selectFields}
-  FROM "AdminUsers" a
-  JOIN "BaseUser" b ON a."baseUserId" = b.id
-  LEFT JOIN LATERAL (
-    SELECT *
-    FROM "UserSessions" us
-    WHERE us."userId" = b.id::text
-      AND us."userType" = 'admin'
-      AND us."isActive" = true
-    ORDER BY us."lastActivity" DESC
-    LIMIT 1
-  ) s ON TRUE
-  LEFT JOIN LATERAL (
-    SELECT 
-      MAX("timestamp") AS "lastActivityTimestamp",
-      MAX(CASE WHEN "timestamp" = (
-        SELECT MAX("timestamp")
-        FROM "UserActivities"
-        WHERE "userId" = b.id::text AND "userType" = 'admin'
-      ) THEN "action" ELSE NULL END) AS "lastAction"
-    FROM "UserActivities" ua
-    WHERE ua."userId" = b.id::text AND ua."userType" = 'admin'
-  ) ua ON TRUE
-  `;
-
-  const whereClauses: string[] = [];
-  const params: any[] = [];
-
-  if (lastNameStartsWith) {
-    params.push(`${lastNameStartsWith}%`);
-    whereClauses.push(`b."lastName" ILIKE $${params.length}`);
-  }
-
-  if (roles && roles.length > 0) {
-    params.push(roles);
-    whereClauses.push(`a."role" = ANY($${params.length})`);
-  }
-
-  if (permissionsInclude && permissionsInclude.length > 0) {
-
-    params.push(permissionsInclude);
-    whereClauses.push(`a."permissions" ?| $${params.length}`);
-  }
-
-  if (lastLoginAfter) {
-    params.push(lastLoginAfter);
-    whereClauses.push(`a."lastLoginAt" > $${params.length}`);
-  }
-
-  if (lastLoginBefore) {
-    params.push(lastLoginBefore);
-    whereClauses.push(`a."lastLoginAt" < $${params.length}`);
-  }
-
-  if (createdAfter) {
-    params.push(createdAfter);
-    whereClauses.push(`a."createdAt" >= $${params.length}`);
-  }
-  if (createdBefore) {
-    params.push(createdBefore);
-    whereClauses.push(`a."createdAt" < $${params.length}`);
-  }
-
-  if (updatedAfter) {
-    params.push(updatedAfter);
-    whereClauses.push(`a."updatedAt" >= $${params.length}`);
-  }
-  if (updatedBefore) {
-    params.push(updatedBefore);
-    whereClauses.push(`a."updatedAt" < $${params.length}`);
-  }
-  if (lastActivityAfter) {
-    params.push(lastActivityAfter);
-    whereClauses.push(`ua."lastActivityTimestamp" >= $${params.length}`);
-  }
-  if (lastActivityBefore) {
-    params.push(lastActivityBefore);
-    whereClauses.push(`ua."lastActivityTimestamp" < $${params.length}`);
-  }
-  if (activeLastNDays !== undefined && activeLastNDays !== null) {
-    const cutOffDate = new Date(Date.now() - activeLastNDays * 24 * 60 * 60 * 1000);
-    params.push(cutOffDate);
-    whereClauses.push(`ua."lastActivityTimestamp" >= $${params.length}`);
-  }
-  if (whereClauses.length > 0) {
-    baseQuery += ` WHERE ${whereClauses.join(' AND ')}`;
-  }
-
-  if (sortBy) {
-    if (sortBy === 'permissions') {
-      baseQuery += ` ORDER BY jsonb_array_length(a."permissions") ${sortDirection.toUpperCase()}`;
-    } else if (sortBy === 'lastName') {
-      baseQuery += ` ORDER BY b."lastName" ${sortDirection.toUpperCase()}`;
-    } else if (sortBy === 'createdAt' || sortBy === 'lastLoginAt') {
-      baseQuery += ` ORDER BY a."${sortBy}" ${sortDirection.toUpperCase()}`;
-    }
-    else if (sortBy === 'lastActivityTimestamp') {
-      baseQuery += ` ORDER BY ua."lastActivityTimestamp" ${sortDirection.toUpperCase()}`;
-    }
-  }
-
-  if (limit) {
-    params.push(limit);
-    baseQuery += ` LIMIT $${params.length}`;
-  }
-
-  if (offset) {
-    params.push(offset);
-    baseQuery += ` OFFSET $${params.length}`;
-  }
-
-  const { rows } = await pool.query(baseQuery, params);
-  console.log(filters.limit)
-  return rows.map(row => {
-    if (typeof row.permissions === 'string') {
-      try {
-        row.permissions = JSON.parse(row.permissions);
-      } catch {
-        row.permissions = [];
-      }
-    }
-
-    const {
-      baseUserId,
-      passwordHash,
-      sessionId, 
-      sessionExpiresAt,
-      sessionIpAddress,
-      sessionUserAgent,
-      sessionIsActive,
-      lastActivityTimestamp,
-      lastAction,
-      ...adminUserData 
-    } = row;
-
-    const adminUser = AdminUser.create({
-      ...adminUserData,
-      passwordHash,
-    });
-
-    const { passwordHash: _, ...adminUserFullWithoutPassword } = adminUser;
-
-    const {
-      createdAt,
-      updatedAt,
-      idNumber,
-      lastLoginAt,
-      id,
-      ...adminUserWithoutFilteredFields
-    } = adminUserFullWithoutPassword;
-
-    return {
-      adminUser: adminUserWithoutFilteredFields,
-      lastUserActivity: lastActivityTimestamp ? {
-        lastActivityTimestamp,
-        lastAction,
-      } : null,
-    };
+  await sequelize.query(`
+    DELETE FROM "AdminUsers" WHERE id = :id
+  `, {
+    replacements: { id },
+    type: QueryTypes.BULKDELETE,
   });
+}
+
+export async function getFilteredAdminUsers(filters: any): Promise<any[]> {
+  const conditions: string[] = [];
+  const params: Record<string, any> = {};
+
+  if (filters.lastNameStartsWith) {
+    conditions.push(`b."lastName" ILIKE :lastName`);
+    params.lastName = `${filters.lastNameStartsWith}%`;
+  }
+
+  if (filters.roles?.length) {
+    conditions.push(`a.role IN (:roles)`);
+    params.roles = filters.roles;
+  }
+
+  if (filters.lastLoginAfter) {
+    conditions.push(`a."lastLoginAt" > :lastLoginAfter`);
+    params.lastLoginAfter = filters.lastLoginAfter;
+  }
+
+  if (filters.lastLoginBefore) {
+    conditions.push(`a."lastLoginAt" < :lastLoginBefore`);
+    params.lastLoginBefore = filters.lastLoginBefore;
+  }
+
+  if (filters.permissionsInclude?.length) {
+    const perms = filters.permissionsInclude.map((digit: number, i: number) => {
+      const key = `perm_like_${i}`;
+      params[key] = `%${digit}%`;
+      return `CAST(a.permissions AS TEXT) LIKE :${key}`;
+    });
+    conditions.push(`(${perms.join(' OR ')})`);
+  }
+
+  const whereClause = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
+
+  const sortField = filters.sortBy === 'lastName' ? 'b."lastName"' : `a."${filters.sortBy || 'id'}"`;
+  const sortDir = filters.sortDirection?.toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
+  const orderClause = `ORDER BY ${sortField} ${sortDir}`;
+
+  params.limit = filters.limit || 50;
+  params.offset = filters.offset || 0;
+
+  const result = await sequelize.query<any>(`
+    SELECT a.*, b."idNumber", b.email, b."firstName", b."lastName"
+    FROM "AdminUsers" a
+    JOIN "BaseUser" b ON a."baseUserId" = b.id
+    ${whereClause}
+    ${orderClause}
+    LIMIT :limit OFFSET :offset
+  `, {
+    replacements: params,
+    type: QueryTypes.SELECT,
+  });
+
+  return result.map((admin: any) => ({
+    ...admin,
+    permissions: intToPermissionStrings(admin.permissions),
+  }));
 }

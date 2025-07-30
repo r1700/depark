@@ -7,7 +7,7 @@ const client = new Client({
   user: "postgres",
   host: "localhost",
   database: "depark",
-  password: "1333",
+  password: "pnini",
   port: 5432
 });
 
@@ -25,13 +25,12 @@ const getId = async (email:string) => {
   }
 };
 
-// פונקציה לחיפוש תפקיד של משתמש לפי id
 const getRole = async (id:string) => {
   try {
     const result = await client.query(`SELECT * FROM "AdminUsers" WHERE id = $1`, [id]);
     console.log("Role result:", result.rows[0].role);
     
-    return result.rows[0] // מחזיר את כל המידע של המשתמש
+    return result.rows[0]
   } catch (err) {
     console.error('Query error', err);
   }
