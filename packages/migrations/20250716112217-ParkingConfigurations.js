@@ -3,34 +3,36 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('ParkingConfigurations', {
+    await queryInterface.createTable('parkingconfigurations', {
       id: {
-        type: Sequelize.STRING,  
+        type: Sequelize.INTEGER,  
         primaryKey: true,
         allowNull: false,
+        autoIncrement: true,
+
       },
-      facilityName: {
+      facility_name: {
         type: Sequelize.STRING,  
         allowNull: false,
       },
-      totalSurfaceSpots: {
+      total_surface_spots: {
         type: Sequelize.INTEGER,  
         allowNull: false,
       },
-      surfaceSpotIds: {
+      surface_spot_ids: {
         type: Sequelize.ARRAY(Sequelize.STRING),  
         allowNull: false,
       },
-      avgRetrievalTimeMinutes: {
+      avg_retrieval_time_minutes: {
         type: Sequelize.INTEGER,  
         defaultValue: 1,
         allowNull: false,
       },
-      maxQueueSize: {
+      max_queue_size: {
         type: Sequelize.INTEGER,  
         allowNull: false,
       },
-      operatingHours: {
+      operating_hours: {
         type: Sequelize.JSON,  
         allowNull: false,
       },
@@ -38,46 +40,44 @@ module.exports = {
         type: Sequelize.STRING,  
         allowNull: false,
       },
-      updatedAt: {
+      updated_at: {
         type: Sequelize.DATE,  
         allowNull: false,
         defaultValue: Sequelize.NOW,
       },
-      updatedBy: {
+      updated_by: {
         type: Sequelize.STRING,  
         allowNull: false,
       },
     });
 
-    await queryInterface.bulkInsert('ParkingConfigurations', [
+    await queryInterface.bulkInsert('parkingconfigurations', [
       {
-        id: '1',
-        facilityName: 'Central Parking Lot',
-        totalSurfaceSpots: 50,
-        surfaceSpotIds: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'],
-        avgRetrievalTimeMinutes: 5,
-        maxQueueSize: 10,
-        operatingHours: JSON.stringify({ start: '07:00', end: '19:00' }),  
+        facility_name: 'Central Parking Lot',
+        total_surface_spots: 50,
+        surface_spot_ids: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'],
+        avg_retrieval_time_minutes: 5,
+        max_queue_size: 10,
+        operating_hours: JSON.stringify({ start: '07:00', end: '19:00' }),  
         timezone: 'Asia/Jerusalem',
-        updatedAt: new Date(),
-        updatedBy: 'admin123',
+        updated_at: new Date(),
+        updated_by: 'admin123',
       },
       {
-        id: '2',
-        facilityName: 'North Parking Garage',
-        totalSurfaceSpots: 30,
-        surfaceSpotIds: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'],
-        avgRetrievalTimeMinutes: 3,
-        maxQueueSize: 5,
-        operatingHours: JSON.stringify({ start: '08:00', end: '20:00' }),  
+        facility_name: 'North Parking Garage',
+        total_surface_spots: 30,
+        surface_spot_ids: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'],
+        avg_retrieval_time_minutes: 3,
+        max_queue_size: 5,
+        operating_hours: JSON.stringify({ start: '08:00', end: '20:00' }),  
         timezone: 'Asia/Jerusalem',
-        updatedAt: new Date(),
-        updatedBy: 'admin456',
+        updated_at: new Date(),
+        updated_by: 'admin456',
       },
     ]);
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('ParkingConfigurations');
+    await queryInterface.dropTable('parkingconfigurations');
   }
 };

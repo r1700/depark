@@ -1,9 +1,7 @@
 'use strict';
-console.log('lllllllllllll');
-
 module.exports = {
     up: async (queryInterface, Sequelize) => {
-        await queryInterface.createTable('BaseUser', {
+        await queryInterface.createTable('baseuser', {
             id: {
                 type: Sequelize.INTEGER,
                 primaryKey: true,
@@ -13,50 +11,50 @@ module.exports = {
                 type: Sequelize.STRING,
                 allowNull: false,
             },
-            firstName: {
+            first_name: {
                 type: Sequelize.STRING,
                 allowNull: false,
             },
-            lastName: {
+            last_name: {
                 type: Sequelize.STRING,
                 allowNull: false,
             },
-            createdAt: {
+            created_at: {
                 type: Sequelize.DATE,
                 allowNull: false,
             },
-            updatedAt: {
+            updated_at: {
                 type: Sequelize.DATE,
                 allowNull: false,
             }
         });
 
-        await queryInterface.bulkInsert('BaseUser', [
+        await queryInterface.bulkInsert('baseuser', [
             {
                 email: 'user1@example.com',
-                firstName: 'John',
-                lastName: 'Doe',
-                createdAt: new Date(),
-                updatedAt: new Date()
+                first_name: 'John',
+                last_name: 'Doe',
+                created_at: new Date(),
+                updated_at: new Date()
             },
             {
                 email: 'user2@example.com',
-                firstName: 'Jane',
-                lastName: 'Smith',
-                createdAt: new Date(),
-                updatedAt: new Date()
+                first_name: 'Jane',
+                last_name: 'Smith',
+                created_at: new Date(),
+                updated_at: new Date()
             },
             {
                 email: 'user3@example.com',
-                firstName: 'Alice',
-                lastName: 'Johnson',
-                createdAt: new Date(),
-                updatedAt: new Date()
+                first_name: 'Alice',
+                last_name: 'Johnson',
+                created_at: new Date(),
+                updated_at: new Date()
             }
         ]);
     },
 
     down: async (queryInterface, Sequelize) => {
-        await queryInterface.dropTable('BaseUser');
+        await queryInterface.dropTable('baseuser');
     }
 };

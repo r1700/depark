@@ -3,88 +3,87 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('UnknownVehicleModels', {
+    await queryInterface.createTable('unknownvehiclemodels', {
       id: {
-        type: Sequelize.STRING,  
+        type: Sequelize.INTEGER,
         primaryKey: true,
         allowNull: false,
+        autoIncrement: true,
       },
       make: {
-        type: Sequelize.STRING,  
+        type: Sequelize.STRING,
         allowNull: false,
       },
       model: {
-        type: Sequelize.STRING,  
+        type: Sequelize.STRING,
         allowNull: false,
       },
-      requestCount: {
-        type: Sequelize.INTEGER,  
+      request_count: {
+        type: Sequelize.INTEGER,
         allowNull: false,
-        defaultValue: 0,  
+        defaultValue: 0,
       },
-      lastRequested: {
-        type: Sequelize.DATE,  
+      last_requested: {
+        type: Sequelize.DATE,
         allowNull: false,
-        defaultValue: Sequelize.NOW,  
+        defaultValue: Sequelize.NOW,
       },
       status: {
-        type: Sequelize.ENUM('pending_review', 'resolved', 'ignored'),  
+        type: Sequelize.INTEGER,
         allowNull: false,
+        comment: '1=pending_review, 2=resolved, 3=ignored',
       },
-      resolvedBy: {
-        type: Sequelize.STRING,  
+      resolved_by: {
+        type: Sequelize.STRING,
         allowNull: true,
       },
-      resolvedAt: {
-        type: Sequelize.DATE,  
+      resolved_at: {
+        type: Sequelize.DATE,
         allowNull: true,
       },
-      resolvedVehicleModelId: {
-        type: Sequelize.STRING,  
+      resolved_vehicle_model_id: {
+        type: Sequelize.STRING,
         allowNull: true,
       },
-      createdAt: {
-        type: Sequelize.DATE,  
+      created_at: {
+        type: Sequelize.DATE,
         allowNull: false,
-        defaultValue: Sequelize.NOW,  
+        defaultValue: Sequelize.NOW,
       },
     });
 
-    await queryInterface.bulkInsert('UnknownVehicleModels', [
+    await queryInterface.bulkInsert('unknownvehiclemodels', [
       {
-        id: '1',
         make: 'Toyota',
         model: 'Corolla',
-        requestCount: 3,
-        lastRequested: new Date(),
-        status: 'pending_review',
-        createdAt: new Date(),
+        request_count: 3,
+        last_requested: new Date(),
+        status: 1, 
+        created_at: new Date(),
       },
       {
-        id: '2',
         make: 'Honda',
         model: 'Civic',
-        requestCount: 5,
-        lastRequested: new Date(),
-        status: 'resolved',
-        resolvedBy: 'admin1',
-        resolvedAt: new Date(),
-        resolvedVehicleModelId: 'H123',
-        createdAt: new Date(),
+        request_count: 5,
+        last_requested: new Date(),
+        status: 2, 
+        resolved_by: 'admin1',
+        resolved_at: new Date(),
+        resolved_vehicle_model_id: 'H123',
+        created_at: new Date(),
       },
       {
-        id: '3',
         make: 'Ford',
         model: 'Focus',
-        requestCount: 2,
-        lastRequested: new Date(),
-        status: 'ignored',
-        createdAt: new Date(),
+        request_count: 2,
+        last_requested: new Date(),
+        status: 3, 
+        created_at: new Date(),
       },
     ]);
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('UnknownVehicleModels');  
+    await queryInterface.dropTable('unknownvehiclemodels');
   }
 };

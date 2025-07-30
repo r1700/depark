@@ -3,81 +3,70 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('UserActivities', { 
+    await queryInterface.createTable('useractivities', {
       id: {
-        type: Sequelize.STRING,  
+        type: Sequelize.INTEGER,
         primaryKey: true,
         allowNull: false,
+        autoIncrement: true,
       },
-      userId: {
-        type: Sequelize.STRING,  
-        allowNull: true,
-      },
-      userType: {
-        type: Sequelize.ENUM('hr', 'admin', 'employee', 'anonymous'),  
+      baseuser_id: {
+        type: Sequelize.INTEGER,
         allowNull: false,
       },
+      user_type: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        comment: '1=hr, 2=admin, 3=employee, 4=anonymous',
+      },
       action: {
-        type: Sequelize.STRING,  
+        type: Sequelize.STRING,
         allowNull: false,
       },
       details: {
-        type: Sequelize.JSONB,  
+        type: Sequelize.JSONB,
         allowNull: false,
       },
-      ipAddress: {
-        type: Sequelize.STRING,  
+      ip_address: {
+        type: Sequelize.STRING,
         allowNull: true,
       },
-      userAgent: {
-        type: Sequelize.STRING,  
+      user_agent: {
+        type: Sequelize.STRING,
         allowNull: true,
       },
       timestamp: {
-        type: Sequelize.DATE,  
-        allowNull: false,
-      },
-      createdAt: {
         type: Sequelize.DATE,
         allowNull: false,
-        defaultValue: Sequelize.NOW,
       },
-      updatedAt: {
-        type: Sequelize.DATE,
-        allowNull: false,
-        defaultValue: Sequelize.NOW,
-      },
+
+
     });
 
-    await queryInterface.bulkInsert('UserActivities', [
+    await queryInterface.bulkInsert('useractivities', [
       {
-        id: '1',
-        userId: 'user123',
-        userType: 'admin',
+        baseuser_id: 1,
+        user_type: 2,
         action: 'login',
         details: JSON.stringify({ success: true }),
-        ipAddress: '192.168.1.1',
-        userAgent: 'Mozilla/5.0',
+        ip_address: '192.168.1.1',
+        user_agent: 'Mozilla/5.0',
         timestamp: new Date(),
-        createdAt: new Date(),
-        updatedAt: new Date(),
+       
       },
       {
-        id: '2',
-        userId: 'user456',
-        userType: 'employee',
+       baseuser_id: 2,
+        user_type: 3,
         action: 'update_profile',
         details: JSON.stringify({ field: 'email', oldValue: 'user@old.com', newValue: 'user@new.com' }),
-        ipAddress: '192.168.1.2',
-        userAgent: 'Mozilla/5.0',
+        ip_address: '192.168.1.2',
+        user_agent: 'Mozilla/5.0',
         timestamp: new Date(),
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
+      }
     ]);
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('UserActivities');
+    await queryInterface.dropTable('useractivities');
   }
 };

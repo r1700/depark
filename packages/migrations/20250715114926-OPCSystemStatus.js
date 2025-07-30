@@ -3,33 +3,34 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('OPCSystemStatuses', {
+    await queryInterface.createTable('opcsystemstatuses', {
       id: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
         primaryKey: true,
         allowNull: false,
+        autoIncrement: true,
       },
-      isConnected: {
+      is_connected: {
         type: Sequelize.BOOLEAN,
         allowNull: false,
       },
-      lastHeartbeat: {
+      last_heartbeat: {
         type: Sequelize.DATE,
         allowNull: false,
       },
-      availableSurfaceSpots: {
+      available_surface_spots: {
         type: Sequelize.INTEGER,
         allowNull: false,
       },
-      queueLength: {
+      queue_length: {
         type: Sequelize.INTEGER,
         allowNull: false,
       },
-      systemErrors: {
+      system_errors: {
         type: Sequelize.JSONB,
         allowNull: true,
       },
-      performanceMetrics: {
+      performance_metrics: {
         type: Sequelize.JSONB,
         allowNull: false,
         defaultValue: {
@@ -43,55 +44,42 @@ module.exports = {
         allowNull: false,
         defaultValue: Sequelize.NOW,
       },
-      createdAt: {
-        type: Sequelize.DATE,
-        allowNull: false,
-        defaultValue: Sequelize.NOW,
-      },
-      updatedAt: {
-        type: Sequelize.DATE,
-        allowNull: false,
-        defaultValue: Sequelize.NOW,
-      },
+  
     });
 
-    await queryInterface.bulkInsert('OPCSystemStatuses', [
+    await queryInterface.bulkInsert('opcsystemstatuses', [
       {
-        id: '1',
-        isConnected: true,
-        lastHeartbeat: new Date(),
-        availableSurfaceSpots: 10,
-        queueLength: 5,
-        systemErrors: JSON.stringify(['Error 1', 'Error 2']),
-        performanceMetrics: JSON.stringify({
+        is_connected: true,
+        last_heartbeat: new Date(),
+        available_surface_spots: 10,
+        queue_length: 5,
+        system_errors: JSON.stringify(['Error 1', 'Error 2']),
+        performance_metrics: JSON.stringify({
           avgRetrievalTime: 5,
           successfulRetrievals: 100,
           failedOperations: 2,
         }),
         timestamp: new Date(),
-        createdAt: new Date(),
-        updatedAt: new Date(),
+    
       },
       {
-        id: '2',
-        isConnected: false,
-        lastHeartbeat: new Date(),
-        availableSurfaceSpots: 0,
-        queueLength: 15,
-        systemErrors: JSON.stringify(['Error 3']),
-        performanceMetrics: JSON.stringify({
+        is_connected: false,
+        last_heartbeat: new Date(),
+        available_surface_spots: 0,
+        queue_length: 15,
+        system_errors: JSON.stringify(['Error 3']),
+        performance_metrics: JSON.stringify({
           avgRetrievalTime: 7,
           successfulRetrievals: 80,
           failedOperations: 5,
         }),
         timestamp: new Date(),
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        
       },
     ]);
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('OPCSystemStatuses');  
+    await queryInterface.dropTable('opcsystemstatuses');  
   }
 };

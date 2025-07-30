@@ -3,97 +3,108 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('ParkingSessions', {
+    await queryInterface.createTable('parkingsessions', {
       id: {
-        type: Sequelize.STRING,  
+        type: Sequelize.INTEGER,
         primaryKey: true,
         allowNull: false,
+        autoIncrement: true,
       },
-      userId: {
-        type: Sequelize.STRING,  
+      baseuser_id: {
+        type: Sequelize.INTEGER,
         allowNull: false,
       },
-      vehicleId: {
-        type: Sequelize.STRING,  
+      vehicle_id: {
+        type: Sequelize.INTEGER,
         allowNull: false,
       },
-      licensePlate: {
-        type: Sequelize.STRING,  
+     parking_spots_id: {
+        type: Sequelize.INTEGER,
         allowNull: false,
       },
-      surfaceSpot: {
-        type: Sequelize.STRING,  
+      license_plate: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      surface_spot: {
+        type: Sequelize.STRING,
         allowNull: true,
       },
-      undergroundSpot: {
-        type: Sequelize.STRING,  
+      underground_spot: {
+        type: Sequelize.STRING,
         allowNull: true,
       },
       status: {
-        type: Sequelize.ENUM('parked', 'retrieval_requested', 'completed'),  
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        comment: '1=parked, 2=retrieval_requested, 3=completed',
       },
-      entryTime: {
-        type: Sequelize.DATE,  
+      entry_time: {
+        type: Sequelize.DATE,
         allowNull: false,
       },
-      exitTime: {
-        type: Sequelize.DATE,  
+      exit_time: {
+        type: Sequelize.DATE,
         allowNull: true,
       },
-      retrievalRequestTime: {
-        type: Sequelize.DATE,  
+      retrieval_request_time: {
+        type: Sequelize.DATE,
         allowNull: true,
       },
-      actualRetrievalTime: {
-        type: Sequelize.DATE, 
+      actual_retrieval_time: {
+        type: Sequelize.DATE,
         allowNull: true,
       },
-      pickupSpot: {
-        type: Sequelize.STRING,  
+      pickup_spot: {
+        type: Sequelize.STRING,
         allowNull: true,
       },
-      requestedBy: {
-        type: Sequelize.ENUM('mobile', 'tablet'),  
+      requested_by: {
+        type: Sequelize.INTEGER,
         allowNull: true,
+        comment: '1=mobile, 2=tablet',
       },
     });
 
-    await queryInterface.bulkInsert('ParkingSessions', [
+      await queryInterface.bulkInsert('parkingsessions', [
       {
-        id: '1',
-        userId: 'user123',
-        vehicleId: 'vehicle1',
-        licensePlate: 'ABC123',
-        surfaceSpot: '5',
-        undergroundSpot: null,
-        status: 'parked',
-        entryTime: new Date('2025-07-15T07:00:00'),
-        exitTime: null,
-        retrievalRequestTime: null,
-        actualRetrievalTime: null,
-        pickupSpot: null,
-        requestedBy: null,
+        baseuser_id: 1,
+        vehicle_id: 1,
+        parking_spots_id: 1,
+        license_plate: 'ABC123',
+        surface_spot: '5',
+        underground_spot: null,
+        status: 1,
+        entry_time: new Date('2025-07-15T07:00:00'),
+        exit_time: null,
+        retrieval_request_time: null,
+        actual_retrieval_time: null,
+        pickup_spot: null,
+        requested_by: null,
+       
       },
       {
-        id: '2',
-        userId: 'user456',
-        vehicleId: 'vehicle2',
-        licensePlate: 'XYZ456',
-        surfaceSpot: '2',
-        undergroundSpot: null,
-        status: 'retrieval_requested',
-        entryTime: new Date('2025-07-15T08:30:00'),
-        exitTime: null,
-        retrievalRequestTime: new Date('2025-07-15T09:00:00'),
-        actualRetrievalTime: null,
-        pickupSpot: '6',
-        requestedBy: 'mobile',
+        baseuser_id: 2,
+        vehicle_id: 2,
+        parking_spots_id: 2,
+        license_plate: 'XYZ456',
+        surface_spot: '2',
+        underground_spot: null,
+        status: 2,
+        entry_time: new Date('2025-07-15T08:30:00'),
+        exit_time: null,
+        retrieval_request_time: new Date('2025-07-15T09:00:00'),
+        actual_retrieval_time: null,
+        pickup_spot: '6',
+        requested_by: 1,
+        
       },
     ]);
   },
 
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('ParkingSessions');  
+    await queryInterface.dropTable('parkingsessions');
   }
 };
+

@@ -3,69 +3,68 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('LoginAttempts', {  // שם הטבלה: LoginAttempts
+    await queryInterface.createTable('loginattempts', { 
       id: {
-        type: Sequelize.STRING,  
+        type: Sequelize.INTEGER,
         primaryKey: true,
         allowNull: false,
+        autoIncrement: true,
       },
       email: {
-        type: Sequelize.STRING,  
+        type: Sequelize.STRING,
         allowNull: false,
       },
-      userType: {
-        type: Sequelize.ENUM('user', 'admin'),  
+      user_type: {
+        type: Sequelize.INTEGER,
         allowNull: false,
+        comment: '1=user, 2=admin',
       },
       success: {
-        type: Sequelize.BOOLEAN,  
+        type: Sequelize.BOOLEAN,
         allowNull: false,
       },
-      ipAddress: {
-        type: Sequelize.STRING,  
+      ip_address: {
+        type: Sequelize.STRING,
         allowNull: false,
       },
-      userAgent: {
-        type: Sequelize.STRING,  
+      user_agent: {
+        type: Sequelize.STRING,
         allowNull: false,
       },
-      failureReason: {
-        type: Sequelize.STRING,  
-        allowNull: true,  
+      failure_reason: {
+        type: Sequelize.STRING,
+        allowNull: true,
       },
       timestamp: {
-        type: Sequelize.DATE,  
+        type: Sequelize.DATE,
         allowNull: false,
-        defaultValue: Sequelize.NOW,  
+        defaultValue: Sequelize.NOW,
       },
     });
 
-    await queryInterface.bulkInsert('LoginAttempts', [
+    await queryInterface.bulkInsert('loginattempts', [
       {
-        id: '1',
         email: 'user@example.com',
-        userType: 'user',
+        user_type: 1, 
         success: true,
-        ipAddress: '192.168.1.1',
-        userAgent: 'Mozilla/5.0',
-        failureReason: null,
+        ip_address: '192.168.1.1',
+        user_agent: 'Mozilla/5.0',
+        failure_reason: null,
         timestamp: new Date(),
       },
       {
-        id: '2',
         email: 'admin@example.com',
-        userType: 'admin',
+        user_type: 2, 
         success: false,
-        ipAddress: '192.168.1.2',
-        userAgent: 'Mozilla/5.0',
-        failureReason: 'Incorrect password',
+        ip_address: '192.168.1.2',
+        user_agent: 'Mozilla/5.0',
+        failure_reason: 'Incorrect password',
         timestamp: new Date(),
       },
     ]);
   },
 
   async down(queryInterface, Sequelize) {
-    console.log("down");
-    await queryInterface.dropTable('LoginAttempts');  
+    await queryInterface.dropTable('loginattempts');
   }
 };
