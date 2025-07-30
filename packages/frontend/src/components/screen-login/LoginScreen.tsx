@@ -13,6 +13,7 @@ import {
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import GoogleAuth from "../google-auth/GoogleAuth";
 
 interface LoginScreenProps {
   onLogin: () => void;
@@ -165,6 +166,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
             {loading ? <CircularProgress size={24} color="inherit" /> : "Login"}
           </Button>
         </Box>
+          <GoogleAuth/>
 
         <Stack
           direction="row"
