@@ -141,4 +141,4 @@ packages/backend/package.json
 packages/mobile/package.json
 .env
 
-
+config/config.json
