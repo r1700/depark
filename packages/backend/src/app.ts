@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 
 // ייבוא הראוטרים
-import adminConfigRouter from './routes/admin-config';
+import adminConfigRouter from './routes/adminConfig';
 
 const app = express();
 
@@ -26,14 +26,18 @@ app.get('/health', (req, res) => {
 });
 
 // 404 handler
-app.use('*', (req, res) => {
-    res.status(404).json({ message: 'Route not found' });
-});
+
 
 // Error handler
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
     console.error('Error:', err);
     res.status(500).json({ message: 'Internal server error' });
 });
+
+// 404 handler - חייב להיות האחרון!
+app.use('*', (req, res) => {
+    res.status(404).json({ message: 'Route not found' });
+});
+
 
 export default app;
