@@ -23,7 +23,7 @@
     "sequelize": "^6.37.7"
   },
   "devDependencies": {
-    "sequelize-cli": "^6.6.3"
+    "sequelize-cli": "^6.6.3",
     "install:all": "npm install && npm install --workspace=packages/backend && npm install --workspace=packages/frontend && npm install --workspace=packages/opc",
     "start:frontend": "npm start --workspace packages/frontend",
     "start:backend": "npm start --workspace packages/backend"
