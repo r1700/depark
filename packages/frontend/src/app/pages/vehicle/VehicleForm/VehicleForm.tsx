@@ -27,6 +27,8 @@ const AddOrEditVehicleForm = ({ onClose, vehicleToEdit=null }
     {name: 'dimensionsSource', label: 'dimensionsSource', type: 'select', 
      options: ['model_reference' ,'manual_override', 'government_db'],required: true},
     ]
+  
+    
   return (
     <GenericForm<Vehicle>
       title={vehicleToEdit ? 'Edit Vehicle' : 'Add Vehicle'}

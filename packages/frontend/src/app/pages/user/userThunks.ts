@@ -56,9 +56,9 @@ export const fetchUsers = createAsyncThunk(
           createdAt: new Date().toISOString(),
         },
       ];
-            
-return mockUsers;
 
+      
+return mockUsers;
 
        const response = await axios.get<User[]>('/api/users');
        return response.data;

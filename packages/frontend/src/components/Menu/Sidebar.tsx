@@ -20,7 +20,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import PeopleIcon from '@mui/icons-material/People';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import AssessmentIcon from '@mui/icons-material/Assessment';
-import path from 'path';
+
 
 const drawerWidth = 240;
 
@@ -45,8 +45,8 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
 
     const menuItems = [
         { text: 'Users', icon: <PeopleIcon />, path: '/users' },
-        { text: 'Vehicles', icon: <DirectionsCarIcon />, path: '' },
-        { text: 'Reports', icon: <AssessmentIcon />, path: '' },
+        { text: 'Vehicles', icon: <DirectionsCarIcon />, path: '/vehicles' },
+        { text: 'Reports', icon: <AssessmentIcon />, path: '/reports' },
     ];
 
     return (

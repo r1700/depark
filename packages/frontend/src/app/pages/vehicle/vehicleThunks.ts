@@ -28,6 +28,7 @@ export const updateVehicle = createAsyncThunk(
   }
 );
 
+
 export const fetchVehicles = createAsyncThunk(
   'vehicles/fetchVehicles',
   async (_, thunkAPI) => {

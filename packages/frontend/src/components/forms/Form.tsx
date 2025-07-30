@@ -87,6 +87,7 @@ const GenericForm = <T extends { [key: string]: any }>({
         }
       }
 
+      
       if (field.type === 'number' && formData[field.name]) {
         const numValue = Number(formData[field.name]);
         if (isNaN(numValue)) {
@@ -192,6 +193,13 @@ const GenericForm = <T extends { [key: string]: any }>({
             )
           )))}
       </Box>
+
+
+
+
+
+
+
 
 
 

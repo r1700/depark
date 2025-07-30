@@ -11,6 +11,7 @@ const userFields: FieldConfig<User>[] = [
   { name: 'maxCarsAllowedParking', label: 'Max Cars', type: 'number' },
 ];
 
+
 const UserForm=({
   onClose,
   userToEdit=null,
@@ -19,6 +20,8 @@ const UserForm=({
   userToEdit?: Partial<User> | null;
 }) => {
   const dispatch = useAppDispatch(); 
+
+
 
   return (
     <GenericForm<User>

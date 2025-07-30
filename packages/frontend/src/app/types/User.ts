@@ -7,6 +7,7 @@ export interface BaseUser {
   updatedAt?: Date | null;
 }
 
+
 export interface User extends BaseUser {
   department?: string;
   employeeId?: string;
