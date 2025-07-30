@@ -5,7 +5,7 @@ const router = express.Router();
 const now = new Date().toISOString();
 
 router.get('/users', async (req: Request, res: Response) => {
-   try {
+  try {
     const {
       lastNameStartsWith,
       roles,
@@ -40,12 +40,17 @@ router.get('/users', async (req: Request, res: Response) => {
     }
 
     if (permissionsInclude) {
-      if (Array.isArray(permissionsInclude)) {
-        filters.permissionsInclude = permissionsInclude;
-      } else if (typeof permissionsInclude === 'string') {
-        filters.permissionsInclude = permissionsInclude.split(',').map(p => p.trim());
-      }
-    }
+  if (Array.isArray(permissionsInclude)) {
+    filters.permissionsInclude = permissionsInclude
+      .map(p => Number(p))
+      .filter(p => !isNaN(p));
+  } else if (typeof permissionsInclude === 'string') {
+    filters.permissionsInclude = permissionsInclude
+      .split(',')
+      .map(p => Number(p.trim()))
+      .filter(p => !isNaN(p));
+  }
+}
 
     const parseAndValidateDate = (dateStr: any, paramName: string) => {
       if (typeof dateStr !== 'string') {
@@ -57,7 +62,7 @@ router.get('/users', async (req: Request, res: Response) => {
       }
       return date.toISOString();
     };
-    
+
     if (lastLoginAfter) {
       filters.lastLoginAfter = parseAndValidateDate(lastLoginAfter, 'lastLoginAfter');
     }
@@ -85,7 +90,7 @@ router.get('/users', async (req: Request, res: Response) => {
     if (lastActivityAfter) {
       filters.lastActivityAfter = parseAndValidateDate(lastActivityAfter, 'lastActivityAfter');
     }
-    
+
     if (lastActivityBefore) {
       filters.lastActivityBefore = parseAndValidateDate(lastActivityBefore, 'lastActivityBefore');
     }
