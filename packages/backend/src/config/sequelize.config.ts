@@ -7,10 +7,10 @@ const { DB_USER, DB_PASSWORD, DB_HOST, DB_NAME }: any = process.env;
 
 export default {
   development: {
-    username: DB_USER ,
-    password: DB_PASSWORD ,
-    database: DB_NAME ,
-    host: DB_HOST ,
+    username: DB_USER,
+    password: DB_PASSWORD,
+    database: DB_NAME,
+    host: DB_HOST,
     dialect: 'postgres',
     migrationStorageTableName: 'sequelize_meta',
     migrations: {
@@ -18,4 +18,4 @@ export default {
       pattern: /\.js|ts$/
     }
   }
-};
+}
