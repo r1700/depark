@@ -1,10 +1,7 @@
 
 import React, { useState } from 'react';
-import Sidebar from '../components/Menu/Sidebar';
-import { Vehicle } from '../app/types/Vehicle';
 import {  Button, Box, Typography, Modal, Fade, Backdrop } from '@mui/material';
 import VehicleForm from '../app/pages/vehicle/VehicleForm/VehicleForm';
-
 
 
 const styleModal = {
@@ -43,7 +40,6 @@ const [showAddVehicleModal, setShowAddVehicleModal] = useState(false);
 
   return (<>
     <Box sx={{ display: 'flex' }}>
-      <Sidebar user={user} onLogout={handleLogout} />
       <Box sx={{ flexGrow: 1, p: 3 }}>
         
         <Typography 

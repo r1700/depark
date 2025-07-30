@@ -1,6 +1,5 @@
 
 import React, { useState } from 'react';
-import Sidebar from '../components/Menu/Sidebar';
 import { Button, Box, Typography, Modal, Fade, Backdrop } from '@mui/material';
 import UserForm from '../app/pages/user/UserForm/UserForm';
 
@@ -43,7 +42,6 @@ const [showAddUserModal, setShowAddUserModal] = useState(false);
 
   return (<>
     <Box sx={{ display: 'flex' }}>
-      <Sidebar user={user} onLogout={handleLogout} />
       <Box sx={{ flexGrow: 1, p: 3 }}>
         
         <Typography 
@@ -60,9 +58,10 @@ const [showAddUserModal, setShowAddUserModal] = useState(false);
        
         <Button
           variant="contained"
-           onClick={openAddUserModal}
           color="primary"
           sx={{ marginRight: 2 }}
+          onClick={openAddUserModal}
+
         >
           add user
         </Button>
@@ -107,3 +106,6 @@ const [showAddUserModal, setShowAddUserModal] = useState(false);
 };
 
 export default UsersPage;
+
+
+
