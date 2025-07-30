@@ -5,10 +5,13 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+<<<<<<< HEAD
 package-lock.json
 package.json
 packages/opc/package.json
 packages/plc-mock/package.json
+=======
+>>>>>>> c4bfe141 (fix the resetPassword)
 
 # Environment variables
 .env
@@ -55,28 +58,13 @@ Thumbs.db
 .vercel
 .render
 
-# Local environment files
-.env*.local
-
-# Local configuration files
+# Specific config files (with sensitive data)
 config/config.json
 config/database.json
 
-# connection files
-connection/connectToDB.js
-
-# models
-models/*.js
-# knex files
-knexfile.js
-
-#package files
-yarn.lock
-
-# models
+# Generated files
 models/index.js
 
 # Temp files
 temp/*.json
-
 
