@@ -1,5 +1,5 @@
 import { OAuth2Client } from 'google-auth-library';
-import { getRole, getId } from '../config/db/operations';
+import { getRoleById, getIdByEmail } from '../config/db/operations';
 
 const clientId = process.env.CLIENT_ID;
 const client = new OAuth2Client(clientId);
@@ -11,11 +11,11 @@ const auth = async (idToken: string) => {
         if(!userEmail) {
             throw new Error('was an error with the token');
         }
-        const userId = await getId(userEmail);
+        const userId = await getIdByEmail(userEmail);
         if(!userId) {
             throw new Error('User not found');
         }
-        const role = await getRole(userId);
+        const role = await getRoleById(userId);
         if(!role) {
             return false
         }

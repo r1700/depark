@@ -38,9 +38,8 @@ const GoogleAuth: React.FC = () => {
   };
 
   return (
-    <GoogleOAuthProvider clientId="263731331737-828dn63isghps9ihmr694amas0ka245m.apps.googleusercontent.com">
+    <GoogleOAuthProvider clientId={process.env.CLIENT_ID ?? ''}>
       <div>
-        <h1>Sign in with Google</h1>
         <GoogleLogin
           onSuccess={responseGoogle}
           onError={() => setAnswer('Google login failed')}
