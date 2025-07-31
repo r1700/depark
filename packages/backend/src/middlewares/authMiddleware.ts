@@ -28,7 +28,6 @@ console.log('Authorization header:', authHeader);
       return res.status(403).json({ error: 'Invalid or expired token' });
     }
 
-    // מוסיפים את המשתמש ל-request (כאן נתייחס ל-req כ-any בראוטר)
     console.log('Decoded JWT user:', user);
 
     (req as any).user = user;

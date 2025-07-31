@@ -2,15 +2,15 @@ import path from 'path';
 import dotenv from 'dotenv';
 dotenv.config({ path: path.resolve(__dirname, '../../.env') }); // Load environment variables from the root .env file
 
-const { DB_USER, DB_PASSWORD, DB_HOST, DB_NAME }: any = process.env;
+const { DATA_USERNAME, PASSWORD, HOST, DATABASE }: any = process.env;
 
 
 export default {
   development: {
-    username: DB_USER ,
-    password: DB_PASSWORD ,
-    database: DB_NAME ,
-    host: DB_HOST ,
+    username: DATA_USERNAME ,
+    password: PASSWORD ,
+    database: DATABASE,
+    host: HOST,
     dialect: 'postgres',
     migrationStorageTableName: 'sequelize_meta',
     migrations: {

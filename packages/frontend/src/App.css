@@ -32,45 +32,41 @@ body {
   min-height: auto;
 }
 
-/* החזר את הכותרת למצב רגיל: */
 .admin-config h1 {
   color: #333;
   text-align: center;
-  font-size: 2.3rem; /* גדול יותר */
+  font-size: 2.3rem; 
   font-weight: 400;
   margin-bottom: 2.5rem;
   padding-bottom: 1.5rem;
   border-bottom: 2px solid #4A90E2;
 }
 
-/* שנה את Grid Layout ל-2 עמודות: */
 .config-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr; /* 2 ריבועים בכל שורה */
-  gap: 2.5rem; /* מרווח גדול יותר */
+  grid-template-columns: 1fr 1fr; 
+  gap: 2.5rem; 
   margin-bottom: 2.5rem;
 }
 
-/* הסר את config-grid-bottom - כל הריבועים באותו grid */
 .config-grid-bottom {
   display: grid;
-  grid-template-columns: 1fr 1fr; /* 2 ריבועים */
+  grid-template-columns: 1fr 1fr; 
   gap: 2.5rem;
   margin-bottom: 2.5rem;
 }
 
-/* ריבועים גדולים יותר: */
 .config-section {
   background: white;
   border: 1px solid #4A90E2;
   border-radius: 8px;
-  padding: 2.2rem; /* padding גדול יותר */
-  min-height: 400px; /* גובה גדול יותר */
+  padding: 2.2rem; 
+  min-height: 400px; 
 }
 
 .config-section h2 {
   color: #4A90E2;
-  font-size: 1.2rem; /* גדול יותר */
+  font-size: 1.2rem;
   font-weight: 600;
   margin-bottom: 2rem;
   display: flex;
@@ -82,8 +78,7 @@ body {
   background: #4A90E2;
   color: white;
   border-radius: 50%;
-  width: 26px; /* גדול יותר */
-  height: 26px;
+  width: 26px;
   display: flex;
   align-items: center;
   justify-content: center;

@@ -10,11 +10,14 @@
     "db:migrate:undo": "npx sequelize-cli db:migrate:undo --migrations-path ./packages/migrations --config ./sequelize.config.js",
     "migration:generate": "npx sequelize-cli migration:generate --migrations-path ./packages/migrations --config ./sequelize.config.js",
     "install:all": "npm install --workspaces",
-    "start:frontend": "npm start --workspace packages/frontend",
-    "start:backend": "npm start --workspace packages/backend",
     "dev:opc": "npm run dev --workspace=packages/opc",
     "dev:backend": "npm run dev --workspace=packages/backend",
-    "dev:frontend": "npm run start --workspace=packages/frontend"
+    "dev:frontend": "npm run start --workspace=packages/frontend",
+    " db:migrate:undo": "npx sequelize-cli db:migrate:undo --migrations-path ./packages/migrations --config ./sequelize.config.js,",
+    " migration:generate": "npx sequelize-cli migration:generate --migrations-path ./packages/migrations --config ./sequelize.config.js",
+    "start:frontend": "npm start --workspace packages/frontend",
+    "start:backend": "npm start --workspace packages/backend",
+    "start:mobile": "npm start --workspace packages/mobile"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",

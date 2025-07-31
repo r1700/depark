@@ -1,58 +1,62 @@
+import 'reflect-metadata';
 import dotenv from 'dotenv';
 dotenv.config();
 
 import express from 'express';
 import cors from 'cors';
 import loggerRoutes from './middlewares/locallLoggerMiddleware';
+import './models';
+// import adminUsersRouter from './routes/admin/adminUsers';
 import healthRoutes from './routes/health';
 import passwordRoutes from './routes/user.routes';
 import vehicleRoutes from './routes/vehicle';
 import exportToCSV from './routes/exportToCSV';
+import authRoutes from './routes/auth';
+import { databaseService } from './services/database';
+import { OAuth2Client } from 'google-auth-library';
 
 const app = express();
-
 const PORT = process.env.PORT || 3001;
 const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:3000';
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 
-// Middleware setup
-app.use(cors({
-  origin: CORS_ORIGIN,
-  credentials: true,
-}));
+if (!GOOGLE_CLIENT_ID) {
+  throw new Error('Missing GOOGLE_CLIENT_ID');
+}
+
+app.use(cors({ origin: CORS_ORIGIN, credentials: true }));
 app.use(express.json());
 app.use(loggerRoutes);
+
 app.use('/api/health', healthRoutes);
 app.use('/api/password', passwordRoutes);
 app.use('/api/vehicle', vehicleRoutes);
 app.use('/api/exportToCSV', exportToCSV);
+app.use('/api/auth', authRoutes);
+// app.use('/admin', adminUsersRouter);
+
+app.use((req, res, next) => {
+  console.log(`[${req.method}] ${req.path}`, req.body);
+  next();
+});
+
+app.listen(PORT, async () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+
+  if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
+    console.log('🗄️ Initializing Supabase...');
+    try {
+      databaseService.canInitialize();
+      await databaseService.initializeSampleData();
+      console.log('✅ Database initialized');
+    } catch (err) {
+      console.error('❌ Database init failed:', err);
+    }
+  } else {
+    console.log('📝 Mock mode - Supabase not configured');
+  }
+});
 
 app.get('/', (req, res) => {
   res.json({ message: 'DePark Backend is running!' });
-});
-
-app.get('/health', (req, res) => {
-  res.json({
-    status: 'OK',
-    timestamp: new Date().toISOString(),
-  });
-});
-
-if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
-  console.log('🗄️ Initializing database...');
-} else {
-  console.log('📝 Using mock data - Supabase not configured');
-}
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`🌐 CORS enabled for: ${CORS_ORIGIN}`);
-  console.log('✅ Password reset API ready!');
-  console.log('🔗 Available routes:');
-  console.log('   GET  /');
-  console.log('   GET  /health');
-  console.log('   GET  /api/auth/users');      // 👈 חשוב!
-  console.log('   POST /api/auth/register');   // 👈 חשוב!
-  console.log('   POST /api/auth/login');
-  console.log('   GET  /api/admin/config');
-  console.log('   PUT  /api/admin/config');
 });

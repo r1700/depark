@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.49.8",
+    "@types/sequelize": "^4.28.20",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
@@ -26,6 +27,8 @@
     "sequelize-typescript": "^2.1.6",
     "tsconfig-paths": "^4.2.0",
     "typeorm": "^0.3.25",
+    "mysql2": "^3.14.3",
+    "sqlite3": "^5.1.7",
     "winston": "^3.17.0"
   },
   "devDependencies": {
