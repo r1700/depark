@@ -1,3 +1,4 @@
+
 # Dependencies
 node_modules/
 npm-debug.log*
@@ -104,8 +105,23 @@ Thumbs.db
 # Local environment files
 .env*.local
 
-# Specific config files to ignore
+# Local configuration files
 config/config.json
+
+# connection files
+connection/connectToDB.js
+
+# models
+models/*.js
+# knex files
+knexfile.js
+
+#package files
+package-lock.json
+package.json
+packages/frontend/package.json
+packages/frontend/package-lock.json
+packages/backend/package.json
 
 # models
 models/index.js
@@ -119,8 +135,6 @@ temp/*.json
 
 # Keep important JSON files
 packages/backend/package.json
-package.json
-package-lock.json
 !package.json
 !package-lock.json
 !tsconfig.json
@@ -136,14 +150,9 @@ packages/frontend/src/components/screen-login/
 # Miscellaneous
 package.json
 package-lock.json
-packages/backend/package.json
 
 packages/mobile/package.json
 .env
 
-config/config.json
-
-
+#yarn files
 yarn.lock
-packages/frontend/package.json
-packages/frontend/package-lock.json
