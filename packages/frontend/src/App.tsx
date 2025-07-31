@@ -3,12 +3,10 @@ import LoginScreen from './components/screen-login/LoginScreen';
 import { Box, Button, Container, Typography } from "@mui/material";
 
 const App: React.FC = () => {
-  // קריאה ראשונית מה־localStorage כדי לטעון אם המשתמש כבר מחובר
   const [loggedIn, setLoggedIn] = useState<boolean>(() => {
     return !!localStorage.getItem("token");
   });
 
-  // הפונקציה לטיפול בכניסה מוצלחת, מקבלת טוקן
   const handleLogin = useCallback((token?: string) => {
     if (token) {
       localStorage.setItem("token", token);
@@ -16,7 +14,6 @@ const App: React.FC = () => {
     setLoggedIn(true);
   }, []);
 
-  // פונקצית logout מוחקת את הטוקן ומעדכנת מצב
   const handleLogout = () => {
     localStorage.removeItem("token");
     setLoggedIn(false);
@@ -34,11 +31,10 @@ const App: React.FC = () => {
           </Button>
         </Box>
       ) : (
-        // כאן מוסיפים פרופס של onLogin שמקבלת טוקן
         <LoginScreen onLogin={handleLogin} />
       )}
     </Container>
   );
-};
 
+}
 export default App;

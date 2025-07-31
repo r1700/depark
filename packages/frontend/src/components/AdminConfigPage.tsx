@@ -20,15 +20,9 @@ import {
   Divider,
   ThemeProvider,
   createTheme,
-<<<<<<< HEAD
-  RadioGroup,
-  Radio,
-  Checkbox, // ← הוסף כאן!
-=======
   Checkbox,
   Radio,
   RadioGroup
->>>>>>> 1a8304accf346ea6f0b4f0196004edf1dbd22e52
 } from '@mui/material';
 
 import {
@@ -51,16 +45,6 @@ interface ParkingConfig {
   timezone: string;
   surfaceSpotIds: string[];
   totalSpots: number;
-<<<<<<< HEAD
-  
-  // הסר את השעות הכלליות:
-  // openingHour: string;
-  // closingHour: string;
-  // activeDays: string[];
-  
-  // הוסף שעות לכל יום:
-=======
->>>>>>> 1a8304accf346ea6f0b4f0196004edf1dbd22e52
   dailyHours: {
     [key: string]: {
       isActive: boolean;
@@ -68,10 +52,6 @@ interface ParkingConfig {
       closingHour: string;
     };
   };
-<<<<<<< HEAD
-  
-=======
->>>>>>> 1a8304accf346ea6f0b4f0196004edf1dbd22e52
   maxQueueSize: number;
   avgRetrievalTime: number;
   maxParallelRetrievals: number; // ✅ חדש!
@@ -150,11 +130,7 @@ const timezones = [
 ];
 
 const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-<<<<<<< HEAD
-const maxSpotsLimit = 100; // ← שנה מ-100 ל-3
-=======
 const maxSpotsLimit = 100;
->>>>>>> 1a8304accf346ea6f0b4f0196004edf1dbd22e52
 
 export default function AdminConfigPage() {
   // Initial config
@@ -341,15 +317,11 @@ export default function AdminConfigPage() {
     if (parkingConfig.avgRetrievalTime <= 0) {
       errors.push('Please set Average Retrieval Time to a number greater than 0');
     }
-<<<<<<< HEAD
-    
-=======
 
     if (parkingConfig.maxParallelRetrievals <= 0) {
       errors.push('Please set Max Parallel Retrievals to a number greater than 0');
     }
 
->>>>>>> 1a8304accf346ea6f0b4f0196004edf1dbd22e52
     return {
       isValid: errors.length === 0,
       firstError: errors.length > 0 ? errors[0] : null,
@@ -952,11 +924,7 @@ export default function AdminConfigPage() {
                 startIcon={saving ? <TimeIcon /> : undefined}
                 sx={{
                   minWidth: 200,
-<<<<<<< HEAD
-                  bgcolor: 'primary.main', // תמיד כחול
-=======
                   bgcolor: 'primary.main',
->>>>>>> 1a8304accf346ea6f0b4f0196004edf1dbd22e52
                   color: 'white',
                   boxShadow: '0 4px 16px rgba(25, 118, 210, 0.10)',
                   borderRadius: 3,

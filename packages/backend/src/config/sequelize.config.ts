@@ -1,15 +1,15 @@
 import path from 'path';
 require('dotenv').config();
 
-const { DATA_USERNAME, PASSWORD, HOST, DATABASE }: any = process.env || 'development';
+const { DATA_USERNAME, PASSWORD, HOST, DATABASE }: any = process.env;
 
 
 export default {
   development: {
-    username: DATA_USERNAME || 'postgres',
-    password: PASSWORD || 'pnini',
-    database: DATABASE || 'depark',
-    host: HOST || 'localhost',
+    username: DATA_USERNAME ,
+    password: PASSWORD ,
+    database: DATABASE,
+    host: HOST,
     dialect: 'postgres',
     migrationStorageTableName: 'sequelize_meta',
     migrations: {
