@@ -10,9 +10,18 @@ import vehicleRoutes from './routes/vehicle';
 import exportToCSV from './routes/exportToCSV';
 import authRoutes from './routes/auth';
 import userGoogleAuthRoutes from './routes/userGoogle-auth';
+import session from 'express-session';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+
+app.use(session({
+  secret: 'your-secret-key', 
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false } 
+}));
+// Middleware
 const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:3000';
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 
