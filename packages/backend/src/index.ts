@@ -17,11 +17,12 @@ const PORT = process.env.PORT || 3001;
 const CORS_ORIGIN = process.env.CORS_ORIGIN || '*';
 
 // app.use(session({
-//   secret: 'your-secret-key', // החליפי למשהו סודי משלך
+//   secret: 'your-secret-key', 
 //   resave: false,
 //   saveUninitialized: true,
-//   cookie: { secure: false } // ב־localhost, אם תעברי ל־https שימי true
+//   cookie: { secure: false } 
 // }));
+
 // Middleware
 app.use(cors({
   origin: CORS_ORIGIN,
