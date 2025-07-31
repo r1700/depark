@@ -1,7 +1,6 @@
 import express from 'express';
 import cors from 'cors';
 
-// ייבוא הראוטרים
 import adminConfigRouter from './routes/admin-config';
 
 const app = express();
@@ -11,16 +10,12 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// הודעת התחלה
 console.log('App file started');
 
-// Routes עיקריים (קיימים)
 
-// API Routes חדשים
 app.use('/api/admin', adminConfigRouter);
 
 
-// Health check
 app.get('/health', (req, res) => {
     res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });

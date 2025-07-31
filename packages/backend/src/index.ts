@@ -8,10 +8,19 @@ import healthRoutes from './routes/health';
 import passwordRoutes from './routes/user.routes';
 import vehicleRoutes from './routes/vehicle';
 import exportToCSV from './routes/exportToCSV';
+import session from 'express-session';
 
 const app = express();
 
 const PORT = process.env.PORT || 3001;
+
+app.use(session({
+  secret: 'your-secret-key', 
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false } 
+}));
+// Middleware
 const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:3000';
 
 // Middleware setup
@@ -20,6 +29,15 @@ app.use(cors({
   credentials: true,
 }));
 app.use(express.json());
+
+app.get('/', (req, res) => {
+  res.json({ message: 'DePark Backend is running!' });
+});
+
+app.get('/health', (req, res) => {
+  res.json({ status: 'OK', timestamp: new Date().toISOString() });
+});
+
 app.use(loggerRoutes);
 app.use('/api/health', healthRoutes);
 app.use('/api/password', passwordRoutes);
