@@ -11,7 +11,6 @@ import {
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret';
 const TOKEN_EXPIRATION_MINUTES = parseInt(process.env.RESET_TOKEN_EXPIRATION_MINUTES || '15');
 
-// בקשת איפוס: שומר את ה־userId ב־session ומחזיר טוקן אמיתי
 export const requestPasswordReset = async (req: any, email: string): Promise<string> => {
   const baseUser = await findBaseUserByEmail(email);
   if (!baseUser) {
@@ -23,10 +22,8 @@ export const requestPasswordReset = async (req: any, email: string): Promise<str
     throw new Error('User not authorized for password reset');
   }
 
-  // שמירת ה־userId ב־session
   req.session.userId = baseUser.id;
 
-  // יצירת טוקן אמיתי
   const tempToken = jwt.sign(
     { userId: baseUser.id, email: baseUser.email },
     JWT_SECRET,
@@ -36,13 +33,12 @@ export const requestPasswordReset = async (req: any, email: string): Promise<str
   return tempToken;
 };
 
-// שינוי סיסמה רק עם שתי סיסמאות, מזהה לפי ה־userId מה־session
 export const changePasswordForCurrentUser = async (
   req: any,
   password: string,
   confirmPassword: string
 ): Promise<void> => {
-  const userId = req.session.userId; // מזהה מתוך session
+  const userId = req.session.userId; 
   if (!userId) {
     throw new Error('User not authenticated');
   }

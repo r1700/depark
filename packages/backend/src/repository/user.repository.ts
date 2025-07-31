@@ -6,7 +6,6 @@ export const findBaseUserByEmail = async (email: string): Promise<BaseUser | nul
   return await BaseUser.findOne({ where: { email } });
 };
 
-// חיפוש משתמש עם תפקיד admin/hr
 export const findUserWithAdminRole = async (
   userId: number
 ): Promise<{ isAdminOrHr: boolean, user: any } | null> => {
@@ -23,7 +22,6 @@ export const findUserWithAdminRole = async (
   return { isAdminOrHr, user };
 };
 
-// עדכון טוקן זמני בסשן
 export const updateTempTokenInSession = async (
   userId: number,
   tempToken: string
@@ -34,7 +32,6 @@ export const updateTempTokenInSession = async (
   );
 };
 
-// עדכון סיסמה רק עם פעמיים סיסמא (ללא userId, מזהים מתוך הטוקן)
 export const updatePasswordWithSession = async (
   baseUser: BaseUser,
   password: string,
