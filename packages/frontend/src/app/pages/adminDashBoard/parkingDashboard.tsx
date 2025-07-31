@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchParkingData, setTabs} from './parkingSlice';
-import DataTable from '../../components/table/table';
+import DataTable from '../../../components/table/table';
 
 import type { AppDispatch } from '../../store'; 
 const ParkingDashboard = () => {
