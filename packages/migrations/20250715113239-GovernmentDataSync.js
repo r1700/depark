@@ -3,25 +3,26 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('GovernmentDataSync', {
+    await queryInterface.createTable('governmentdatasync', {
       id: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
         primaryKey: true,
         allowNull: false,
+        autoIncrement: true,
       },
-      syncDate: {
+      sync_date: {
         type: Sequelize.DATE,
         allowNull: false,
       },
-      recordsProcessed: {
+      records_processed: {
         type: Sequelize.INTEGER,
         allowNull: false,
       },
-      recordsAdded: {
+      records_added: {
         type: Sequelize.INTEGER,
         allowNull: false,
       },
-      recordsUpdated: {
+      records_updated: {
         type: Sequelize.INTEGER,
         allowNull: false,
       },
@@ -30,46 +31,34 @@ module.exports = {
         allowNull: true,
       },
       status: {
-        type: Sequelize.ENUM('completed', 'failed', 'partial'),
+        type: Sequelize.INTEGER,
         allowNull: false,
+        comment: '1=completed, 2=failed, 3=partial',
       },
-      triggeredBy: {
+      triggered_by: {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      fileSource: {
+      file_source: {
         type: Sequelize.STRING,
         allowNull: true,
       },
-      createdAt: {
-        type: Sequelize.DATE,
-        allowNull: false,
-        defaultValue: Sequelize.NOW,
-      },
-      updatedAt: {
-        type: Sequelize.DATE,
-        allowNull: false,
-        defaultValue: Sequelize.NOW,
-      },
     });
 
-    await queryInterface.bulkInsert('GovernmentDataSync', [{
-      id: 'sync_001',
-      syncDate: new Date(),
-      recordsProcessed: 100,
-      recordsAdded: 75,
-      recordsUpdated: 25,
+    await queryInterface.bulkInsert('governmentdatasync', [{
+      sync_date: new Date(),
+      records_processed: 100,
+      records_added: 75,
+      records_updated: 25,
       errors: null,
-      status: 'completed',
-      triggeredBy: 'admin_001',
-      fileSource: '/path/to/file.csv',
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      status: 1,  
+      triggered_by: 'admin_001',
+      file_source: '/path/to/file.csv',
     }], {});
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.bulkDelete('GovernmentDataSync', null, {});
-    await queryInterface.dropTable('GovernmentDataSync');
+    await queryInterface.bulkDelete('governmentdatasync', null, {});
+    await queryInterface.dropTable('governmentdatasync');
   }
 };

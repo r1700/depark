@@ -3,90 +3,87 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('SystemSettings', {
+    await queryInterface.createTable('systemsettings', {
       id: {
-        type: Sequelize.STRING,  
+        type: Sequelize.INTEGER,  
         primaryKey: true,
         allowNull: false,
+        autoIncrement: true,
       },
       key: {
-        type: Sequelize.STRING,  
+        type: Sequelize.STRING,
         allowNull: false,
-        unique: true,  
+        unique: true,
       },
       value: {
-        type: Sequelize.STRING,  
+        type: Sequelize.STRING,
         allowNull: false,
       },
       description: {
-        type: Sequelize.STRING,  
+        type: Sequelize.STRING,
         allowNull: false,
       },
       category: {
-        type: Sequelize.ENUM('parking', 'auth', 'notifications', 'integration', 'government_db'),  // קטגוריה של ההגדרה
+        type: Sequelize.INTEGER,
         allowNull: false,
+        comment: '1=parking, 2=auth, 3=notifications, 4=integration, 5=government_db',
       },
-      updatedAt: {
-        type: Sequelize.DATE,  
+      updated_at: {
+        type: Sequelize.DATE,
         allowNull: false,
-        defaultValue: Sequelize.NOW,  
+        defaultValue: Sequelize.NOW,
       },
-      updatedBy: {
-        type: Sequelize.STRING,  
+      updated_by: {
+        type: Sequelize.STRING,
         allowNull: false,
       },
     });
 
-    await queryInterface.bulkInsert('SystemSettings', [
+    await queryInterface.bulkInsert('systemsettings', [
       {
-        id: '1',
         key: 'maxParkingTime',
-        value: '120', 
+        value: '120',
         description: 'Max time a vehicle can park in the facility',
-        category: 'parking',
-        updatedAt: new Date(),
-        updatedBy: 'admin1',
+        category: 1, 
+        updated_at: new Date(),
+        updated_by: 'admin1',
       },
       {
-        id: '2',
         key: 'authTimeout',
-        value: '30', 
+        value: '30',
         description: 'Timeout for user authentication session',
-        category: 'auth',
-        updatedAt: new Date(),
-        updatedBy: 'admin2',
+        category: 2, 
+        updated_at: new Date(),
+        updated_by: 'admin2',
       },
       {
-        id: '3',
         key: 'notificationEmail',
         value: 'support@example.com',
         description: 'Email address for system notifications',
-        category: 'notifications',
-        updatedAt: new Date(),
-        updatedBy: 'admin3',
+        category: 3, // notifications
+        updated_at: new Date(),
+        updated_by: 'admin3',
       },
       {
-        id: '4',
         key: 'integrationEnabled',
-        value: 'true', 
+        value: 'true',
         description: 'Is system integration enabled',
-        category: 'integration',
-        updatedAt: new Date(),
-        updatedBy: 'admin4',
+        category: 4,
+        updated_at: new Date(),
+        updated_by: 'admin4',
       },
       {
-        id: '5',
         key: 'govSyncInterval',
-        value: '3600', 
+        value: '3600',
         description: 'Interval between government database syncs',
-        category: 'government_db',
-        updatedAt: new Date(),
-        updatedBy: 'admin5',
+        category: 5, 
+        updated_at: new Date(),
+        updated_by: 'admin5',
       },
     ]);
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('SystemSettings');  
-  }
+    await queryInterface.dropTable('systemsettings');
+  },
 };

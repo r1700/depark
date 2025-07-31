@@ -1,0 +1,67 @@
+name: Node.js CI/CD
+
+on:
+  push:
+    branches:
+      - main  # Trigger the Workflow when there's a push to the main branch
+      # - feature/*   # Also trigger on any push to a branch starting with feature/
+
+  pull_request:
+    branches:
+      - main  # Also trigger when there is a PR to the main branch
+
+jobs:
+  install_dependencies:
+    runs-on: ubuntu-latest  # The system the Workflow runs on
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2  # Checkout your code
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'  # Set up Node.js version 14
+      - name: Install dependencies
+        run: |
+          npm install  # Install dependencies listed in package.json
+
+  test:
+    runs-on: ubuntu-latest  # The system the Workflow runs on
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - name: Install dependencies
+        run: |
+          npm install  # Install all dependencies
+      - name: Run Tests
+        run: |
+          npm test  # Run your tests, if defined in package.json
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - name: Install dependencies
+        run: |
+          npm install  # Install dependencies
+      - name: Build TypeScript project
+        run: |
+          npx tsc  # Run TypeScript transpiler
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build  # Deployment will only happen if the build is successful
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Deploy to Server
+        run: |
+          scp -r ./dist myuser@myserver:/path/to/deployment  # Example: Deploying code to server

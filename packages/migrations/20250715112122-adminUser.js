@@ -3,70 +3,62 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('AdminUsers', {
+    await queryInterface.createTable('adminusers', {
       id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
         allowNull: false,
-        autoIncrement: true,  
+        autoIncrement: true,
       },
-      passwordHash: {
+      baseuser_id: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+      },
+      password_hash: {
         type: Sequelize.STRING,
-        allowNull: false,  
+        allowNull: false,
       },
       role: {
-        type: Sequelize.ENUM('hr', 'admin'),
-        allowNull: false,  
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        comment: '1=hr, 2=admin',
       },
       permissions: {
-        type: Sequelize.ARRAY(Sequelize.STRING),  
-        allowNull: false,  
-      },
-      lastLoginAt: {
-        type: Sequelize.DATE,
-        allowNull: true,  
-      },
-      createdAt: {
-        type: Sequelize.DATE,
+        type: Sequelize.ARRAY(Sequelize.STRING),
         allowNull: false,
-        defaultValue: Sequelize.NOW,  
       },
-      updatedAt: {
+      last_login_at: {
         type: Sequelize.DATE,
-        allowNull: false,
-        defaultValue: Sequelize.NOW,  
+        allowNull: true,
       },
     });
 
-    await queryInterface.bulkInsert('AdminUsers', [
+    await queryInterface.bulkInsert('adminusers', [
       {
-        passwordHash: 'hashed_password_1',
-        role: 'admin',
+        baseuser_id: 1, 
+        password_hash: 'hashed_password_1',
+        role: 2, 
         permissions: ['read', 'write', 'delete'],
-        lastLoginAt: null,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        last_login_at: null,
       },
       {
-        passwordHash: 'hashed_password_2',
-        role: 'hr',
+        baseuser_id: 2,
+        password_hash: 'hashed_password_2',
+        role: 1, // hr
         permissions: ['read', 'write'],
-        lastLoginAt: new Date(),
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        last_login_at: new Date(),
       },
       {
-        passwordHash: 'hashed_password_3',
-        role: 'admin',
+        baseuser_id: 3,
+        password_hash: 'hashed_password_3',
+        role: 2, 
         permissions: ['read'],
-        lastLoginAt: null,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        last_login_at: null,
       },
     ]);
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('AdminUsers');  
-  }
+    await queryInterface.dropTable('adminusers');
+  },
 };
