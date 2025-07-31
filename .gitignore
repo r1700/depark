@@ -5,13 +5,12 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
-<<<<<<< HEAD
+
 package-lock.json
 package.json
 packages/opc/package.json
 packages/plc-mock/package.json
-=======
->>>>>>> c4bfe141 (fix the resetPassword)
+
 
 # Environment variables
 .env
