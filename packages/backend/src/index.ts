@@ -27,6 +27,15 @@ app.use(cors({
   credentials: true,
 }));
 app.use(express.json());
+
+app.get('/', (req, res) => {
+  res.json({ message: 'DePark Backend is running!' });
+});
+
+app.get('/health', (req, res) => {
+  res.json({ status: 'OK', timestamp: new Date().toISOString() });
+});
+
 app.use(loggerRoutes);
 
 // Routes

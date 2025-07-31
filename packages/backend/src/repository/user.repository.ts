@@ -1,7 +1,6 @@
 import bcrypt from 'bcrypt';
 import { AdminUser, UserSession, BaseUser } from '../model/password/admin';
 
-// חיפוש משתמש לפי אימייל
 export const findBaseUserByEmail = async (email: string): Promise<BaseUser | null> => {
   return await BaseUser.findOne({ where: { email } });
 };
