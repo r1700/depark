@@ -10,12 +10,11 @@ import passwordRoutes from './routes/user.routes';
 import vehicleRoutes from './routes/vehicle';
 import exportToCSV from './routes/exportToCSV';
 import adminConfigRouter from './routes/adminConfig';
-
 const app = express();
 
 const PORT = process.env.PORT || 3001;
 const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:3000';
-
+console.log('adminConfigRouter imported!');
 // Middleware setup
 app.use(cors({
   origin: CORS_ORIGIN,
@@ -28,7 +27,11 @@ app.use('/api/health', healthRoutes);
 app.use('/api/password', passwordRoutes);
 app.use('/api/vehicle', vehicleRoutes);
 app.use('/api/exportToCSV', exportToCSV);
-app.use('/api/admin', adminConfigRouter); // הוסף את זה
+app.use('/api/admin',adminConfigRouter);
+console.log('AdminConfigRouter mounted on /api/admin');
+
+// Static file serving
+
 app.get('/', (req, res) => {
   res.json({ message: 'DePark Backend is running!' });
 });
@@ -56,6 +59,7 @@ app.listen(PORT, () => {
   console.log('   GET  /api/auth/users');      // 👈 חשוב!
   console.log('   POST /api/auth/register');   // 👈 חשוב!
   console.log('   POST /api/auth/login');
-  console.log('   GET  /api/admin/config');
-  console.log('   PUT  /api/admin/config');
+  console.log('   GET  /api/admin');
+  console.log('   PUT  /api/admin');
+  console.log(`Server will run on port: ${PORT}, CORS origin: ${CORS_ORIGIN}`);
 });
