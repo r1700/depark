@@ -7,3 +7,4 @@ dotenv.config();
 export const pool = new Pool({
   connectionString: process.env.SUPABASE_FULL_URL || process.env.DATABASE_URL,
 });
+
