@@ -117,10 +117,7 @@ models/*.js
 knexfile.js
 
 #package files
-package-lock.json
-package.json
-packages/frontend/package.json
-packages/frontend/package-lock.json
+yarn.lock
 packages/backend/package.json
 
 # models
@@ -154,5 +151,3 @@ package-lock.json
 packages/mobile/package.json
 .env
 
-#yarn files
-yarn.lock
