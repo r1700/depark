@@ -1,70 +1,51 @@
 import bcrypt from 'bcrypt';
-import db from '../db';
-import { AdminUser, UserSession, BaseUser } from '../models/admin';
+import { AdminUser, UserSession, BaseUser } from '../model/password/admin';
 
 export const findBaseUserByEmail = async (email: string): Promise<BaseUser | null> => {
-  const result = await db.query(
-    `SELECT * FROM "BaseUser" WHERE email = $1 LIMIT 1`,
-    [email]
-  );
-  return result.rows[0] || null;
+  return await BaseUser.findOne({ where: { email } });
 };
 
-export const findUserWithAdminRole = async (userId: number): Promise<{ isAdminOrHr: boolean, user: any } | null> => {
-  const result = await db.query(
-    `SELECT bu.*, au.role
-     FROM "BaseUser" bu
-     LEFT JOIN "AdminUsers" au ON bu.id = au."userId"
-     WHERE bu.id = $1`,
-    [userId]
-  );
-  const user = result.rows[0];
-  if (!user) return null;
-  const isAdminOrHr = user.role === 'admin' || user.role === 'hr';
+export const findUserWithAdminRole = async (
+  userId: number
+): Promise<{ isAdminOrHr: boolean, user: any } | null> => {
+  const user = await BaseUser.findOne({
+    where: { id: userId },
+    include: [{
+      model: AdminUser,
+      as: 'adminData',
+      attributes: ['role']
+    }]
+  });
+  if (!user || !user.adminData) return null;
+  const isAdminOrHr = user.adminData.role === 'admin' || user.adminData.role === 'hr';
   return { isAdminOrHr, user };
 };
 
-export const updateTemporaryTokenInSession = async (
+export const updateTempTokenInSession = async (
   userId: number,
-  temporaryToken: string
+  tempToken: string
 ): Promise<void> => {
-  await db.query(
-    `UPDATE "UserSessions" SET "temporaryToken" = $1, "createdAt" = $2 WHERE "userId" = $3`,
-    [temporaryToken, new Date(), userId]
+  await UserSession.update(
+    { tempToken, createdAt: new Date() },
+    { where: { userId } }
   );
 };
 
-export const updatePasswordForUser = async (
-  userId: number,
-  newPassword: string
+export const updatePasswordWithSession = async (
+  baseUser: BaseUser,
+  password: string,
+  confirmPassword: string
 ): Promise<void> => {
-  const hashedPassword = await bcrypt.hash(newPassword, 10);
-  await db.query(
-    `UPDATE "AdminUsers" SET "passwordHash" = $1 WHERE "userId" = $2`,
-    [hashedPassword, userId]
+  if (password !== confirmPassword) {
+    throw new Error('Passwords do not match');
+  }
+  const hashedPassword = await bcrypt.hash(password, 10);
+  await AdminUser.update(
+    { passwordHash: hashedPassword },
+    { where: { userId: baseUser.id } }
   );
 };
 
-export const findUserSessionByUserId = async (userId: number): Promise<UserSession | null> => {
-  const result = await db.query(
-    `SELECT * FROM "UserSessions" WHERE "userId" = $1 LIMIT 1`,
-    [userId]
-  );
-  const row = result.rows[0];
-  if (!row) return null;
-  
-  return {
-    id: row.id,
-    userId: row.userId,
-    userType: row.userType,
-    token: row.token,
-    refreshToken: row.refreshToken,
-    expiresAt: row.expiresAt,
-    isActive: row.isActive,
-    ipAddress: row.ipAddress,
-    userAgent: row.userAgent,
-    createdAt: row.createdAt,
-    lastActivity: row.lastActivity,
-    temporaryToken: row.temporaryToken,
-  };
+export const findBaseUserById = async (id: number): Promise<BaseUser | null> => {
+  return await BaseUser.findOne({ where: { id } });
 };

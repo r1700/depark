@@ -1,36 +1,22 @@
+import { requestPasswordReset, changePasswordForCurrentUser } from '../services/user.service';
 import { Request, Response } from 'express';
-import { requestPasswordReset, confirmPasswordReset } from '../services/user.service';
 
 export const handlePasswordReset = async (req: Request, res: Response) => {
+  const { email, token, password, confirmPassword } = req.body;
+
   try {
-    const { email, token, password } = req.body;
-    
-    // אם יש רק email - בקשת איפוס
-    if (email && !token && !password) {
-      if (!email) {
-        return res.status(400).json({ error: 'Email is required' });
-      }
-      
-      await requestPasswordReset(email);
-      return res.status(200).json({ message: 'Reset link sent' });
+    if (email && !token && !password && !confirmPassword) {
+      const tempToken = await requestPasswordReset(req, email);
+      return res.status(200).json({ message: 'Token generated', token: tempToken });
     }
-    
-    // אם יש token + password - אישור איפוס
-    if (token && password && !email) {
-      if (!token || !password) {
-        return res.status(400).json({ error: 'Token and password are required' });
-      }
-      
-      await confirmPasswordReset(token, password);
-      return res.status(200).json({ message: 'Password reset successful' });
+
+    if (password && confirmPassword) {
+      await changePasswordForCurrentUser(req, password, confirmPassword);
+      return res.status(200).json({ message: 'Password changed successfully' });
     }
-    
-    // אם הנתונים לא תקינים
-    return res.status(400).json({ 
-      error: 'Invalid request. Send either email for reset request, or token+password for confirmation' 
-    });
-    
+
+    return res.status(400).json({ error: 'Invalid request' });
   } catch (e: any) {
-    res.status(400).json({ error: e.message });
+    return res.status(400).json({ error: e.message });
   }
 };
