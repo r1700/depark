@@ -17,10 +17,10 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 app.use(session({
-  secret: 'your-secret-key', // החליפי למשהו סודי משלך
+  secret: 'your-secret-key', 
   resave: false,
   saveUninitialized: true,
-  cookie: { secure: false } // ב־localhost, אם תעברי ל־https שימי true
+  cookie: { secure: false } 
 }));
 // Middleware
 const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:3000';
@@ -32,7 +32,6 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// Routes - הגדר לפני app.listen!
 app.get('/', (req, res) => {
   res.json({ message: 'DePark Backend is running!' });
 });
