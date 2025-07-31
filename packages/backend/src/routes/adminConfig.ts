@@ -1,138 +1,128 @@
-// src/routes/admin-config.ts
 import { Router } from 'express';
-
+import client from '../services/db/connection'; 
 const router = Router();
 
-// טיפוסים זמניים (עד שתיצרי את קובץ הטיפוסים)
-interface ParkingConfiguration {
-  id: string;
-  facilityName: string;
-  timezone: string;
-  totalSurfaceSpots: number;
-  surfaceSpotIds: string[];
-  operatingHours: {
-    start: string;
-    end: string;
-  };
-  activeDays?: string[];
-  maxQueueSize: number;
-  avgRetrievalTimeMinutes: number;
-  maxParallelRetrievals?: number;
-  updatedAt: Date;
-  updatedBy: string;
-}
-
-interface SystemSettings {
-  maintenance_mode: boolean;
-  show_admin_analytics: boolean;
-  updatedAt: Date;
-  updatedBy: string;
-}
-
-// Mock data
-let mockParkingConfig: ParkingConfiguration = {
-  id: 'main-lot',
-  facilityName: 'Main Parking Facility',
-  timezone: 'Asia/Jerusalem',
-  totalSurfaceSpots: 50,
-  surfaceSpotIds: ['S1', 'S2', 'S3', 'S4', 'S5'],
-  operatingHours: {
-    start: '07:00',
-    end: '22:00'
-  },
-  activeDays: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday'],
-  maxQueueSize: 10,
-  avgRetrievalTimeMinutes: 2.5,
-  maxParallelRetrievals: 3,
-  updatedAt: new Date(),
-  updatedBy: 'admin'
-};
-
-let mockSystemSettings: SystemSettings = {
-  maintenance_mode: false,
-  show_admin_analytics: true,
-  updatedAt: new Date(),
-  updatedBy: 'admin'
-};
-
-// GET /api/admin/config
-router.get('/config', async (req, res) => {
+router.post('/', async (req, res) => {
   try {
-    res.json({
-      success: true,
-      data: {
-        parkingConfig: mockParkingConfig,
-        systemSettings: mockSystemSettings
-      }
-    });
-  } catch (error) {
-    console.error('Error fetching admin config:', error);
-    res.status(500).json({ success: false, error: 'Internal server error' });
-  }
-});
-
-// PUT /api/admin/config
-router.put('/config', async (req, res) => {
-  try {
-    const { parkingConfig, systemSettings } = req.body;
-
-    // ולידציות בסיסיות
-    if (!validateParkingConfig(parkingConfig)) {
-      return res.status(400).json({ success: false, error: 'Invalid parking configuration' });
+    const { parkingConfig } = req.body;
+    if (!parkingConfig || !parkingConfig.lotId) {
+      return res.status(400).json({ success: false, error: 'Missing parkingConfig or lotId' });
     }
 
-    const now = new Date();
-    console.log('🔄 Updating config at:', now.toISOString()); // לוג!
 
-    // עדכון המידע
-    mockParkingConfig = {
-      ...parkingConfig,
-      updatedAt: now, // ודא שזה מתעדכן!
-      updatedBy: 'admin'
-    };
+    const exists = await client.query(
+      `SELECT 1 FROM "ParkingConfigurations" WHERE "id" = $1 LIMIT 1`,
+      [parkingConfig.lotId]
+    );
+    if (exists.rowCount && exists.rowCount > 0) {
+      // מחזירים שגיאה תקינה, לא קריסה
+      return res.status(409).json({ success: false, error: 'Lot ID already exists' });
+    }
 
-    mockSystemSettings = {
-      ...systemSettings,
-      updatedAt: now, // גם כאן!
-      updatedBy: 'admin'
-    };
+    await client.query(
+      `INSERT INTO "ParkingConfigurations"
+        ("id", "facilityName", "totalSurfaceSpots", "surfaceSpotIds", "avgRetrievalTimeMinutes", "maxQueueSize", "operatingHours", "timezone", "updatedAt", "updatedBy")
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+      `,
+      [
+        parkingConfig.lotId, 
+        parkingConfig.facilityName,
+        parkingConfig.totalSurfaceSpots,
+        parkingConfig.surfaceSpotIds,
+        parkingConfig.avgRetrievalTimeMinutes,
+        parkingConfig.maxQueueSize,
+        JSON.stringify(parkingConfig.operatingHours),
+        parkingConfig.timezone,
+        parkingConfig.updatedAt,
+        parkingConfig.updatedBy || 'admin'
+      ]
+    );
 
-    console.log('✅ Config updated:', {
-      parkingUpdated: mockParkingConfig.updatedAt,
-      systemUpdated: mockSystemSettings.updatedAt
-    });
-
-    res.json({
-      success: true,
-      data: {
-        parkingConfig: mockParkingConfig,
-        systemSettings: mockSystemSettings
-      }
-    });
+    res.json({ success: true });
   } catch (error) {
-    console.error('Error updating admin config:', error);
+    console.error('Error saving parking config:', error);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });
 
-// פונקציית ולידציה
-function validateParkingConfig(config: any): boolean {
-  if (!config) return false;
-  
-  // בדיקת פורמט זמן HH:mm
-  const timeRegex = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/;
-  
-  if (!timeRegex.test(config.operatingHours?.start) || 
-      !timeRegex.test(config.operatingHours?.end)) {
-    return false;
-  }
 
-  // בדיקות נוספות
-  if (config.totalSurfaceSpots < 0 || config.maxQueueSize < 0) {
-    return false;
-  }
+router.put('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { parkingConfig } = req.body;
+    if (!parkingConfig) {
+      return res.status(400).json({ success: false, error: 'Missing parkingConfig' });
+    }
 
-  return true;
-}
+ 
+    const exists = await client.query(
+      `SELECT 1 FROM "ParkingConfigurations" WHERE "id" = $1 LIMIT 1`,
+      [id]
+    );
+    if (!exists.rowCount || exists.rowCount === 0) {
+      return res.status(404).json({ success: false, error: 'Lot ID not found' });
+    }
+
+    await client.query(
+      `UPDATE "ParkingConfigurations" SET
+        "facilityName" = $2,
+        "totalSurfaceSpots" = $3,
+        "surfaceSpotIds" = $4,
+        "avgRetrievalTimeMinutes" = $5,
+        "maxQueueSize" = $6,
+        "operatingHours" = $7,
+        "timezone" = $8,
+        "updatedAt" = $9,
+        "updatedBy" = $10
+       WHERE "id" = $1
+      `,
+      [
+        id,
+        parkingConfig.facilityName,
+        parkingConfig.totalSurfaceSpots,
+        parkingConfig.surfaceSpotIds,
+        parkingConfig.avgRetrievalTimeMinutes,
+        parkingConfig.maxQueueSize,
+        JSON.stringify(parkingConfig.operatingHours),
+        parkingConfig.timezone,
+        parkingConfig.updatedAt,
+        parkingConfig.updatedBy || 'admin'
+      ]
+    );
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error updating parking config:', error);
+    res.status(500).json({ success: false, error: 'Internal server error' });
+  }
+});
+
+
+router.get('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await client.query(
+      `SELECT * FROM "ParkingConfigurations" WHERE "id" = $1 LIMIT 1`,
+      [id]
+    );
+    if (!result.rows || result.rows.length === 0) {
+      return res.status(404).json({ success: false, error: 'Lot ID not found' });
+    }
+    res.json({ success: true, parkingConfig: result.rows[0] });
+  } catch (error) {
+    console.error('Error fetching parking config:', error);
+    res.status(500).json({ success: false, error: 'Internal server error' });
+  }
+});
+
+router.get('/', async (req, res) => { 
+  try {
+    const result = await client.query(`SELECT * FROM "ParkingConfigurations"`);
+    res.json({ success: true, parkingConfigs: result.rows });
+  } catch (error) {
+    console.error('Error fetching parking configs:', error);
+    res.status(500).json({ success: false, error: 'Internal server error' });
+  }
+});
 
 export default router;
