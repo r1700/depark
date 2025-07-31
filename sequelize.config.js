@@ -7,6 +7,5 @@ require('ts-node').register({
     },
   });
   
-  // מייבא ומייצא את הקונפיג TS
 module.exports = require('./packages/backend/src/config/sequelize.config.ts').default;
   
