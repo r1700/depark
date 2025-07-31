@@ -29,7 +29,7 @@ app.use('/api/vehicle', vehicleRoutes);
 app.use('/api/exportToCSV', exportToCSV);
 app.use('/api/admin',adminConfigRouter);
 console.log('AdminConfigRouter mounted on /api/admin');
-
+console.log('CORS enabled for:', CORS_ORIGIN);
 // Static file serving
 
 app.get('/', (req, res) => {
