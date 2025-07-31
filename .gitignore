@@ -142,3 +142,8 @@ packages/mobile/package.json
 .env
 
 config/config.json
+
+
+yarn.lock
+packages/frontend/package.json
+packages/frontend/package-lock.json
