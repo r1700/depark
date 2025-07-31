@@ -9,6 +9,8 @@
     "db:migrate": "npx sequelize-cli db:migrate --migrations-path ./packages/migrations --config ./sequelize.config.js",
     "db:migrate:undo": "npx sequelize-cli db:migrate:undo --migrations-path ./packages/migrations --config ./sequelize.config.js",
     "migration:generate": "npx sequelize-cli migration:generate --migrations-path ./packages/migrations --config ./sequelize.config.js",
+    "build": "tsc",
+    "test": "jest",
     "install:all": "npm install --workspaces",
     "start:frontend": "npm start --workspace packages/frontend",
     "start:backend": "npm start --workspace packages/backend",
@@ -49,15 +51,17 @@
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.2.0",
     "postcss-preset-env": "^10.2.4",
+    "express": "^4.17.1",
+    "google-auth-library": "^10.2.0",
     "joi": "^17.13.3",
     "pg": "^8.16.3",
     "pg-hstore": "^2.3.4",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
+    "react-hook-form": "^7.61.1",
     "sequelize": "^6.37.7",
     "sequelize-cli": "^6.6.3",
-    "supabase": "^2.31.8",
-    "webpack": "^5.64.4"
+    "yup": "^1.6.1"
   }
   
 }

@@ -94,7 +94,6 @@ UserSession.init({
   timestamps: false,
 });
 
-// הגדרת היחסים בין המודלים
 BaseUser.hasOne(AdminUser, { foreignKey: 'userId', as: 'adminData' });
 AdminUser.belongsTo(BaseUser, { foreignKey: 'userId', as: 'baseData' });
 BaseUser.hasMany(UserSession, { foreignKey: 'userId', as: 'sessions' });
