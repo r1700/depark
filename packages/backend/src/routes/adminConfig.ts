@@ -15,7 +15,6 @@ router.post('/', async (req, res) => {
       [parkingConfig.lotId]
     );
     if (exists.rowCount && exists.rowCount > 0) {
-      // מחזירים שגיאה תקינה, לא קריסה
       return res.status(409).json({ success: false, error: 'Lot ID already exists' });
     }
 
