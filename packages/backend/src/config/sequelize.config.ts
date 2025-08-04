@@ -14,7 +14,7 @@ export default {
     dialect: 'postgres',
     migrationStorageTableName: 'sequelize_meta',
     migrations: {
-      path: path.resolve(__dirname, '../../../migrations'), // ודא הנתיב נכון
+      path: path.resolve(__dirname, '../../../migrations'),
       pattern: /\.js|ts$/
     }
   }
