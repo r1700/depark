@@ -9,6 +9,7 @@ import healthRoutes from './routes/health';
 import passwordRoutes from './routes/user.routes';
 import vehicleRoutes from './routes/vehicle';
 import exportToCSV from './routes/exportToCSV';
+import adminConfigRouter from './routes/adminConfig';
 import session from 'express-session';
 
 
@@ -45,9 +46,9 @@ app.use('/admin', adminUsersRouter);
 app.use('/api/health', healthRoutes);
 app.use('/api/password', passwordRoutes);
 app.use('/api/vehicle', vehicleRoutes);
+app.use('/api/admin',adminConfigRouter);
 app.use('/api/exportToCSV', exportToCSV);
 
-// Start server - בסוף!
 app.get('/', (req, res) => {
   res.json({ message: 'DePark Backend is running!' });
 });
