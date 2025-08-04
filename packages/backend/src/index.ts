@@ -5,7 +5,7 @@ import express from 'express';
 import cors from 'cors';
 import healthRoutes from './routes/health';
 import vehicleRoutes from './routes/vehicle';
-
+import userApprovalRoutes from './routes/userApproval'; // ייבוא נתיבי המשתמשים
 const app = express();
 const PORT = process.env.PORT || 3001; // הוסף ברירת מחדל
 const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:3000'; // הוסף ברירת מחדל
@@ -18,6 +18,7 @@ app.use(express.json());
 
 app.use('/api/health', healthRoutes);
 app.use('/api/vehicle', vehicleRoutes);
+app.use('/api/users',userApprovalRoutes)
 
 app.listen(PORT, async () => {
   console.log(`🚀 Server running on port ${PORT}`);
