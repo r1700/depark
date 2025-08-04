@@ -60,41 +60,30 @@ export default function Login() {
     }
   };
 
-  // React.useEffect(() => {
-  //   if (typeof window !== 'undefined' && google) {
-  //     google.accounts.id.initialize({
-  //       client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID!,
-  //       callback: handleCredentialResponse,
-  //     });
-
-  //     google.accounts.id.renderButton(
-  //       document.getElementById('googleSignInDiv')!,
-  //       { theme: 'outline', size: 'large' }
-  //     );
-  //   }
-  // }, []);
-
 
   React.useEffect(() => {
-  const interval = setInterval(() => {
-    const google = (window as any).google;
-    if (google && google.accounts && google.accounts.id) {
-      google.accounts.id.initialize({
-        client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID!,
-        callback: handleCredentialResponse,
-      });
+    const interval = setInterval(() => {
+      const google = (window as any).google;
+      if (google && google.accounts && google.accounts.id) {
+        google.accounts.id.initialize({
+          client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID!,
+          callback: handleCredentialResponse,
+        });
 
-      google.accounts.id.renderButton(
-        document.getElementById('googleSignInDiv')!,
-        { theme: 'outline', size: 'large' }
-      );
+        google.accounts.id.renderButton(
+          document.getElementById('googleSignInDiv')!,
+          {
+            theme: 'outline',
+            size: 'large',
+            width: 250,
+          }
+        );
+        clearInterval(interval);
+      }
+    }, 100);
 
-      clearInterval(interval); 
-    }
-  }, 100); 
-
-  return () => clearInterval(interval);
-}, []);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleOtpLogin = () => {
     navigate('/otp');
@@ -111,8 +100,8 @@ export default function Login() {
         Sign in with Password / OTP
       </button>
 
-      <div className="flex justify-center w-full">
-        <div id="googleSignInDiv" />
+      <div className="w-full flex justify-center items-center">
+        <div id="googleSignInDiv" className="w-[240px] h-[50px]" />
       </div>
 
       {popup && <PopupMessage message={popup.message} color={popup.color} />}
