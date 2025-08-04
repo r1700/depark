@@ -8,6 +8,7 @@ import healthRoutes from './routes/health';
 import passwordRoutes from './routes/user.routes';
 import vehicleRoutes from './routes/vehicle';
 import exportToCSV from './routes/exportToCSV';
+import adminConfigRouter from './routes/adminConfig';
 import session from 'express-session';
 
 
@@ -33,6 +34,7 @@ app.use(loggerRoutes);
 app.use('/api/health', healthRoutes);
 app.use('/api/password', passwordRoutes);
 app.use('/api/vehicle', vehicleRoutes);
+app.use('/api/admin',adminConfigRouter);
 app.use('/api/exportToCSV', exportToCSV);
 
 
@@ -74,3 +76,4 @@ app.listen(PORT, () => {
   console.log('   GET  /api/vehicle');
   console.log('   GET  /api/exportToCSV');
 });
+
