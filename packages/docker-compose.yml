@@ -1,0 +1,41 @@
+services:
+  db:
+    image: supabase/postgres:15.1.0.105
+    container_name: supabase-db
+    restart: always
+    ports:
+      - "54322:5432"        # חשוף לפורט 54322 במכונה שלך
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - backend-net
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: ts-backend
+    ports:
+      - "3001:3001"           # שרת האפליקציה מאזין על פורט 3000
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: postgres
+      DB_USER: postgres
+      DB_PASS: postgres
+    volumes:
+      - ./backend:/usr/src/app      # למפות את הקוד לתוך הקונטיינר
+      - /usr/src/app/node_modules   # להימנע מהחלפת node_modules
+    networks:
+      - backend-net
+
+volumes:
+  db_data:
+
+networks:
+  backend-net:

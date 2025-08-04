@@ -1,13 +1,20 @@
-FROM node:16
+FROM node:18
 
-WORKDIR /app
+# הגדרת תיקיית עבודה
+WORKDIR /usr/src/app
 
+# העתקת קובצי התלויות בלבד
 COPY package*.json ./
 
+# התקנת התלויות
 RUN npm install
 
+# העתקת כל הקוד
 COPY . .
 
-RUN npx tsc
+# קומפילציה (אפשרי, אם משתמשים ב-TS build)
+# RUN npm run build
 
-CMD ["node", "dist/index.js"]
+# פקודת הפעלה עם ts-node (לשימוש בפיתוח) או הפעלת הקוד הממוקמץ
+CMD ["npm", "run", "dev"]  
+# או אם תרצה מעלים מפורשים: ["npx", "ts-node", "src/index.ts"]

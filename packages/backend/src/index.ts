@@ -7,7 +7,12 @@ import loggerRoutes from './middlewares/locallLoggerMiddleware';
 import healthRoutes from './routes/health';
 import passwordRoutes from './routes/user.routes';
 import vehicleRoutes from './routes/vehicle';
+<<<<<<< HEAD
 import exportToCSV from './routes/exportToCSV';
+=======
+import  {sequelize}  from './config/testDbConnection'; // או הנתיב שלך
+
+>>>>>>> 4d41522b (reswea0tch branch)
 
 const app = express();
 
