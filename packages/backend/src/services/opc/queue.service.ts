@@ -78,7 +78,6 @@ export async function vehicleQueueService() {
     throw new Error('APLICATION_QUOTA is not defined in environment variables');
   }
   console.log(`Application Quota: ${APLICATION_QUOTA}`, `aplicationQuota: ${aplicsationQuota}`);
-
   if (aplicsationQuota < APLICATION_QUOTA) {
     const firstQueuedQueue = await getFirstQueuedQueue();
     if (firstQueuedQueue) {
