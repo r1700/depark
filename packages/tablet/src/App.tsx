@@ -1,19 +1,21 @@
+import React, { FC } from 'react';
 import UnifiedEntry from './components/UnifiedEntry/UnifiedEntry';
-const App: React.FC = () => {
+
+const App: FC = () => {
         return (
-        // <div
-        //     style={{
-        //         minHeight: '100vh',
-        //         width: '100vw',
-        //         display: 'flex',
-        //         flexDirection: 'column',
-        //         alignItems: 'center',
-        //         background: '#f5f5f5',
-        //         overflow: 'hidden',
-        //     }}
-        // >
+        <div
+            style={{
+                minHeight: '100vh',
+                width: '100vw',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                background: '#f5f5f5',
+                overflow: 'hidden',
+            }}
+        >
             <UnifiedEntry />
-        // </div>
+         </div>
     );
 }
 export default App;
