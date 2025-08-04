@@ -144,3 +144,4 @@ packages/frontend/src/components/screen-login/
 package-lock.json
 .env
 
+package.json
