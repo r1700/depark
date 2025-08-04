@@ -3,6 +3,7 @@ import { getRoleById, getIdByEmail } from '../db/operations';
 const clientId = process.env.CLIENT_ID;
 const client = new OAuth2Client(clientId);
 
+
 //Check the authentication of the user
 const auth = async (idToken: string) => {
     try {

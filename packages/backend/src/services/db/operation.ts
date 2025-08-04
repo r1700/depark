@@ -17,6 +17,7 @@ client.connect().then(() => {
   console.error('Failed to connect to Postgres database:', err);
 });
 
+
 const getId = async (email: string) => {
   try {
     const result = await client.query(`SELECT id FROM "baseuser" WHERE email = $1`, [email]);
