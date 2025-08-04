@@ -1,19 +1,19 @@
 import React, { useState } from 'react';
-import { GoogleOAuthProvider, GoogleLogin, CredentialResponse } from '@react-oauth/google';
+import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import './GoogleAuth.css';
 
 const GoogleAuth: React.FC = () => {
 
-  const [message, setMessage] = useState<string | null>(null);
+  const [answer, setAnswer] = useState<string | null>(null);
 
-
-  const GoogleResponse = (response: CredentialResponse): void => {
-    if (response.credential) {
+  const responseGoogle = (response: any): void => {
+    if (!response.error) {
       const idToken = response.credential;
       authenticateUser(idToken);
     }
-  };
 
+    return;
+  };
 
   const authenticateUser = (idToken: string): void => {
     fetch('http://localhost:3001/OAuth/verify-google-token', {
@@ -23,38 +23,31 @@ const GoogleAuth: React.FC = () => {
       },
       body: JSON.stringify({ idToken: idToken }),
     })
-      .then(async (response) => {
-        const data = await response.json();
-        const idToken = response.headers.get('idtoken');
-        return { data, idToken };
-      })
-      .then(({ data, idToken }) => {
+      .then((response) => response.json())
+      .then((data: any) => {
         if (data.success) {
-          localStorage.setItem('token', idToken || '');
-          setMessage("login successful");
+          localStorage.setItem('token', idToken);
+          setAnswer("login successful");
         }
-        else {
-          setMessage(data.error);
+        else{
+          setAnswer(data.error);
         }
       })
       .catch((error) => {
-        setMessage('Authentication failed');
       });
   };
 
-
   return (
-    <GoogleOAuthProvider clientId={process.env.REACT_APP_CLIENT_ID || ''}>
+    <GoogleOAuthProvider clientId={process.env.CLIENT_ID ?? ''}>
       <div>
         <GoogleLogin
-          onSuccess={GoogleResponse}
-          onError={() => setMessage('Google login failed')}
+          onSuccess={responseGoogle}
+          onError={() => setAnswer('Google login failed')}
         />
-        {message && <p>{message}</p>}
+        {answer && <p>{answer}</p>}
       </div>
     </GoogleOAuthProvider>
   );
 };
-
 
 export default GoogleAuth;

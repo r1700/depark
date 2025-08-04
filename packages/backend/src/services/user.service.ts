@@ -1,17 +1,18 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
-import {
-  findBaseUserByEmail,
-  findUserWithAdminRole,
-  updateTempTokenInSession,
-  updatePasswordWithSession,
-  findBaseUserById
+import { 
+  findBaseUserByEmail, 
+  findUserWithAdminRole, 
+  updateTemporaryTokenInSession,
+  updatePasswordForUser,
+  findUserSessionByUserId 
 } from '../repository/user.repository';
+import { sendResetEmail } from '../utils/email';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret';
 const TOKEN_EXPIRATION_MINUTES = parseInt(process.env.RESET_TOKEN_EXPIRATION_MINUTES || '15');
 
-export const requestPasswordReset = async (req: any, email: string): Promise<string> => {
+export const requestPasswordReset = async (email: string): Promise<void> => {
   const baseUser = await findBaseUserByEmail(email);
   if (!baseUser) {
     throw new Error('User not found');
@@ -22,29 +23,39 @@ export const requestPasswordReset = async (req: any, email: string): Promise<str
     throw new Error('User not authorized for password reset');
   }
 
-  req.session.userId = baseUser.id;
-
-  const tempToken = jwt.sign(
+  const temporaryToken = jwt.sign(
     { userId: baseUser.id, email: baseUser.email },
     JWT_SECRET,
     { expiresIn: `${TOKEN_EXPIRATION_MINUTES}m` }
   );
 
-  return tempToken;
+  await updateTemporaryTokenInSession(baseUser.id, temporaryToken);
+
+  const resetUrl = `https://yourfrontend.com/reset-password?token=${temporaryToken}`;
+  await sendResetEmail(email, resetUrl);
 };
 
-export const changePasswordForCurrentUser = async (
-  req: any,
-  password: string,
-  confirmPassword: string
-): Promise<void> => {
-  const userId = req.session.userId; 
-  if (!userId) {
-    throw new Error('User not authenticated');
+export const confirmPasswordReset = async (token: string, newPassword: string): Promise<void> => {
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET) as { userId: number, email: string };
+    
+    const baseUser = await findBaseUserByEmail(decoded.email);
+    if (!baseUser) {
+      throw new Error('User not found');
+    }
+
+    const session = await findUserSessionByUserId(decoded.userId);
+    if (!session || !session.temporaryToken || session.temporaryToken !== token) {
+      throw new Error('Invalid token');
+    }
+
+    await updatePasswordForUser(decoded.userId, newPassword);
+    await updateTemporaryTokenInSession(decoded.userId, '');
+    
+  } catch (error: any) {
+    if (error instanceof jwt.JsonWebTokenError) {
+      throw new Error('Invalid or expired token');
+    }
+    throw error;
   }
-  const baseUser = await findBaseUserById(userId);
-  if (!baseUser) {
-    throw new Error('User not found');
-  }
-  await updatePasswordWithSession(baseUser, password, confirmPassword);
 };

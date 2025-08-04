@@ -1,4 +1,5 @@
-import {pool}from '../db/db';
+import pool from '../services/db/database';
+
 import { AdminUser } from '../model/user/adminUser';
 
 async function checkUniqueBaseUser(
@@ -118,27 +119,23 @@ export async function updateAdminUser(id: number, data: any): Promise<AdminUser>
     throw new Error(`AdminUser with id ${id} not found`);
   }
 
-  // מיזוג השדות המעודכנים (data) לשדות הקיימים
   const mergedData = {
     ...existingAdminUser,
     ...data,
-    updatedAt,        // עדכון שדה זמן העדכון
+    updatedAt,       
   };
 
   const adminUser = AdminUser.create(mergedData);
 
-  // המשך הכתיבה ל-DB (כדוגמה שלך)
-  // קודם כל למצוא baseUserId - אם אין אותו ב mergedData, נשאל מה-DB
+  
   const baseUserIdResult = await pool.query(`SELECT "baseUserId" FROM "AdminUsers" WHERE id = $1`, [id]);
   if (baseUserIdResult.rowCount === 0) {
     throw new Error(`AdminUser with id ${id} not found`);
   }
   const baseUserId = baseUserIdResult.rows[0].baseUserId;
 
-  // בדיקת ייחודיות idNumber ו-email
   await checkUniqueBaseUser(adminUser.idNumber, adminUser.email, baseUserId);
 
-  // עדכון טבלת BaseUser
   const baseUserUpdateQuery = `
     UPDATE "BaseUser"
     SET "idNumber"=$1, "email"=$2, "firstName"=$3, "lastName"=$4, "updatedAt"=$5
@@ -154,7 +151,6 @@ export async function updateAdminUser(id: number, data: any): Promise<AdminUser>
   ];
   await pool.query(baseUserUpdateQuery, baseUserValues);
 
-  // עדכון טבלת AdminUsers
   const adminUserUpdateQuery = `
     UPDATE "AdminUsers"
     SET "passwordHash"=$1, "role"=$2, "permissions"=$3, "lastLoginAt"=$4, "updatedAt"=$5
@@ -182,7 +178,6 @@ export async function deleteAdminUser(id: number): Promise<void> {
   if (deleteResult.rowCount === 0) {
     throw new Error(`AdminUser with id ${id} not found`);
   }
-  // מחיקת BaseUser מתבצעת אוטומטית על ידי FK עם ON DELETE CASCADE בבסיס הנתונים
 }
 
 interface AdminUserFilters {

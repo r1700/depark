@@ -1,58 +1,41 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import {
   OPCUAClient,
   AttributeIds,
   DataType,
   ClientSession,
-  Variant
+  ReadValueIdOptions,
+  DataValue
 } from 'node-opcua';
 const app = express();
 app.use(express.json());
 const endpointUrl: string = "opc.tcp://localhost:4080/UA/PLC";
+// Multiple nodeIds read
 
 let opcClient: OPCUAClient | null = null;
 let opcSession: ClientSession | null = null;
 
-// Function to check if the session is valid
-function isChannelValid(session: ClientSession | null): boolean {
-  return session ? session.sessionId !== null : false; // If the session exists and has a sessionId, it is valid
-}
-
-// Function to check if the client is connected
-function isConnected(client: OPCUAClient | null): boolean {
-  return client ? client.connectionStrategy.maxRetry === 0 : false; // If the client exists and has valid connection settings
-}
-
-// Create a single client
+// יצירת לקוח יחיד
 async function getOpcClient(): Promise<OPCUAClient> {
-  if (!opcClient || !isConnected(opcClient)) {
+  if (!opcClient) {
     opcClient = OPCUAClient.create({ endpointMustExist: false });
     await opcClient.connect(endpointUrl);
+    console.log("Connected to OPC UA Server");
   }
   return opcClient;
 }
 
-// Create a single session
-export async function ensureSession(): Promise<ClientSession> {
-  try {
-    if (!opcSession || !isChannelValid(opcSession)) {
-      if (opcClient && isConnected(opcClient)) {
-        await opcClient.disconnect();
-      }
-      opcClient = await getOpcClient();
-      opcSession = await opcClient.createSession();
-    }
-    return opcSession;
-  } catch (err) {
-    console.error("OPC connection failed. Retrying in 5 seconds...");
-    opcSession = null;
-    opcClient = null;
-    setTimeout(() => ensureSession(), 5000); // Retry
-    throw err;
+// יצירת Session יחיד
+export async function getOpcSession(): Promise<ClientSession> {
+  if (!opcSession) {
+    const client = await getOpcClient();
+    opcSession = await client.createSession();
+    console.log("Session created");
   }
+  return opcSession;
 }
 
-// Close the client and session (e.g., when the application ends)
+// סגירת הלקוח וה-Session (למשל, בעת סיום היישום)
 async function closeOpcConnection() {
   if (opcSession) {
     await opcSession.close();
@@ -66,55 +49,40 @@ async function closeOpcConnection() {
   }
 }
 
-// Function that returns the dataType based on the value
-function detectDataType(value: any): DataType {
-  switch (typeof value) {
-    case "boolean":
-      return DataType.Boolean;
-    case "number":
-      return Number.isInteger(value) ? DataType.Int32 : DataType.Double;
-    case "string":
-      return DataType.String;
-    case "object":
-      if (value instanceof Date) {
-        return DataType.DateTime;
-      }
-      return DataType.Variant; 
-
-      default:
-      throw new Error(`Unsupported data type: ${typeof value}`);
-  }
+export async function readNodeValues(
+  session: ClientSession,
+  nodeIds: string[]
+): Promise<{ nodeId: string; value: any }[]> {
+  const nodesToRead: ReadValueIdOptions[] = nodeIds.map(nodeId => ({
+    nodeId,
+    attributeId: AttributeIds.Value
+  }));
+  const results: DataValue[] = await session.read(nodesToRead);
+  return results.map((res, i) => ({
+    nodeId: nodeIds[i],
+    value: res.value?.value
+  }));
 }
-
+// Multiple nodeIds write
 export interface WriteItem {
   nodeId: string;
-  value: any;
+  value: boolean;
 }
-
 export async function writeNodeValues(
+  session: ClientSession,
   writeItems: WriteItem[]
 ): Promise<void> {
-  await ensureSession(); // Ensure the session exists
-  if (!opcSession) {
-    throw new Error("OPC session is not initialized");
-  }
-  console.log(`Writing values to nodes: ${JSON.stringify(writeItems)}`);
-
-  const nodesToWrite = writeItems.map((item) => {
-    const dataType = detectDataType(item.value);
-
-    return {
-      nodeId: item.nodeId,
-      attributeId: AttributeIds.Value,
+  const nodesToWrite = writeItems.map(item => ({
+    nodeId: item.nodeId,
+    attributeId: AttributeIds.Value,
+    value: {
       value: {
-        value: new Variant({
-          dataType,
-          value: item.value,
-        }),
-      },
-    };
-  });
-  await opcSession.write(nodesToWrite);
+        dataType: DataType.Boolean,
+        value: item.value
+      }
+    }
+  }));
+  await session.write(nodesToWrite);
 }
 
 process.on("SIGINT", async () => {
@@ -122,3 +90,4 @@ process.on("SIGINT", async () => {
   await closeOpcConnection();
   process.exit(0);
 });
+
