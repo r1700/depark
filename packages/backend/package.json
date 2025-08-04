@@ -4,6 +4,9 @@
   "description": "Backend API server",
   "main": "dist/index.js",
   "scripts": {
+    "db:migrate": "npx sequelize-cli db:migrate --migrations-path ./packages/migrations --config ./sequelize.config.js",
+    "db:migrate:undo": "npx sequelize-cli db:migrate:undo --migrations-path ./packages/migrations --config ./sequelize.config.js",
+    "migration:generate": "npx sequelize-cli migration:generate --migrations-path ./packages/migrations --config ./sequelize.config.js",
     "dev": "nodemon src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
