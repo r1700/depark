@@ -3,7 +3,7 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 
-const backendUrl = process.env.SOURCE_URL || "http://localhost:3001/vehicle-lookup";
+const backendUrl = `http://${process.env.SOURCE_URL || "localhost:3001"}/vehicle-lookup`;
 
 // פונקציה לשליחת הנתון ל-backend
 async function sendDataToBackend(nodeId: string, value: any) {
