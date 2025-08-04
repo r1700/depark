@@ -11,7 +11,6 @@ import googleAuth from './routes/google-auth';
 import auth from './routes/auth';
 import loggerRoutes from './middlewares/locallLoggerMiddleware';
 import healthRoutes from './routes/health';
-// import { databaseService } from './services/database';
 // import itemsRoutes from './routes/items';
 // import { databaseService } from './services/database';
 
@@ -37,6 +36,7 @@ app.use('/api/health', healthRoutes);
 // app.use('/api/password', passwordRoutes);
 // app.use('/api/vehicle', vehicleRoutes);
 // app.use('/api/exportToCSV', exportToCSV);
+// app.use('/api/items', itemsRoutes);
 
 
 app.listen(PORT, async () => {
@@ -47,18 +47,17 @@ app.listen(PORT, async () => {
   // Initialize database with sample data if using Supabase
   if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
     console.log('🗄️ Initializing database...');
-    try {
-      databaseService.canInitialize();
-      try {
-       
-        
-        console.log('✅ Database initialized successfully');  
-      } catch (error) {
-        console.error('❌ Database sample-data initialization failed');
-      }
-    } catch (error) {
-      console.error('❌ Database not connected');
-    }
+    // try {
+    //   databaseService.canInitialize();
+    //   try {
+    //     await databaseService.initializeSampleData();
+    //     console.log('✅ Database initialized successfully');  
+    //   } catch (error) {
+    //     console.error('❌ Database sample-data initialization failed');
+    //   }
+    // } catch (error) {
+    //   console.error('❌ Database not connected');
+    // }
   } else {
     console.log('📝 Using mock data - Supabase not configured');
   }

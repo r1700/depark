@@ -4,6 +4,7 @@ dotenv.config({ path: path.resolve(__dirname, '../../.env') }); // Load environm
 
 const { DB_USER, DB_PASSWORD, DB_HOST, DB_NAME }: any = process.env;
 
+const { DATA_USERNAME, PASSWORD, HOST, DATABASE }: any = process.env;
 
 export default {
   development: {

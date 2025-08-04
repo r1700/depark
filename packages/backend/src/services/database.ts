@@ -1,5 +1,6 @@
 // import { createClient, SupabaseClient } from '@supabase/supabase-js';
 // import { Item } from '../routes/items';
+// import { Item } from '@base-project/shared';
 
 // export class DatabaseService {
 //   private readonly tableName = 'items';
