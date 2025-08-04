@@ -1,5 +1,4 @@
 {
-
   "compilerOptions": {
     "target": "ES2020",
     "module": "commonjs",
@@ -16,7 +15,7 @@
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "jsx": "react-jsx"
+    // "jsx": "react-jsx"
   },
   "include": [
     "src/**/*",
@@ -28,5 +27,8 @@
   ],
   "ts-node": {
     "esm": false
-  }
+  },
+  "typeRoots": [
+    "node_modules/@types"
+  ],
 }

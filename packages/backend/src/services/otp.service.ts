@@ -1,5 +1,5 @@
 import { error } from "console";
-import { pool } from '../db/db';
+import pool from './db/db';
 const otpGenerator = require('otp-generator');
 
 interface OtpEntry {
