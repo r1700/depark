@@ -25,6 +25,7 @@ copy packages\opc\.env.example packages\opc\.env
 
 # Set up database
 npx supabase start
+npx supabase db reset
 
 # Start all services (in separate terminals):
 
@@ -89,7 +90,7 @@ This project provides a digital platform for managing smart parking facilities w
 - **📱 Mobile Web App:** Progressive Web App for employee self-service
 - **📲 Tablet Interface:** Touch-optimized interface for on-site parking operations
 - **🗄️ Database:** Supabase PostgreSQL with real-time capabilities
-- **🔐 Integrations:** Google O, Government vehicle database, WebSocket real-time updates
+- **🔐 Integrations:** Google OAuth, Government vehicle database, WebSocket real-time updates
 
 ## 👥 Team Structure
 
@@ -193,4 +194,4 @@ Each developer owns a specific feature with clear boundaries:
 
 ## 📄 License
 
-This project is private and proprietary. Unorized copying, distribution, or use is strictly prohibited.
+This project is private and proprietary. Unauthorized copying, distribution, or use is strictly prohibited.
