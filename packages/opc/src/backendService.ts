@@ -1,11 +1,13 @@
-import axios from "axios";
+import axios from 'axios';
 
-const backendUrl = "http://localhost:3001/vehicle-lookup";
+const backendUrl = "http://localhost:3001/vehicle-lookup";  // כתובת ה-API של ה-backend
 
-async function sendLicensePlateToBackend(licensePlate: string) {
+// פונקציה לשליחת הנתון ל-backend
+async function sendDataToBackend(nodeId: string, value: any) {
   try {
     const response = await axios.post(backendUrl, {
-      licensePlate: licensePlate
+      nodeId: nodeId,
+      value: value
     });
     console.log("Backend response:", response.data);
   } catch (error) {
@@ -13,4 +15,4 @@ async function sendLicensePlateToBackend(licensePlate: string) {
   }
 }
 
-export { sendLicensePlateToBackend };
+export { sendDataToBackend };
