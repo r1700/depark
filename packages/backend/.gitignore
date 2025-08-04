@@ -2,7 +2,6 @@
 dist/
 build/
 *.tsbuildinfo
-package.json
 
 # Environment variables
 .env
@@ -37,4 +36,3 @@ coverage/
 # Temporary files
 tmp/
 temp/
-package.json

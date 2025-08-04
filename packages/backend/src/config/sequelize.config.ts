@@ -1,19 +1,20 @@
 import path from 'path';
-require('dotenv').config();
+import dotenv from 'dotenv';
+dotenv.config({ path: path.resolve(__dirname, '../../.env') }); // Load environment variables from the root .env file
 
-const { DATA_USERNAME, PASSWORD, HOST, DATABASE }: any = process.env || 'development';
+const { DB_USER, DB_PASSWORD, DB_HOST, DB_NAME }: any = process.env;
 
 
 export default {
   development: {
-    username: DATA_USERNAME || 'postgres',
-    password: PASSWORD || 'pnini',
-    database: DATABASE || 'depark',
-    host: HOST || 'localhost',
+    username: DB_USER ,
+    password: DB_PASSWORD ,
+    database: DB_NAME ,
+    host: DB_HOST ,
     dialect: 'postgres',
     migrationStorageTableName: 'sequelize_meta',
     migrations: {
-      path: path.resolve(__dirname, '../../../migrations'), 
+      path: path.resolve(__dirname, '../../../migrations'),
       pattern: /\.js|ts$/
     }
   }
