@@ -1,7 +1,7 @@
 import request from 'supertest';
 import express from 'express';
-import ParkingConfiguration from '../models/ParkingConfiguration';
-import adminConfigRouter from '../routes/adminConfig';
+import ParkingConfiguration from '../../models/ParkingConfiguration';
+import adminConfigRouter from '../../routes/adminConfig';
 
 // Mock the auth middleware
 jest.mock('../middlewares/authMiddleware', () => {
