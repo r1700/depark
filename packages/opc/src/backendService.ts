@@ -1,6 +1,9 @@
 import axios from 'axios';
+import * as dotenv from 'dotenv';
+dotenv.config();
 
-const backendUrl = "http://localhost:3001/vehicle-lookup";  // כתובת ה-API של ה-backend
+
+const backendUrl = process.env.SOURCE_URL || "http://localhost:3001/vehicle-lookup";
 
 // פונקציה לשליחת הנתון ל-backend
 async function sendDataToBackend(nodeId: string, value: any) {

@@ -11,8 +11,10 @@ import {
 } from "node-opcua";
 
 import { sendDataToBackend } from "./backendService";
+import * as dotenv from 'dotenv';
+dotenv.config();
 
-const ENDPOINT_URL = "opc.tcp://localhost:4080/UA/PLC";
+const ENDPOINT_URL = process.env.TARGET_URL || "opc.tcp://localhost:4080/UA/PLC";
 
 let opcClient: OPCUAClient | null = null;
 let opcSession: ClientSession | null = null;
