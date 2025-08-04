@@ -3,12 +3,18 @@ dotenv.config();
 
 import express from 'express';
 import cors from 'cors';
-import adminUsersRouter from './routes/admin/adminUsers';
-import loggerRoutes from './middlewares/locallLoggerMiddleware';
+// import adminUsersRouter from './routes/admin/adminUsers';
+// import loggerRoutes from './middlewares/locallLoggerMiddleware';
 import healthRoutes from './routes/health';
-import passwordRoutes from './routes/user.routes';
-import vehicleRoutes from './routes/vehicle';
-import exportToCSV from './routes/exportToCSV';
+import authRouter from './routes/auth';
+// import passwordRoutes from './routes/user.routes';
+// import vehicleRoutes from './routes/vehicle';
+// import exportToCSV from './routes/exportToCSV';
+import googleAuth from './routes/google-auth';
+import auth from './routes/auth';
+import APIvehicles from './routes/APIvheicle';
+
+
 
 const app = express();
 
@@ -21,12 +27,17 @@ app.use(cors({
   credentials: true,
 }));
 app.use(express.json());
-app.use(loggerRoutes);
-app.use('/admin', adminUsersRouter);
+// app.use(loggerRoutes);
+app.use('/OAuth', googleAuth)
+app.use('/login', auth)
+// app.use('/admin', adminUsersRouter);
+app.use('/api/login', authRouter);
+
 app.use('/api/health', healthRoutes);
-app.use('/api/password', passwordRoutes);
-app.use('/api/vehicle', vehicleRoutes);
-app.use('/api/exportToCSV', exportToCSV);
+app.use('/api/vehicles', APIvehicles);
+// app.use('/api/password', passwordRoutes);
+// app.use('/api/vehicle', vehicleRoutes);
+// app.use('/api/exportToCSV', exportToCSV);
 
 app.get('/', (req, res) => {
   res.json({ message: 'DePark Backend is running!' });

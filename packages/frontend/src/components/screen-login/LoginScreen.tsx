@@ -22,21 +22,19 @@ interface LoginScreenProps {
 interface IFormInputs {
   email: string;
   password: string;
-  
 }
 
-const schema = yup.object({
-  email: yup
-    .string()
-    .email("Invalid email format")
-    .required("Email is required"),
-  password: yup
-    .string()
-    .required("Password is required")
-    .min(4, "Password must be at least 4 characters"),
-}).required();
+const schema = yup
+  .object({
+    email: yup.string().email("Invalid email format").required("Email is required"),
+    password: yup
+      .string()
+      .required("Password is required")
+      .min(4, "Password must be at least 4 characters"),
+  })
+  .required();
 
-const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
+const LoginScreen = ({ onLogin }: LoginScreenProps): JSX.Element => {
   const [serverError, setServerError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -55,36 +53,40 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
     setLoading(true);
 
     try {
-      const response = await fetch('https://your-api-url.com/login', {
-        method: 'POST',
+      const response = await fetch("http://localhost:3001/login", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          email: data.email,
+          password: data.password,
+        }),
       });
 
-      setLoading(false);
-
       if (!response.ok) {
-        // אם הסטטוס אינו 200-299, נקבל שגיאה מהשרת
         const errorData = await response.json();
-        setServerError(errorData.message || "Login failed");
+        setServerError(errorData.error || errorData.message || "Login failed");
+        setLoading(false);
         return;
       }
 
       const result = await response.json();
 
-      // נניח שה-API מחזיר טוקן כניסה; תתאים לפי מה שקיבלת מה-API
-      if (result && result.token) {
-        // ייתכן שתרצה לשמור את הטוקן ב-localStorage
-        // localStorage.setItem('token', result.token);
+      if (result.success && result.message === "Successfully logged in") {
+        console.log("Logged in user:", result.data.user);
+        localStorage.setItem("user", JSON.stringify(result.data.user));
+        localStorage.setItem("token", result.data.token);
+        localStorage.setItem("expiresAt", result.data.expiresAt);
+
         onLogin();
       } else {
-        setServerError("Incorrect email or password");
+        setServerError("Login failed");
       }
-    } catch (error) {
+    } catch (error: any) {
+      setServerError("Server error: " + (error.message || "Unknown error"));
+    } finally {
       setLoading(false);
-      setServerError("Network error: " + (error as Error).message);
     }
   };
 
@@ -101,13 +103,12 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
           direction: "ltr",
         }}
       >
-        <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 'bold' }}>
-          Welcome Back!
+        <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: "bold" }}>
+          Welcome!
         </Typography>
         <Typography variant="subtitle1" color="text.secondary" gutterBottom>
           Please login to your account
         </Typography>
-
         <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate sx={{ mt: 1 }}>
           <Controller
             name="email"
@@ -128,7 +129,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
               />
             )}
           />
-
           <Controller
             name="password"
             control={control}
@@ -148,13 +148,11 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
               />
             )}
           />
-
           {serverError && (
             <Alert severity="error" sx={{ mt: 2 }}>
               {serverError}
             </Alert>
           )}
-
           <Button
             type="submit"
             fullWidth
@@ -166,14 +164,8 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
             {loading ? <CircularProgress size={24} color="inherit" /> : "Login"}
           </Button>
         </Box>
-          <GoogleAuth/>
-
-        <Stack
-          direction="row"
-          justifyContent="space-between"
-          sx={{ mt: 2 }}
-          spacing={2}
-        >
+        <GoogleAuth />
+        <Stack direction="row" justifyContent="space-between" sx={{ mt: 2 }} spacing={2}>
           <Link href="#" underline="hover" variant="body2" dir="ltr">
             Forgot password?
           </Link>
