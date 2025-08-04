@@ -5,7 +5,12 @@ import { readNodeValues, writeNodeValues ,WriteItem ,  getOpcSession} from './op
 
 const app = express();
 app.use(express.json());
-const endpointUrl = "opc.tcp://localhost:4080/UA/PLC";
+
+const endpointUrl =`opc.tcp://${process.env.TARGET_URL || "localhost:4080"}/UA/PLC`;
+
+
+
+
 
 
 // GET /plc/read?ids=...

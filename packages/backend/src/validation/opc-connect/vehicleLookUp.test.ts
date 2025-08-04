@@ -6,7 +6,6 @@ import {
   isParkingAvailableForSize,
   isLotFull
 } from './parkingService';
-
 describe('Parking Service Tests', () => {
   beforeAll(async () => {
     // אתחול משאבים פעם אחת
@@ -62,6 +61,54 @@ describe('Parking Service Tests', () => {
       const exists = await isLicensePlateExists('INVALID_PLATE');
       expect(exists).toBe(false);
     });
+
+    test('בודק שקריאה למסד נתונים מתבצעת', async () => {
+      const result = await isLicensePlateExists('123456789');
+      expect(result).toBe(true);
+      expect(db.findPlate).toHaveBeenCalledWith('123456789');
+    });
+    test('בודק שקריאה למסד נתונים מתבצעת עם לוחית רישוי לא תקינה', async () => {
+      const result = await isLicensePlateExists('INVALID_PLATE');
+      expect(result).toBe(false);
+      expect(db.findPlate).toHaveBeenCalledWith('INVALID_PLATE');
+    });
+    test('בודק שקריאה למסד נתונים מתבצעת עם לוחית רישוי ריקה', async () => {
+      const result = await isLicensePlateExists('');
+      expect(result).toBe(false);
+      expect(db.findPlate).toHaveBeenCalledWith('');
+    });
+    test('בודק שקריאה למסד נתונים מתבצעת עם לוחית רישוי null', async () => {
+      const result = await isLicensePlateExists(null);
+      expect(result).toBe(false);
+      expect(db.findPlate).toHaveBeenCalledWith(null);
+    });
+    test('בודק שקריאה למסד נתונים מתבצעת עם לוחית רישוי קצרה מידי', async () => {
+      const result = await isLicensePlateExists('123');
+      expect(result).toBe(false);
+      expect(db.findPlate).toHaveBeenCalledWith('123');
+    });
+    test('בודק שקריאה למסד נתונים מתבצעת עם לוחית רישוי עם רווחים מיותרים', async () => {
+      const result = await isLicensePlateExists(' 1234 56789 ');
+      expect(result).toBe(false);
+      expect(db.findPlate).toHaveBeenCalledWith(' 1234 56789 ');
+    });
+    test('בודק שקריאה למסד נתונים מתבצעת עם לוחית רישוי תקינה', async () => {
+      const result = await isLicensePlateExists('123456789');
+      expect(result).toBe(true);
+      expect(db.findPlate).toHaveBeenCalledWith('123456789');
+    });
+    test('בודק שקריאה למסד נתונים מתבצעת עם לוחית רישוי לא קיימת', async () => {
+      const result = await isLicensePlateExists('NOT_EXIST');
+      expect(result).toBe(false);
+      expect(db.findPlate).toHaveBeenCalledWith('NOT_EXIST');
+    });
+    test('בודק שקריאה למסד נתונים מתבצעת עם לוחית רישוי לא תקינה', async () => {
+      const result = await isLicensePlateExists('INVALID_PLATE');
+      expect(result).toBe(false);
+      expect(db.findPlate).toHaveBeenCalledWith('INVALID_PLATE');
+    });
+
+
   });
   describe('חניון לא פעיל', () => {
     test('שעה שגויה', async () => {
@@ -193,8 +240,8 @@ describe('Parking Service Tests', () => {
       expect(available).toBe(false);
     });
 
-  
-    
+
+
   });
 
   describe('בדיקת מקום בחניון', () => {
