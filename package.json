@@ -14,5 +14,24 @@
     "build:backend": "npm run build --workspace=packages/backend",
     "build:frontend": "npm run build --workspace=packages/frontend",
     "install:all": "npm install && npm install --workspace=packages/backend && npm install --workspace=packages/frontend && npm install --workspace=packages/opc"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/icons-material": "^7.2.0",
+    "@mui/material": "^7.2.0",
+    "chart.js": "^4.5.0",
+    "cors": "^2.8.5",
+    "pg": "^8.16.3",
+    "pg-hstore": "^2.3.4",
+    "react-chartjs-2": "^5.3.0",
+    "react-hook-form": "^7.61.0",
+    "sequelize": "^6.37.7"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/pg": "^8.15.4",
+    "sequelize-cli": "^6.6.3"
   }
+  
 }

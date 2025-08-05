@@ -1,53 +1,80 @@
 import express from 'express';
 import cors from 'cors';
-import healthRoutes from './routes/health';
-import vehiclesRoutes from './routes/vehicles';
-import loggerRoutes from './middlewares/locallLoggerMiddleware';
+import { Pool } from 'pg';
+import dotenv from 'dotenv';
+import net from 'net';
+
+dotenv.config();
 
 const app = express();
 
-const PORT = process.env.PORT || 3001;
-const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:3000';
-
-// Logging Middleware - should be applied here before all paths
-app.use(loggerRoutes);  // Adding middleware to all requests
-
-// CORS Configuration
 app.use(cors({
-  origin: CORS_ORIGIN,
-  credentials: true
+  origin: process.env.CORS_ORIGIN || '*',
 }));
 
-// Body Parser Middleware
 app.use(express.json());
 
-// Routes
-app.get('/', (req, res) => {
-  res.send('hello world!!!');
+// יצירת Pool של PostgreSQL מחובר לפי משתני הסביבה
+const pool = new Pool({
+  user: process.env.DB_USER,
+  host: process.env.DB_HOST,
+  database: process.env.DB_DATABASE,
+  password: process.env.DB_PASSWORD,
+  port: Number(process.env.DB_PORT) || 5432,
 });
-app.use('/api/health', healthRoutes);
-app.use('/api/vehicles', vehiclesRoutes);
 
-// Listen to the defined port
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`🌐 CORS enabled for: ${CORS_ORIGIN}`);
+// נקודת API לשליפת רכבים לפי userId
+app.get('/api/vehicles', async (req, res) => {
+  const userId = req.query.userId;
+  if (!userId || typeof userId !== 'string') {
+    return res.status(400).json({ error: 'Missing or invalid userId' });
+  }
 
-  // Initialize database with sample data if using Supabase
-  if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
-    console.log('🗄️ Initializing database...');
-    try {
-      // databaseService.canInitialize();
-      try {
-        // await databaseService.initializeSampleData();
-        console.log('✅ Database initialized successfully');  
-      } catch (error) {
-        console.error('❌ Database sample-data initialization failed');
-      }
-    } catch (error) {
-      console.error('❌ Database not connected');
-    }
-  } else {
-    console.log('📝 Using mock data - Supabase not configured');
+  try {
+    const query = `
+      SELECT 
+        id, 
+        license_plate AS "licensePlate", 
+        model, 
+        location
+      FROM vehicles
+      WHERE user_id = $1
+    `;
+
+    const result = await pool.query(query, [userId]);
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Database query error:', error);
+    res.status(500).json({ error: 'Database error' });
   }
 });
+
+// פונקציה לבדיקת זמינות פורט
+function checkPortAvailable(port: number): Promise<boolean> {
+  return new Promise((resolve) => {
+    const server = net.createServer();
+    server.once('error', (err: any) => {
+      resolve(err.code !== 'EADDRINUSE');
+    });
+    server.once('listening', () => {
+      server.close();
+      resolve(true);
+    });
+    server.listen(port);
+  });
+}
+
+// הפעלת השרת עם בדיקת פורט
+async function startServer() {
+  const PORT = Number(process.env.PORT) || 3001;
+  const isAvailable = await checkPortAvailable(PORT);
+  if (!isAvailable) {
+    console.error(`Port ${PORT} is already in use. Please free this port or change the PORT environment variable.`);
+    process.exit(1);
+  }
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
+
+startServer();

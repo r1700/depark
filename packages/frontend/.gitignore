@@ -4,7 +4,8 @@
 /node_modules
 /.pnp
 .pnp.js
-
+package.json
+packages/backend/src/config/sequelize.config.ts
 # testing
 /coverage
 

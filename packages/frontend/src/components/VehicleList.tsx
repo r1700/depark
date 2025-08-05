@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+
+import React, { useEffect, useState } from "react";
 import {
   Card,
   Typography,
@@ -6,144 +7,166 @@ import {
   Button,
   Stack,
   Alert,
+  IconButton,
 } from "@mui/material";
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
 import LocalTaxiIcon from "@mui/icons-material/LocalTaxi";
-import ElectricCarIcon from "@mui/icons-material/ElectricCar";
 import AirportShuttleIcon from "@mui/icons-material/AirportShuttle";
-import TwoWheelerIcon from "@mui/icons-material/TwoWheeler";
-import FireTruckIcon from "@mui/icons-material/FireTruck";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
+import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 import { VehicleReportDialog } from "./VehicleReportDialog";
+
 interface Vehicle {
-  id: number;
+  id: string;
   licensePlate: string;
-  model: string;
-  location: string;
+  location?: string;
+  dimensionOverrides?: {
+    length?: string;
+    weight?: string;
+    width?: string;
+    height?: string;
+  };
 }
-const vehicles: Vehicle[] = [
-  { id: 1, licensePlate: "123-45-678", model: "Toyota Corolla", location: "Zone A" },
-  { id: 2, licensePlate: "987-65-432", model: "Honda Civic", location: "Zone B" },
-  { id: 4, licensePlate: "222-22-222", model: "Nissan Leaf", location: "Zone D" },
-  { id: 5, licensePlate: "333-33-333", model: "Suzuki Swift", location: "Zone E" },
-  { id: 6, licensePlate: "444-44-444", model: "Ford Transit", location: "Zone F" },
-];
-export const VehicleRow = () => {
-  const [queuePosition, setQueuePosition] = useState<Record<number, number>>({});
+
+export const VehicleList = () => {
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [queuePosition, setQueuePosition] = useState<Record<string, number>>({});
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [reportOpen, setReportOpen] = useState(false);
-  const [hoveredVehicleId, setHoveredVehicleId] = useState<number | null>(null);
-  const requestVehicle = (vehicleId: number) => {
-    const randomPosition = Math.floor(Math.random() * 10) + 1;
-    setQueuePosition((prev) => ({ ...prev, [vehicleId]: randomPosition }));
+  const [userId, setUserId] = useState<string>(); // לדוגמה, userId סטטי
+
+
+useEffect(() => {
+  const userStr = localStorage.getItem('user');
+  if (userStr !== null) {
+    try {
+      const user = JSON.parse(userStr);
+      if (user?.userId) {
+        setUserId(user.userId);
+      }
+    } catch (e) {
+      console.error("Failed to parse user from localStorage", e);
+    }
+  }
+}, []);
+
+
+
+  useEffect(() => {
+    fetch("/api/vehicles")
+      .then(async (res) => {
+        if (!res.ok) {
+          const text = await res.text();
+          throw new Error(text || "Server Error");
+        }
+        return res.json();
+      })
+      .then(setVehicles)
+      .catch((err) => {
+        console.error("Fetch error:", err.message);
+      });
+  }, []);
+
+  const getVehicleCategory = (v: Vehicle) => {
+    const dims = v.dimensionOverrides;
+    if (!dims || !dims.length || !dims.weight) return "unknown";
+    const length = parseInt(dims.length);
+    const weight = parseInt(dims.weight);
+    if (length <= 4500 && weight <= 1300) return "private";
+    if (length <= 5000 && weight <= 2200) return "van";
+    if (length <= 7000 && weight <= 3500) return "truck_light";
+    return "unknown";
   };
-  const iconForVehicle = (id: number) => {
+
+  const iconForCategory = (category: string) => {
     const iconProps = { sx: { fontSize: 80 } };
-    const icons = [
-      <DirectionsCarIcon {...iconProps} />,
-      <LocalTaxiIcon {...iconProps} />,
-      <ElectricCarIcon {...iconProps} />,
-      <AirportShuttleIcon {...iconProps} />,
-      <TwoWheelerIcon {...iconProps} />,
-      <FireTruckIcon {...iconProps} />,
-    ];
-    return icons[(id - 1) % icons.length];
+    switch (category) {
+      case "private":
+        return <DirectionsCarIcon {...iconProps} />;
+      case "van":
+        return <AirportShuttleIcon {...iconProps} />;
+      case "truck_light":
+        return <LocalTaxiIcon {...iconProps} />;
+      default:
+        return <HelpOutlineIcon {...iconProps} />;
+    }
   };
-  const handleOpenReport = () => {
-    setReportOpen(true);
+
+  const requestVehicle = (vehicleId: string) => {
+    const pos = Math.floor(Math.random() * 10) + 1;
+    setQueuePosition((prev) => ({ ...prev, [vehicleId]: pos }));
   };
-  const handleCloseReport = () => {
-    setReportOpen(false);
-  };
+
+  const vehicle = vehicles[currentIndex];
+  const category = vehicle ? getVehicleCategory(vehicle) : "unknown";
+  const icon = iconForCategory(category);
+
   return (
     <Box p={3} display="flex" flexDirection="column" alignItems="center">
-      <Typography variant="h4" sx={{ mb: 6, fontSize: "2.5rem", fontWeight: "bold" }}>
-        User Vehicles
+      <Typography variant="h4" sx={{ mb: 4 }}>
+        User vehicles
       </Typography>
-      <Box display="flex" flexWrap="wrap" gap={2} justifyContent="center">
-        {vehicles.map((vehicle) => (
-          <Card
-            key={vehicle.id}
-            sx={{
-              p: 2,
-              width: 220,
-              height: 250,
-              textAlign: "center",
-              cursor: "pointer",
-              boxShadow: 4,
-              borderRadius: 3,
-              transition: "0.3s",
-              position: "relative",
-              ":hover": { transform: "scale(1.07)" },
-              backgroundColor: "transparent",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-            onMouseEnter={() => setHoveredVehicleId(vehicle.id)}
-            onMouseLeave={() => setHoveredVehicleId(null)}
-          >
-            <Stack spacing={1} alignItems="center" justifyContent="center">
-              {hoveredVehicleId === vehicle.id ? (
-                <Box textAlign="center">
-                  <Typography sx={{ fontSize: "1.2rem", fontWeight: "bold", color: "#333" }}>
-                    {vehicle.model}
-                  </Typography>
-                  <Typography sx={{ fontSize: "1rem", color: "#555" }}>
-                    Plate: {vehicle.licensePlate}
-                  </Typography>
-                  <Typography sx={{ fontSize: "1rem", color: "#555" }}>
-                    Location: {vehicle.location}
-                  </Typography>
-                  <Button
-                    variant="contained"
-                    size="small"
-                    sx={{ textTransform: "capitalize", mt: 1 }}
-                    onClick={() => requestVehicle(vehicle.id)}
-                  >
-                    Request vehicle
-                  </Button>
-                  {queuePosition[vehicle.id] && (
-                    <Alert severity="info" sx={{ mt: 1 }}>
-                      Queue: {queuePosition[vehicle.id]}
-                    </Alert>
-                  )}
-                </Box>
-              ) : (
-                <>
-                  <Box display="flex" justifyContent="center" alignItems="center">
-                    {iconForVehicle(vehicle.id)}
-                  </Box>
-                  <Button
-                    variant="contained"
-                    size="small"
-                    sx={{ textTransform: "capitalize", mt: 1 }}
-                    onClick={() => requestVehicle(vehicle.id)}
-                  >
-                    Request vehicle
-                  </Button>
-                  {queuePosition[vehicle.id] && (
-                    <Alert severity="info" sx={{ mt: 1 }}>
-                      Queue: {queuePosition[vehicle.id]}
-                    </Alert>
-                  )}
-                </>
-              )}
-            </Stack>
-          </Card>
+      {vehicle && (
+        <Card
+          sx={{
+            p: 2,
+            width: 220,
+            height: 250,
+            textAlign: "center",
+            cursor: "pointer",
+            boxShadow: 4,
+            borderRadius: 3,
+            transition: "0.3s",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Stack spacing={1} alignItems="center" justifyContent="center">
+            {icon}
+          
+            <Typography fontSize="0.9rem">Plate: {vehicle.licensePlate}</Typography>
+            <Button
+              size="small"
+              onClick={() => requestVehicle(vehicle.id)}
+              sx={{ mt: 1, textTransform: "none" }}
+              variant="contained"
+            >
+              Request
+            </Button>
+            {queuePosition[vehicle.id] && (
+              <Alert severity="info" sx={{ mt: 1 }}>
+                Queue: {queuePosition[vehicle.id]}
+              </Alert>
+            )}
+          </Stack>
+        </Card>
+      )}
+      <Box display="flex" justifyContent="center" gap={1} mt={2}>
+        {vehicles.map((_, idx) => (
+          <IconButton key={idx} onClick={() => setCurrentIndex(idx)}>
+            <FiberManualRecordIcon
+              fontSize="small"
+              color={idx === currentIndex ? "primary" : "disabled"}
+            />
+          </IconButton>
         ))}
       </Box>
       <Button
         variant="contained"
-        sx={{ marginTop: 3, textTransform: "capitalize", maxWidth: 300 }}
-        onClick={handleOpenReport}
+        sx={{ mt: 3, textTransform: "none" }}
+        onClick={() => setReportOpen(true)}
       >
-        View Vehicle Report
+        View report
       </Button>
-    <VehicleReportDialog
-  open={reportOpen}
-  onClose={handleCloseReport}
-  userId={"USER_ID_HERE"}
-/>
+      {/* הפעלת דיאלוג הדוח עם userId */}
+      <VehicleReportDialog
+        open={reportOpen}
+        onClose={() => setReportOpen(false)}
+        // vehicles={vehicles}
+        userId={userId  ?? null} // העברת userId חיונית!
+           />
     </Box>
   );
 };
