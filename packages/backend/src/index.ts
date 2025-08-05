@@ -8,11 +8,23 @@ import healthRoutes from './routes/health';
 import passwordRoutes from './routes/user.routes';
 import vehicleRoutes from './routes/vehicle';
 import exportToCSV from './routes/exportToCSV';
+import adminConfigRouter from './routes/adminConfig';
+// ייבוא חיבור מסד נתונים
+import { sequelize } from './models/ParkingConfiguration';
 
 const app = express();
 
 const PORT = process.env.PORT || 3001;
 const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:3000';
+
+// בדיקת חיבור למסד נתונים
+sequelize.authenticate()
+  .then(() => {
+    console.log('✅ Database connection established successfully');
+  })
+  .catch(err => {
+    console.error('❌ Unable to connect to the database:', err);
+  });
 
 // Middleware setup
 app.use(cors({
@@ -25,6 +37,7 @@ app.use('/api/health', healthRoutes);
 app.use('/api/password', passwordRoutes);
 app.use('/api/vehicle', vehicleRoutes);
 app.use('/api/exportToCSV', exportToCSV);
+app.use('/api/admin', adminConfigRouter); // הוספת admin routes
 
 app.get('/', (req, res) => {
   res.json({ message: 'DePark Backend is running!' });

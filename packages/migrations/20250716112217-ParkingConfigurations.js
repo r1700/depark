@@ -5,11 +5,9 @@ module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('parkingconfigurations', {
       id: {
-        type: Sequelize.INTEGER,  
+        type: Sequelize.STRING,  
         primaryKey: true,
         allowNull: false,
-        autoIncrement: true,
-
       },
       facility_name: {
         type: Sequelize.STRING,  
@@ -53,6 +51,7 @@ module.exports = {
 
     await queryInterface.bulkInsert('parkingconfigurations', [
       {
+        id: 'main',
         facility_name: 'Central Parking Lot',
         total_surface_spots: 50,
         surface_spot_ids: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'],
@@ -64,6 +63,7 @@ module.exports = {
         updated_by: 'admin123',
       },
       {
+        id: 'north',
         facility_name: 'North Parking Garage',
         total_surface_spots: 30,
         surface_spot_ids: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'],

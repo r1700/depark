@@ -2,9 +2,20 @@ import express from 'express';
 import cors from 'cors';
 
 // ייבוא הראוטרים
-import adminConfigRouter from './routes/admin-config';
+import adminConfigRouter from './routes/adminConfig';
+// ייבוא חיבור מסד נתונים
+import { sequelize } from './models/ParkingConfiguration';
 
 const app = express();
+
+// בדיקת חיבור למסד נתונים
+sequelize.authenticate()
+  .then(() => {
+    console.log('✅ Database connection established successfully');
+  })
+  .catch(err => {
+    console.error('❌ Unable to connect to the database:', err);
+  });
 
 // Middleware
 app.use(cors());
