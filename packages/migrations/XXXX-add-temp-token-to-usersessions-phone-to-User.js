@@ -9,7 +9,7 @@ module.exports = {
     });
 
 
-     await queryInterface.addColumn('Users', 'phone', {
+     await queryInterface.addColumn('User', 'phone', {
       type: Sequelize.STRING,      
       allowNull: true,
     });
@@ -17,6 +17,6 @@ module.exports = {
 
   async down(queryInterface, Sequelize) {
     await queryInterface.removeColumn('UserSessions', 'tempToken');
-    await queryInterface.removeColumn('Users', 'phone');
+    await queryInterface.removeColumn('User', 'phone');
   },
 };

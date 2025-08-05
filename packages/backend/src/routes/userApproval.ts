@@ -6,12 +6,6 @@ import { UserStatusEnum } from '../types/UserStatusEnum';
 const router = express.Router();
 console.log('7777777777777777777777777');
 
-router.get('/', async (req, res) => {
-  console.log('Get all users request received');
-  // כאן תוכל להוסיף לוגיקה לקבלת כל המשתמשים
-  res.json({ message: 'Get all users' });
-});
-
 router.post('/:id/approve', async (req, res) => {
   console.log('9999999999999');
   

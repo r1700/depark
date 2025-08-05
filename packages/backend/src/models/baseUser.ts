@@ -64,7 +64,7 @@ BaseUser.init(
   {
     sequelize,
     modelName: 'BaseUser',
-    tableName: 'BaseUsers',
+    tableName: 'BaseUser',
     timestamps: false, // כי יש לך שדות createdAt ו-updatedAt בטבלה
   }
 );

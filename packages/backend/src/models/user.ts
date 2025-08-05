@@ -5,7 +5,6 @@ import sequelize from '../config/databes'; // ודאי שהנתיב נכון
 // הגדרת טיפוס TypeScript לשדות
 export interface UserAttributes {
   id: string;
-  idNumber: string;
   email: string;
   firstName: string;
   lastName: string;
@@ -26,7 +25,6 @@ export interface UserAttributes {
 
 export class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
   public id!: string;
-  public idNumber!: string;
   public email!: string;
   public firstName!: string;
   public lastName!: string;
@@ -49,11 +47,6 @@ User.init(
       primaryKey: true,
       allowNull: false,
       defaultValue: DataTypes.UUIDV4,
-    },
-    idNumber: {
-      type: DataTypes.STRING(255),
-      allowNull: false,
-      unique: true,
     },
     email: {
       type: DataTypes.STRING(255),
@@ -115,7 +108,7 @@ User.init(
   {
     sequelize,
     modelName: 'User',
-    tableName: 'users',
+    tableName: 'User',
     timestamps: true,
   }
 );
