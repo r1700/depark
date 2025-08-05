@@ -1,14 +1,14 @@
 import express from 'express';
 import cors from 'cors';
 
-// ייבוא הראוטרים
+// Import routers
 import adminConfigRouter from './routes/adminConfig';
-// ייבוא חיבור מסד נתונים
+// Import database connection
 import { sequelize } from './models/ParkingConfiguration';
 
 const app = express();
 
-// בדיקת חיבור למסד נתונים
+// Database connection test
 sequelize.authenticate()
   .then(() => {
     console.log('✅ Database connection established successfully');

@@ -1,18 +1,18 @@
 import { DataTypes, Model, Sequelize } from 'sequelize';
 import sequelizeConfig from '../config/sequelize.config';
 
-// יצירת חיבור Sequelize
+// Create Sequelize connection
 const sequelize = new Sequelize({
   ...sequelizeConfig.development,
   dialect: 'postgres' as any,
-  logging: false // השתק לוגים
+  logging: false // Disable logs
 });
 
-// הגדרת המודל
+// Model definition
 export interface ParkingConfigurationAttributes {
-  id?: string; // שינוי חזרה ל-string עם optional
+  id?: string; // Changed back to string with optional
   facilityName: string;
-  totalSpots: number; // שינוי חזרה ל-totalSpots
+  totalSpots: number; // Changed back to totalSpots
   surfaceSpotIds: string[];
   avgRetrievalTimeMinutes: number;
   maxQueueSize: number;
@@ -23,9 +23,9 @@ export interface ParkingConfigurationAttributes {
 }
 
 export class ParkingConfiguration extends Model<ParkingConfigurationAttributes> implements ParkingConfigurationAttributes {
-  public id!: string; // שינוי חזרה ל-string
+  public id!: string; // Changed back to string
   public facilityName!: string;
-  public totalSpots!: number; // שינוי חזרה ל-totalSpots
+  public totalSpots!: number; // Changed back to totalSpots
   public surfaceSpotIds!: string[];
   public avgRetrievalTimeMinutes!: number;
   public maxQueueSize!: number;
@@ -93,7 +93,7 @@ ParkingConfiguration.init(
     sequelize,
     tableName: 'parkingconfigurations',
     timestamps: false,
-    underscored: false, // כי אנחנו מגדירים field במפורש
+    underscored: false, // Because we define field explicitly
   }
 );
 

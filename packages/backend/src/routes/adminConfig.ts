@@ -2,7 +2,7 @@ import { Router } from 'express';
 import ParkingConfiguration from '../models/ParkingConfiguration';
 const router = Router();
 
-// יצירה (INSERT בלבד)
+// Create (INSERT only)
 router.post('/', async (req, res) => {
   try {
     const { parkingConfig } = req.body;
@@ -10,13 +10,13 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ success: false, error: 'Missing parkingConfig or lotId' });
     }
 
-    // בדוק אם כבר קיים
+    // Check if already exists
     const exists = await ParkingConfiguration.findByPk(parkingConfig.lotId);
     if (exists) {
       return res.status(409).json({ success: false, error: 'Lot ID already exists' });
     }
 
-    // יצירת רשומה חדשה
+    // Create new record
     await ParkingConfiguration.create({
       id: parkingConfig.lotId,
       facilityName: parkingConfig.facilityName,
@@ -36,7 +36,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-// עדכון (UPDATE בלבד)
+// Update (UPDATE only)
 router.put('/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -45,13 +45,13 @@ router.put('/:id', async (req, res) => {
       return res.status(400).json({ success: false, error: 'Missing parkingConfig' });
     }
 
-    // בדוק אם קיים
+    // Check if exists
     const exists = await ParkingConfiguration.findByPk(id);
     if (!exists) {
       return res.status(404).json({ success: false, error: 'Lot ID not found' });
     }
 
-    // עדכון הרשומה
+    // Update record
     await exists.update({
       facilityName: parkingConfig.facilityName,
       totalSpots: parkingConfig.totalSpots,
@@ -70,7 +70,7 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-// קבלת חניון לפי מזהה (ID)
+// Get parking lot by ID
 router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -87,7 +87,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// קבלת כל החניונים
+// Get all parking lots
 router.get('/', async (req, res) => { 
   try {
     const parkingConfigs = await ParkingConfiguration.findAll();

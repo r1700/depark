@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import LoginScreen from './components/screen-login/LoginScreen';
 import { Box, Button, Container, Typography } from "@mui/material";
+import AdminConfigPage from "./components/AdminConfigPage";
 
 const App: React.FC = () => {
   // קריאה ראשונית מה־localStorage כדי לטעון אם המשתמש כבר מחובר
@@ -23,21 +24,24 @@ const App: React.FC = () => {
   };
 
   return (
-    <Container maxWidth="sm" sx={{ mt: 8, textAlign: "center", direction: "ltr" }}>
-      {loggedIn ? (
-        <Box>
-          <Typography variant="h4" gutterBottom>
-            Welcome!
-          </Typography>
-          <Button variant="contained" onClick={handleLogout}>
-            Logout
-          </Button>
-        </Box>
-      ) : (
-        // כאן מוסיפים פרופס של onLogin שמקבלת טוקן
-        <LoginScreen onLogin={handleLogin} />
-      )}
-    </Container>
+    // <Container maxWidth="sm" sx={{ mt: 8, textAlign: "center", direction: "ltr" }}>
+    //   {loggedIn ? (
+    //     <Box>
+    //       <Typography variant="h4" gutterBottom>
+    //         Welcome!
+    //       </Typography>
+    //       <Button variant="contained" onClick={handleLogout}>
+    //         Logout
+    //       </Button>
+    //     </Box>
+    //   ) : (
+    //     // כאן מוסיפים פרופס של onLogin שמקבלת טוקן
+    //     <LoginScreen onLogin={handleLogin} />
+    //   )}
+    // </Container>
+    <>
+      <AdminConfigPage />
+    </>
   );
 };
 
