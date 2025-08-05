@@ -2,13 +2,13 @@ import path from 'path';
 import dotenv from 'dotenv';
 dotenv.config({ path: path.resolve(__dirname, '../../.env') }); // Load environment variables from the root .env file
 
-const { DB_USER, DB_PASSWORD, DB_HOST, DB_NAME }: any = process.env;
+const { DB_USER, DB_PASS, DB_HOST, DB_NAME }: any = process.env;
 
 
 export default {
   development: {
     username: DB_USER ,
-    password: DB_PASSWORD ,
+    password: DB_PASS ,
     database: DB_NAME ,
     host: DB_HOST ,
     dialect: 'postgres',
