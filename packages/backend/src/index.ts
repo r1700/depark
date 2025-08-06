@@ -8,8 +8,8 @@ import healthRoutes from './routes/health';
 import passwordRoutes from './routes/user.routes';
 import vehicleRoutes from './routes/vehicle';
 import exportToCSV from './routes/exportToCSV';
-import adminConfigRouter from './routes/adminConfig';
-// Import database connection
+import adminConfigRouter from './routes/adminConfig'; // Using YOUR validation model!
+// Import database connection - keep for database connectivity
 import { sequelize } from './models/ParkingConfiguration';
 
 const app = express();
