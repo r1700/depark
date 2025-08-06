@@ -1,6 +1,8 @@
 import { Model, DataTypes, Optional } from 'sequelize';
 import sequelize from '../config/databes';
 import { AdminUser } from './adminUser';
+import { UserStatusEnum } from '../types/UserStatusEnum';
+
 // טיפוסים עבור BaseUser
 interface BaseUserAttributes {
   id: number;
@@ -10,6 +12,8 @@ interface BaseUserAttributes {
   lastName: string;
   createdAt: Date;
   updatedAt: Date;
+  status :UserStatusEnum;
+  approvedAt:Date;
 }
 
 interface BaseUserCreationAttributes extends Optional<BaseUserAttributes, 'id'> {}
@@ -23,8 +27,9 @@ export class BaseUser extends Model<BaseUserAttributes, BaseUserCreationAttribut
   public lastName!: string;
   public createdAt!: Date;
   public updatedAt!: Date;
+  public status!: UserStatusEnum;
+  public approvedAt!: Date;
 }
-BaseUser.hasOne(AdminUser, { foreignKey: 'baseUserId', as: 'adminUser' });
 
 BaseUser.init(
   {
@@ -60,6 +65,14 @@ BaseUser.init(
       type: DataTypes.DATE,
       allowNull: false,
     },
+    status: {
+      type: DataTypes.ENUM(...Object.values(UserStatusEnum)),
+      allowNull: false,  
+  },
+    approvedAt: {
+        type: DataTypes.DATE,
+        allowNull: true,
+        }
   },
   {
     sequelize,

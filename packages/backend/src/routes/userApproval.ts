@@ -1,33 +1,39 @@
 import express from 'express';
-import  authenticateToken from '../middlewares/authMiddleware';
+import authenticateToken from '../middlewares/authMiddleware';
 import { updateUserStatus } from '../services/userService';
 import { UserStatusEnum } from '../types/UserStatusEnum';
 
 const router = express.Router();
-console.log('7777777777777777777777777');
 
-router.post('/:id/approve', async (req, res) => {
-  console.log('9999999999999');
-  
-  const userId = req.params.id;
-  
-  console.log(req.body);
-  const adminId = req.body.id; // ודא שב-middleware את מגדירה req.user
-
+router.post('/:id/approve', authenticateToken, async (req, res) => {
   try {
-    console.log('im hereeeeeeeeeeeeeeeeeeeeeeeeee');
-    
-    const updatedUser = await updateUserStatus(userId, UserStatusEnum.Approved, adminId);
+    const idParam = req.params.id;
+    const id = parseInt(idParam, 10);
+    if (isNaN(id)) {
+      return res.status(400).json({ error: 'Invalid user ID' });
+    }
+
+    // מזהה האדמין צריך להיתפס דרך middleware שאחראי על אימות, לדוגמה:
+    // const adminId = req.user.id;
+    // אבל אם אין כזה, אפשר לקחת מה-body (כפי שכתבת)
+    const adminId = req.body.id;
+    if (!adminId) {
+      return res.status(401).json({ error: 'Admin ID missing' });
+    }
+
+    // מכיוון ש-baseUserId ו-userId זהים
+    const updated = await updateUserStatus(id, id, UserStatusEnum.Approved, adminId);
+
     res.status(200).json({
       message: 'User approved successfully',
-      user: updatedUser, // אופציונלי - לשלוח את המשתמש המעודכן בתגובה
+      data: updated,
     });
   } catch (error) {
-    if (typeof error === 'object' && error !== null && 'message' in error && (error as any).message === 'User not found') {
-      res.status(404).json({ error: 'User not found' });
-    } else {
-      res.status(500).json({ error: 'Failed to approve user' });
+    console.error(error);
+    if (error instanceof Error && error.message.includes('not found')) {
+      return res.status(404).json({ error: error.message });
     }
+    res.status(500).json({ error: 'Failed to approve user' });
   }
 });
 
