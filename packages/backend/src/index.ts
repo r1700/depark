@@ -7,6 +7,8 @@ import loggerRoutes from './middlewares/locallLoggerMiddleware';
 import healthRoutes from './routes/health';
 import passwordRoutes from './routes/user.routes';
 // import vehicleRoutes from './routes/vehicle';
+import RetrievalQueue from './model/database-models/retrievalQueue.model';  // ייבוא המודל של RetrievalQueue
+
 import exportToCSV from './routes/exportToCSV';
 
 const app = express();
@@ -35,6 +37,20 @@ app.get('/health', (req, res) => {
     status: 'OK',
     timestamp: new Date().toISOString(),
   });
+});
+
+app.get('/api/retrievalqueues', async (req, res) => {
+  try {
+    const allQueues = await RetrievalQueue.findAll();  // שליפה של כל הרשומות
+    console.log({allQueues});
+    
+    res.json(allQueues);  // מחזיר את הרשומות כ-JSON
+  } catch (error) {
+    console.log({error});
+    
+    console.error('Error retrieving queues:', error);
+    res.status(500).json({ message: 'Failed to retrieve queues' });  // מחזיר שגיאה אם לא הצלחנו לשלוף את הנתונים
+  }
 });
 
 if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
