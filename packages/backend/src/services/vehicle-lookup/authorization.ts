@@ -57,12 +57,12 @@ ParkingSessions.init({
 
 const canUserPark = async (baseuser_id: number): Promise<boolean> => {
   try {
-    // שלב 1 – כמה רכבים חונים כעת למשתמש
+    // how many active parking sessions does the user have?
     const activeSessionsCount = await ParkingSessions.count({
       where: { baseuser_id }
     });
 
-    // שלב 2 – כמה מותר לו להחנות
+    // how many cars is the user allowed to park?
     const user = await User.findOne({
       where: { baseuser_id }
     });
@@ -79,4 +79,12 @@ const canUserPark = async (baseuser_id: number): Promise<boolean> => {
   }
 };
 
-canUserPark()
+// canUserPark(1)
+// .then(canPark => {
+//   console.log(`User can park: ${canPark}`);
+// })
+// .catch(err => { 
+//   console.error('Error checking if user can park:', err);
+// }); 
+
+export default canUserPark;

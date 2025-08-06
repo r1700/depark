@@ -11,6 +11,7 @@ import googleAuth from './routes/google-auth';
 import auth from './routes/auth';
 import loggerRoutes from './middlewares/locallLoggerMiddleware';
 import healthRoutes from './routes/health';
+import vehicleLookupRouter from './routes/vehicleLookup';
 // import itemsRoutes from './routes/items';
 // import { databaseService } from './services/database';
 
@@ -33,6 +34,7 @@ app.use('/OAuth', googleAuth); // Ensure this route is correctly set up
 app.use('/auth', auth);
 app.use(loggerRoutes);
 app.use('/api/health', healthRoutes);
+app.use('/api/vehicle',vehicleLookupRouter);
 // app.use('/api/password', passwordRoutes);
 // app.use('/api/vehicle', vehicleRoutes);
 // app.use('/api/exportToCSV', exportToCSV);

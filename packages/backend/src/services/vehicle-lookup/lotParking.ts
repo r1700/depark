@@ -26,15 +26,14 @@ ParkingConfigurations.init({
   timestamps: false,
 });
 
-const isParkingLotActive = async (timestamp: Date, ): Promise<boolean> => {
+const isParkingLotActive = async (timestamp: Date, lotid: Number): Promise<boolean> => {
   try {
-    const config = await ParkingConfigurations.findOne();
-
+    const config = await ParkingConfigurations.findOne({ where: { id: lotid } });
     if (!config) {
-      console.error('No parking configuration found');
+      console.error('No parking configuration found for the given lot ID');
       return false;
     }
-
+   
     const operatingHours = config.getDataValue('operating_hours') as {
       [day: string]: {
         isActive: boolean;
@@ -60,9 +59,9 @@ const isParkingLotActive = async (timestamp: Date, ): Promise<boolean> => {
 };
 
 
-isParkingLotActive(new Date())
-  .then(active =>
-    console.log(`Parking lot is currently ${active ? 'active' : 'inactive'}`))
-  .catch(err => console.error('Error checking parking lot status:', err));
+// isParkingLotActive(new Date(),2)
+//   .then(active =>
+//     console.log(`Parking lot is currently ${active ? 'active' : 'inactive'}`))
+//   .catch(err => console.error('Error checking parking lot status:', err));
 
 export default isParkingLotActive;
