@@ -13,7 +13,6 @@ const apiClient = axios.create({
   },
 });
 
-// Response interceptor for error handling
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -23,13 +22,11 @@ apiClient.interceptors.response.use(
 );
 
 export const apiService = {
-  // Health check
   checkHealth: async () => {
     const response = await apiClient.get('/health'); 
     return response.data;
   },
 
-  // Get all items
   getItems: async (): Promise<Item[]> => {
     const response = await apiClient.get<ItemsResponse>('/items');
     if (response.data.success && response.data.data) {
@@ -38,7 +35,6 @@ export const apiService = {
     throw new Error(response.data.error || 'Failed to fetch items');
   },
 
-  // Get specific item
   getItem: async (id: string): Promise<Item> => {
     const response = await apiClient.get<ItemResponse>(`/items/${id}`);
     if (response.data.success && response.data.data) {

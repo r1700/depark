@@ -6,7 +6,6 @@ import express from 'express';
 import cors from 'cors';
 import loggerRoutes from './middlewares/locallLoggerMiddleware';
 import './models';
-// import adminUsersRouter from './routes/admin/adminUsers';
 import healthRoutes from './routes/health';
 import passwordRoutes from './routes/user.routes';
 import vehicleRoutes from './routes/vehicle';
