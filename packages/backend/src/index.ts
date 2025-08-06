@@ -7,7 +7,8 @@ import healthRoutes from './routes/health';
 import passwordRoutes from './routes/user.routes';
 // import vehicleRoutes from './routes/vehicle';
 import exportToCSV from './routes/exportToCSV';
-import vehicleStatsRoutes from './routes/parkingStat'; 
+import vehicleStatsRoutes from './routes/parkingStat';
+import surfaceStatsRoutes from './routes/surfaceStat'; 
 
 
 const app = express();
@@ -24,7 +25,8 @@ app.use('/api/health', healthRoutes);
 app.use('/api/password', passwordRoutes);
 // app.use('/api/vehicle', vehicleRoutes);
 app.use('/api/exportToCSV', exportToCSV);
-app.use('/api/parking-stats', vehicleStatsRoutes); // הוספתי את ה-API החדש
+app.use('/api/parking-stats', vehicleStatsRoutes);
+app.use('/api/surface-stats', surfaceStatsRoutes);
 
 
 app.get('/', (req, res) => {
@@ -55,4 +57,5 @@ app.listen(PORT, () => {
   console.log('   GET  /api/admin/config');
   console.log('   PUT  /api/admin/config');
   console.log('   GET  /api/parking-stats/stats'); 
+  console.log('   GET  /api/surface-stats/stats');
 });
