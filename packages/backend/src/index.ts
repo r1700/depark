@@ -5,12 +5,13 @@ dotenv.config();
 import express from 'express';
 import cors from 'cors';
 import loggerRoutes from './middlewares/locallLoggerMiddleware';
-import './dbModels/sequelize'; 
+import './dbModels/sequelize';
 import healthRoutes from './routes/health';
 import passwordRoutes from './routes/user.routes';
 import vehicleRoutes from './routes/vehicle';
 import exportToCSV from './routes/exportToCSV';
 import authRoutes from './routes/auth';
+import { databaseService } from './services/database';
 import userGoogleAuthRoutes from './routes/userGoogle-auth';
 import { OAuth2Client } from 'google-auth-library';
 
@@ -39,7 +40,22 @@ app.use((req, res, next) => {
   next();
 });
 
+app.listen(PORT, async () => {
+  console.log(`🚀 Server running on port ${PORT}`);
 
+  if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
+    console.log('🗄️ Initializing Supabase...');
+    try {
+      databaseService.canInitialize();
+      await databaseService.initializeSampleData();
+      console.log('✅ Database initialized');
+    } catch (err) {
+      console.error('❌ Database init failed:', err);
+    }
+  } else {
+    console.log('📝 Mock mode - Supabase not configured');
+  }
+});
 
 app.get('/', (req, res) => {
   res.json({ message: 'DePark Backend is running!' });
