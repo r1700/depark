@@ -9,6 +9,7 @@ import passwordRoutes from './routes/user.routes';
 import vehicleRoutes from './routes/vehicle';
 import exportToCSV from './routes/exportToCSV';
 import RetrievalQueue from './model/database-models/retrievalQueue.model';  // ייבוא המודל של RetrievalQueue
+import { all } from 'axios';
 
 const app = express();
 
@@ -31,6 +32,8 @@ app.use('/api/exportToCSV', exportToCSV);
 app.get('/api/retrievalqueues', async (req, res) => {
   try {
     const allQueues = await RetrievalQueue.findAll();  // שליפה של כל הרשומות
+    console.log({allQueues});
+    
     res.json(allQueues);  // מחזיר את הרשומות כ-JSON
   } catch (error) {
     console.log({error});
