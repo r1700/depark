@@ -6,7 +6,7 @@ import cors from 'cors';
 import loggerRoutes from './middlewares/locallLoggerMiddleware';
 import healthRoutes from './routes/health';
 import passwordRoutes from './routes/user.routes';
-import vehicleRoutes from './routes/vehicle';
+// import vehicleRoutes from './routes/vehicle';
 import exportToCSV from './routes/exportToCSV';
 
 const app = express();
@@ -23,7 +23,7 @@ app.use(express.json());
 app.use(loggerRoutes);
 app.use('/api/health', healthRoutes);
 app.use('/api/password', passwordRoutes);
-app.use('/api/vehicle', vehicleRoutes);
+// app.use('/api/vehicle', vehicleRoutes);
 app.use('/api/exportToCSV', exportToCSV);
 
 app.get('/', (req, res) => {
