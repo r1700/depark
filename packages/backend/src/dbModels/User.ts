@@ -29,4 +29,5 @@ export class User extends Model<User> {
   createdBy!: string;
 }
 
+console.log('✅ User model loaded');
 

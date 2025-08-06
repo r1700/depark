@@ -22,7 +22,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setToken(newToken);
 
     try {
-      const res = await axios.get('http://localhost:3001/api/auth/me', {
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/auth/me`, {
         headers: { Authorization: `Bearer ${newToken}` },
       });
       setUser(res.data.user);

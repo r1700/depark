@@ -5,7 +5,7 @@ dotenv.config();
 import express from 'express';
 import cors from 'cors';
 import loggerRoutes from './middlewares/locallLoggerMiddleware';
-import './models';
+import './dbModels/sequelize'; 
 import healthRoutes from './routes/health';
 import passwordRoutes from './routes/user.routes';
 import vehicleRoutes from './routes/vehicle';
@@ -32,8 +32,7 @@ app.use('/api/password', passwordRoutes);
 app.use('/api/vehicle', vehicleRoutes);
 app.use('/api/exportToCSV', exportToCSV);
 app.use('/api/auth', authRoutes);
-app.use('/api/google', userGoogleAuthRoutes);
-// app.use('/admin', adminUsersRouter);
+app.use('/api/auth', userGoogleAuthRoutes);
 
 app.use((req, res, next) => {
   console.log(`[${req.method}] ${req.path}`, req.body);
