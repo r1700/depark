@@ -7,7 +7,7 @@ services:
       - "54322:5432"      
     environment:
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
+      POSTGRES_DB: depark
     volumes:
       - db_data:/var/lib/postgresql/data
     networks:
@@ -25,7 +25,7 @@ services:
     environment:
       DB_HOST: db
       DB_PORT: 5432
-      DB_NAME: postgres
+      DB_NAME: depark
       DB_USER: postgres
       DB_PASS: postgres
     volumes:
