@@ -30,3 +30,6 @@ yarn-error.log*
 
 # Runtime
 *.tsbuildinfo
+
+#package
+package.json
