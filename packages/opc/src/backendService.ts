@@ -5,7 +5,6 @@ dotenv.config();
 
 const backendUrl = `http://${process.env.SOURCE_URL || "localhost:3001"}/vehicle-lookup`;
 
-// פונקציה לשליחת הנתון ל-backend
 async function sendDataToBackend(nodeId: string, value: any) {
   try {
     const response = await axios.post(backendUrl, {
