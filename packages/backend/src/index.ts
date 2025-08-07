@@ -9,7 +9,7 @@ import cors from 'cors';
 // import exportToCSV from './routes/exportToCSV';
 import googleAuth from './routes/google-auth';
 import auth from './routes/auth';
-
+import mailOnActionsRouter from './routes/mailOnActions';
 const app = express();
 const PORT = process.env.PORT || 3001;
 const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:3000';
@@ -24,6 +24,7 @@ app.use(express.json());
 // app.use('/api/password', passwordRoutes);
 // app.use('/api/vehicle', vehicleRoutes);
 // app.use('/api/exportToCSV', exportToCSV);
+app.use('/api/mailOnActions', mailOnActionsRouter);
 app.use('/OAuth', googleAuth); // Ensure this route is correctly set up
 app.use('/auth', auth);
 app.get('/', (req, res) => {
