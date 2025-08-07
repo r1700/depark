@@ -2,7 +2,6 @@ import React from 'react';
 import Sidebar from '../Menu/Sidebar';
 import { Box } from '@mui/material';
 import { Outlet } from 'react-router-dom';
-
 interface LayoutProps {
     user: {
         firstName: string;
@@ -10,7 +9,6 @@ interface LayoutProps {
     };
     onLogout: () => void;
 }
-
 const Layout: React.FC<LayoutProps> = ({ user, onLogout }) => {
     return (
         <Box sx={{ display: 'flex' }}>
@@ -21,5 +19,4 @@ const Layout: React.FC<LayoutProps> = ({ user, onLogout }) => {
         </Box>
     );
 };
-
 export default Layout;

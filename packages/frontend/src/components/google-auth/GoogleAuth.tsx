@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { GoogleOAuthProvider, GoogleLogin, CredentialResponse } from '@react-oauth/google';
 import './GoogleAuth.css';
 
-const GoogleAuth: React.FC = () => {
+interface GoogleAuthProps {
+  setLogin: React.Dispatch<React.SetStateAction<boolean>>;  // פרופס מ-LoginScreen
+}
 
+const GoogleAuth: React.FC<GoogleAuthProps> = ({ setLogin }) => {
   const [message, setMessage] = useState<string | null>(null);
-
 
   const GoogleResponse = (response: CredentialResponse): void => {
     if (response.credential) {
@@ -14,34 +16,26 @@ const GoogleAuth: React.FC = () => {
     }
   };
 
-
   const authenticateUser = (idToken: string): void => {
     fetch('http://localhost:3001/OAuth/verify-google-token', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ idToken: idToken }),
     })
-      .then(async (response) => {
-        const data = await response.json();
-        const idToken = response.headers.get('idtoken');
-        return { data, idToken };
-      })
-      .then(({ data, idToken }) => {
+      .then((response) => response.json())
+      .then((data: any) => {
         if (data.success) {
-          localStorage.setItem('token', idToken || '');
-          setMessage("login successful");
-        }
-        else {
-          setMessage(data.error);
+          localStorage.setItem('token', data.idToken);
+          localStorage.setItem("user", JSON.stringify(data.user));
+          setLogin(true);
+        } else {
+          setMessage(data.error || 'Authentication failed');
         }
       })
       .catch((error) => {
         setMessage('Authentication failed');
       });
   };
-
 
   return (
     <GoogleOAuthProvider clientId={process.env.REACT_APP_CLIENT_ID || ''}>
@@ -55,6 +49,5 @@ const GoogleAuth: React.FC = () => {
     </GoogleOAuthProvider>
   );
 };
-
 
 export default GoogleAuth;

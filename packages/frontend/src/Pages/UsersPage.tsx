@@ -31,13 +31,14 @@ const [showAddUserModal, setShowAddUserModal] = useState(false);
 
 
   const handleLogout = () => {
-    localStorage.removeItem('firstName');
-    localStorage.removeItem('lastName');
+    localStorage.removeItem('user');
   };
 
-  const user = {
-    firstName: localStorage.getItem('firstName') ?? '',
-    lastName: localStorage.getItem('lastName') ?? '',
+  let user= JSON.parse(localStorage.getItem("user") || "{}");
+
+ user = {
+    firstName: user.firstName || '',
+    lastName: user.lastName || ''
   };
 
   return (<>
@@ -106,6 +107,5 @@ const [showAddUserModal, setShowAddUserModal] = useState(false);
 };
 
 export default UsersPage;
-
 
 

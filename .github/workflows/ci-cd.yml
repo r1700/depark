@@ -52,9 +52,28 @@ jobs:
       - name: Install dependencies
         run: |
           npm install  # Install dependencies
-      - name: Build TypeScript project
+      # - name: Build TypeScript project
+      #   run: |
+      #     npx tsc  # Run TypeScript transpiler
+      - name: Build Backend
         run: |
-          npx tsc  # Run TypeScript transpiler
+          npx tsc --project packages/backend/tsconfig.json  # Build the backend with its specific tsconfig
+      
+      - name: Build Frontend
+        run: |
+          npx tsc --project packages/frontend/tsconfig.json  # Build the frontend with its specific tsconfig
+
+      - name: Build OPC
+        run: |
+          npx tsc --project packages/opc/tsconfig.json  # Build the OPC with its specific tsconfig
+
+      - name: Build PLC Mock
+        run: |  
+          npx tsc --project packages/plc-mock/tsconfig.json  # Build the PLC Mock with its specific tsconfig
+
+      - name: Build Mobile
+        run: |
+          npx tsc --project packages/mobile/tsconfig.json  # Build the Mobile with its specific tsconfig
 
   deploy:
     runs-on: ubuntu-latest
