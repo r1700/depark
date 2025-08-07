@@ -4,7 +4,7 @@ import sequelize from '../../config/sequlize'
 
 
 
-class ParkingSession extends Model {
+export class ParkingSession extends Model {
   public id!: number;
   public userId!: string;
   public vehicleId!: number;
@@ -84,3 +84,4 @@ ParkingSession.init(
 
 
 sequelize.sync();
+
