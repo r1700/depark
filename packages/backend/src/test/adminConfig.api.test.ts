@@ -30,7 +30,6 @@ describe('adminConfig API', () => {
       surfaceSpotIds: ['TEST_spot1', 'TEST_spot2', 'TEST_spot3'],
       avgRetrievalTimeMinutes: 30,
       maxQueueSize: 10,
-      maxParallelRetrievals: 3,
       operatingHours: { 
         Sunday: { isActive: true, openingHour: '08:00', closingHour: '18:00' },
         Monday: { isActive: true, openingHour: '08:00', closingHour: '18:00' },
@@ -41,8 +40,6 @@ describe('adminConfig API', () => {
         Saturday: { isActive: false, openingHour: '00:00', closingHour: '00:00' }
       },
       timezone: 'Asia/Jerusalem',
-      maintenanceMode: false,
-      showAdminAnalytics: true,
       updatedBy: 'test-admin'
     });
 
@@ -53,7 +50,6 @@ describe('adminConfig API', () => {
       surfaceSpotIds: ['TEST_spot4', 'TEST_spot5'],
       avgRetrievalTimeMinutes: 25,
       maxQueueSize: 5,
-      maxParallelRetrievals: 2,
       operatingHours: { 
         Sunday: { isActive: true, openingHour: '09:00', closingHour: '19:00' },
         Monday: { isActive: true, openingHour: '09:00', closingHour: '19:00' },
@@ -64,8 +60,6 @@ describe('adminConfig API', () => {
         Saturday: { isActive: false, openingHour: '00:00', closingHour: '00:00' }
       },
       timezone: 'Asia/Jerusalem',
-      maintenanceMode: false,
-      showAdminAnalytics: true,
       updatedBy: 'test-admin'
     });
   });
@@ -306,7 +300,6 @@ describe('adminConfig API', () => {
       surfaceSpotIds: ['TEST_spot1', 'TEST_spot2', 'TEST_spot3', 'TEST_spot4'],
       avgRetrievalTimeMinutes: 35,
       maxQueueSize: 12,
-      maxParallelRetrievals: 2,
       operatingHours: { 
         Sunday: { isActive: true, openingHour: '07:00', closingHour: '19:00' },
         Monday: { isActive: true, openingHour: '07:00', closingHour: '19:00' },
@@ -317,8 +310,6 @@ describe('adminConfig API', () => {
         Saturday: { isActive: false, openingHour: '00:00', closingHour: '00:00' }
       },
       timezone: 'Asia/Jerusalem',
-      maintenanceMode: false,
-      showAdminAnalytics: true,
       updatedBy: 'test-admin'
     };
 
@@ -418,10 +409,7 @@ describe('adminConfig API', () => {
       maxQueueSize: 3,
       operatingHours: { monday: '08:00-17:00' },
       timezone: 'UTC',
-      updatedBy: 'test-admin',
-      maintenanceMode: false,
-      showAdminAnalytics: false,
-      maxParallelRetrievals: 1
+      updatedBy: 'test-admin'
     });
 
     const res = await request(app)
