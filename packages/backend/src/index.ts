@@ -2,13 +2,13 @@ import dotenv from 'dotenv';
 dotenv.config();
 import express from 'express';
 import cors from 'cors';
-// import loggerRoutes from './middlewares/locallLoggerMiddleware';
-// import healthRoutes from './routes/health';
-// import passwordRoutes from './routes/user.routes';
+import loggerRoutes from './middlewares/locallLoggerMiddleware';
+import healthRoutes from './routes/health';
+import passwordRoutes from './routes/user.routes';
 // import vehicleRoutes from './routes/vehicle';
-// import exportToCSV from './routes/exportToCSV';
-import googleAuth from './routes/google-auth';
-import auth from './routes/auth';
+import exportToCSV from './routes/exportToCSV';
+import vehicleStatsRoutes from './routes/parkingStat'; 
+
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -19,13 +19,14 @@ app.use(cors({
   credentials: true,
 }));
 app.use(express.json());
-// app.use(loggerRoutes);
-// app.use('/api/health', healthRoutes);
-// app.use('/api/password', passwordRoutes);
+app.use(loggerRoutes);
+app.use('/api/health', healthRoutes);
+app.use('/api/password', passwordRoutes);
 // app.use('/api/vehicle', vehicleRoutes);
-// app.use('/api/exportToCSV', exportToCSV);
-app.use('/OAuth', googleAuth); // Ensure this route is correctly set up
-app.use('/auth', auth);
+app.use('/api/exportToCSV', exportToCSV);
+app.use('/api/parking-stats', vehicleStatsRoutes); // הוספתי את ה-API החדש
+
+
 app.get('/', (req, res) => {
   res.json({ message: 'DePark Backend is running!' });
 });
@@ -53,4 +54,5 @@ app.listen(PORT, () => {
   console.log('   POST /api/auth/login');
   console.log('   GET  /api/admin/config');
   console.log('   PUT  /api/admin/config');
+  console.log('   GET  /api/parking-stats/stats'); 
 });
