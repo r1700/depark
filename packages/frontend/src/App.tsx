@@ -1,13 +1,13 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useCallback } from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import LoginScreen from './components/screen-login/LoginScreen';
-import { Box, Button, Container, Typography } from "@mui/material";
+import { Container } from "@mui/material";
 import AdminConfigPage from "./components/AdminConfigPage";
+import ParkingsPage from "./Pages/ParkingsPage";
 
 const App: React.FC = () => {
-  // קריאה ראשונית מה־localStorage כדי לטעון אם המשתמש כבר מחובר
-  const [loggedIn, setLoggedIn] = useState<boolean>(() => {
-    return !!localStorage.getItem("token");
-  });
+  // Always show as logged in for now - skip login screen
+  const [loggedIn, setLoggedIn] = useState<boolean>(true);
 
   // הפונקציה לטיפול בכניסה מוצלחת, מקבלת טוקן
   const handleLogin = useCallback((token?: string) => {
@@ -17,31 +17,33 @@ const App: React.FC = () => {
     setLoggedIn(true);
   }, []);
 
-  // פונקצית logout מוחקת את הטוקן ומעדכנת מצב
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    setLoggedIn(false);
-  };
+  if (!loggedIn) {
+    return (
+      <Container maxWidth="sm" sx={{ mt: 8, textAlign: "center", direction: "ltr" }}>
+        <LoginScreen onLogin={handleLogin} />
+      </Container>
+    );
+  }
 
   return (
-    // <Container maxWidth="sm" sx={{ mt: 8, textAlign: "center", direction: "ltr" }}>
-    //   {loggedIn ? (
-    //     <Box>
-    //       <Typography variant="h4" gutterBottom>
-    //         Welcome!
-    //       </Typography>
-    //       <Button variant="contained" onClick={handleLogout}>
-    //         Logout
-    //       </Button>
-    //     </Box>
-    //   ) : (
-    //     // כאן מוסיפים פרופס של onLogin שמקבלת טוקן
-    //     <LoginScreen onLogin={handleLogin} />
-    //   )}
-    // </Container>
-    <>
-      <AdminConfigPage />
-    </>
+    <Router>
+      <Routes>
+        {/* Default route - redirect to parkings */}
+        <Route path="/" element={<Navigate to="/parkings" replace />} />
+        
+        {/* Parkings list page */}
+        <Route path="/parkings" element={<ParkingsPage />} />
+        
+        {/* Admin config page - for new parking lot */}
+        <Route path="/admin-config" element={<AdminConfigPage />} />
+        
+        {/* Admin config page - for editing specific parking lot */}
+        <Route path="/admin-config/:lotId" element={<AdminConfigPage />} />
+        
+        {/* Catch all - redirect to parkings */}
+        <Route path="*" element={<Navigate to="/parkings" replace />} />
+      </Routes>
+    </Router>
   );
 };
 

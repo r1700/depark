@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Container, Paper, Typography, Box, Button, Stack } from "@mui/material";
+import { Container, Paper, Typography, Box, Button } from "@mui/material";
 import DataTable from "../components/table/table";
+import { useNavigate } from "react-router-dom";
 
-interface ParkingsPageProps {
-  onEdit?: (lotId: string) => void;
-  onAddNew?: () => void;
-}
+interface ParkingsPageProps {}
 
-const ParkingsPage: React.FC<ParkingsPageProps> = ({ onEdit, onAddNew }) => {
-  
+const ParkingsPage: React.FC<ParkingsPageProps> = () => {
+  const navigate = useNavigate();
   const [tableData, setTableData] = useState<{
     columns: Array<{ id: string; label: string }>;
     rows: Array<any>;
@@ -19,12 +17,6 @@ const ParkingsPage: React.FC<ParkingsPageProps> = ({ onEdit, onAddNew }) => {
     ],
     rows: []
   });
-
-  // State for delete confirmation dialog
-  const [deleteConfirmDialog, setDeleteConfirmDialog] = useState<{
-    open: boolean;
-    lotData: any;
-  }>({ open: false, lotData: null });
 
   // Fetch parking lots data
   const getAllParkingLots = async () => {
@@ -69,47 +61,6 @@ const ParkingsPage: React.FC<ParkingsPageProps> = ({ onEdit, onAddNew }) => {
     loadData();
   }, []);
 
-  // Handle edit - call onEdit prop if provided
-  const handleEdit = (row: any) => {
-    console.log('🔄 Editing lot:', row.id);
-    if (onEdit) {
-      onEdit(row.id);
-    }
-  };
-
-  // Handle delete - show confirmation dialog first
-  const handleDelete = (row: any) => {
-    setDeleteConfirmDialog({ open: true, lotData: row });
-  };
-
-  // Confirm and execute delete
-  const confirmDeleteLot = async () => {
-    if (!deleteConfirmDialog.lotData) return;
-    
-    try {
-      const response = await fetch(`/api/admin/${deleteConfirmDialog.lotData.id}`, {
-        method: 'DELETE'
-      });
-      
-      if (response.ok) {
-        // Remove from table immediately
-        setTableData(prev => ({
-          ...prev,
-          rows: prev.rows.filter(r => r.id !== deleteConfirmDialog.lotData.id)
-        }));
-        console.log('✅ Parking lot deleted successfully');
-      } else {
-        const errorData = await response.json();
-        console.error('❌ Failed to delete:', errorData.error);
-      }
-    } catch (error) {
-      console.error('❌ Error deleting parking lot:', error);
-    } finally {
-      // Close the dialog
-      setDeleteConfirmDialog({ open: false, lotData: null });
-    }
-  };
-
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
       <Paper elevation={3} sx={{ p: 4, borderRadius: 3 }}>
@@ -130,16 +81,14 @@ const ParkingsPage: React.FC<ParkingsPageProps> = ({ onEdit, onAddNew }) => {
         {/* Data Table */}
         <DataTable 
           data={tableData} 
-          onEdit={handleEdit}
-          onDelete={handleDelete}
+          editPath="/admin-config"
+          deletePath="/api/admin"
         />
         <Box sx={{ textAlign: 'center', mb: 6 }}>
             <Button
               onClick={() => {
                 console.log('🔄 Add New Lot clicked');
-                if (onAddNew) {
-                  onAddNew();
-                }
+                navigate('/admin-config');
               }}
               sx={{ minWidth: 500,
                         bgcolor: 'primary.main',
@@ -165,61 +114,6 @@ const ParkingsPage: React.FC<ParkingsPageProps> = ({ onEdit, onAddNew }) => {
               + Add New Lot
             </Button>
           </Box>
-
-        {/* Delete Confirmation Dialog */}
-        {deleteConfirmDialog.open && (
-          <Box
-            sx={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              bgcolor: 'rgba(0, 0, 0, 0.5)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              zIndex: 1600
-            }}
-          >
-            <Box
-              sx={{
-                bgcolor: 'white',
-                borderRadius: 2,
-                p: 3,
-                maxWidth: 400,
-                width: '90%',
-                boxShadow: '0 8px 32px rgba(0,0,0,0.3)'
-              }}
-            >
-              <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: '#d32f2f' }}>
-                ⚠️ Delete Parking Lot
-              </Typography>
-              <Typography variant="body1" sx={{ mb: 3 }}>
-                Are you sure you want to delete parking lot{' '}
-                <Box component="span" sx={{ fontWeight: 600, color: 'primary.main' }}>
-                  "{deleteConfirmDialog.lotData?.facilityName || deleteConfirmDialog.lotData?.id}"
-                </Box>
-                ?
-              </Typography>
-              <Stack direction="row" spacing={2} justifyContent="flex-end">
-                <Button
-                  variant="outlined"
-                  onClick={() => setDeleteConfirmDialog({ open: false, lotData: null })}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  variant="contained"
-                  color="error"
-                  onClick={confirmDeleteLot}
-                >
-                  Delete
-                </Button>
-              </Stack>
-            </Box>
-          </Box>
-        )}
       </Paper>
     </Container>
   );

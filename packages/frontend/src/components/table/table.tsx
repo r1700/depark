@@ -1,6 +1,6 @@
 
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TablePagination, IconButton } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -8,15 +8,24 @@ import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import './table.css';
+import { useNavigate } from 'react-router-dom';
+import DeleteConfirmDialog, { DeleteConfirmDialogRef } from '../DeleteConfirmDialog/DeleteConfirmDialog';
 
-const DataTable = ({ data }: { data: { columns: any[], rows: any[] } }) => {
+const DataTable = ({ data, editPath, deletePath }: { 
+  data: { columns: any[], rows: any[] };
+  editPath?: string;
+  deletePath?: string;
+}) => {
+  const navigate = useNavigate();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [order, setOrder] = useState<'asc' | 'desc'>('asc');
   const [orderBy, setOrderBy] = useState<string>('');
   const [sortMenuOpen, setSortMenuOpen] = useState<boolean>(false);
   const [selectedColumn, setSelectedColumn] = useState<string>('');
-  const [hoveredOption, setHoveredOption] = useState<'asc' | 'desc' | null>(null); 
+  const [hoveredOption, setHoveredOption] = useState<'asc' | 'desc' | null>(null);
+  const [currentDeleteItem, setCurrentDeleteItem] = useState<any>(null);
+  const deleteDialogRef = useRef<DeleteConfirmDialogRef>(null);
 
   const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
     setPage(newPage);
@@ -25,6 +34,14 @@ const DataTable = ({ data }: { data: { columns: any[], rows: any[] } }) => {
   const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
+  };
+
+  // Handle delete button click
+  const handleDelete = (row: any) => {
+    if (deletePath && deleteDialogRef.current) {
+      setCurrentDeleteItem(row);
+      deleteDialogRef.current.openDialog();
+    }
   };
 
   const stableSort = (array: any[], comparator: any) => {
@@ -139,10 +156,22 @@ const DataTable = ({ data }: { data: { columns: any[], rows: any[] } }) => {
                     </TableCell>
                   ))}
                   <TableCell className="actions">
-                    <IconButton color="success" aria-label="edit">
+                    <IconButton 
+                      color="success" 
+                      aria-label="edit"
+                      onClick={() => {
+                      if (editPath) {
+                          navigate(`${editPath}/${row.id}`);
+                        }
+                      }}
+                    >
                       <EditIcon />
                     </IconButton>
-                    <IconButton color="error" aria-label="delete">
+                    <IconButton 
+                      color="error" 
+                      aria-label="delete"
+                      onClick={() => handleDelete(row)}
+                    >
                       <DeleteIcon />
                     </IconButton>
                   </TableCell>
@@ -167,6 +196,13 @@ const DataTable = ({ data }: { data: { columns: any[], rows: any[] } }) => {
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
         className="table-pagination"
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <DeleteConfirmDialog
+        ref={deleteDialogRef}
+        itemData={currentDeleteItem}
+        deletePath={deletePath || ''}
       />
     </>
   );

@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
   Container,
   Paper,
@@ -37,7 +38,6 @@ import {
 } from '@mui/icons-material';
 
 import { styled } from '@mui/material/styles';
-import DataTable from './table/table';
 
 // Types
 interface ParkingConfig {
@@ -132,13 +132,14 @@ const timezones = [
 
 const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-interface AdminConfigPageProps {
-  onNavigateBack?: () => void;
-}
+interface AdminConfigPageProps {}
 
-export default function AdminConfigPage({ onNavigateBack }: AdminConfigPageProps) {
-  // Initial config
-  const initialConfig: ParkingConfig = {
+export default function AdminConfigPage({}: AdminConfigPageProps) {
+  const navigate = useNavigate();
+  const { lotId } = useParams<{ lotId?: string }>();
+  
+  // Initial config - memoized to prevent re-creation on every render
+  const initialConfig: ParkingConfig = useMemo(() => ({
     facilityName: '',
     lotId: '',
     timezone: 'Asia/Jerusalem',
@@ -158,7 +159,7 @@ export default function AdminConfigPage({ onNavigateBack }: AdminConfigPageProps
     maxParallelRetrievals:0, 
     maintenanceMode: false,
     showAdminAnalytics: false
-  };
+  }), []);
 
   // State
   const [parkingConfig, setParkingConfig] = useState<ParkingConfig>(initialConfig);
@@ -166,6 +167,7 @@ export default function AdminConfigPage({ onNavigateBack }: AdminConfigPageProps
   const [newSpotId, setNewSpotId] = useState('');
   const [showAddSpot, setShowAddSpot] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [showErrorPopup, setShowErrorPopup] = useState(false);
   const [currentError, setCurrentError] = useState<string | null>(null);
@@ -179,6 +181,83 @@ export default function AdminConfigPage({ onNavigateBack }: AdminConfigPageProps
     open: boolean;
     lotData: any;
   }>({ open: false, lotData: null });
+
+  // Load existing parking config if lotId is provided
+  useEffect(() => {
+    console.log('🔄 useEffect triggered with lotId:', lotId);
+    
+    const loadExistingConfig = async () => {
+      if (lotId) {
+        setLoading(true);
+        try {
+          console.log('🔄 Loading existing config for lotId:', lotId);
+          const response = await fetch(`/api/admin/${lotId}`, {
+            headers: {
+              'Cache-Control': 'no-cache',
+              'Pragma': 'no-cache'
+            }
+          });
+          
+          if (response.ok) {
+            const result = await response.json();
+            console.log('✅ Loaded existing config:', result);
+            
+            if (result.success && result.parkingConfig) {
+              const config = result.parkingConfig;
+              
+              // Convert the loaded config to match our format
+              const defaultDailyHours = {
+                Sunday: { isActive: false, openingHour: '00:00', closingHour: '00:00' },
+                Monday: { isActive: false, openingHour: '00:00', closingHour: '00:00' },
+                Tuesday: { isActive: false, openingHour: '00:00', closingHour: '00:00' },
+                Wednesday: { isActive: false, openingHour: '00:00', closingHour: '00:00' },
+                Thursday: { isActive: false, openingHour: '00:00', closingHour: '00:00' },
+                Friday: { isActive: false, openingHour: '00:00', closingHour: '00:00' },
+                Saturday: { isActive: false, openingHour: '00:00', closingHour: '00:00' }
+              };
+              
+              const loadedConfig: ParkingConfig = {
+                facilityName: config.facilityName || '',
+                lotId: config.id || '',
+                timezone: config.timezone || 'Asia/Jerusalem',
+                surfaceSpotIds: config.surfaceSpotIds || [],
+                totalSpots: config.totalSpots || 0,
+                dailyHours: config.operatingHours || defaultDailyHours,
+                avgRetrievalTime: config.avgRetrievalTimeMinutes || 0,
+                maxQueueSize: config.maxQueueSize || 0,
+                maxParallelRetrievals: config.maxParallelRetrievals || 1,
+                maintenanceMode: config.maintenanceMode || false,
+                showAdminAnalytics: config.showAdminAnalytics || false,
+                updatedAt: config.updatedAt ? new Date(config.updatedAt) : undefined,
+                updatedBy: config.updatedBy || 'admin'
+              };
+              
+              setParkingConfig(loadedConfig);
+              setLastSavedConfig(loadedConfig);
+              console.log('✅ Config loaded and set:', loadedConfig);
+            }
+          } else {
+            console.error('❌ Failed to load config:', response.status);
+            setCurrentError(`Failed to load parking lot data: ${response.status}`);
+            setShowErrorPopup(true);
+          }
+        } catch (error) {
+          console.error('❌ Error loading config:', error);
+          setCurrentError('Error loading parking lot data');
+          setShowErrorPopup(true);
+        } finally {
+          setLoading(false);
+        }
+      } else {
+        console.log('💭 No lotId provided, staying with initial config');
+        // Reset to initial config when no lotId (new lot)
+        setParkingConfig(initialConfig);
+        setLastSavedConfig(initialConfig);
+      }
+    };
+    
+    loadExistingConfig();
+  }, [lotId]); // Remove initialConfig dependency
 
   // Auto-hide error popup after 3 seconds
   useEffect(() => {
@@ -281,27 +360,11 @@ export default function AdminConfigPage({ onNavigateBack }: AdminConfigPageProps
     rows: []
   });
 
-  // Load data only once and check for URL parameters
+  // Load table data only once
   useEffect(() => {
     const loadData = async () => {
       const parkingLots = await getAllParkingLots();
       setTableData(prev => ({ ...prev, rows: parkingLots || [] }));
-      
-      // Check if there's a lotId in URL parameters
-      const urlParams = new URLSearchParams(window.location.search);
-      const lotIdFromUrl = urlParams.get('lotId');
-      
-      if (lotIdFromUrl) {
-        console.log('🔄 Loading lot from URL parameter:', lotIdFromUrl);
-        await loadLotForEdit(lotIdFromUrl);
-      } else {
-        // If no URL parameter and we have parking lots, load the first one (usually 'main')
-        if (parkingLots && parkingLots.length > 0) {
-          const firstLot = parkingLots[0];
-          console.log('🔄 Loading default lot:', firstLot.id);
-          await loadLotForEdit(firstLot.id);
-        }
-      }
     };
     loadData();
   }, []); // Empty - will load only once
@@ -325,6 +388,7 @@ export default function AdminConfigPage({ onNavigateBack }: AdminConfigPageProps
           maintenanceMode: data.parkingConfig.maintenanceMode ?? false,
           showAdminAnalytics: data.parkingConfig.showAdminAnalytics ?? false,
           updatedAt: data.parkingConfig.updatedAt ? new Date(data.parkingConfig.updatedAt) : undefined,
+          updatedBy: data.parkingConfig.updatedBy || 'admin'
         };
         
         setParkingConfig(loadedConfig);
@@ -362,6 +426,7 @@ export default function AdminConfigPage({ onNavigateBack }: AdminConfigPageProps
           maintenanceMode: data.parkingConfig.maintenanceMode ?? false,
           showAdminAnalytics: data.parkingConfig.showAdminAnalytics ?? false,
           updatedAt: data.parkingConfig.updatedAt ? new Date(data.parkingConfig.updatedAt) : undefined,
+          updatedBy: data.parkingConfig.updatedBy || 'admin'
         };
         
         setParkingConfig(convertedConfig);
@@ -575,16 +640,18 @@ export default function AdminConfigPage({ onNavigateBack }: AdminConfigPageProps
     setSaving(true);
     try {
       const now = new Date();
-      const isNewLot = addingNewLot && (!lastSavedConfig.lotId || lastSavedConfig.lotId === '');
+      // Check if this is a new lot - use React Router lotId instead of URL params
+      const isNewLot = !lotId; // If no lotId from useParams, it's a new lot
 
       console.log('🔄 CRITICAL_SAVE_DEBUG: Starting save process');
       console.log('🔄 Current parkingConfig:', JSON.stringify(parkingConfig, null, 2));
+      console.log('🔄 lotId from useParams:', lotId);
       console.log('🔄 isNewLot:', isNewLot);
       console.log('🔄 Sending timestamp:', now.toISOString());
 
       const url = isNewLot
         ? '/api/admin'
-        : `/api/admin/${parkingConfig.lotId}`; 
+        : `/api/admin/${lotId}`; // Use lotId from useParams
 
       const method = isNewLot ? 'POST' : 'PUT';
 
@@ -718,6 +785,7 @@ export default function AdminConfigPage({ onNavigateBack }: AdminConfigPageProps
           maintenanceMode: data.parkingConfig.maintenanceMode ?? false,
           showAdminAnalytics: data.parkingConfig.showAdminAnalytics ?? false,
           updatedAt: data.parkingConfig.updatedAt ? new Date(data.parkingConfig.updatedAt) : undefined,
+          updatedBy: data.parkingConfig.updatedBy || 'admin'
         };
         
         setParkingConfig(loadedConfig);
@@ -757,24 +825,22 @@ export default function AdminConfigPage({ onNavigateBack }: AdminConfigPageProps
           {/* Header */}
           <Box textAlign="center" mb={4}>
             {/* Back Button */}
-            {onNavigateBack && (
-              <Box sx={{ textAlign: 'left', mb: 2 }}>
-                <Button
-                  variant="outlined"
-                  onClick={onNavigateBack}
-                  sx={{ 
-                    color: 'primary.main',
-                    borderColor: 'primary.main',
-                    '&:hover': {
-                      backgroundColor: 'primary.main',
-                      color: 'white'
-                    }
+            <Box sx={{ textAlign: 'left', mb: 2 }}>
+              <Button
+                variant="outlined"
+                onClick={() => navigate('/parkings')}
+                sx={{ 
+                  color: 'primary.main',
+                  borderColor: 'primary.main',
+                  '&:hover': {
+                    backgroundColor: 'primary.main',
+                    color: 'white'
+                  }
                   }}
                 >
                   ← Back to Parking Lots
                 </Button>
               </Box>
-            )}
             
             <Typography variant="h3" component="h1" gutterBottom sx={{ 
               fontWeight: 400, 
@@ -784,9 +850,18 @@ export default function AdminConfigPage({ onNavigateBack }: AdminConfigPageProps
               pb: 2,
               mb: 4
             }}>
-              Parking System Configuration
+              {lotId ? `Edit Parking Lot: ${parkingConfig.facilityName || lotId}` : 'New Parking System Configuration'}
             </Typography>
           </Box>
+
+          {/* Loading indicator */}
+          {loading && (
+            <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
+              <Typography variant="h6" sx={{ color: 'primary.main' }}>
+                Loading parking lot data...
+              </Typography>
+            </Box>
+          )}
 
           {/* Success Alert Message */}
           {message && message.type === 'success' && (
@@ -1333,17 +1408,18 @@ export default function AdminConfigPage({ onNavigateBack }: AdminConfigPageProps
                 🔄 Reset to Default Settings
               </Button>
             </Stack>
-            {parkingConfig.updatedAt && (
+            {(parkingConfig.updatedAt || lotId) && (
               <Typography variant="caption" color="text.secondary" sx={{ mt: 2, display: 'block' }}>
-                {(() => {
+                {parkingConfig.updatedAt ? (() => {
                   const d = new Date(parkingConfig.updatedAt);
                   const dateStr = d.toLocaleDateString('en-GB');
                   const timeStr = d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                  return `Last updated: Date: ${dateStr} Time: ${timeStr}`;
-                })()}
+                  return `Last updated: ${dateStr} at ${timeStr}${parkingConfig.updatedBy ? ` by ${parkingConfig.updatedBy}` : ''}`;
+                })() : lotId ? `Configuration loaded for lot: ${lotId}` : 'New configuration'}
               </Typography>
             )}
           </Box>
+          
           {/* Load for Update Section */}
           {showDeleteConfirm && spotToDelete && (
             <Box
