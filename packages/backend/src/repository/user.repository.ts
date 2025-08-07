@@ -49,3 +49,16 @@ export const updatePasswordWithSession = async (
 export const findBaseUserById = async (id: number): Promise<BaseUser | null> => {
   return await BaseUser.findOne({ where: { id } });
 };
+export const isTokenValid = async (
+  userId: number,
+  tempToken: string,
+  maxMinutes: number = 30
+): Promise<boolean> => {
+  const session = await UserSession.findOne({ where: { userId, tempToken } });
+  if (!session) return false;
+  const createdAt = session.createdAt as Date;
+  const now = new Date();
+  const diffMs = now.getTime() - createdAt.getTime();
+  const diffMinutes = diffMs / (1000 * 60);
+  return diffMinutes <= maxMinutes;
+};

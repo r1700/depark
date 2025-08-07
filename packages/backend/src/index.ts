@@ -10,6 +10,7 @@ import exportToCSV from './routes/exportToCSV';
 import session from 'express-session';
 import googleAuth from './routes/google-auth';
 import auth from './routes/auth';
+import userRouter from './routes/user.routes'; 
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -45,6 +46,7 @@ app.use('/api/vehicle', vehicleRoutes);
 app.use('/api/exportToCSV', exportToCSV);
 app.use('/OAuth', googleAuth);
 app.use('/auth', auth);
+app.use('/api/password', userRouter); 
 
 app.get('/', (req, res) => {
   res.json({ message: 'DePark Backend is running!' });

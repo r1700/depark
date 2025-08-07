@@ -5,6 +5,8 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter, createBrowserRouter, RouterProvider } from 'react-router-dom';
 import LoginScreen from './components/screen-login/LoginScreen';
+import ForgotPassword from './Pages/Password-reset/ForgotPassword';
+import ResetPassword from './Pages/Password-reset/ResetPassword';
 import HrDashboard from './components/hrDashboard/HrDashboard';
 import AdminDashboard from './components/adminDashboard/AdminDashboard';
 import Layout from './components/layout/layout';
@@ -25,6 +27,8 @@ const routers = createBrowserRouter([
           { path: 'admin-dashboard', element: <AdminDashboard /> },
           { path: 'hr-dashboard', element: <HrDashboard /> },
           { path: 'users', element: <UsersPage />},
+          { path: 'reset-password', element: <ResetPassword /> },
+          { path: 'forgot-password', element: <ForgotPassword /> },
         ]
       },
 

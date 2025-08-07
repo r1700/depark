@@ -1,18 +1,36 @@
+import nodemailer from 'nodemailer';
+
 export const sendResetEmail = async (email: string, resetUrl: string): Promise<void> => {
-  // לעת עתה - רק לוג מדומה
-  console.log('🎯 ========== PASSWORD RESET EMAIL ==========');
-  console.log(`📧 נשלח אימייל איפוס סיסמה ל: ${email}`);
-  console.log(`🔗 קישור איפוס: ${resetUrl}`);
-  console.log('✅ אימייל "נשלח" בהצלחה (דמה)');
-  console.log('===============================================');
-  
-  // אם תרצה להוסיף אימייל אמיתי בעתיד:
   if (process.env.EMAIL_HOST && process.env.EMAIL_USER && process.env.EMAIL_PASS) {
-    // כאן תוסיף קוד שליחת אימייל אמיתי (nodemailer וכו')
-    console.log('💡 Email settings found - would send real email here');
+    const transporter = nodemailer.createTransport({
+      host: process.env.EMAIL_HOST,
+      port: Number(process.env.EMAIL_PORT) || 587,
+      secure: false,
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    const mailOptions = {
+      from: `"Depark Support" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: 'Password Reset - Depark',
+      html: `
+        <p>Hello,</p>
+        <p>You requested a password reset. Click the link below to reset your password:</p>
+        <a href="${resetUrl}">${resetUrl}</a>
+        <p>If you did not request a reset, you can ignore this message.</p>
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log(`📧 Password reset email sent to: ${email}`);
   } else {
-    console.log('📧 Using mock email - real email settings not configured');
+    // Dummy mode - email settings not configured
+    console.log('🎯 ========== PASSWORD RESET EMAIL ==========');
+    console.log(`📧 Password reset email sent to: ${email}`);
+    console.log(`🔗 Reset link: ${resetUrl}`);
+    console.log('✅ "Email sent" successfully');
   }
-  
-  return Promise.resolve();
 };

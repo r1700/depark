@@ -11,7 +11,7 @@ import {
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret';
 const TOKEN_EXPIRATION_MINUTES = parseInt(process.env.RESET_TOKEN_EXPIRATION_MINUTES || '15');
 
-export const requestPasswordReset = async (req: any, email: string): Promise<string> => {
+export const requestPasswordReset = async (email: string): Promise<{ tempToken: string, userId: number }> => {
   const baseUser = await findBaseUserByEmail(email);
   if (!baseUser) {
     throw new Error('User not found');
@@ -22,23 +22,23 @@ export const requestPasswordReset = async (req: any, email: string): Promise<str
     throw new Error('User not authorized for password reset');
   }
 
-  req.session.userId = baseUser.id;
-
   const tempToken = jwt.sign(
     { userId: baseUser.id, email: baseUser.email },
     JWT_SECRET,
     { expiresIn: `${TOKEN_EXPIRATION_MINUTES}m` }
   );
 
-  return tempToken;
+  // עדכן את הטוקן הזמני במסד הנתונים
+  await updateTempTokenInSession(baseUser.id, tempToken);
+
+  return { tempToken, userId: baseUser.id };
 };
 
 export const changePasswordForCurrentUser = async (
-  req: any,
+  userId: number,
   password: string,
   confirmPassword: string
 ): Promise<void> => {
-  const userId = req.session.userId; 
   if (!userId) {
     throw new Error('User not authenticated');
   }

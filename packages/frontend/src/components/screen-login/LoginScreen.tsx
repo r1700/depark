@@ -3,8 +3,12 @@ import { Box, Button, TextField, Typography, Link, Alert, Stack, Container, Circ
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { useNavigate } from "react-router-dom";
 import GoogleAuth from "../google-auth/GoogleAuth";
+import ForgotPassword from "../../Pages/Password-reset/ForgotPassword";
+import { useNavigate } from "react-router-dom";
+interface LoginScreenProps {
+  onLogin: () => void;
+}
 
 interface IFormInputs {
   email: string;
@@ -155,10 +159,19 @@ const LoginScreen: React.FC = () => {
           </Button>
         </Box>
 
-        <GoogleAuth setLogin={setLogin} />
-
-        <Stack direction="row" justifyContent="space-between" sx={{ mt: 2 }} spacing={2}>
-          <Link href="#" underline="hover" variant="body2" dir="ltr">
+        <Stack
+          direction="row"
+          justifyContent="space-between"
+          sx={{ mt: 2 }}
+          spacing={2}
+        >
+          <Link
+          component="button"
+          underline="hover"
+          variant="body2"
+          dir="ltr"
+          onClick={() => navigate("/password-reset/ForgotPassword")}
+        >
             Forgot password?
           </Link>
           <Link href="#" underline="hover" variant="body2" dir="ltr">
