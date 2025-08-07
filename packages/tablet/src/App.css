@@ -1,0 +1,753 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  background-color: #f5f5f5;
+  color: #333;
+  line-height: 1.6;
+}
+
+.App {
+  text-align: center;
+}
+
+/* החזר את .container למצב בינוני: */
+.container {
+  max-width: 1600px; /* רחב יותר מ-1400px */
+  margin: 0 auto; /* מרכז */
+  padding: 40px; /* padding גדול יותר מהצדדים */
+  box-sizing: border-box;
+}
+
+.admin-config {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 3rem; /* padding גדול יותר */
+  margin: 30px; /* margin גדול יותר מהצדדים */
+  min-height: auto;
+}
+
+/* החזר את הכותרת למצב רגיל: */
+.admin-config h1 {
+  color: #333;
+  text-align: center;
+  font-size: 2.3rem; /* גדול יותר */
+  font-weight: 400;
+  margin-bottom: 2.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid #4A90E2;
+}
+
+/* שנה את Grid Layout ל-2 עמודות: */
+.config-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* 2 ריבועים בכל שורה */
+  gap: 2.5rem; /* מרווח גדול יותר */
+  margin-bottom: 2.5rem;
+}
+
+/* הסר את config-grid-bottom - כל הריבועים באותו grid */
+.config-grid-bottom {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* 2 ריבועים */
+  gap: 2.5rem;
+  margin-bottom: 2.5rem;
+}
+
+/* ריבועים גדולים יותר: */
+.config-section {
+  background: white;
+  border: 1px solid #4A90E2;
+  border-radius: 8px;
+  padding: 2.2rem; /* padding גדול יותר */
+  min-height: 400px; /* גובה גדול יותר */
+}
+
+.config-section h2 {
+  color: #4A90E2;
+  font-size: 1.2rem; /* גדול יותר */
+  font-weight: 600;
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.section-number {
+  background: #4A90E2;
+  color: white;
+  border-radius: 50%;
+  width: 26px; /* גדול יותר */
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+/* Form elements גדולים יותר: */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  color: #666;
+  font-weight: 500;
+  margin-bottom: 0.8rem;
+  font-size: 1rem; /* גדול יותר */
+  text-align: left;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 0.8rem; /* גדול יותר */
+  border: 1px solid #ddd;
+  border-radius: 6px; /* radius גדול יותר */
+  font-size: 1rem; /* גדול יותר */
+  background: white;
+}
+
+/* החלף את .days-selector ו-.day-checkbox (שורות 104-122) בזה: */
+
+.days-selector {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr); /* 6 ימים בשורה אחת */
+  gap: 0.6rem; /* מרווח קטן יותר */
+  margin-top: 1.2rem;
+}
+
+.day-checkbox {
+  position: relative;
+  display: block;
+  cursor: pointer;
+  user-select: none;
+}
+
+.day-checkbox input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  width: 0;
+  height: 0;
+}
+
+/* כפתור יום מותאם אישית */
+.day-checkbox .day-label {
+  display: block;
+  padding: 0.8rem 0.4rem; /* צר יותר - padding קטן בצדדים */
+  background: #f8f9fa;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  color: #6c757d;
+  font-size: 0.85rem; /* קצת יותר קטן */
+  font-weight: 600;
+  text-align: center;
+  transition: all 0.3s ease;
+  min-height: 48px; /* גובה קטן יותר */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap; /* מונע שבירת טקסט */
+}
+
+/* מצב לא נבחר - hover */
+.day-checkbox:hover .day-label {
+  background: #e9ecef;
+  border-color: #4A90E2;
+  color: #495057;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* מצב נבחר */
+.day-checkbox input[type="checkbox"]:checked + .day-label {
+  background: linear-gradient(135deg, #4A90E2, #357ABD);
+  border-color: #357ABD;
+  color: white;
+  font-weight: 700;
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.4);
+}
+
+/* מצב נבחר + hover */
+.day-checkbox input[type="checkbox"]:checked + .day-label:hover {
+  background: linear-gradient(135deg, #357ABD, #2c5aa0);
+  transform: scale(1.05) translateY(-1px);
+  box-shadow: 0 6px 16px rgba(74, 144, 226, 0.5);
+}
+
+/* אנימציה */
+.day-checkbox .day-label {
+  animation: dayFadeIn 0.5s ease-out;
+}
+
+@keyframes dayFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* רספונסיב */
+@media (max-width: 768px) {
+  .days-selector {
+    grid-template-columns: repeat(3, 1fr); /* 3 בשורה במובייל */
+    gap: 0.5rem;
+  }
+  
+  .day-checkbox .day-label {
+    padding: 0.6rem 0.3rem; /* עוד יותר צר במובייל */
+    font-size: 0.75rem; /* טקסט קטן יותר */
+    min-height: 42px;
+  }
+}
+
+/* עבור מסכים קטנים מאוד: */
+@media (max-width: 480px) {
+  .days-selector {
+    grid-template-columns: repeat(2, 1fr); /* 2 בשורה במסכים קטנים מאוד */
+    gap: 0.4rem;
+  }
+  
+  .day-checkbox .day-label {
+    padding: 0.5rem 0.2rem;
+    font-size: 0.7rem;
+    min-height: 38px;
+  }
+}
+
+/* עבור מסכים בינוניים: */
+@media (max-width: 1000px) and (min-width: 769px) {
+  .days-selector {
+    grid-template-columns: repeat(6, 1fr); /* עדיין 6 במסכים בינוניים */
+    gap: 0.5rem;
+  }
+  
+  .day-checkbox .day-label {
+    padding: 0.7rem 0.3rem; /* צר יותר במסכים בינוניים */
+    font-size: 0.8rem;
+    min-height: 45px;
+  }
+}
+
+/* מסכים גדולים מאוד: */
+@media (min-width: 1400px) {
+  .days-selector {
+    grid-template-columns: repeat(6, 1fr); /* 6 בשורה במסכים גדולים */
+    gap: 0.8rem; /* מרווח גדול יותר */
+  }
+  
+  .day-checkbox .day-label {
+    padding: 0.9rem 0.6rem; /* קצת יותר רחב במסכים גדולים */
+    font-size: 0.9rem;
+    min-height: 52px;
+  }
+}
+
+/* Spots Management - עיצוב יפה */
+.spots-management {
+  margin-top: 1rem;
+}
+
+.add-spot-btn {
+  background: #27ae60 !important; /* כפה ירוק עם !important */
+  color: white !important;
+  border: none !important;
+  border-radius: 8px; /* radius גדול יותר */
+  padding: 1rem 1.5rem; /* גדול יותר */
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 1.2rem;
+  width: 100%;
+  font-size: 1rem; /* גדול יותר */
+}
+
+.add-spot-btn:hover {
+  background: #229954 !important; /* כפה ירוק כהה עם !important */
+}
+
+.add-spot-btn:disabled {
+  background: #95a5a6 !important; /* כפה אפור עם !important */
+  cursor: not-allowed;
+}
+
+.add-spot-container {
+  margin-bottom: 1rem;
+}
+
+.new-spot-input {
+  width: 100%;
+  padding: 1rem 1.2rem; /* גדול יותר */
+  border: 2px solid #4A90E2;
+  border-radius: 8px;
+  font-size: 1rem; /* גדול יותר */
+  background: linear-gradient(135deg, #f8f9fa, #fff);
+  transition: all 0.3s ease;
+}
+
+.new-spot-input:focus {
+  outline: none;
+  border-color: #357ABD;
+  background: white;
+}
+
+.existing-spots {
+  margin-top: 1rem;
+}
+
+.spots-header {
+  margin-bottom: 1rem;
+  color: #666;
+  font-size: 0.9rem;
+  text-align: left;
+}
+
+.spots-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem; /* מרווח גדול יותר */
+  max-height: 280px; /* גובה גדול יותר */
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 1.2rem; /* padding גדול יותר */
+  background: #f8f9fa;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Custom Scrollbar - דק יותר */
+.spots-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.spots-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.spots-list::-webkit-scrollbar-thumb {
+  background: #4A90E2;
+  border-radius: 3px;
+}
+
+.spots-list::-webkit-scrollbar-thumb:hover {
+  background: #357ABD;
+}
+
+.spot-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: white;
+  border: 2px solid #4A90E2;
+  border-radius: 8px;
+  padding: 1.2rem; /* padding גדול יותר */
+  min-height: 60px; /* גובה גדול יותר */
+  width: 100%;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0; /* מונע כיווץ */
+}
+
+.spot-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+  border-color: #357ABD;
+}
+
+/* אייקון אחיד לכל החניות */
+/* .spot-item::before {
+  content: "🅿️"; 
+  position: absolute;
+  top: 50%;
+  left: 1rem;
+  transform: translateY(-50%);
+  font-size: 1.2rem;
+} */
+
+/* Remove Button - בצד ימין */
+.remove-spot-btn {
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  margin-left: 1rem;
+  flex-shrink: 0;
+}
+
+.remove-spot-btn:hover {
+  background: linear-gradient(135deg, #c0392b, #a93226);
+  transform: scale(1.2) rotate(90deg);
+  box-shadow: 0 3px 8px rgba(231, 76, 60, 0.4);
+}
+
+/* No Spots Message */
+.no-spots {
+  color: #999;
+  font-style: italic;
+  text-align: center;
+  padding: 3rem 1rem;
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  border-radius: 8px;
+  border: 2px dashed #ddd;
+  position: relative;
+  min-height: 240px; /* שינוי מ-180px ל-210px */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.no-spots::before {
+  content: "🚗";
+  display: block;
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+/* Spots Header */
+.spots-header {
+  margin-bottom: 1rem;
+  color: #4A90E2;
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.spots-header::before {
+  content: "🅿️";
+  font-size: 1.2rem;
+}
+
+/* Add Spot Container */
+.add-spot-container {
+  margin-bottom: 1.5rem;
+}
+
+.new-spot-input {
+  width: 100%;
+  padding: 1rem 1.2rem; /* גדול יותר */
+  border: 2px solid #4A90E2;
+  border-radius: 8px;
+  font-size: 1rem; /* גדול יותר */
+  background: linear-gradient(135deg, #f8f9fa, #fff);
+  transition: all 0.3s ease;
+}
+
+.new-spot-input:focus {
+  outline: none;
+  border-color: #357ABD;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+  transform: translateY(-1px);
+}
+
+.new-spot-input::placeholder {
+  color: #999;
+  font-style: italic;
+}
+
+/* Animation for new spots */
+.spot-item {
+  animation: spotFadeIn 0.5s ease-out;
+}
+
+@keyframes spotFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .spots-list {
+    max-height: 150px; /* קצת יותר קטן במובייל */
+  }
+  
+  .spot-item {
+    padding: 0.8rem;
+    min-height: 45px;
+  }
+  
+  .spot-tag {
+    font-size: 1rem;
+    padding-left: 1.5rem;
+  }
+  
+  .remove-spot-btn {
+    width: 20px;
+    height: 20px;
+    font-size: 14px;
+  }
+}
+
+.loading {
+  color: #6c757d;
+  font-style: italic;
+  text-align: center;
+  padding: 2rem;
+}
+
+/* הוסף לApp.css: */
+
+.add-spot-btn-full {
+  background: linear-gradient(135deg, #95a5a6, #7f8c8d) !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.add-spot-btn-full::before {
+  content: "🚫 ";
+  margin-right: 0.5rem;
+}
+
+.add-spot-btn-full:hover {
+  background: linear-gradient(135deg, #95a5a6, #7f8c8d) !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* החלף את .spot-tag ו-.spot-item::before בזה: */
+
+.spot-tag {
+  font-weight: 700;
+  font-size: 1.15rem; /* גדול יותר */
+  color: #2c3e50;
+  text-align: left;
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.spot-tag::before {
+  content: "🅿️";
+  font-size: 1.1rem; /* גדול יותר */
+  margin-right: 1rem; /* מרווח גדול יותר */
+}
+
+/* מחק את .spot-item::before לגמרי */
+
+/* הוסף בסוף הקובץ - Checkboxes יפים לריבוע החמישי: */
+
+/* Container לכל ה-checkboxes */
+.settings-checkboxes,
+.system-checkboxes,
+.config-checkboxes {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 2 בכל שורה */
+  gap: 0.8rem;
+  margin-top: 1rem;
+}
+
+/* כל checkbox יפה */
+.settings-checkbox,
+.system-checkbox,
+.config-checkbox {
+  position: relative;
+  display: block;
+  cursor: pointer;
+  user-select: none;
+}
+
+.settings-checkbox input[type="checkbox"],
+.system-checkbox input[type="checkbox"],
+.config-checkbox input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  width: 0;
+  height: 0;
+}
+
+/* Label יפה כמו הימים */
+.settings-checkbox .checkbox-label,
+.system-checkbox .checkbox-label,
+.config-checkbox .checkbox-label {
+  display: block;
+  padding: 1rem;
+  background: #f8f9fa;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  color: #6c757d;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: center;
+  transition: all 0.3s ease;
+  min-height: 55px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Hover effect */
+.settings-checkbox:hover .checkbox-label,
+.system-checkbox:hover .checkbox-label,
+.config-checkbox:hover .checkbox-label {
+  background: #e9ecef;
+  border-color: #4A90E2;
+  color: #495057;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* מצב נבחר - ירוק יפה */
+.settings-checkbox input[type="checkbox"]:checked + .checkbox-label,
+.system-checkbox input[type="checkbox"]:checked + .checkbox-label,
+.config-checkbox input[type="checkbox"]:checked + .checkbox-label {
+  background: linear-gradient(135deg, #27ae60, #229954);
+  border-color: #229954;
+  color: white;
+  font-weight: 700;
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(39, 174, 96, 0.4);
+}
+
+/* מצב נבחר + hover */
+.settings-checkbox input[type="checkbox"]:checked + .checkbox-label:hover,
+.system-checkbox input[type="checkbox"]:checked + .checkbox-label:hover,
+.config-checkbox input[type="checkbox"]:checked + .checkbox-label:hover {
+  background: linear-gradient(135deg, #229954, #1e8449);
+  transform: scale(1.02) translateY(-1px);
+  box-shadow: 0 6px 16px rgba(39, 174, 96, 0.5);
+}
+
+/* אייקון ✓ כשנבחר */
+.settings-checkbox input[type="checkbox"]:checked + .checkbox-label::before,
+.system-checkbox input[type="checkbox"]:checked + .checkbox-label::before,
+.config-checkbox input[type="checkbox"]:checked + .checkbox-label::before {
+  content: "✓";
+  position: absolute;
+  top: 5px;
+  right: 8px;
+  color: white;
+  font-weight: bold;
+  font-size: 1.2rem;
+  animation: checkmarkPop 0.3s ease-out;
+}
+
+@keyframes checkmarkPop {
+  0% {
+    transform: scale(0) rotate(-180deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2) rotate(-90deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+/* אפקט ללחיצה */
+.settings-checkbox:active .checkbox-label,
+.system-checkbox:active .checkbox-label,
+.config-checkbox:active .checkbox-label {
+  transform: scale(0.98);
+}
+
+.settings-checkbox input[type="checkbox"]:checked:active + .checkbox-label,
+.system-checkbox input[type="checkbox"]:checked:active + .checkbox-label,
+.config-checkbox input[type="checkbox"]:checked:active + .checkbox-label {
+  transform: scale(1);
+}
+
+/* אנימציה בטעינה */
+.settings-checkbox .checkbox-label,
+.system-checkbox .checkbox-label,
+.config-checkbox .checkbox-label {
+  animation: checkboxFadeIn 0.5s ease-out;
+}
+
+@keyframes checkboxFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* רספונסיב */
+@media (max-width: 768px) {
+  .settings-checkboxes,
+  .system-checkboxes,
+  .config-checkboxes {
+    grid-template-columns: 1fr; /* עמודה אחת במובייל */
+    gap: 0.6rem;
+  }
+  
+  .settings-checkbox .checkbox-label,
+  .system-checkbox .checkbox-label,
+  .config-checkbox .checkbox-label {
+    padding: 0.8rem;
+    font-size: 0.85rem;
+    min-height: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .settings-checkbox .checkbox-label,
+  .system-checkbox .checkbox-label,
+  .config-checkbox .checkbox-label {
+    padding: 0.7rem;
+    font-size: 0.8rem;
+    min-height: 45px;
+  }
+}
+
+/* עבור מסכים גדולים - 3 בשורה */
+@media (min-width: 1400px) {
+  .settings-checkboxes,
+  .system-checkboxes,
+  .config-checkboxes {
+    grid-template-columns: repeat(3, 1fr); /* 3 בשורה במסכים גדולים */
+    gap: 1rem;
+  }
+  
+  .settings-checkbox .checkbox-label,
+  .system-checkbox .checkbox-label,
+  .config-checkbox .checkbox-label {
+    padding: 1.1rem;
+    font-size: 1rem;
+    min-height: 60px;
+  }
+}
