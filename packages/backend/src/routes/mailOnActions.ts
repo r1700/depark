@@ -13,8 +13,7 @@ router.post('/', async (req, res) => {
             return res.status(400).json({ error: 'Missing required fields' });
         }
 
-        const templatesDir = path.resolve(process.cwd(), 'frontend', 'src', 'app', 'pages', 'sendMail');
-
+        const templatesDir = path.resolve(process.cwd(), '..','frontend', 'src', 'app', 'pages', 'sendMail');
         const templateFile = path.join(templatesDir, `${subject}.html`);
 
         let htmlTemplate = '';
