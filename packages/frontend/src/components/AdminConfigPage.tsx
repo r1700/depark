@@ -756,7 +756,7 @@ export default function AdminConfigPage() {
                           InputLabelProps={{ shrink: true }}
                           disabled={!dayData.isActive} // Disabled if day is not active
                           sx={{
-                            '& .MuiInputBase-input': {
+                            '& .MuiInput-input': {
                               color: dayData.isActive ? 'inherit' : 'text.secondary'
                             },
                             '& .MuiInputLabel-root': {

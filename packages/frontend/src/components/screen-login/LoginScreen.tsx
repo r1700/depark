@@ -14,32 +14,24 @@ import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import GoogleAuth from "../google-auth/GoogleAuth";
-
+import { useNavigate } from "react-router-dom";  // הוספתי את ה-import הזה
 interface LoginScreenProps {
   onLogin: () => void;
 }
-
 interface IFormInputs {
   email: string;
   password: string;
-  
 }
-
-const schema = yup.object({
-  email: yup
-    .string()
-    .email("Invalid email format")
-    .required("Email is required"),
-  password: yup
-    .string()
-    .required("Password is required")
-    .min(4, "Password must be at least 4 characters"),
-}).required();
-
+const schema = yup
+  .object({
+    email: yup.string().email("Invalid email format").required("Email is required"),
+    password: yup.string().required("Password is required").min(4, "Password must be at least 4 characters"),
+  })
+  .required();
 const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
   const [serverError, setServerError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
-
+  const navigate = useNavigate();  // הוספתי את ה-hook הזה
   const {
     control,
     handleSubmit,
@@ -49,45 +41,44 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
     mode: "onChange",
     reValidateMode: "onChange",
   });
-
   const onSubmit: SubmitHandler<IFormInputs> = async (data) => {
     setServerError("");
     setLoading(true);
-
     try {
-      const response = await fetch('https://your-api-url.com/login', {
-        method: 'POST',
+      const response = await fetch("http://localhost:3001/auth/login", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
       });
-
+      const result = await response.json();
       setLoading(false);
-
-      if (!response.ok) {
-        // אם הסטטוס אינו 200-299, נקבל שגיאה מהשרת
-        const errorData = await response.json();
-        setServerError(errorData.message || "Login failed");
+      if (!response || result.status === "error") {
+        setServerError(result.message || "Login failed");
         return;
       }
-
-      const result = await response.json();
-
-      // נניח שה-API מחזיר טוקן כניסה; תתאים לפי מה שקיבלת מה-API
-      if (result && result.token) {
-        // ייתכן שתרצה לשמור את הטוקן ב-localStorage
-        // localStorage.setItem('token', result.token);
+      if (result.message === true) {
+        if (result.user.role === "admin") {
+          localStorage.setItem("isAdmin", "true");
+          navigate("/admin-dashboard");
+        } else if (result.user.role === "hr") {
+          localStorage.setItem("isHR", "true");
+          navigate("/hr-dashboard");
+        }
+        const { user, token, expiresAt } = result;
+        localStorage.setItem("token", token);
+        localStorage.setItem("user", JSON.stringify(user));
+        localStorage.setItem("expiresAt", expiresAt);
         onLogin();
       } else {
-        setServerError("Incorrect email or password");
+        setServerError("Unexpected server response");
       }
     } catch (error) {
       setLoading(false);
       setServerError("Network error: " + (error as Error).message);
     }
   };
-
   return (
     <Container maxWidth="xs">
       <Box
@@ -101,13 +92,12 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
           direction: "ltr",
         }}
       >
-        <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 'bold' }}>
-          Welcome Back!
+        <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: "bold" }}>
+          Welcome !
         </Typography>
         <Typography variant="subtitle1" color="text.secondary" gutterBottom>
           Please login to your account
         </Typography>
-
         <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate sx={{ mt: 1 }}>
           <Controller
             name="email"
@@ -128,7 +118,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
               />
             )}
           />
-
           <Controller
             name="password"
             control={control}
@@ -148,13 +137,11 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
               />
             )}
           />
-
           {serverError && (
             <Alert severity="error" sx={{ mt: 2 }}>
               {serverError}
             </Alert>
           )}
-
           <Button
             type="submit"
             fullWidth
@@ -166,14 +153,8 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
             {loading ? <CircularProgress size={24} color="inherit" /> : "Login"}
           </Button>
         </Box>
-          <GoogleAuth/>
-
-        <Stack
-          direction="row"
-          justifyContent="space-between"
-          sx={{ mt: 2 }}
-          spacing={2}
-        >
+        <GoogleAuth />
+        <Stack direction="row" justifyContent="space-between" sx={{ mt: 2 }} spacing={2}>
           <Link href="#" underline="hover" variant="body2" dir="ltr">
             Forgot password?
           </Link>
@@ -185,5 +166,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
     </Container>
   );
 };
-
 export default LoginScreen;
+
+

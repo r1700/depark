@@ -1,15 +1,15 @@
 import Joi from 'joi';
-import { BaseUser } from './baseUser';  //Imports BaseUser
+import { baseuser } from './baseUser';  //Imports baseuser
 
-export class User extends BaseUser {
+export class User extends baseuser {
   static schema = Joi.object({
-    id: BaseUser.schema.extract('id'),
-    idNumber: BaseUser.schema.extract('idNumber'),
-    email: BaseUser.schema.extract('email'),
-    firstName: BaseUser.schema.extract('firstName'),
-    lastName: BaseUser.schema.extract('lastName'),
-    createdAt: BaseUser.schema.extract('createdAt'),
-    updatedAt: BaseUser.schema.extract('updatedAt'),
+    id: baseuser.schema.extract('id'),
+    idNumber: baseuser.schema.extract('idNumber'),
+    email: baseuser.schema.extract('email'),
+    firstName: baseuser.schema.extract('firstName'),
+    lastName: baseuser.schema.extract('lastName'),
+    createdAt: baseuser.schema.extract('createdAt'),
+    updatedAt: baseuser.schema.extract('updatedAt'),
     department: Joi.string().optional(),
     employeeId: Joi.string().optional(),
     googleId: Joi.string().optional(),
@@ -46,7 +46,7 @@ export class User extends BaseUser {
     approvedBy?: string,
     approvedAt?: Date
   ) {
-    super(idNumber, email, firstName, lastName, createdAt, updatedAt, id);  // קריאה ל-BaseUser constructor
+    super(idNumber, email, firstName, lastName, createdAt, updatedAt, id);  // קריאה ל-baseuser constructor
     this.status = status;
     this.createdBy = createdBy;
     this.department = department;

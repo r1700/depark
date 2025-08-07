@@ -3,7 +3,7 @@ import Joi from 'joi';
 export class ParkingSession {
   static schema = Joi.object({
     id: Joi.number().integer().positive().optional(),
-    userId: Joi.number().integer().positive().required(),//reference to BaseUser
+    userId: Joi.number().integer().positive().required(),//reference to baseuser
     vehicleId: Joi.number().integer().positive().required(),// reference to Vehicle
     licensePlate: Joi.string().required(),
     surfaceSpot: Joi.string().optional(),
