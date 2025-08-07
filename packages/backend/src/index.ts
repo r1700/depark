@@ -32,6 +32,8 @@ app.get('/health', (req, res) => {
     timestamp: new Date().toISOString(),
   });
 });
+
+
 if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
   console.log(':file_cabinet: Initializing database...');
 } else {
