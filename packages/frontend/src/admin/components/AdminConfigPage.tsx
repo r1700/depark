@@ -44,7 +44,7 @@ interface ParkingConfig {
   lotId: string;
   timezone: string;
   surfaceSpotIds: string[];
-  totalSpots: number;
+  totalSurfaceSpots: number;
   dailyHours: {
     [key: string]: {
       isActive: boolean;
@@ -54,7 +54,7 @@ interface ParkingConfig {
   };
   maxQueueSize: number;
   avgRetrievalTime: number;
-  maxParallelRetrievals: number; // ✅ חדש!
+  maxParallelRetrievals: number; 
   maintenanceMode: boolean;
   showAdminAnalytics: boolean;
   updatedAt?: Date;
@@ -139,7 +139,7 @@ export default function AdminConfigPage() {
     lotId: '',
     timezone: 'Asia/Jerusalem',
     surfaceSpotIds: [],
-    totalSpots: 0,
+    totalSurfaceSpots: 0,
     dailyHours: {
       Sunday: { isActive: false, openingHour: '00:00', closingHour: '00:00' },
       Monday: { isActive: false, openingHour: '00:00', closingHour: '00:00' },
@@ -151,7 +151,7 @@ export default function AdminConfigPage() {
     },
     maxQueueSize: 0,
     avgRetrievalTime: 0,
-    maxParallelRetrievals:0, // ✅ ברירת מחדל
+    maxParallelRetrievals:0, 
     maintenanceMode: false,
     showAdminAnalytics: false
   };
@@ -167,6 +167,10 @@ export default function AdminConfigPage() {
   const [currentError, setCurrentError] = useState<string | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [spotToDelete, setSpotToDelete] = useState<{index: number, name: string} | null>(null);
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [updateLotId, setUpdateLotId] = useState('');
+  const [loadingUpdate, setLoadingUpdate] = useState(false);
+  const [addingNewLot, setAddingNewLot] = useState(false);
 
   // Auto-hide error popup after 3 seconds
   useEffect(() => {
@@ -219,21 +223,31 @@ export default function AdminConfigPage() {
   };
 
   const addNewSpot = () => {
-    if (newSpotId.trim() && parkingConfig.surfaceSpotIds.length < maxSpotsLimit) {
-      if (!parkingConfig.surfaceSpotIds.includes(newSpotId.trim())) {
-        const newSpot = newSpotId.trim();
-        setParkingConfig(prev => ({
-          ...prev,
-          surfaceSpotIds: [...prev.surfaceSpotIds, newSpot],
-          totalSpots: prev.surfaceSpotIds.length + 1
-        }));
-        setNewSpotId('');
-        setShowAddSpot(false);
-      } else {
-        setCurrentError('❌ Spot ID already exists');
-        setShowErrorPopup(true);
-      }
+    const trimmedSpot = newSpotId.trim();
+    if (!trimmedSpot) {
+      setCurrentError('❌ Please enter a valid parking spot ID.');
+      setShowErrorPopup(true);
+      return;
     }
+    if (parkingConfig.surfaceSpotIds.length >= maxSpotsLimit) {
+      setCurrentError(`❌ You cannot add more than ${maxSpotsLimit} parking spots`);
+      setShowErrorPopup(true);
+      return;
+
+
+    }
+    if (parkingConfig.surfaceSpotIds.includes(trimmedSpot)) {
+      setCurrentError('❌ This parking spot ID already exists.');
+      setShowErrorPopup(true);
+      return;
+    }
+    setParkingConfig(prev => ({
+      ...prev,
+      surfaceSpotIds: [...prev.surfaceSpotIds, trimmedSpot],
+      totalSurfaceSpots: prev.surfaceSpotIds.length + 1
+    }));
+    setNewSpotId('');
+    setShowAddSpot(false);
   };
 
   const removeSpot = (index: number) => {
@@ -247,7 +261,7 @@ export default function AdminConfigPage() {
       setParkingConfig(prev => ({
         ...prev,
         surfaceSpotIds: prev.surfaceSpotIds.filter((_, i) => i !== spotToDelete.index),
-        totalSpots: prev.surfaceSpotIds.length - 1
+        totalSurfaceSpots: prev.surfaceSpotIds.length - 1
       }));
     }
     setShowDeleteConfirm(false);
@@ -257,6 +271,19 @@ export default function AdminConfigPage() {
   const cancelDelete = () => {
     setShowDeleteConfirm(false);
     setSpotToDelete(null);
+  };
+
+  const handleResetClick = () => {
+    setShowResetConfirm(true);
+  };
+
+  const confirmReset = () => {
+    setShowResetConfirm(false);
+    resetToDefaults();
+  };
+
+  const cancelReset = () => {
+    setShowResetConfirm(false);
   };
 
   // Validate required fields with priority order
@@ -328,8 +355,6 @@ export default function AdminConfigPage() {
       allErrors: errors
     };
   };
-
-  // Check if configuration has changes
   const hasChanges = () => {
     const current = {
       facilityName: parkingConfig.facilityName,
@@ -339,8 +364,10 @@ export default function AdminConfigPage() {
       dailyHours: parkingConfig.dailyHours,
       maxQueueSize: parkingConfig.maxQueueSize,
       avgRetrievalTime: parkingConfig.avgRetrievalTime,
+      maxParallelRetrievals: parkingConfig.maxParallelRetrievals,
       maintenanceMode: parkingConfig.maintenanceMode,
-      showAdminAnalytics: parkingConfig.showAdminAnalytics
+      showAdminAnalytics: parkingConfig.showAdminAnalytics,
+      totalSurfaceSpots: parkingConfig.totalSurfaceSpots
     };
 
     const lastSaved = {
@@ -351,15 +378,16 @@ export default function AdminConfigPage() {
       dailyHours: lastSavedConfig.dailyHours,
       maxQueueSize: lastSavedConfig.maxQueueSize,
       avgRetrievalTime: lastSavedConfig.avgRetrievalTime,
+      maxParallelRetrievals: lastSavedConfig.maxParallelRetrievals,
       maintenanceMode: lastSavedConfig.maintenanceMode,
-      showAdminAnalytics: lastSavedConfig.showAdminAnalytics
+      showAdminAnalytics: lastSavedConfig.showAdminAnalytics,
+      totalSurfaceSpots: lastSavedConfig.totalSurfaceSpots
     };
 
     return JSON.stringify(current) !== JSON.stringify(lastSaved);
   };
 
   const saveConfig = async () => {
-    // Check - are there any changes at all
     if (!hasChanges()) {
       setCurrentError('⚠️ No changes detected. Please make some changes before saving.');
       setShowErrorPopup(true);
@@ -377,22 +405,59 @@ export default function AdminConfigPage() {
     // Only if both checks passed - save
     setSaving(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const now = new Date();
+      const isNewLot = addingNewLot && (!lastSavedConfig.lotId || lastSavedConfig.lotId === '');
 
-      const updatedConfig = {
-        ...parkingConfig,
-        totalSpots: parkingConfig.surfaceSpotIds.length,
-        updatedAt: new Date(),
+      const url = isNewLot
+        ? '/api/admin'
+        : `/api/admin/${parkingConfig.lotId}`; 
+
+      const method = isNewLot ? 'POST' : 'PUT';
+
+      const response = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          parkingConfig: {
+            ...parkingConfig,
+            totalSurfaceSpots: parkingConfig.surfaceSpotIds.length,
+            avgRetrievalTimeMinutes: parkingConfig.avgRetrievalTime,
+            operatingHours: parkingConfig.dailyHours,
+            updatedAt: now,
+            updatedBy: 'admin'
+          }
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setCurrentError(data.error || '❌ Error saving configuration.');
+        setShowErrorPopup(true);
+        return;
+      }
+
+      setParkingConfig(prev => ({
+        ...prev,
+        totalSurfaceSpots: prev.surfaceSpotIds.length,
+        updatedAt: now,
         updatedBy: 'admin'
-      };
+      }));
 
-      setParkingConfig(updatedConfig);
-      setLastSavedConfig(updatedConfig);
+      setLastSavedConfig({
+        ...parkingConfig,
+        totalSurfaceSpots: parkingConfig.surfaceSpotIds.length,
+        updatedAt: now,
+        updatedBy: 'admin'
+      });
+
       setMessage({
         type: 'success',
-        text: '✅ Configuration saved successfully!'
+        text: isNewLot
+          ? '✅ New lot added successfully!'
+          : '✅ Configuration saved successfully!'
       });
+      setAddingNewLot(false);
     } catch (error) {
       setCurrentError('❌ Error saving configuration. Please try again.');
       setShowErrorPopup(true);
@@ -407,7 +472,7 @@ export default function AdminConfigPage() {
       lotId: '',
       timezone: 'Asia/Jerusalem',
       surfaceSpotIds: [],
-      totalSpots: 0,
+      totalSurfaceSpots: 0,
       dailyHours: {
         Sunday: { isActive: false, openingHour: '00:00', closingHour: '00:00' },
         Monday: { isActive: false, openingHour: '00:00', closingHour: '00:00' },
@@ -419,7 +484,7 @@ export default function AdminConfigPage() {
       },
       maxQueueSize: 0,
       avgRetrievalTime: 0,
-      maxParallelRetrievals: 0, // ✅ ברירת מחדל
+      maxParallelRetrievals: 0, 
       maintenanceMode: false,
       showAdminAnalytics: false,
       updatedAt: new Date(),
@@ -430,6 +495,61 @@ export default function AdminConfigPage() {
       text: '🔄 Configuration reset to defaults!'
     });
   };
+
+  const handleLoadForUpdate = async () => {
+    if (!updateLotId.trim()) {
+      setCurrentError('❌ Please enter a Lot ID to load.');
+      setShowErrorPopup(true);
+      return;
+    }
+    setLoadingUpdate(true);
+    try {
+      const res = await fetch(`/api/admin/${encodeURIComponent(updateLotId.trim())}`);
+      const data = await res.json();
+      if (!data.success || !data.parkingConfig) {
+        setCurrentError('❌ Lot ID not found.');
+        setShowErrorPopup(true);
+      } else {
+        setParkingConfig({
+          ...data.parkingConfig,
+          lotId: updateLotId.trim(),
+          dailyHours: convertOperatingHoursToDailyHours(data.parkingConfig.operatingHours),
+          avgRetrievalTime: data.parkingConfig.avgRetrievalTimeMinutes ?? 0,
+          updatedAt: data.parkingConfig.updatedAt ? new Date(data.parkingConfig.updatedAt) : undefined,
+        });
+        setLastSavedConfig({
+          ...data.parkingConfig,
+          dailyHours: convertOperatingHoursToDailyHours(data.parkingConfig.operatingHours),
+          avgRetrievalTime: data.parkingConfig.avgRetrievalTimeMinutes ?? 0,
+          updatedAt: data.parkingConfig.updatedAt ? new Date(data.parkingConfig.updatedAt) : undefined,
+        });
+        setMessage({ type: 'success', text: '✅ Lot loaded for update!' });
+      }
+    } catch (err) {
+      setCurrentError('❌ Error loading lot for update.');
+      setShowErrorPopup(true);
+    } finally {
+      setLoadingUpdate(false);
+    }
+  };
+
+  // Convert operating hours from various formats to the unified dailyHours structure
+  function convertOperatingHoursToDailyHours(operatingHours: any): ParkingConfig['dailyHours'] {
+    if (operatingHours && typeof operatingHours === 'object' && operatingHours.Sunday) {
+      return operatingHours;
+    }
+    const start = operatingHours?.start || '00:00';
+    const end = operatingHours?.end || '00:00';
+    const daily: ParkingConfig['dailyHours'] = {};
+    for (const day of days) {
+      daily[day] = {
+        isActive: true,
+        openingHour: start,
+        closingHour: end
+      };
+    }
+    return daily;
+  }
 
   return (
     <ThemeProvider theme={theme}>
@@ -808,7 +928,6 @@ export default function AdminConfigPage() {
                       avgRetrievalTime: parseInt(e.target.value) || 0
                     }))}
                   />
-                  {/* ✅ חדש: */}
                   <TextField
                     fullWidth
                     label="Max Parallel Retrievals"
@@ -818,14 +937,11 @@ export default function AdminConfigPage() {
                       ...prev,
                       maxParallelRetrievals: parseInt(e.target.value) || 0
                     }))}
-                    // inputProps={{ min: 1 }}
                   />
                 </Stack>
               </CardContent>
             </StyledCard>
           </Box>
-
-          {/* System Settings Card */}
           <Box sx={{ 
             display: 'grid', 
             gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, 
@@ -874,8 +990,6 @@ export default function AdminConfigPage() {
                       />
                     </RadioGroup>
                   </Box>
-
-                  {/* Show Admin Analytics checkbox remains as is */}
 <Box>
   <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
     Show Admin Analytics
@@ -912,9 +1026,6 @@ export default function AdminConfigPage() {
           {/* Action Buttons */}
           <Divider sx={{ my: 3 }} />
           <Box sx={{ textAlign: 'center' }}>
-            {/* Status Display */}
-            
-            
             <Stack direction="row" spacing={2} justifyContent="center">
               <Button
                 variant="contained"
@@ -922,8 +1033,7 @@ export default function AdminConfigPage() {
                 onClick={saveConfig}
                 disabled={saving || !!message || showErrorPopup}
                 startIcon={saving ? <TimeIcon /> : undefined}
-                sx={{
-                  minWidth: 200,
+                sx={{ minWidth: 200,
                   bgcolor: 'primary.main',
                   color: 'white',
                   boxShadow: '0 4px 16px rgba(25, 118, 210, 0.10)',
@@ -952,7 +1062,7 @@ export default function AdminConfigPage() {
               <Button
                 variant="outlined"
                 size="large"
-                onClick={resetToDefaults}
+                onClick={handleResetClick}
                 disabled={saving}
                 sx={{
                   minWidth: 150,
@@ -982,8 +1092,6 @@ export default function AdminConfigPage() {
                 🔄 Reset to Defaults
               </Button>
             </Stack>
-
-            {/* Last update date */}
             {parkingConfig.updatedAt && (
               <Typography variant="caption" color="text.secondary" sx={{ mt: 2, display: 'block' }}>
                 {(() => {
@@ -995,8 +1103,79 @@ export default function AdminConfigPage() {
               </Typography>
             )}
           </Box>
+          {/* Load for Update Section */}
+<Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 4 }}>
+  <Button
+    // variant="contained"
+    // color="primary"
+    onClick={() => {
+      setParkingConfig(initialConfig);
+      setLastSavedConfig(initialConfig);
+      setAddingNewLot(true);
+      setUpdateLotId('');
+      setMessage(null);
+    }}
+     sx={{ minWidth: 200,
+                  bgcolor: 'primary.main',
+                  color: 'white',
+                  boxShadow: '0 4px 16px rgba(25, 118, 210, 0.10)',
+                  borderRadius: 3,
+                  fontWeight: 700,
+                  letterSpacing: 1,
+                  transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)',
+                  '&:hover': {
+                    bgcolor: 'primary.dark',
+                    boxShadow: '0 8px 32px rgba(25, 118, 210, 0.18)',
+                    transform: 'translateY(-2px) scale(1.03)'
+                  },
+                  '&.Mui-disabled': {
+                    bgcolor: 'grey.400',
+                    color: 'white',
+                    boxShadow: 'none',
+                    opacity: 0.7
+                  }
+                }}
+  >
+    + Add New Lot
+  </Button>
+  <TextField
+    label="Lot ID to Update"
+    size="small"
+    value={updateLotId}
+    onChange={e => setUpdateLotId(e.target.value)}
+    disabled={loadingUpdate}
+    sx={{ width: 220 }}
+  />
+  <Button
+    variant="contained"
+    color="secondary"
+    onClick={handleLoadForUpdate}
+    disabled={loadingUpdate || !updateLotId.trim()}
+     sx={{ minWidth: 200,
+                  bgcolor: 'primary.main',
+                  color: 'white',
+                  boxShadow: '0 4px 16px rgba(25, 118, 210, 0.10)',
+                  borderRadius: 3,
+                  fontWeight: 700,
+                  letterSpacing: 1,
+                  transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)',
+                  '&:hover': {
+                    bgcolor: 'primary.dark',
+                    boxShadow: '0 8px 32px rgba(25, 118, 210, 0.18)',
+                    transform: 'translateY(-2px) scale(1.03)'
+                  },
+                  '&.Mui-disabled': {
+                    bgcolor: 'grey.400',
+                    color: 'white',
+                    boxShadow: 'none',
+                    opacity: 0.7
+                  }
+                }}
+  >
+    {loadingUpdate ? 'Loading...' : 'Load for Update'}
+  </Button>
+</Box>
 
-          {/* Delete confirmation dialog */}
           {showDeleteConfirm && spotToDelete && (
             <Box
               sx={{
@@ -1071,8 +1250,57 @@ export default function AdminConfigPage() {
               </Box>
             </Box>
           )}
-
-          {/* Popup error message */}
+          {showResetConfirm && (
+            <Box
+              sx={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                bgcolor: 'rgba(0, 0, 0, 0.5)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: 1500
+              }}
+            >
+              <Box
+                sx={{
+                  bgcolor: 'white',
+                  borderRadius: 2,
+                  p: 3,
+                  maxWidth: 400,
+                  width: '90%',
+                  boxShadow: '0 8px 32px rgba(0,0,0,0.3)'
+                }}
+              >
+                <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: '#1976d2' }}>
+                  ⚠️ Reset Confirmation
+                </Typography>
+                <Typography variant="body1" sx={{ mb: 3 }}>
+                  Are you sure you want to reset all configuration to defaults?
+                </Typography>
+                <Stack direction="row" spacing={2} justifyContent="flex-end">
+                  <Button variant="outlined" onClick={cancelReset} sx={{ minWidth: 100 }}>
+                    Cancel
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="error"
+                    onClick={confirmReset}
+                    sx={{
+                      minWidth: 100,
+                      bgcolor: '#d32f2f',
+                      '&:hover': { bgcolor: '#b71c1c' }
+                    }}
+                  >
+                    Reset
+                  </Button>
+                </Stack>
+              </Box>
+            </Box>
+          )}
           {showErrorPopup && currentError && (
             <Box
               sx={{
@@ -1103,6 +1331,9 @@ export default function AdminConfigPage() {
     </ThemeProvider>
   );
 }
+
+
+
 
 
 

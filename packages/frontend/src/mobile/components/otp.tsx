@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { TextField, Button, Alert, Container, Typography, Box } from '@mui/material';
 
-function Otp() {
+
+const Otp: React.FC = () => {
     console.log('React runtime version:', React.version);
 
     const [contact, setContact] = useState('');
@@ -9,6 +10,8 @@ function Otp() {
     const [otpSent, setOtpSent] = useState(false);
     const [error, setError] = useState('');
     const [message, setMessage] = useState('');
+
+    const url = process.env.REACT_APP_URL || 'http://localhost:3000';
 
     // Handle sending OTP
     const sendOtp = async () => {
@@ -24,7 +27,9 @@ function Otp() {
         }
 
         try {
-            const response = await fetch('http://localhost:3000/otp/create', {
+            console.log('URL:', url);
+
+            const response = await fetch(`${url}/otp/create`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ contact }),
@@ -54,7 +59,7 @@ function Otp() {
         }
 
         try {
-            const response = await fetch('http://localhost:3000/otp/verify', {
+            const response = await fetch(`${url}/otp/verify`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ contact, otp }),
@@ -64,6 +69,13 @@ function Otp() {
 
             if (response.status === 200) {
                 setMessage('Code verified successfully!');
+                console.log(data);
+
+                if (data.token) {
+                    localStorage.setItem('token', data.token);
+                }
+                localStorage.setItem('user', JSON.stringify({ userId: data.user.id, contact }));
+
             } else {
                 setError(data.error || 'Invalid code.');
             }
@@ -146,6 +158,6 @@ function Otp() {
             </Box>
         </Container>
     );
-}
+};
 
 export default Otp;

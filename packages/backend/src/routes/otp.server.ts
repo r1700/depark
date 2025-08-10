@@ -1,6 +1,6 @@
 import express from 'express';
 import bodyParser from 'body-parser';
-import { handleCreateOtp, handleVerifyOtp } from './controllers/otp.controller';
+import { handleCreateOtp, handleVerifyOtp } from '../controllers/otp.controller';
 import cors from 'cors';
 
 const app = express();
