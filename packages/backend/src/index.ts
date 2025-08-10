@@ -41,14 +41,14 @@ app.use('/api/vehicle',vehicleLookupRouter);
 // app.use('/api/items', itemsRoutes);
 
 
-app.listen(PORT, async () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`🌐 CORS enabled for: ${CORS_ORIGIN}`);
+// app.listen(PORT, async () => {
+//   console.log(`🚀 Server running on port ${PORT}`);
+//   console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
+//   console.log(`🌐 CORS enabled for: ${CORS_ORIGIN}`);
   
   // Initialize database with sample data if using Supabase
-  if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
-    console.log('🗄️ Initializing database...');
+  // if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
+    // console.log('🗄️ Initializing database...');
     // try {
     //   databaseService.canInitialize();
     //   try {
@@ -60,10 +60,10 @@ app.listen(PORT, async () => {
     // } catch (error) {
     //   console.error('❌ Database not connected');
     // }
-  } else {
-    console.log('📝 Using mock data - Supabase not configured');
-  }
-});
+  // } else {
+    // console.log('📝 Using mock data - Supabase not configured');
+  // }
+// });
 
 // Test route
 app.get('/', (req, res) => {

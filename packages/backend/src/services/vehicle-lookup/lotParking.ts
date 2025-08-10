@@ -26,14 +26,21 @@ ParkingConfigurations.init({
   timestamps: false,
 });
 
-const isParkingLotActive = async (timestamp: Date, lotid: Number): Promise<boolean> => {
+interface ParkingConfiguration {
+  active: boolean;
+  message: string;
+}
+
+const isParkingLotActive = async (timestamp: Date, lotid: Number): Promise<ParkingConfiguration> => {
   try {
     const config = await ParkingConfigurations.findOne({ where: { id: lotid } });
+    // console.log('config', config);
+
     if (!config) {
       console.error('No parking configuration found for the given lot ID');
-      return false;
+      return {active: false, message: 'Parking lot configuration not found'};
     }
-   
+
     const operatingHours = config.getDataValue('operating_hours') as {
       [day: string]: {
         isActive: boolean;
@@ -46,15 +53,23 @@ const isParkingLotActive = async (timestamp: Date, lotid: Number): Promise<boole
     const timeNow = timestamp.toTimeString().slice(0, 5); // "HH:mm"
 
     const todayConfig = operatingHours[dayName];
-    if (!todayConfig || !todayConfig.isActive) {
-      return false;
+    if (!todayConfig ) {
+      return {active: false, message:`No configuration for ${dayName}`};
     }
 
-    return timeNow >= todayConfig.openingHour && timeNow <= todayConfig.closingHour;
+     if (!todayConfig.isActive) {
+      return { active: false, message: `Parking lot is closed on ${dayName}` };
+    }
+
+     if (timeNow < todayConfig.openingHour || timeNow > todayConfig.closingHour) {
+      return { active: false, message: `Parking lot is closed at this hour (${timeNow})` };
+    }
+
+    return { active: true, message: 'Parking lot is active' };
 
   } catch (err) {
     console.error('Error checking parking hours', err);
-    return false;
+    return { active: false, message: 'Error checking parking hours' };
   }
 };
 

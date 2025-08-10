@@ -30,16 +30,6 @@ const isVehicleAllowed = async (vehicleReq: VehicleLookupRequest): Promise<Vehic
     try {
         const { licensePlate, timestamp, opcRequestId, lotId } = vehicleReq;
 
-        // Check if the parking lot is active at the given timestamp
-        const isActive = await isParkingLotActive(timestamp, lotId);
-        if (!isActive) {
-            return {
-                found: false,
-                approved: false,
-                error: 'Parking lot is not active at the requested time'
-            };
-        }
-
         // Check if the vehicle is allowed to park
         const vehicleDetails = await isLicensePlateExists(licensePlate);
         if (!vehicleDetails.found) {
@@ -47,6 +37,16 @@ const isVehicleAllowed = async (vehicleReq: VehicleLookupRequest): Promise<Vehic
                 found: false,
                 approved: false,
                 error: 'Vehicle not found'
+            };
+        }
+
+         // Check if the parking lot is active at the given timestamp
+        const isActive = await isParkingLotActive(timestamp, lotId);
+        if (!isActive.active) {
+            return {
+                found: false,
+                approved: false,
+                error: isActive.message
             };
         }
 

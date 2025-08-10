@@ -2,7 +2,7 @@
 // בס"ד
 
 import { Model, DataTypes } from 'sequelize';
-import { sequelize } from '../../config/sequelize.config';
+import { sequelize} from '../../config/sequelize.config';
 
 export class User extends Model {
     public id!: number;
