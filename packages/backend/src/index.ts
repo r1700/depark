@@ -9,7 +9,7 @@ import cors from 'cors';
 // import exportToCSV from './routes/exportToCSV';
 import googleAuth from './routes/google-auth';
 import auth from './routes/auth';
-
+import APIvehicle from './routes/APIvehicle';
 const app = express();
 const PORT = process.env.PORT || 3001;
 const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:3000';
@@ -26,6 +26,7 @@ app.use(express.json());
 // app.use('/api/exportToCSV', exportToCSV);
 app.use('/OAuth', googleAuth); // Ensure this route is correctly set up
 app.use('/auth', auth);
+app.use('/api/vehicles', APIvehicle); // Ensure this route is correctly set up
 app.get('/', (req, res) => {
   res.json({ message: 'DePark Backend is running!' });
 });
@@ -48,8 +49,8 @@ app.listen(PORT, () => {
   console.log(':link: Available routes:');
   console.log('   GET  /');
   console.log('   GET  /health');
-  console.log('   GET  /api/auth/users');      // :point_left: חשוב!
-  console.log('   POST /api/auth/register');   // :point_left: חשוב!
+  console.log('   GET  /api/auth/users');     
+  console.log('   POST /api/auth/register');  
   console.log('   POST /api/auth/login');
   console.log('   GET  /api/admin/config');
   console.log('   PUT  /api/admin/config');
