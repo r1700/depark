@@ -113,7 +113,6 @@ package.json
 package-lock.json
 connection/
 knexfile.js
-# migrations/
 packages/frontend/src/app/
 packages/frontend/src/components/screen-login/
 
