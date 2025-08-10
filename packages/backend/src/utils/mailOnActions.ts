@@ -6,7 +6,6 @@ export interface MailOptions {
     name: string;
     to: string;
     subject: string;
-    text: string;
     html?: string;
 }
 
@@ -22,9 +21,33 @@ export class MailService {
 
 
     public async sendMail(options: MailOptions): Promise<void> {
-        const htmlContent = options.html ?? `
-     
-    `;
+        let htmlContent = options.html ?? ``;
+      if (!htmlContent) {
+            const templatesDir = path.resolve(process.cwd(),'..', 'frontend', 'src', 'app', 'pages', 'sendMail');
+            const templateFile = path.join(templatesDir, `${options.subject}.html`);
+            
+            try {
+                htmlContent = await fs.promises.readFile(templateFile, 'utf-8');
+            } catch (err) {
+                console.warn(`Template file for subject '${options.subject}' not found, using default template.`);
+            }
+        }
+
+        // אם לא נמצאה תבנית, נשתמש בתבנית ברירת מחדל
+        if (!htmlContent) {
+            htmlContent = `
+                <html>
+                <body style="font-family:Ink Free, sans-serif; color: #0000CC;font-size: 30px;background-color: #f5f5f5db;">
+                  <h1 style="color: #b6b6b6c5;font-family: Bookman Old Style">Hello {{name}}!!!</h1>
+                  <p>?????</p>
+                </body>
+                </html>
+            `;
+        }
+
+        // החלפת משתנה {{name}} בשם שנשלח
+        htmlContent = htmlContent.replace(/{{name}}/g, options.name);
+    
 
         if (process.env.NODE_ENV === 'production') {
             const transporter = nodemailer.createTransport({
@@ -39,7 +62,6 @@ export class MailService {
                 from: process.env.GMAIL_APP_PASSWORD,
                 to: options.to,
                 subject: options.subject,
-                text: options.text,
                 html: htmlContent,
             };
 
