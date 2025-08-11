@@ -8,6 +8,7 @@ import healthRoutes from './routes/health';
 import passwordRoutes from './routes/user.routes';
 import vehicleRoutes from './routes/vehicle';
 import exportToCSV from './routes/exportToCSV';
+import userFilter from './routes/userAPI';
 
 const app = express();
 
@@ -25,6 +26,7 @@ app.use('/api/health', healthRoutes);
 app.use('/api/password', passwordRoutes);
 app.use('/api/vehicle', vehicleRoutes);
 app.use('/api/exportToCSV', exportToCSV);
+app.use('/api/users', userFilter);
 
 app.get('/', (req, res) => {
   res.json({ message: 'DePark Backend is running!' });
