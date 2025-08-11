@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { TextField, Button, Alert, Container, Typography, Box } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 
 const Otp: React.FC = () => {
@@ -10,6 +11,7 @@ const Otp: React.FC = () => {
     const [otpSent, setOtpSent] = useState(false);
     const [error, setError] = useState('');
     const [message, setMessage] = useState('');
+    const navigate = useNavigate();
 
     const url = process.env.REACT_APP_URL || 'http://localhost:3000';
 
@@ -75,6 +77,7 @@ const Otp: React.FC = () => {
                     localStorage.setItem('token', data.token);
                 }
                 localStorage.setItem('user', JSON.stringify({ userId: data.user.id, contact }));
+                navigate('/VehicleRow'); // Redirect to home page after successful verification
 
             } else {
                 setError(data.error || 'Invalid code.');
