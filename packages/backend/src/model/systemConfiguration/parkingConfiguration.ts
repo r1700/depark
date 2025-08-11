@@ -2,7 +2,7 @@ import Joi from 'joi';
 
 export class ParkingConfigurationModel {
   static schema = Joi.object({
-    id: Joi.string().allow(null).optional(), // Changed to string to match database
+    id: Joi.number().allow(null).optional(),
     facilityName: Joi.string().required(),
     totalSpots: Joi.number().integer().min(1).required(), // Changed to match frontend
     surfaceSpotIds: Joi.array().items(Joi.string()).required(),
