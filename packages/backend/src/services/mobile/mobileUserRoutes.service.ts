@@ -2,8 +2,6 @@
 import express from "express";
 import cors from "cors";
 import routes from "../../routes/mobile/mobileUserRoutes"; 
-import {Vehicle} from "../../model/database-models/vehicle.model";
-import {ParkingSession} from "../../model/database-models/parkingstssion.model";
 
 const app = express();
 
