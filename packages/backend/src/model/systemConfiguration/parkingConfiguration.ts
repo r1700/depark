@@ -30,7 +30,7 @@ export class ParkingConfigurationModel {
     public showAdminAnalytics: boolean, // Added missing field
     public updatedAt: Date,
     public updatedBy: string,
-    public id?: string // Changed to string
+    public id?: number
   ) {}
 
   static create(data: any): Promise<ParkingConfigurationModel> {
