@@ -16,7 +16,7 @@ let dbConfig: DBVars;
 
 if (STATUS === 'production') {
   dbConfig = {
-    DB_USER: process.env.PROD_DB_USER || 'postgres',
+    DB_USER: process.env.PROD_DB_USER || '',
     DB_PASSWORD: process.env.PROD_DB_PASSWORD || 'postgres',
     DB_HOST: process.env.PROD_DB_HOST || 'db',   
     DB_NAME: process.env.PROD_DB_NAME || 'postgres',
