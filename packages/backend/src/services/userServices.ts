@@ -5,170 +5,170 @@ import { QueryTypes } from 'sequelize';
 // import { Op } from 'sequelize';
 
 function buildLiteral(tableName: string, whereClause: string) {
-  const query = `(
+    const query = `(
     SELECT *
     FROM ${tableName} 
     WHERE ${whereClause}
   )`;
-  return literal(query);
+    return literal(query);
 }
 
 type SearchInput = {
-  department?: string | string[];
-  email?: string;
-  first_name?: string;
-  last_name?: string;
-  phone?: string;
-  employee_id?: string;
-  max_cars_allowed_parking?: number;
-  name?: string;
-  role?: string;
-  permissions?: string;
-  [key: string]: any;
+    department?: string | string[];
+    email?: string;
+    phone?: string;
+    employee_id?: string;
+    max_cars_allowed_parking?: number;
+    freeSearch?: string;
+    role?: string;
+    permissions?: string;
+    [key: string]: any;
 };
 
 function parseFlexibleDate(dateStr: string): Date {
-  dateStr = dateStr.replace(/^"+|"+$/g, '').trim();
-  let match = dateStr.match(/^(\d{2})[\/-](\d{2})[\/-](\d{4})$/);
-  
-  if (match) {
-    const [, day, month, year] = match;
-    return new Date(`${year}-${month}-${day}T00:00:00Z`);
-  }
+    dateStr = dateStr.replace(/^"+|"+$/g, '').trim();
+    let match = dateStr.match(/^(\d{2})[\/-](\d{2})[\/-](\d{4})$/);
 
-  match = dateStr.match(/^(\d{2})[\/-](\d{2})[\/-](\d{2})$/);
-  if (match) {
-    const [, day, month, shortYear] = match;
-    let year = parseInt(shortYear, 10);
-    year = year < 50 ? 2000 + year : 1900 + year;
-    return new Date(`${year}-${month}-${day}T00:00:00Z`);
-  }
+    if (match) {
+        const [, day, month, year] = match;
+        return new Date(`${year}-${month}-${day}T00:00:00Z`);
+    }
 
-  const parsed = new Date(dateStr);
-  if (!isNaN(parsed.getTime())) {
-    return parsed;
-  }
+    match = dateStr.match(/^(\d{2})[\/-](\d{2})[\/-](\d{2})$/);
+    if (match) {
+        const [, day, month, shortYear] = match;
+        let year = parseInt(shortYear, 10);
+        year = year < 50 ? 2000 + year : 1900 + year;
+        return new Date(`${year}-${month}-${day}T00:00:00Z`);
+    }
 
-  throw new Error(`Invalid date format: ${dateStr}`);
+    const parsed = new Date(dateStr);
+    if (!isNaN(parsed.getTime())) {
+        return parsed;
+    }
+
+    throw new Error(`Invalid date format: ${dateStr}`);
 }
 
 function formatDateForSQL(date: Date): string {
-  return date.toISOString().split('T')[0];
+    return date.toISOString().split('T')[0];
 }
 
 
 function getDateRange(dateStr: string): [Date, Date] {
-  const startDate = new Date(dateStr);  
+    const startDate = new Date(dateStr);
 
-  const today = new Date();
+    const today = new Date();
 
-  
-  startDate.setHours(0, 0, 0, 0);
-  today.setHours(23, 59, 59, 999); 
 
-  return [startDate, today];
+    startDate.setHours(0, 0, 0, 0);
+    today.setHours(23, 59, 59, 999);
+
+    return [startDate, today];
 }
 
 
 
 
 function buildWhereClauseFromInput(input: SearchInput, getDateRange: (dateStr: string) => [Date, Date]): string {
-  const conditions: string[] = [];
+    const conditions: string[] = [];
 
-  if (input.department) {
-    if (Array.isArray(input.department)) {
-      const deps = input.department.map(dep => `'${dep}'`).join(', ');
-      conditions.push(`department IN (${deps})`);
-    } else {
-      conditions.push(`department ILIKE '%${input.department}%'`);
+    if (input.department) {
+        if (Array.isArray(input.department)) {
+            const deps = input.department.map(dep => `'${dep}'`).join(', ');
+            conditions.push(`department IN (${deps})`);
+        } else {
+            conditions.push(`department ILIKE '%${input.department}%'`);
+        }
     }
-  }
 
- 
-  if (input.name) {
-    const likePattern = `%${input.name}%`;
-    conditions.push(`(first_name ILIKE '${likePattern}' OR last_name ILIKE '${likePattern}')`);
-  }
-  if (input.first_name) conditions.push(`first_name ILIKE '%${input.first_name}%'`);
-  if (input.last_name) conditions.push(`last_name ILIKE '%${input.last_name}%'`);
-  if (input.phone) conditions.push(`phone ILIKE '%${input.phone}%'`);
-  if (input.email) conditions.push(`email ILIKE '%${input.email}%'`);
-  if (input.permissions) conditions.push(`permissions ILIKE '%${input.permissions}%'`);
-
-  // חיפושים מדויקים
-  if (input.status !== undefined) conditions.push(`status = ${input.status}`);
-  if (input.max_cars_allowed_parking !== undefined) conditions.push(`max_cars_allowed_parking >= ${input.max_cars_allowed_parking}`);
-  if (input.role) conditions.push(`role = '${input.role}'`);
-
-  // תאריכים
-  const dateFields: (keyof SearchInput)[] = ['created_at', 'updated_at', 'approved_at', 'last_login_at'];
-  for (const field of dateFields) {
-    if (input[field]) {
-      try {
-        const parsedDate = parseFlexibleDate(input[field] as string);
-        const [start, end] = getDateRange(formatDateForSQL(parsedDate));
-        const startStr = formatDateForSQL(start);
-        const endStr = formatDateForSQL(end);
-        conditions.push(`${field} BETWEEN '${startStr}' AND '${endStr}'`);
-      } catch {
-        throw new Error(`Invalid date format in ${field}`);
-      }
+    if (input.freeSearch) {
+        const safe = input.freeSearch.replace(/'/g, "''");
+        const likePattern = `%${safe}%`;
+        conditions.push(
+            `(first_name ILIKE '${likePattern}' OR last_name ILIKE '${likePattern}'` +
+            ` OR phone ILIKE '${likePattern}' OR email ILIKE '${likePattern}')`
+        );
     }
-  }
+    if (input.permissions) conditions.push(`permissions ILIKE '%${input.permissions}%'`);
 
-  return conditions.length > 0 ? conditions.join(' AND ') : '1=1';
+    // חיפושים מדויקים
+    if (input.status !== undefined) conditions.push(`status = ${input.status}`);
+    if (input.max_cars_allowed_parking !== undefined) conditions.push(`max_cars_allowed_parking >= ${input.max_cars_allowed_parking}`);
+    if (input.role) conditions.push(`role = '${input.role}'`);
+
+    // תאריכים
+    const dateFields: (keyof SearchInput)[] = ['created_at', 'updated_at', 'approved_at', 'last_login_at'];
+    for (const field of dateFields) {
+        if (input[field]) {
+            try {
+                const parsedDate = parseFlexibleDate(input[field] as string);
+                const [start, end] = getDateRange(formatDateForSQL(parsedDate));
+                const startStr = formatDateForSQL(start);
+                const endStr = formatDateForSQL(end);
+                conditions.push(`${field} BETWEEN '${startStr}' AND '${endStr}'`);
+            } catch {
+                throw new Error(`Invalid date format in ${field}`);
+            }
+        }
+    }
+
+    return conditions.length > 0 ? conditions.join(' AND ') : '1=1';
 }
 
 function convertQueryToSearchInput(req: Request): SearchInput {
-  const query = req.query;
-  const input: SearchInput = {};
+    const query = req.query;
+    const input: SearchInput = {};
 
- if (query.department) {
-    if (Array.isArray(query.department)) {
-        input.department = query.department.filter(dep => typeof dep === 'string');
-    } else if (typeof query.department === 'string') {
-        input.department = query.department;
+    if (query.department) {
+        if (Array.isArray(query.department)) {
+            input.department = query.department.filter(dep => typeof dep === 'string');
+        } else if (typeof query.department === 'string') {
+            // תמיכה בפסיקים: "Engineering,Sales"
+            if (query.department.includes(',')) {
+                input.department = query.department.split(',').map(dep => dep.trim());
+            } else {
+                input.department = query.department;
+            }
+        }
     }
-}
-  
-  if (query.name) input.name = query.name as string;
-  if (query.first_name) input.first_name = query.first_name as string;
-  if (query.last_name) input.last_name = query.last_name as string;
-  if (query.phone) input.phone = query.phone as string;
-  if (query.email) input.email = query.email as string;
-  if (query.role) input.role = query.role as string;
-  if (query.permissions) input.permissions = query.permissions as string;
 
-  if (query.status) input.status = Number(query.status);
-  if (query.max_cars_allowed_parking) input.max_cars_allowed_parking = Number(query.max_cars_allowed_parking);
+    if (query.freeSearch) input.freeSearch = query.freeSearch as string;
+    if (query.phone) input.phone = query.phone as string;
+    if (query.email) input.email = query.email as string;
+    if (query.role) input.role = query.role as string;
+    if (query.permissions) input.permissions = query.permissions as string;
 
-  const dateFields: (keyof SearchInput)[] = ['created_at', 'updated_at', 'approved_at', 'last_login_at'];
-  for (const field of dateFields) {
-    if (query[field]) {
-      const parsedDate = parseFlexibleDate(query[field] as string);
-      if (parsedDate) {
-        input[field] = parsedDate.toISOString().split('T')[0];  // פורמט ל-YYYY-MM-DD
-      }
+    if (query.status) input.status = Number(query.status);
+    if (query.max_cars_allowed_parking) input.max_cars_allowed_parking = Number(query.max_cars_allowed_parking);
+
+    const dateFields: (keyof SearchInput)[] = ['created_at', 'updated_at', 'approved_at', 'last_login_at'];
+    for (const field of dateFields) {
+        if (query[field]) {
+            const parsedDate = parseFlexibleDate(query[field] as string);
+            if (parsedDate) {
+                input[field] = parsedDate.toISOString().split('T')[0];  // פורמט ל-YYYY-MM-DD
+            }
+        }
     }
-  }
 
-  return input;
+    return input;
 }
 
 export async function handleUserFilter(req: Request, res: Response) {
-  try {
-    
-    const input: SearchInput = convertQueryToSearchInput(req);
+    try {
 
-   
-    const whereClause = buildWhereClauseFromInput(input, getDateRange);
+        const input: SearchInput = convertQueryToSearchInput(req);
 
-    
-    const lit = buildLiteral('users', whereClause);
 
-    
-    const results = await sequelize.query(
-      `
+        const whereClause = buildWhereClauseFromInput(input, getDateRange);
+
+
+        const lit = buildLiteral('users', whereClause);
+
+
+        const results = await sequelize.query(
+            `
       SELECT
           bu.id AS baseuser_id,
           bu.first_name,
@@ -184,17 +184,15 @@ export async function handleUserFilter(req: Request, res: Response) {
       LEFT JOIN adminusers a ON a.baseuser_id = bu.id
       WHERE ${whereClause}
       `,
-      { type: QueryTypes.SELECT }
-    );
+            { type: QueryTypes.SELECT }
+        );
 
-    res.json({
-      whereClause,
-      literal: lit.val,
-      results
-    });
-  } catch (error) {
-    res.status(400).json({ error: (error as Error).message });
-  }
+        res.json({
+            whereClause,
+            literal: lit.val,
+            results
+        });
+    } catch (error) {
+        res.status(400).json({ error: (error as Error).message });
+    }
 }
-
-
