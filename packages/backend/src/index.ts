@@ -2,31 +2,42 @@ import dotenv from 'dotenv';
 dotenv.config();
 import express from 'express';
 import cors from 'cors';
-// import loggerRoutes from './middlewares/locallLoggerMiddleware';
-// import healthRoutes from './routes/health';
-// import passwordRoutes from './routes/user.routes';
-// import vehicleRoutes from './routes/vehicle';
-// import exportToCSV from './routes/exportToCSV';
+
 import googleAuth from './routes/google-auth';
 import auth from './routes/auth';
 import APIvehicle from './routes/APIvehicle';
+import loggerRoutes from './middlewares/locallLoggerMiddleware';
+import healthRoutes from './routes/health';
+import passwordRoutes from './routes/user.routes';
+import vehicleRoutes from './routes/vehicle';
+import exportToCSV from'./routes/exportToCSV';
+import userFilter from './routes/userAPI';
+
 const app = express();
-const PORT = process.env.PORT || 3001;
-const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:3000';
+const PORT = process.env.PORT || 3001; // הוסף ברירת מחדל
+const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:3001'; // הוסף ברירת מחדל
+
+
 // Middleware setup
 app.use(cors({
   origin: CORS_ORIGIN,
   credentials: true,
 }));
 app.use(express.json());
-// app.use(loggerRoutes);
-// app.use('/api/health', healthRoutes);
-// app.use('/api/password', passwordRoutes);
-// app.use('/api/vehicle', vehicleRoutes);
-// app.use('/api/exportToCSV', exportToCSV);
+
 app.use('/OAuth', googleAuth); // Ensure this route is correctly set up
 app.use('/auth', auth);
 app.use('/api/vehicles', APIvehicle); // Ensure this route is correctly set up
+
+
+app.use(loggerRoutes);
+app.use('/api/health', healthRoutes);
+app.use('/api/password', passwordRoutes);
+app.use('/api/vehicle', vehicleRoutes);
+app.use('/api/exportToCSV', exportToCSV);
+app.use('/api/users', userFilter);
+
+
 app.get('/', (req, res) => {
   res.json({ message: 'DePark Backend is running!' });
 });

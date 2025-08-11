@@ -21,7 +21,7 @@
   "include": [
     "src/**/*",
     "backend/**/*"
-  ],
+, "tests/controllers/otpController.test.ts"  ],
   "exclude": [
     "node_modules",
     "dist"
