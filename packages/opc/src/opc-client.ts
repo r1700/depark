@@ -7,14 +7,18 @@ import {
   ClientSubscription,
   ClientMonitoredItem,
   TimestampsToReturn,
-  StatusCodes
+  StatusCodes,
+  UserTokenType,
+  MessageSecurityMode,
+  SecurityPolicy 
 } from "node-opcua";
 
 import { sendDataToBackend } from "./backendService";
 import * as dotenv from 'dotenv';
 dotenv.config();
 
-const ENDPOINT_URL =`opc.tcp://${process.env.TARGET_URL || "localhost:4080"}/UA/PLC`;
+// const ENDPOINT_URL =`opc.tcp://${process.env.TARGET_URL || "localhost:4080"}/UA/PLC`;
+const ENDPOINT_URL = `opc.tcp://${process.env.TARGET_URL || "localhost"}:4840/UA/PLC`;
 
 let opcClient: OPCUAClient | null = null;
 let opcSession: ClientSession | null = null;
@@ -26,7 +30,7 @@ const nodesToMonitor = [
   "ns=1;s=parkingSpot",
   "ns=1;s=licensePlateExit",
   "ns=1;s=licensePlateEntry",
-];
+]
 
 function guessDataType(value: any): DataType {
   switch (typeof value) {
@@ -46,7 +50,10 @@ async function getOpcClient(): Promise<OPCUAClient> {
     return opcClient;
   }
 
-  opcClient = OPCUAClient.create({ endpointMustExist: false });
+  opcClient = OPCUAClient.create({ 
+    endpointMustExist: false ,
+    securityMode: MessageSecurityMode.None,
+    securityPolicy: SecurityPolicy.None,});
 
   opcClient.on("backoff", (retry, delay) => {
     console.warn(`Retrying OPC UA Server connection - attempt #${retry} in ${delay}ms`);
@@ -70,7 +77,13 @@ export async function ensureSession(): Promise<ClientSession> {
 
   try {
     const client = await getOpcClient();
-    opcSession = await client.createSession();
+
+    opcSession = await client.createSession({
+      type: UserTokenType.UserName,
+      userName: process.env.OPCUA_USERNAME || "TestUser",
+      password: process.env.OPCUA_PASSWORD || "Interpaz1234!"
+    });
+
     isSessionActive = true;
     console.log("✅ Session created");
     return opcSession;
