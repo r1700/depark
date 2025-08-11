@@ -58,7 +58,7 @@ export class ParkingConfigurationModel {
 // Example usage of ParkingConfigurationModel
 
 const parkingConfigData = {
-  id: "main",
+  id: 1,
   facilityName: "Main Street Parking",
   totalSpots: 100,
   surfaceSpotIds: ["1", "2", "3", "4", "5", "6"],
@@ -81,6 +81,8 @@ const parkingConfigData = {
   updatedBy: "adminUser"
 };
 
+// Example usage מבוטל - לא צריך לרוץ אוטומטית
+/* 
 ParkingConfigurationModel.create(parkingConfigData)
   .then(parkingConfig => {
     console.log("Parking Configuration created successfully:", parkingConfig);
@@ -88,3 +90,4 @@ ParkingConfigurationModel.create(parkingConfigData)
   .catch(error => {
     console.error("Error creating parking configuration:", error);
   });
+*/
