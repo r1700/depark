@@ -1,5 +1,5 @@
 import { Sequelize, DataTypes, Model } from "sequelize";
-import sequelize from '../../config/sequlize'
+import sequelize from '../../config/sequelize'
 
 
 export class Vehicle extends Model {

@@ -1,6 +1,6 @@
 import { Sequelize, DataTypes, Model } from "sequelize";
 
-import sequelize from '../../config/instance'
+import sequelize from '../../config/sequelize'
 
 
 
