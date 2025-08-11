@@ -1,47 +1,53 @@
 import { OAuth2Client } from 'google-auth-library';
-import { getRoleById, getIdByEmail } from '../db/operations';
+import { getRoleById, getUserByEmail } from '../db/operations';
+import { Err } from 'joi';
+
 const clientId = process.env.CLIENT_ID;
+
 const client = new OAuth2Client(clientId);
 
-//Check the authentication of the user
-const auth = async (idToken: string) => {
-    try {
-        const userEmail:string|any = await verifyGoogleToken(idToken);
-        if(!userEmail) {
-            throw new Error('was an error with the token');
-        }
-        const userId = await getIdByEmail(userEmail);
-        if(!userId) {
-            throw new Error('User not found');
-        }
-        const role = await getRoleById(userId);
-        if(!role) {
-            return false
-        }
-        return true;
-    }
-    catch (error:Error | any) {
-        throw new Error(error.message);
-    }
-
-}
-
-// This function verifies the Google ID token and returns user information
-const verifyGoogleToken = async (idToken: string) => {
+const verifyGoogleToken = async (idToken: string): Promise<string | undefined> => {
     try {
         const ticket = await client.verifyIdToken({
-            idToken: idToken,
+            idToken,
             audience: clientId,
         });
 
         const payload = ticket.getPayload();
-        
-    return payload?.email;
+        if (!payload) {
+            throw new Error('Token payload is missing');
+        }
 
-    } catch (error: any) {
-        throw new Error('Invalid token:'+ error.message);
+        return payload.email;
+
+    } catch (error: Error|any) {
+            throw new Error('Invalid token: ' + error.message);
     }
 }
 
+const auth = async (idToken: string): Promise<any> => {
+    try {
+        const userEmail = await verifyGoogleToken(idToken);
+        if (!userEmail) {
+            throw new Error('Failed to extract user email from token');
+        }
 
-export default auth;
+        const user = await getUserByEmail(userEmail);
+        if (!user) {
+            throw new Error('User not found');
+        }
+
+        const role = await getRoleById(user.id);
+        if (!role) {
+            throw new Error('you dont have permission to access this system');
+        }
+
+        return {user, role};
+
+    } catch (error: Error|any) {
+        
+            throw new Error(error.message);
+    }
+}
+
+export { auth, verifyGoogleToken };
