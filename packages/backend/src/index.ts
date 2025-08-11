@@ -7,9 +7,10 @@ import loggerRoutes from './middlewares/locallLoggerMiddleware';
 import healthRoutes from './routes/health';
 import passwordRoutes from './routes/user.routes';
 import vehicleRoutes from './routes/vehicle';
-import exportToCSV from './routes/exportToCSV';
-import authRoutes from './routes/auth';
-import userGoogleAuthRoutes from './routes/userGoogle-auth';
+
+import exportToCSV from'./routes/exportToCSV';
+import userFilter from './routes/userApi';
+
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -35,14 +36,8 @@ app.use('/api/health', healthRoutes);
 app.use('/api/password', passwordRoutes);
 app.use('/api/vehicle', vehicleRoutes);
 app.use('/api/exportToCSV', exportToCSV);
-// app.use('/api/users', userFilter);
-app.use('/api/auth', authRoutes);
-app.use('/api/auth', userGoogleAuthRoutes);
+app.use('/api/users', userFilter);
 
-// app.use((req, res, next) => {
-//   console.log(`[${req.method}] ${req.path}`, req.body);
-//   next();
-// });
 
 
 // app.get('/', (req, res) => {
