@@ -6,6 +6,9 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 package-lock.json
+package.json
+packages/opc/package.json
+packages/plc-mock/package.json
 
 # Environment variables
 .env
@@ -19,66 +22,24 @@ dist/
 build/
 *.tsbuildinfo
 
-# Runtime data
-pids
-*.pid
-*.seed
-*.pid.lock
-
-# Coverage directory used by tools like istanbul
-coverage/
-*.lcov
-
-# nyc test coverage
-.nyc_output
-
 # Logs
 logs
 *.log
 
-# Optional npm cache directory
+# Cache directories
 .npm
-
-# Optional eslint cache
 .eslintcache
-
-# Optional stylelint cache
 .stylelintcache
-
-# Microbundle cache
 .rpt2_cache/
 .rts2_cache_cjs/
 .rts2_cache_es/
 .rts2_cache_umd/
 
-# Optional REPL history
-.node_repl_history
-
-# Output of 'npm pack'
-*.tgz
-
-# Yarn Integrity file
-.yarn-integrity
-
-# parcel-bundler cache (https://parceljs.org/)
-.cache
-.parcel-cache
-
-# Next.js build output
-.next
-
-# Nuxt.js build / generate output
-.nuxt
-
-# Storybook build outputs
-.out
-.storybook-out
-
 # Temporary folders
 tmp/
 temp/
 
-# Editor directories and files
+# Editor directories
 .vscode/
 !.vscode/extensions.json
 .idea/
@@ -86,26 +47,21 @@ temp/
 *.swo
 *~
 
-# OS generated files
+# OS files
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
 Thumbs.db
 
-# Vercel
+# Deployment
 .vercel
-
-# Render
 .render
 
 # Local environment files
 .env*.local
 
 # Local configuration files
+# Specific config files (with sensitive data)
 config/config.json
+config/database.json
 
 # connection files
 connection/connectToDB.js
@@ -119,13 +75,10 @@ knexfile.js
 yarn.lock
 
 # models
+# Generated files
 models/index.js
 
-# migrations
-migrations/*.js
-
-# Specific JSON files to ignore (NOT all JSON!)
-config/database.json
+# Temp files
 temp/*.json
 
 # Keep important JSON files
@@ -142,4 +95,25 @@ migrations/
 # Miscellaneous
 package-lock.json
 .env
+
+# Project specific
+connection/
+knexfile.js
+packages/frontend/src/app/
+packages/frontend/src/components/screen-login/
+
+# IMPORTANT: Keep these essential files!
+# package.json ✅
+# package-lock.json ✅  
+# yarn.lock ✅
+# migrations/ ✅ - DON'T IGNORE MIGRATIONS!
+# Miscellaneous
+package.json
+package-lock.json
+packages/backend/package.json
+
+yarn.lock
+.env
+
+jest.config.js
 
