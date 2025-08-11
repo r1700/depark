@@ -1,35 +1,16 @@
 import React, { useState, useCallback } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import LoginScreen from './components/screen-login/LoginScreen';
-import { Container } from "@mui/material";
-import AdminConfigPage from "./components/AdminConfigPage";
-import ParkingsPage from "./Pages/ParkingsPage";
-
+import AdminConfigPage from "./admin/components/AdminConfigPage";
+import ParkingsPage from "./admin/Pages/ParkingsPage";
+import LoginPage from "./admin/Pages/loginPage";
+import Otp from "./mobile/components/otp";
+import HomePage from "./tablet/pages/HomePage";
 const App: React.FC = () => {
-  // Always show as logged in for now - skip login screen
-  const [loggedIn, setLoggedIn] = useState<boolean>(true);
-
-  // הפונקציה לטיפול בכניסה מוצלחת, מקבלת טוקן
-  const handleLogin = useCallback((token?: string) => {
-    if (token) {
-      localStorage.setItem("token", token);
-    }
-    setLoggedIn(true);
-  }, []);
-
-  if (!loggedIn) {
-    return (
-      <Container maxWidth="sm" sx={{ mt: 8, textAlign: "center", direction: "ltr" }}>
-        <LoginScreen onLogin={handleLogin} />
-      </Container>
-    );
-  }
 
   return (
     <Router>
       <Routes>
-        {/* Default route - redirect to parkings */}
-        <Route path="/" element={<Navigate to="/parkings" replace />} />
+        
         
         {/* Parkings list page */}
         <Route path="/parkings" element={<ParkingsPage />} />
@@ -42,6 +23,11 @@ const App: React.FC = () => {
         
         {/* Catch all - redirect to parkings */}
         <Route path="*" element={<Navigate to="/parkings" replace />} />
+         <Route path="/admin" element={<LoginPage />} />
+
+          <Route path="/mobile" element={<Otp />} />
+
+          <Route path="/" element={<HomePage />} />
       </Routes>
     </Router>
   );
