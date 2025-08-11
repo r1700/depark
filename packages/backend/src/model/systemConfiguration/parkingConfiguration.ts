@@ -55,39 +55,3 @@ export class ParkingConfigurationModel {
   }
 }
 
-// Example usage of ParkingConfigurationModel
-
-const parkingConfigData = {
-  id: 1,
-  facilityName: "Main Street Parking",
-  totalSpots: 100,
-  surfaceSpotIds: ["1", "2", "3", "4", "5", "6"],
-  avgRetrievalTimeMinutes: 1,
-  maxQueueSize: 50,
-  maxParallelRetrievals: 2,
-  operatingHours: {
-    Sunday: { isActive: true, openingHour: "08:00", closingHour: "20:00" },
-    Monday: { isActive: true, openingHour: "08:00", closingHour: "20:00" },
-    Tuesday: { isActive: true, openingHour: "08:00", closingHour: "20:00" },
-    Wednesday: { isActive: true, openingHour: "08:00", closingHour: "20:00" },
-    Thursday: { isActive: true, openingHour: "08:00", closingHour: "20:00" },
-    Friday: { isActive: true, openingHour: "08:00", closingHour: "20:00" },
-    Saturday: { isActive: false, openingHour: "00:00", closingHour: "00:00" }
-  },
-  timezone: "Asia/Jerusalem",
-  maintenanceMode: false,
-  showAdminAnalytics: true,
-  updatedAt: new Date(),
-  updatedBy: "adminUser"
-};
-
-// Example usage מבוטל - לא צריך לרוץ אוטומטית
-/* 
-ParkingConfigurationModel.create(parkingConfigData)
-  .then(parkingConfig => {
-    console.log("Parking Configuration created successfully:", parkingConfig);
-  })
-  .catch(error => {
-    console.error("Error creating parking configuration:", error);
-  });
-*/
