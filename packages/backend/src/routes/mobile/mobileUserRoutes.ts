@@ -8,6 +8,8 @@ import { ParkingSession } from "../../model/database-models/parkingstssion.model
 
 
 const router = express.Router();
+import { Vehicle } from "../../model/database-models/vehicle.model";
+import { ParkingSession } from "../../model/database-models/parkingstssion.model";
 
 // GET - vehicles
 router.get("/vehicles", async (req, res) => {
