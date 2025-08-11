@@ -9,7 +9,9 @@ import passwordRoutes from './routes/user.routes';
 import vehicleRoutes from './routes/vehicle';
 import exportToCSV from './routes/exportToCSV';
 import authRoutes from './routes/auth';
+import { databaseService } from './services/database';
 import userGoogleAuthRoutes from './routes/userGoogle-auth';
+import { OAuth2Client } from 'google-auth-library';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -31,11 +33,16 @@ if (!GOOGLE_CLIENT_ID) {
 app.use(cors({ origin: CORS_ORIGIN, credentials: true }));
 app.use(express.json());
 app.use(loggerRoutes);
+
+if (!GOOGLE_CLIENT_ID) {
+  throw new Error('Missing GOOGLE_CLIENT_ID');
+}
+
+
 app.use('/api/health', healthRoutes);
 app.use('/api/password', passwordRoutes);
 app.use('/api/vehicle', vehicleRoutes);
 app.use('/api/exportToCSV', exportToCSV);
-// app.use('/api/users', userFilter);
 app.use('/api/auth', authRoutes);
 app.use('/api/auth', userGoogleAuthRoutes);
 
