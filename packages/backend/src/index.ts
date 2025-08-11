@@ -9,7 +9,6 @@ import passwordRoutes from './routes/user.routes';
 import vehicleRoutes from './routes/vehicle';
 import exportToCSV from './routes/exportToCSV';
 import authRoutes from './routes/auth';
-import { databaseService } from './services/database';
 import userGoogleAuthRoutes from './routes/userGoogle-auth';
 import { OAuth2Client } from 'google-auth-library';
 
@@ -61,6 +60,7 @@ app.get('/health', (req, res) => {
     timestamp: new Date().toISOString(),
   });
 });
+
 if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
   console.log(':file_cabinet: Initializing database...');
 } else {
