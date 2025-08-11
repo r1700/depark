@@ -1,0 +1,66 @@
+body, #root {
+  font-family: 'Inter', sans-serif;
+}
+
+.chart-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: flex-start;
+  padding: 40px;
+  gap: 50px;
+  height: 90vh;
+  font-family: 'Inter', sans-serif;
+  background-color: #fafafa;
+  /* אפשר להוסיף גבול או צל */
+  box-sizing: border-box;
+}
+
+/* עיצוב תוויות צירים ב-BarChart */
+.recharts-cartesian-axis-tick-value {
+  font-size: 14px;
+  fill: #333;
+  font-weight: 600;
+}
+
+/* תוויות ציר Y */
+.recharts-cartesian-axis-y .recharts-cartesian-axis-tick-value {
+  font-size: 14px;
+  fill: #333;
+  font-weight: 600;
+}
+
+/* תווית ציר X */
+.chart-x-label {
+  font-size: 16px !important;
+  fill: #222 !important;
+  font-weight: 700 !important;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ריווח וסגנון לפקדי הלג'נד בפאי ובבר */
+.recharts-legend-wrapper {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  padding-top: 10px !important;
+}
+
+/* טיפוס כותרות במידע Tooltip */
+.recharts-default-tooltip {
+  font-family: 'Inter', sans-serif !important;
+  font-size: 14px !important;
+}
+
+/* סיבוב תווית ציר X */
+.recharts-cartesian-axis-tick {
+  cursor: default;
+  pointer-events: none;
+}
+
+/* אפשר להוסיף צל או border לגרפים */
+.recharts-wrapper {
+  box-shadow: 0 2px 6px rgb(0 0 0 / 0.1);
+  border-radius: 8px;
+  background-color: white;
+}
