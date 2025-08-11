@@ -3,6 +3,7 @@ import LoginScreen from './components/screen-login/LoginScreen';
 import { Box, Button, Container, Typography } from "@mui/material";
 import ParkingStatsPage from "./app/pages/adminDashBoard/parkingStats";
 import SurfaceStatsPage from "./app/pages/adminDashBoard/surfaceStats";
+import { Outlet } from "react-router-dom";
 
 const App: React.FC = () => {
   
@@ -26,6 +27,7 @@ const App: React.FC = () => {
       <ParkingStatsPage />
       {/* <SurfaceStatsPage /> */}
     </Container>
+    // <Outlet />
   );
 };
 

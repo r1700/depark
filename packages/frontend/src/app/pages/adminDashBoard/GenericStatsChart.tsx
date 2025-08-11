@@ -70,7 +70,9 @@ const GenericStatsChart: React.FC<GenericStatsChartProps> = ({
               barCategoryGap={12}
               barGap={6}
             >
-              <CartesianGrid strokeDasharray="3 3" />
+              {/* <CartesianGrid strokeDasharray="3 3" /> */}
+              <CartesianGrid vertical={false} horizontal={true} strokeDasharray="3 3" stroke="#ccc" />
+
               <XAxis
                 dataKey={xKey}
                 interval={0}
@@ -94,7 +96,7 @@ const GenericStatsChart: React.FC<GenericStatsChartProps> = ({
                       fill={colorsByEntry[idx % colorsByEntry.length]}
                     />
                   ))}
-                  <LabelList dataKey={key} position="insideTop" style={{ fill: '#333', fontWeight: '600', fontSize: 14 }} />
+                  <LabelList dataKey={key} position="inside" style={{ fill: '#fff', fontWeight: '600', fontSize: 14 }} />
                 </Bar>
               ))}
             </BarChart>

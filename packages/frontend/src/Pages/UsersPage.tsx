@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Button, Box, Typography, Modal, Fade, Backdrop } from '@mui/material';
-import UserForm from '../app/pages/user/UserForm/UserForm';
+// import UserForm from '../app/pages/user/UserForm/UserForm';
 
 
 
@@ -96,9 +96,9 @@ const [showAddUserModal, setShowAddUserModal] = useState(false);
         >
           <Fade in={showAddUserModal}>
             <Box sx={styleModal}>
-              <UserForm
+              {/* <UserForm
               onClose={closeAddUserModal}
-              ></UserForm>
+              ></UserForm> */}
             </Box>
           </Fade>
         </Modal>
