@@ -3,19 +3,9 @@ import cors from 'cors';
 
 // Import routers
 import adminConfigRouter from './routes/adminConfig';
-// Import database connection
-import { sequelize } from './models/ParkingConfiguration';
+
 
 const app = express();
-
-// Database connection test
-sequelize.authenticate()
-  .then(() => {
-    console.log('✅ Database connection established successfully');
-  })
-  .catch(err => {
-    console.error('❌ Unable to connect to the database:', err);
-  });
 
 // Middleware
 app.use(cors());

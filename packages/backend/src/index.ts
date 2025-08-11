@@ -7,14 +7,7 @@ import healthRoutes from './routes/health';
 import passwordRoutes from './routes/user.routes';
 import vehicleRoutes from './routes/vehicle';
 import exportToCSV from './routes/exportToCSV';
-import adminConfigRouter from './routes/adminConfig'; // Using YOUR validation model!
-// Import database connection - keep for database connectivity
-import { sequelize } from './models/ParkingConfiguration';
-// import loggerRoutes from './middlewares/locallLoggerMiddleware';
-// import healthRoutes from './routes/health';
-// import passwordRoutes from './routes/user.routes';
-// import vehicleRoutes from './routes/vehicle';
-// import exportToCSV from './routes/exportToCSV';
+import adminConfigRouter from './routes/adminConfig';
 import googleAuth from './routes/google-auth';
 import auth from './routes/auth';
 
@@ -22,14 +15,6 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:3000';
 
-// Database connection test
-sequelize.authenticate()
-  .then(() => {
-    console.log('✅ Database connection established successfully');
-  })
-  .catch(err => {
-    console.error('❌ Unable to connect to the database:', err);
-  });
 
 // Middleware setup
 app.use(cors({
