@@ -2,33 +2,23 @@ import dotenv from 'dotenv';
 dotenv.config();
 import express from 'express';
 import cors from 'cors';
-import loggerRoutes from './middlewares/locallLoggerMiddleware';
-import healthRoutes from './routes/health';
-import passwordRoutes from './routes/user.routes';
-import vehicleRoutes from './routes/vehicle';
-import exportToCSV from './routes/exportToCSV';
-import adminConfigRouter from './routes/adminConfig';
+// import loggerRoutes from './middlewares/locallLoggerMiddleware';
+// import healthRoutes from './routes/health';
+// import passwordRoutes from './routes/user.routes';
+// import vehicleRoutes from './routes/vehicle';
+// import exportToCSV from './routes/exportToCSV';
 import googleAuth from './routes/google-auth';
 import auth from './routes/auth';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:3000';
-
-
 // Middleware setup
 app.use(cors({
   origin: CORS_ORIGIN,
   credentials: true,
 }));
 app.use(express.json());
-app.use(loggerRoutes);
-app.use('/api/health', healthRoutes);
-app.use('/api/password', passwordRoutes);
-app.use('/api/vehicle', vehicleRoutes);
-app.use('/api/exportToCSV', exportToCSV);
-app.use('/api/admin', adminConfigRouter); // Add admin routes
-
 // app.use(loggerRoutes);
 // app.use('/api/health', healthRoutes);
 // app.use('/api/password', passwordRoutes);
