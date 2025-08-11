@@ -9,6 +9,8 @@ import HrDashboard from './components/hrDashboard/HrDashboard';
 import AdminDashboard from './components/adminDashboard/AdminDashboard';
 import Layout from './components/layout/layout';
 import UsersPage from './Pages/UsersPage';
+import ParkingStatsPage from './app/pages/adminDashBoard/parkingStats';
+import SurfaceStatsPage from './app/pages/adminDashBoard/surfaceStats';
 
 const user = JSON.parse(localStorage.getItem("user") || "{}");
 
@@ -24,7 +26,9 @@ const routers = createBrowserRouter([
         path: 'layout', element: <Layout user={user} onLogout={handleLogout} />, children: [
           { path: 'admin-dashboard', element: <AdminDashboard /> },
           { path: 'hr-dashboard', element: <HrDashboard /> },
-          { path: 'users', element: <UsersPage />},
+          { path: 'users', element: <UsersPage /> },
+          { path: 'parking-stats', element: <ParkingStatsPage /> },
+          { path: 'surface-stats', element: <SurfaceStatsPage /> },
         ]
       },
 
