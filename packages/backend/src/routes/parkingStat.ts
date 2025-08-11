@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import sequelize from '../config/sequelize';
 import { QueryTypes } from 'sequelize';
-<<<<<<< HEAD
 import { toZonedTime, format } from 'date-fns-tz';
 
 const router = Router();
@@ -48,46 +47,10 @@ router.get('/stats', async (req, res) => {
     `;
 
     const results = await sequelize.query(query, {
-=======
-
-const router = Router();
-
-router.get('/stats', async (req, res) => {
-  try {
-    const { start, end, userId } = req.query;
-
-    if (!start || !end) {
-      return res.status(400).json({ error: 'Missing required query parameters: start and end' });
-    }
-
-    const p_start = new Date(start as string);
-    const p_end = new Date(end as string);
-
-    if (isNaN(p_start.getTime()) || isNaN(p_end.getTime())) {
-      return res.status(400).json({ error: 'Invalid date format' });
-    }
-
-    let query = `
-      SELECT
-        COUNT(CASE WHEN "entryTime" >= $1 AND "entryTime" <= $2 THEN 1 END) AS "entries",
-        COUNT(CASE WHEN "exitTime" >= $1 AND "exitTime" <= $2 THEN 1 END) AS "exits"
-      FROM "ParkingSessions"
-    `;
-
-    const bindParams: any[] = [p_start.toISOString(), p_end.toISOString()];
-
-    if (userId) {
-      query += ` WHERE "userId" = $3`;
-      bindParams.push(userId);
-    }
-
-    const [results] = await sequelize.query(query, {
->>>>>>> 46a01406 (reomve changing to a new branch)
       bind: bindParams,
       type: QueryTypes.SELECT,
     });
 
-<<<<<<< HEAD
     // המרה של כל תאריך לשעון ישראל ופורמט לפי יום או שעה
     const formattedResults = results.map((r: any) => {
       const zonedDate = toZonedTime(r.period, TIMEZONE);
@@ -110,9 +73,6 @@ router.get('/stats', async (req, res) => {
     });
 
     res.json(formattedResults);
-=======
-    res.json(results);
->>>>>>> 46a01406 (reomve changing to a new branch)
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal server error' });
