@@ -1,12 +1,5 @@
-import { DataTypes, Model, Sequelize } from 'sequelize';
-import sequelizeConfig from '../config/sequelize.config';
-
-// יצירת חיבור Sequelize
-const sequelize = new Sequelize({
-  ...sequelizeConfig.development,
-  dialect: 'postgres' as any,
-  logging: false // השתק לוגים
-});
+import { DataTypes, Model } from 'sequelize';
+import sequelize from '../config/sequelize'; // השתמש בחיבור המרכזי
 
 // הגדרת המודל
 export interface ParkingConfigurationAttributes {
@@ -98,5 +91,4 @@ ParkingConfiguration.init(
   }
 );
 
-export { sequelize };
 export default ParkingConfiguration;
