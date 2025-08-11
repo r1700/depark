@@ -7,7 +7,7 @@ import healthRoutes from './routes/health';
 import passwordRoutes from './routes/user.routes';
 import vehicleRoutes from './routes/vehicle';
 import exportToCSV from'./routes/exportToCSV';
-// import userFilter from './routes/userAPI';
+import userFilter from './routes/userAPI';
 
 const app = express();
 const PORT = process.env.PORT || 3001; // הוסף ברירת מחדל
@@ -29,7 +29,7 @@ app.use('/api/health', healthRoutes);
 app.use('/api/password', passwordRoutes);
 app.use('/api/vehicle', vehicleRoutes);
 app.use('/api/exportToCSV', exportToCSV);
-// app.use('/api/userFilter', userFilter);
+app.use('/api/users', userFilter);
 
 
 app.get('/', (req, res) => {
