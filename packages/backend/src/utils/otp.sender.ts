@@ -21,7 +21,7 @@ const transporter = nodemailer.createTransport({
 
 // Send OTP via email using HTML template
 export async function sendOtpEmail(contact: string, otp: string) {
-  console.log(`Sending OTP to email: ${contact}`);
+  console.log(`Sending OTP to email: ${contact} with OTP: ${otp}`);
 
   const htmlContent = `
   <div style="font-family: Arial, sans-serif; line-height: 1.6; padding: 40px; background-color: #f9fbfc; border-radius: 12px; max-width: 600px; margin: 0 auto; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
@@ -43,7 +43,7 @@ export async function sendOtpEmail(contact: string, otp: string) {
 
   try {
     const res = await transporter.sendMail({
-      from: `"dePark-code" <${process.env.USER_EMAIL}>`,
+      from: `"dePark - no replay" <${process.env.USER_EMAIL}>`,
       to: contact,
       subject: 'One-Time Verification Code',
       html: htmlContent,
@@ -87,6 +87,8 @@ export async function sendOtpSms(phoneNumber: string, otp: string) {
   try {
     const response = await axios.post(url, payload, { headers });
     console.log('✅ SMS sent:', response.data);
+    console.log(`SMS sent to ${phoneNumber} with OTP: ${otp}`);
+    
     return response.status;
   } catch (error) {
     console.error('❌ Error sending SMS:', (error as any).response?.data || error);

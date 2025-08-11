@@ -1,43 +1,24 @@
 import React, { useState, useEffect, useCallback } from "react";
-import LoginScreen from './components/screen-login/LoginScreen';
-import { Box, Button, Container, Typography } from "@mui/material";
+import LoginPage from "./admin/Pages/loginPage";
+import Otp from "./mobile/components/otp";
+import HomePage from "./tablet/pages/HomePage";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
 const App: React.FC = () => {
-  // קריאה ראשונית מה־localStorage כדי לטעון אם המשתמש כבר מחובר
-  const [loggedIn, setLoggedIn] = useState<boolean>(() => {
-    return !!localStorage.getItem("token");
-  });
-
-  // הפונקציה לטיפול בכניסה מוצלחת, מקבלת טוקן
-  const handleLogin = useCallback((token?: string) => {
-    if (token) {
-      localStorage.setItem("token", token);
-    }
-    setLoggedIn(true);
-  }, []);
-
-  // פונקצית logout מוחקת את הטוקן ומעדכנת מצב
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    setLoggedIn(false);
-  };
 
   return (
-    <Container maxWidth="sm" sx={{ mt: 8, textAlign: "center", direction: "ltr" }}>
-      {loggedIn ? (
-        <Box>
-          <Typography variant="h4" gutterBottom>
-            Welcome!
-          </Typography>
-          <Button variant="contained" onClick={handleLogout}>
-            Logout
-          </Button>
-        </Box>
-      ) : (
-        // כאן מוסיפים פרופס של onLogin שמקבלת טוקן
-        <LoginScreen onLogin={handleLogin} />
-      )}
-    </Container>
+    <>
+      <Router>
+        <Routes>
+          <Route path="/admin" element={<LoginPage />} />
+
+          <Route path="/mobile" element={<Otp />} />
+
+          <Route path="/" element={<HomePage />} />
+        </Routes>
+      </Router>
+    </>
+
   );
 };
 
