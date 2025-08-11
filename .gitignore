@@ -142,32 +142,3 @@ migrations/
 # Miscellaneous
 package-lock.json
 .env
-
-<<<<<<< HEAD
-<<<<<<< HEAD
-package.json 
-=======
-# Project specific
-connection/
-knexfile.js
-packages/frontend/src/app/
-packages/frontend/src/components/screen-login/
-
-# IMPORTANT: Keep these essential files!
-# package.json ✅
-# package-lock.json ✅  
-# yarn.lock ✅
-# migrations/ ✅ - DON'T IGNORE MIGRATIONS!
-# Miscellaneous
-package.json
-package-lock.json
-packages/backend/package.json
-
-yarn.lock
-.env
-
-jest.config.js
->>>>>>> 08fb09e7 (add)
-
-=======
->>>>>>> 22b3ac24 (mobile)
