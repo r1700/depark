@@ -55,3 +55,5 @@ export class ParkingConfigurationModel {
   }
 }
 
+// Example usage of ParkingConfigurationModel
+
