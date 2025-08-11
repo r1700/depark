@@ -4,11 +4,12 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter, createBrowserRouter, RouterProvider } from 'react-router-dom';
-import LoginScreen from './components/screen-login/LoginScreen';
-import HrDashboard from './components/hrDashboard/HrDashboard';
-import AdminDashboard from './components/adminDashboard/AdminDashboard';
-import Layout from './components/layout/layout';
-import UsersPage from './Pages/UsersPage';
+import LoginScreen from './admin/components/screen-login/LoginScreen';
+import HrDashboard from './admin/components/hrDashboard/HrDashboard';
+import AdminDashboard from './admin/components/adminDashboard/AdminDashboard';
+import Layout from './admin/components/layout/layout';
+import UsersPage from './admin/Pages/UsersPage';
+import { VehicleRow } from './mobile/components/mobile-user/VehicleList';
 
 const user = JSON.parse(localStorage.getItem("user") || "{}");
 
@@ -25,6 +26,7 @@ const routers = createBrowserRouter([
           { path: 'admin-dashboard', element: <AdminDashboard /> },
           { path: 'hr-dashboard', element: <HrDashboard /> },
           { path: 'users', element: <UsersPage />},
+          { path: 'VehicleRow', element: <VehicleRow />}
         ]
       },
 
