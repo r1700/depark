@@ -1,71 +1,33 @@
 import { Router } from 'express';
 import { ParkingConfigurationModel } from '../model/systemConfiguration/parkingConfiguration';
-import ParkingConfiguration from '../models/ParkingConfiguration'; // Keep for database operations
+import ParkingConfiguration from '../models/ParkingConfiguration';
 const router = Router();
-
-// Helper function to convert between your model and database model
-function convertToDbFormat(config: any) {
-  return {
-    id: config.lotId || config.id,
-    facilityName: config.facilityName,
-    totalSpots: config.totalSpots,
-    surfaceSpotIds: config.surfaceSpotIds,
-    avgRetrievalTimeMinutes: config.avgRetrievalTimeMinutes || config.avgRetrievalTime,
-    maxQueueSize: config.maxQueueSize,
-    maxParallelRetrievals: config.maxParallelRetrievals,
-    operatingHours: config.operatingHours || config.dailyHours,
-    timezone: config.timezone,
-    maintenanceMode: config.maintenanceMode,
-    showAdminAnalytics: config.showAdminAnalytics,
-    updatedAt: config.updatedAt || new Date(),
-    updatedBy: config.updatedBy || 'admin'
-  };
-}
-
-function convertFromDbFormat(dbConfig: any) {
-  return {
-    id: dbConfig.id,
-    facilityName: dbConfig.facilityName,
-    totalSpots: dbConfig.totalSpots,
-    surfaceSpotIds: dbConfig.surfaceSpotIds,
-    avgRetrievalTimeMinutes: dbConfig.avgRetrievalTimeMinutes,
-    maxQueueSize: dbConfig.maxQueueSize,
-    maxParallelRetrievals: dbConfig.maxParallelRetrievals,
-    operatingHours: dbConfig.operatingHours,
-    timezone: dbConfig.timezone,
-    maintenanceMode: dbConfig.maintenanceMode,
-    showAdminAnalytics: dbConfig.showAdminAnalytics,
-    updatedAt: dbConfig.updatedAt,
-    updatedBy: dbConfig.updatedBy
-  };
-}
 
 // Create (INSERT only) with validation using your model
 router.post('/', async (req, res) => {
   try {
     const { parkingConfig } = req.body;
-    if (!parkingConfig || !parkingConfig.lotId) {
-      return res.status(400).json({ success: false, error: 'Missing parkingConfig or lotId' });
+    if (!parkingConfig) {
+      return res.status(400).json({ success: false, error: 'Missing parkingConfig' });
     }
 
     // Use your validation model first
     try {
-      const validatedConfig = await ParkingConfigurationModel.create(convertToDbFormat(parkingConfig));
+      const validatedConfig = await ParkingConfigurationModel.create(parkingConfig);
       console.log('✅ Validation passed with your model:', validatedConfig);
     } catch (error: any) {
       console.log('❌ Validation failed:', error);
       return res.status(400).json({ success: false, error: 'Validation failed: ' + error.message });
     }
 
-    // Check if already exists
-    const exists = await ParkingConfiguration.findByPk(parkingConfig.lotId);
+    // Check if already exists (using id from validated data)
+    const exists = await ParkingConfiguration.findByPk(parkingConfig.id);
     if (exists) {
-      return res.status(409).json({ success: false, error: 'Lot ID already exists' });
+      return res.status(409).json({ success: false, error: 'ID already exists' });
     }
 
-    // Create new record in database
-    const dbData = convertToDbFormat(parkingConfig);
-    await ParkingConfiguration.create(dbData);
+    // Create new record in database using the original data
+    await ParkingConfiguration.create(parkingConfig);
 
     res.json({ success: true });
   } catch (error) {
@@ -85,7 +47,7 @@ router.put('/:id', async (req, res) => {
 
     // Use your validation model first
     try {
-      const validatedConfig = await ParkingConfigurationModel.create(convertToDbFormat(parkingConfig));
+      const validatedConfig = await ParkingConfigurationModel.create(parkingConfig);
       console.log('✅ Validation passed with your model:', validatedConfig);
     } catch (error: any) {
       console.log('❌ Validation failed:', error);
@@ -95,12 +57,11 @@ router.put('/:id', async (req, res) => {
     // Check if exists
     const exists = await ParkingConfiguration.findByPk(id);
     if (!exists) {
-      return res.status(404).json({ success: false, error: 'Lot ID not found' });
+      return res.status(404).json({ success: false, error: 'ID not found' });
     }
 
-    // Update record in database
-    const dbData = convertToDbFormat(parkingConfig);
-    await exists.update(dbData);
+    // Update record in database using the original data
+    await exists.update(parkingConfig);
 
     res.json({ success: true });
   } catch (error) {
@@ -116,12 +77,11 @@ router.get('/:id', async (req, res) => {
     const parkingConfig = await ParkingConfiguration.findByPk(id);
     
     if (!parkingConfig) {
-      return res.status(404).json({ success: false, error: 'Lot ID not found' });
+      return res.status(404).json({ success: false, error: 'ID not found' });
     }
     
-    // Convert to your model format
-    const configData = convertFromDbFormat(parkingConfig.toJSON());
-    res.json({ success: true, parkingConfig: configData });
+    // Return the data directly from database
+    res.json({ success: true, parkingConfig: parkingConfig.toJSON() });
   } catch (error) {
     console.error('Error fetching parking config:', error);
     res.status(500).json({ success: false, error: 'Internal server error' });
@@ -133,8 +93,8 @@ router.get('/', async (req, res) => {
   try {
     const parkingConfigs = await ParkingConfiguration.findAll();
     
-    // Convert all to your model format
-    const configsData = parkingConfigs.map(config => convertFromDbFormat(config.toJSON()));
+    // Return all data directly from database
+    const configsData = parkingConfigs.map(config => config.toJSON());
     res.json({ success: true, parkingConfigs: configsData });
   } catch (error) {
     console.error('Error fetching parking configs:', error);

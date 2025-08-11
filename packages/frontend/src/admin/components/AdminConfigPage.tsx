@@ -370,78 +370,7 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
   }, []); // Empty - will load only once
 
   // Function to load a specific lot for editing
-  const loadLotForEdit = async (lotId: string) => {
-    setLoadingUpdate(true);
-    try {
-      const res = await fetch(`/api/admin/${encodeURIComponent(lotId.trim())}`);
-      const data = await res.json();
-      if (!data.success || !data.parkingConfig) {
-        setCurrentError('❌ Lot ID not found.');
-        setShowErrorPopup(true);
-      } else {
-        const loadedConfig = {
-          ...data.parkingConfig,
-          lotId: lotId.trim(),
-          dailyHours: convertOperatingHoursToDailyHours(data.parkingConfig.operatingHours),
-          avgRetrievalTime: data.parkingConfig.avgRetrievalTimeMinutes ?? 0,
-          maxParallelRetrievals: data.parkingConfig.maxParallelRetrievals ?? 1,
-          maintenanceMode: data.parkingConfig.maintenanceMode ?? false,
-          showAdminAnalytics: data.parkingConfig.showAdminAnalytics ?? false,
-          updatedAt: data.parkingConfig.updatedAt ? new Date(data.parkingConfig.updatedAt) : undefined,
-          updatedBy: data.parkingConfig.updatedBy || 'admin'
-        };
-        
-        setParkingConfig(loadedConfig);
-        setLastSavedConfig(loadedConfig);
-        setAddingNewLot(false);
-        setMessage({ type: 'success', text: '✅ Lot loaded for editing!' });
-        
-        // Clear the URL parameter after loading
-        window.history.replaceState({}, document.title, window.location.pathname);
-      }
-    } catch (err) {
-      setCurrentError('❌ Error loading lot for update.');
-      setShowErrorPopup(true);
-    } finally {
-      setLoadingUpdate(false);
-    }
-  };
-
   
-  const handleEdit = async(row: any) => {
-    setLoadingUpdate(true);
-    try {
-      const res = await fetch(`/api/admin/${row.id}`);
-      const data = await res.json();
-      if (!data.success || !data.parkingConfig) {
-        setCurrentError('❌ Lot ID not found.');
-        setShowErrorPopup(true);
-      } else {
-        const convertedConfig = {
-          ...data.parkingConfig,
-          lotId: row.id,
-          dailyHours: convertOperatingHoursToDailyHours(data.parkingConfig.operatingHours),
-          avgRetrievalTime: data.parkingConfig.avgRetrievalTimeMinutes ?? 0,
-          maxParallelRetrievals: data.parkingConfig.maxParallelRetrievals ?? 1,
-          maintenanceMode: data.parkingConfig.maintenanceMode ?? false,
-          showAdminAnalytics: data.parkingConfig.showAdminAnalytics ?? false,
-          updatedAt: data.parkingConfig.updatedAt ? new Date(data.parkingConfig.updatedAt) : undefined,
-          updatedBy: data.parkingConfig.updatedBy || 'admin'
-        };
-        
-        setParkingConfig(convertedConfig);
-        setLastSavedConfig(convertedConfig);
-        setAddingNewLot(false);
-        setMessage({ type: 'success', text: '✅ Lot loaded for update!' });
-      }
-    } catch (err) {
-      setCurrentError('❌ Error loading lot for update.');
-      setShowErrorPopup(true);
-    } finally {
-      setLoadingUpdate(false);
-    }
-  };
-
   const confirmDeleteLot = async () => {
     if (!deleteConfirmDialog.lotData) return;
     
@@ -920,11 +849,6 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
               }}
             />
           )}
-          {/* <DataTable 
-                data={tableData} 
-                onEdit={handleEdit}
-                onDelete={handleDelete}
-              /> */}
 
          
           
@@ -963,16 +887,6 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
                     }))}
                   />
                   
-                  <TextField
-                    fullWidth
-                    label="Lot ID"
-                    placeholder="Enter unique lot ID (e.g., main-lot-001)"
-                    value={parkingConfig.lotId || ''}
-                    onChange={(e) => setParkingConfig(prev => ({
-                      ...prev,
-                      lotId: e.target.value
-                    }))}
-                  />
                   
                   <FormControl fullWidth>
                     <InputLabel>Timezone</InputLabel>
