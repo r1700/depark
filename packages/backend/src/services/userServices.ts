@@ -187,6 +187,7 @@ export async function handleUserFilter(req: Request, res: Response) {
             { type: QueryTypes.SELECT }
         );
 
+
         res.json({
             whereClause,
             literal: lit.val,
