@@ -21,6 +21,9 @@ import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
+import { text } from 'stream/consumers';
+import ParkingStatsPage from '../../app/pages/adminDashBoard/parkingStats';
+import SurfaceStatsPage from '../../app/pages/adminDashBoard/surfaceStats';
 const drawerWidth = 240;
 interface User {
     firstName: string;
@@ -50,9 +53,9 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
             icon: <AssessmentIcon />,
             path: '',
             subMenu: [
-                { text: 'Report 1', path: '/reports/report1' },
-                { text: 'Report 2', path: '/reports/report2' },
-                { text: 'Report 3', path: '/reports/report3' }
+                { text: 'Report 1', path: '/reports/report1' },               
+                { text: 'Parking Stats', path: '/reports/parking-stats', element: <ParkingStatsPage /> },
+                { text: 'Surface Stats', path: '/reports/surface-stats', element: <SurfaceStatsPage /> },
             ]
         },
     ];
