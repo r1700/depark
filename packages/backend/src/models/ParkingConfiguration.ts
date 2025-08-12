@@ -9,8 +9,11 @@ export interface ParkingConfigurationAttributes {
   surfaceSpotIds: string[];
   avgRetrievalTimeMinutes: number;
   maxQueueSize: number;
+  maxParallelRetrievals?: number;
   operatingHours: object;
   timezone: string;
+  maintenanceMode?: boolean;
+  showAdminAnalytics?: boolean;
   updatedAt?: Date;
   updatedBy: string;
 }
@@ -22,8 +25,11 @@ export class ParkingConfiguration extends Model<ParkingConfigurationAttributes> 
   public surfaceSpotIds!: string[];
   public avgRetrievalTimeMinutes!: number;
   public maxQueueSize!: number;
+  public maxParallelRetrievals!: number;
   public operatingHours!: object;
   public timezone!: string;
+  public maintenanceMode!: boolean;
+  public showAdminAnalytics!: boolean;
   public updatedAt!: Date;
   public updatedBy!: string;
 }
@@ -62,6 +68,12 @@ ParkingConfiguration.init(
       allowNull: false,
       field: 'max_queue_size'
     },
+    maxParallelRetrievals: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      defaultValue: 1,
+      field: 'max_parallel_retrievals'
+    },
     operatingHours: {
       type: DataTypes.JSONB,
       allowNull: false,
@@ -71,6 +83,18 @@ ParkingConfiguration.init(
       type: DataTypes.STRING,
       allowNull: false,
       field: 'timezone'
+    },
+    maintenanceMode: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+      defaultValue: false,
+      field: 'maintenance_mode'
+    },
+    showAdminAnalytics: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+      defaultValue: false,
+      field: 'show_admin_analytics'
     },
     updatedAt: {
       type: DataTypes.DATE,

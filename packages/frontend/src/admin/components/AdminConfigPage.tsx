@@ -42,11 +42,11 @@ import { styled } from '@mui/material/styles';
 // Types
 interface ParkingConfig {
   facilityName: string;
-  lotId: string;
+  lotId: string; 
   timezone: string;
   surfaceSpotIds: string[];
   totalSpots: number;
-  dailyHours: {
+  operatingHours: {
     [key: string]: {
       isActive: boolean;
       openingHour: string;
@@ -54,7 +54,7 @@ interface ParkingConfig {
     };
   };
   maxQueueSize: number;
-  avgRetrievalTime: number;
+  avgRetrievalTimeMinutes: number;
   maxParallelRetrievals: number; 
   maintenanceMode: boolean;
   showAdminAnalytics: boolean;
@@ -138,6 +138,41 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
   const navigate = useNavigate();
   const { lotId } = useParams<{ lotId?: string }>();
   
+  // Helper function to get headers with authorization
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem('token') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJkZXZAZXhhbXBsZS5jb20iLCJmaXJzdE5hbWUiOiJEZXYiLCJsYXN0TmFtZSI6IlVzZXIiLCJpYXQiOjE3NTQ5OTI2NTcsImV4cCI6MTc1NTA3OTA1N30.w8cTcjsGjx4cNJg7-NZRSoI81ZTDdvuF-CrvbcwwNIk';
+    return {
+      'Content-Type': 'application/json',
+      'Cache-Control': 'no-cache',
+      'Pragma': 'no-cache',
+      'Authorization': `Bearer ${token}`
+    };
+  };
+
+  // Helper function to get current user info
+  const getCurrentUser = () => {
+    let user = JSON.parse(localStorage.getItem("user") || "{}");
+    
+    // If no user data exists, create mock user for development
+    if (!user.firstName || !user.lastName) {
+      user = {
+        firstName: 'Dev',
+        lastName: 'User',
+        email: 'dev-user@example.com'
+      };
+      // Optionally save mock user to localStorage
+      localStorage.setItem("user", JSON.stringify(user));
+    }
+    
+    return user;
+  };
+
+  // Helper function to get user name for updatedBy field
+  const getUserName = () => {
+    const user = getCurrentUser();
+    return `${user.firstName} ${user.lastName}`;
+  };
+  
   // Initial config - memoized to prevent re-creation on every render
   const initialConfig: ParkingConfig = useMemo(() => ({
     facilityName: '',
@@ -145,7 +180,7 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
     timezone: 'Asia/Jerusalem',
     surfaceSpotIds: [],
     totalSpots: 0,
-    dailyHours: {
+    operatingHours: {
       Sunday: { isActive: false, openingHour: '00:00', closingHour: '00:00' },
       Monday: { isActive: false, openingHour: '00:00', closingHour: '00:00' },
       Tuesday: { isActive: false, openingHour: '00:00', closingHour: '00:00' },
@@ -155,7 +190,7 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
       Saturday: { isActive: false, openingHour: '00:00', closingHour: '00:00' }
     },
     maxQueueSize: 0,
-    avgRetrievalTime: 0,
+    avgRetrievalTimeMinutes: 0,
     maxParallelRetrievals:0, 
     maintenanceMode: false,
     showAdminAnalytics: false
@@ -192,10 +227,7 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
         try {
           console.log('🔄 Loading existing config for lotId:', lotId);
           const response = await fetch(`/api/admin/${lotId}`, {
-            headers: {
-              'Cache-Control': 'no-cache',
-              'Pragma': 'no-cache'
-            }
+            headers: getAuthHeaders()
           });
           
           if (response.ok) {
@@ -222,8 +254,8 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
                 timezone: config.timezone || 'Asia/Jerusalem',
                 surfaceSpotIds: config.surfaceSpotIds || [],
                 totalSpots: config.totalSpots || 0,
-                dailyHours: config.operatingHours || defaultDailyHours,
-                avgRetrievalTime: config.avgRetrievalTimeMinutes || 0,
+                operatingHours: config.operatingHours || defaultDailyHours,
+                avgRetrievalTimeMinutes: config.avgRetrievalTimeMinutes || 0,
                 maxQueueSize: config.maxQueueSize || 0,
                 maxParallelRetrievals: config.maxParallelRetrievals || 1,
                 maintenanceMode: config.maintenanceMode || false,
@@ -286,11 +318,11 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
   const handleDayToggle = (day: string) => {
     setParkingConfig(prev => ({
       ...prev,
-      dailyHours: {
-        ...prev.dailyHours,
+      operatingHours: {
+        ...prev.operatingHours,
         [day]: {
-          ...prev.dailyHours[day],
-          isActive: !prev.dailyHours[day].isActive
+          ...prev.operatingHours?.[day],
+          isActive: !prev.operatingHours?.[day]?.isActive
         }
       }
     }));
@@ -299,10 +331,10 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
   const handleTimeChange = (day: string, timeType: 'openingHour' | 'closingHour', value: string) => {
     setParkingConfig(prev => ({
       ...prev,
-      dailyHours: {
-        ...prev.dailyHours,
+      operatingHours: {
+        ...prev.operatingHours,
         [day]: {
-          ...prev.dailyHours[day],
+          ...prev.operatingHours?.[day],
           [timeType]: value
         }
       }
@@ -312,10 +344,7 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
     try {
       console.log('🔄 FETCH_LOTS: Starting to fetch parking lots');
       const response = await fetch('/api/admin/', {
-        headers: {
-          'Cache-Control': 'no-cache',
-          'Pragma': 'no-cache'
-        }
+        headers: getAuthHeaders()
       });
       if (!response.ok) {
         throw new Error('Network response was not ok');
@@ -376,7 +405,8 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
     
     try {
       const response = await fetch(`/api/admin/${deleteConfirmDialog.lotData.id}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: getAuthHeaders()
       });
       
       if (response.ok) {
@@ -469,18 +499,15 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
       errors.push('Please enter a Facility Name');
     }
 
-    if (!parkingConfig.lotId.trim()) {
-      errors.push('Please enter a Lot ID');
-    }
 
     if (parkingConfig.surfaceSpotIds.length === 0) {
       errors.push('Please add at least one parking spot');
     }
 
     // Check active days
-    const activeDays = Object.keys(parkingConfig.dailyHours).filter(day =>
-      parkingConfig.dailyHours[day].isActive
-    );
+    const activeDays = parkingConfig.operatingHours ? Object.keys(parkingConfig.operatingHours).filter(day =>
+      parkingConfig.operatingHours[day]?.isActive
+    ) : [];
 
     if (activeDays.length === 0) {
       errors.push('Please select at least one active day');
@@ -488,7 +515,7 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
 
     // Check hours for each active day
     for (const day of activeDays) {
-      const dayData = parkingConfig.dailyHours[day];
+      const dayData = parkingConfig.operatingHours[day];
 
       if (!dayData.openingHour || dayData.openingHour === '--:--') {
         errors.push(`Please set opening hour for ${day}`);
@@ -516,7 +543,7 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
       errors.push('Please set Max Queue Size to a number greater than 0');
     }
 
-    if (parkingConfig.avgRetrievalTime <= 0) {
+    if (parkingConfig.avgRetrievalTimeMinutes <= 0) {
       errors.push('Please set Average Retrieval Time to a number greater than 0');
     }
 
@@ -542,12 +569,12 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
       parkingConfig.timezone !== lastSavedConfig.timezone ||
       parkingConfig.totalSpots !== lastSavedConfig.totalSpots ||
       parkingConfig.maxQueueSize !== lastSavedConfig.maxQueueSize ||
-      parkingConfig.avgRetrievalTime !== lastSavedConfig.avgRetrievalTime ||
+      parkingConfig.avgRetrievalTimeMinutes !== lastSavedConfig.avgRetrievalTimeMinutes ||
       parkingConfig.maxParallelRetrievals !== lastSavedConfig.maxParallelRetrievals ||
       parkingConfig.maintenanceMode !== lastSavedConfig.maintenanceMode ||
       parkingConfig.showAdminAnalytics !== lastSavedConfig.showAdminAnalytics ||
       JSON.stringify(parkingConfig.surfaceSpotIds.sort()) !== JSON.stringify(lastSavedConfig.surfaceSpotIds.sort()) ||
-      JSON.stringify(parkingConfig.dailyHours) !== JSON.stringify(lastSavedConfig.dailyHours);
+      JSON.stringify(parkingConfig.operatingHours) !== JSON.stringify(lastSavedConfig.operatingHours);
 
     console.log('🔄 hasChanges check:', changes, {
       facilityName: parkingConfig.facilityName + ' vs ' + lastSavedConfig.facilityName,
@@ -571,7 +598,6 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
       const now = new Date();
       // Check if this is a new lot - use React Router lotId instead of URL params
       const isNewLot = !lotId; // If no lotId from useParams, it's a new lot
-
       console.log('🔄 CRITICAL_SAVE_DEBUG: Starting save process');
       console.log('🔄 Current parkingConfig:', JSON.stringify(parkingConfig, null, 2));
       console.log('🔄 lotId from useParams:', lotId);
@@ -588,13 +614,13 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
       const dataToSend = {
         parkingConfig: {
           ...parkingConfig,
-          avgRetrievalTimeMinutes: parkingConfig.avgRetrievalTime,
+          avgRetrievalTimeMinutes: parkingConfig.avgRetrievalTimeMinutes,
           maxParallelRetrievals: parkingConfig.maxParallelRetrievals,
-          operatingHours: parkingConfig.dailyHours,
+          operatingHours: parkingConfig.operatingHours,
           maintenanceMode: parkingConfig.maintenanceMode,
           showAdminAnalytics: parkingConfig.showAdminAnalytics,
           updatedAt: now,
-          updatedBy: 'admin'
+          updatedBy: getUserName()
         }
       };
 
@@ -604,11 +630,7 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
 
       const response = await fetch(url, {
         method,
-        headers: { 
-          'Content-Type': 'application/json',
-          'Cache-Control': 'no-cache',
-          'Pragma': 'no-cache' 
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify(dataToSend)
       });
 
@@ -629,7 +651,7 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
       const newConfig = {
         ...parkingConfig,
         updatedAt: now,
-        updatedBy: 'admin'
+        updatedBy: getUserName()
       };
 
       console.log('🔄 CRITICAL_NEW_CONFIG:', JSON.stringify(newConfig, null, 2));
@@ -668,7 +690,7 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
       timezone: 'Asia/Jerusalem',
       surfaceSpotIds: [],
       totalSpots: 0,
-      dailyHours: {
+      operatingHours: {
         Sunday: { isActive: false, openingHour: '00:00', closingHour: '00:00' },
         Monday: { isActive: false, openingHour: '00:00', closingHour: '00:00' },
         Tuesday: { isActive: false, openingHour: '00:00', closingHour: '00:00' },
@@ -678,12 +700,12 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
         Saturday: { isActive: false, openingHour: '00:00', closingHour: '00:00' }
       },
       maxQueueSize: 0,
-      avgRetrievalTime: 0,
+      avgRetrievalTimeMinutes: 0,
       maxParallelRetrievals: 0, 
       maintenanceMode: false,
       showAdminAnalytics: false,
       updatedAt: new Date(),
-      updatedBy: 'admin'
+      updatedBy: getUserName()
     });
     setMessage({
       type: 'success',
@@ -691,62 +713,8 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
     });
   };
 
-  const handleLoadForUpdate = async () => {
-    if (!updateLotId.trim()) {
-      setCurrentError('❌ Please enter a Lot ID to load.');
-      setShowErrorPopup(true);
-      return;
-    }
-    setLoadingUpdate(true);
-    try {
-      const res = await fetch(`/api/admin/${encodeURIComponent(updateLotId.trim())}`);
-      const data = await res.json();
-      if (!data.success || !data.parkingConfig) {
-        setCurrentError('❌ Lot ID not found.');
-        setShowErrorPopup(true);
-      } else {
-        const loadedConfig = {
-          ...data.parkingConfig,
-          lotId: updateLotId.trim(),
-          dailyHours: convertOperatingHoursToDailyHours(data.parkingConfig.operatingHours),
-          avgRetrievalTime: data.parkingConfig.avgRetrievalTimeMinutes ?? 0,
-          maxParallelRetrievals: data.parkingConfig.maxParallelRetrievals ?? 1,
-          maintenanceMode: data.parkingConfig.maintenanceMode ?? false,
-          showAdminAnalytics: data.parkingConfig.showAdminAnalytics ?? false,
-          updatedAt: data.parkingConfig.updatedAt ? new Date(data.parkingConfig.updatedAt) : undefined,
-          updatedBy: data.parkingConfig.updatedBy || 'admin'
-        };
-        
-        setParkingConfig(loadedConfig);
-        setLastSavedConfig(loadedConfig);
-        setMessage({ type: 'success', text: '✅ Lot loaded for update!' });
-      }
-    } catch (err) {
-      setCurrentError('❌ Error loading lot for update.');
-      setShowErrorPopup(true);
-    } finally {
-      setLoadingUpdate(false);
-    }
-  };
 
-  // Convert operating hours from various formats to the unified dailyHours structure
-  function convertOperatingHoursToDailyHours(operatingHours: any): ParkingConfig['dailyHours'] {
-    if (operatingHours && typeof operatingHours === 'object' && operatingHours.Sunday) {
-      return operatingHours;
-    }
-    const start = operatingHours?.start || '00:00';
-    const end = operatingHours?.end || '00:00';
-    const daily: ParkingConfig['dailyHours'] = {};
-    for (const day of days) {
-      daily[day] = {
-        isActive: true,
-        openingHour: start,
-        closingHour: end
-      };
-    }
-    return daily;
-  }
-
+ 
   return (
     <ThemeProvider theme={theme}>
       <Container maxWidth="xl" sx={{ py: 4 }}>
@@ -1035,7 +1003,8 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
                 {/* Days with Hours in Same Row */}
                 <Stack spacing={1.5}>
                   {days.map((day, index) => {
-                    const dayData = parkingConfig.dailyHours[day]; // Add this missing line
+                    const dayData = parkingConfig.operatingHours?.[day]; // Add safe access
+                    if (!dayData) return null; // Skip if no data
                     return (
                       <Box 
                         key={`day-hours-${index}-${day}`}
@@ -1147,10 +1116,10 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
                     fullWidth
                     label="Average Retrieval Time (minutes)"
                     type="number"
-                    value={parkingConfig.avgRetrievalTime || 0}
+                    value={parkingConfig.avgRetrievalTimeMinutes || 0}
                     onChange={(e) => setParkingConfig(prev => ({
                       ...prev,
-                      avgRetrievalTime: parseInt(e.target.value) || 0
+                      avgRetrievalTimeMinutes: parseInt(e.target.value) || 0
                     }))}
                   />
                   

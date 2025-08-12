@@ -1,43 +1,55 @@
 import { Router } from 'express';
 import { ParkingConfigurationModel } from '../model/systemConfiguration/parkingConfiguration';
 import ParkingConfiguration from '../models/ParkingConfiguration';
+import authenticateToken from '../middlewares/authMiddleware'; // Back to original auth
+
 const router = Router();
+router.post('/', authenticateToken, async (req, res) => {
+  const { parkingConfig } = req.body;
+  if (!parkingConfig) {
+    return res.status(400).json({ success: false, error: 'Missing parkingConfig' });
+  }
 
-// Create (INSERT only) with validation using your model
-router.post('/', async (req, res) => {
   try {
-    const { parkingConfig } = req.body;
-    if (!parkingConfig) {
-      return res.status(400).json({ success: false, error: 'Missing parkingConfig' });
-    }
-
-    // Use your validation model first
-    try {
-      const validatedConfig = await ParkingConfigurationModel.create(parkingConfig);
+    console.log('🔍 Raw parkingConfig data:', JSON.stringify(parkingConfig, null, 2));
+      
+      const configForValidation = { ...parkingConfig };
+      delete configForValidation.id;
+      delete configForValidation.lotId;
+      
+      console.log('🔄 Config after removing IDs for validation:', JSON.stringify(configForValidation, null, 2));
+      
+      const { error, value: validatedConfig } = ParkingConfigurationModel.schema.validate(configForValidation);
+      if (error) {
+        console.log('❌ Validation failed:', error);
+        console.log('❌ Error details:', error.details);
+        return res.status(400).json({ success: false, error: 'Validation failed: ' + error.message });
+      }
       console.log('✅ Validation passed with your model:', validatedConfig);
-    } catch (error: any) {
-      console.log('❌ Validation failed:', error);
-      return res.status(400).json({ success: false, error: 'Validation failed: ' + error.message });
-    }
 
-    // Check if already exists (using id from validated data)
-    const exists = await ParkingConfiguration.findByPk(parkingConfig.id);
-    if (exists) {
-      return res.status(409).json({ success: false, error: 'ID already exists' });
-    }
+      const configForDatabase = { ...parkingConfig }; 
+      delete configForDatabase.id;
+      delete configForDatabase.lotId;
+      
+      // Add updated timestamp and user from authentication
+      configForDatabase.updatedAt = new Date();
+      const currentUser = (req as any).user;
+      configForDatabase.updatedBy = currentUser.email || `user_${currentUser.id}`;
+      
+      console.log('🔄 Config for database insertion:', JSON.stringify(configForDatabase, null, 2));
 
-    // Create new record in database using the original data
-    await ParkingConfiguration.create(parkingConfig);
+      console.log('⏳ About to create record in database...');
+      // Create new record in database - הID יווצר אוטומטית
+      const newRecord = await ParkingConfiguration.create(configForDatabase);
 
-    res.json({ success: true });
+      res.json({ success: true, id: newRecord.id });
   } catch (error) {
     console.error('Error saving parking config:', error);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });
 
-// Update (UPDATE only) with validation using your model
-router.put('/:id', async (req, res) => {
+router.put('/:id', authenticateToken, async (req, res) => {
   try {
     const { id } = req.params;
     const { parkingConfig } = req.body;
@@ -45,32 +57,41 @@ router.put('/:id', async (req, res) => {
       return res.status(400).json({ success: false, error: 'Missing parkingConfig' });
     }
 
-    // Use your validation model first
-    try {
-      const validatedConfig = await ParkingConfigurationModel.create(parkingConfig);
-      console.log('✅ Validation passed with your model:', validatedConfig);
-    } catch (error: any) {
+    const configForValidation = { ...parkingConfig };
+    delete configForValidation.id;
+    delete configForValidation.lotId;
+    
+    const { error, value: validatedConfig } = ParkingConfigurationModel.schema.validate(configForValidation);
+    if (error) {
       console.log('❌ Validation failed:', error);
       return res.status(400).json({ success: false, error: 'Validation failed: ' + error.message });
     }
+    console.log('✅ Validation passed with your model:', validatedConfig);
 
-    // Check if exists
     const exists = await ParkingConfiguration.findByPk(id);
     if (!exists) {
       return res.status(404).json({ success: false, error: 'ID not found' });
     }
 
-    // Update record in database using the original data
-    await exists.update(parkingConfig);
+    // Use the validated config for updating, which includes auto-generated fields
+    const configForDatabase = { ...parkingConfig };
+    delete configForDatabase.id;
+    delete configForDatabase.lotId;
+    
+    // Add updated timestamp and user from authentication
+    configForDatabase.updatedAt = new Date();
+    const currentUser = (req as any).user;
+    configForDatabase.updatedBy = currentUser.email || `user_${currentUser.id}`;
+
+    await exists.update(configForDatabase);
 
     res.json({ success: true });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error updating parking config:', error);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });
 
-// Get parking lot by ID
 router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;

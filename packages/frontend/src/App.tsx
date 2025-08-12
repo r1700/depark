@@ -10,7 +10,17 @@ const App: React.FC = () => {
   return (
     <Router>
       <Routes>
+        {/* Default home route */}
+        <Route path="/" element={<ParkingsPage />} />
         
+        {/* Admin login page */}
+        <Route path="/admin" element={<LoginPage />} />
+        
+        {/* Mobile OTP page */}
+        <Route path="/mobile" element={<Otp />} />
+        
+        {/* Tablet home page */}
+        <Route path="/tablet" element={<HomePage />} />
         
         {/* Parkings list page */}
         <Route path="/parkings" element={<ParkingsPage />} />
@@ -21,13 +31,8 @@ const App: React.FC = () => {
         {/* Admin config page - for editing specific parking lot */}
         <Route path="/admin-config/:lotId" element={<AdminConfigPage />} />
         
-        {/* Catch all - redirect to parkings */}
-        <Route path="*" element={<Navigate to="/parkings" replace />} />
-         <Route path="/admin" element={<LoginPage />} />
-
-          <Route path="/mobile" element={<Otp />} />
-
-          <Route path="/" element={<HomePage />} />
+        {/* Catch all - redirect to home */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
   );
