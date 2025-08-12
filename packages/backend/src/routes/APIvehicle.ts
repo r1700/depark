@@ -1,28 +1,15 @@
 import { Router, Request, Response } from 'express';
-import {
-  getAllVehicles,
-} from '../services/APIvehicle';
 import client from '../db/connection';
-
 import cors from 'cors';
 import express from 'express';
+
 const app = express();
 app.use(cors());
 app.use(express.json());
 
 const router = Router();
 
-router.get('/', async (req: Request, res: Response) => {
-  try {
-    const vehicles = await getAllVehicles();
-    res.status(200).json({ success: true, vehicles });
-  } catch (error: any) {
-    console.error('Error fetching all vehicles:', error);
-    res.status(500).json({ success: false, error: error.message || 'Internal server error' });
-  }
-});
-
-router.get('/filterVehicles', async (req: Request, res: Response) => {
+router.get(['/','/filterVehicles'], async (req: Request, res: Response) => {
   try {
     const { search, is_active, is_currently_parked, created_at, updated_at } = req.query;
 
