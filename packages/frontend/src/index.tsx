@@ -22,16 +22,16 @@ const routers = createBrowserRouter([
   {
     path: '/', element: <App />, children: [
       { path: '', element: <LoginScreen /> },
+      { path: 'password-reset/ForgotPassword', element: <ForgotPassword /> }, 
+      { path: 'password-reset/ResetPassword', element: <ResetPassword /> }, 
+
       {
         path: 'layout', element: <Layout user={user} onLogout={handleLogout} />, children: [
           { path: 'admin-dashboard', element: <AdminDashboard /> },
           { path: 'hr-dashboard', element: <HrDashboard /> },
           { path: 'users', element: <UsersPage />},
-          { path: 'reset-password', element: <ResetPassword /> },
-          { path: 'forgot-password', element: <ForgotPassword /> },
         ]
       },
-
     ]
   }
 ])

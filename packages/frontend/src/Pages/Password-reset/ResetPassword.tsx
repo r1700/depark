@@ -11,13 +11,25 @@ const ResetPassword: React.FC = () => {
   const [message, setMessage] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  e.preventDefault();
+  
+  console.log('🔍 Sending data:');
+  console.log('Token:', token);
+  console.log('UserId:', userId);
+  console.log('Password:', password);
+  console.log('ConfirmPassword:', confirmPassword);
+  
+  try {
     const res = await fetch('http://localhost:3001/api/password/reset', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ token, userId, password, confirmPassword }),
     });
+    
+    console.log('Response status:', res.status);
     const data = await res.json();
+    console.log('Response data:', data);
+    
     setMessage(data.message || data.error);
 
     if (data.message && data.message.includes('success')) {
@@ -25,8 +37,10 @@ const ResetPassword: React.FC = () => {
         navigate('/');
       }, 1500);
     }
-  };
-
+  } catch (error) {
+    console.error('Error:', error);
+  }
+};
   return (
     <div style={{
       minHeight: "100vh",

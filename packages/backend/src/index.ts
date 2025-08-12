@@ -4,13 +4,12 @@ import express from 'express';
 import cors from 'cors';
 import loggerRoutes from './middlewares/locallLoggerMiddleware';
 import healthRoutes from './routes/health';
-import passwordRoutes from './routes/user.routes';
+import userRoutes from './routes/user.routes';
 import vehicleRoutes from './routes/vehicle';
 import exportToCSV from './routes/exportToCSV';
 import session from 'express-session';
 import googleAuth from './routes/google-auth';
 import auth from './routes/auth';
-import userRouter from './routes/user.routes'; 
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -18,16 +17,17 @@ const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:3000';
 
 // Middleware setup
 app.use(session({
-  secret: 'your-secret-key', // Change to your own secret!
+  secret: 'your-secret-key',
   resave: false,
   saveUninitialized: true,
-  cookie: { secure: false } // For localhost, set to true if using https
+  cookie: { secure: false }
 }));
 app.use(cors({
   origin: CORS_ORIGIN,
   credentials: true,
 }));
 app.use(express.json());
+app.use(loggerRoutes);
 
 app.get('/', (req, res) => {
   res.json({ message: 'DePark Backend is running!' });
@@ -37,26 +37,13 @@ app.get('/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
-app.use(loggerRoutes);
-
-// Routes
 app.use('/api/health', healthRoutes);
-app.use('/api/password', passwordRoutes);
+app.use('/api', userRoutes); 
 app.use('/api/vehicle', vehicleRoutes);
 app.use('/api/exportToCSV', exportToCSV);
 app.use('/OAuth', googleAuth);
-app.use('/auth', auth);
-app.use('/api/password', userRouter); 
+app.use('/api/auth', auth); 
 
-app.get('/', (req, res) => {
-  res.json({ message: 'DePark Backend is running!' });
-});
-app.get('/health', (req, res) => {
-  res.json({
-    status: 'OK',
-    timestamp: new Date().toISOString(),
-  });
-});
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
@@ -67,18 +54,8 @@ app.listen(PORT, () => {
   console.log('   GET  /');
   console.log('   GET  /health');
   console.log('   GET  /api/health');
-  console.log('   GET  /api/auth/users');
-  console.log('   POST /api/auth/register');
-  console.log('   POST /api/auth/login');
-  console.log('   GET  /api/admin/config');
-  console.log('   PUT  /api/admin/config');
   console.log('   POST /api/password/reset');
   console.log('   GET  /api/vehicle');
   console.log('   GET  /api/exportToCSV');
-
-  if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
-    console.log('🗄️ Database: Supabase configured');
-  } else {
-    console.log('📝 Database: Using mock data');
-  }
+  console.log('✅ PostgreSQL configured');
 });
