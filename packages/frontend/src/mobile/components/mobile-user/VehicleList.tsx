@@ -96,11 +96,6 @@ export const VehicleRow = () => {
     }
   };
 
-  const requestVehicle = (vehicleId: string) => {
-    const pos = Math.floor(Math.random() * 10) + 1;
-    setQueuePosition((prev) => ({ ...prev, [vehicleId]: pos }));
-  };
-
   const vehicle = vehicles[currentIndex];
   const category = vehicle ? getVehicleCategory(vehicle) : "unknown";
   const icon = iconForCategory(category);
@@ -135,7 +130,7 @@ export const VehicleRow = () => {
               <Button
                 fullWidth
                 size="small"
-                onClick={() => requestVehicle(vehicle.id)}
+              
                 sx={{ mt: 1, textTransform: 'none' }}
                 variant="contained"
               >
