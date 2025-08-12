@@ -12,20 +12,24 @@ import {
 import DataTable from '../table/table';
 import { fetchFilteredVehicles } from './fetch';
 
-const VehiclesPage = () => {
+
+const APIvehicle = () => {
   const [search, setSearch] = useState('');
   const [isActive, setIsActive] = useState<string>('');
   const [isCurrentlyParked, setIsCurrentlyParked] = useState<string>('');
   const [createdAt, setCreatedAt] = useState('');
   const [updatedAt, setUpdatedAt] = useState('');
 
+
   const [data, setData] = useState<{ columns: any[]; rows: any[] }>({ columns: [], rows: [] });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+
   const loadData = async () => {
     setLoading(true);
     setError('');
+
 
     try {
       const filters = {
@@ -36,6 +40,7 @@ const VehiclesPage = () => {
         updated_at: updatedAt || undefined,
       };
 
+
       const data = await fetchFilteredVehicles(filters);
       setData(data);
     } catch (e: any) {
@@ -45,15 +50,18 @@ const VehiclesPage = () => {
     }
   };
 
+
   useEffect(() => {
     loadData();
   }, []);
+
 
   return (
     <Box sx={{ maxWidth: 1000, mx: 'auto', p: 3 }}>
       <Typography variant="h4" mb={3}>
         Vehicles – Combined Filter
       </Typography>
+
 
       <Box component="form" sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 3 }}>
         <TextField
@@ -64,6 +72,7 @@ const VehiclesPage = () => {
           onChange={(e) => setSearch(e.target.value)}
           sx={{ minWidth: 300 }}
         />
+
 
         <FormControl variant="outlined" size="small" sx={{ minWidth: 150 }}>
           <InputLabel>Active</InputLabel>
@@ -80,6 +89,7 @@ const VehiclesPage = () => {
           </Select>
         </FormControl>
 
+
         <FormControl variant="outlined" size="small" sx={{ minWidth: 150 }}>
           <InputLabel>Currently Parked</InputLabel>
           <Select
@@ -95,6 +105,7 @@ const VehiclesPage = () => {
           </Select>
         </FormControl>
 
+
         <TextField
           label="Created At"
           type="date"
@@ -104,6 +115,7 @@ const VehiclesPage = () => {
           onChange={(e) => setCreatedAt(e.target.value)}
           sx={{ minWidth: 180 }}
         />
+
 
         <TextField
           label="Updated At"
@@ -116,9 +128,11 @@ const VehiclesPage = () => {
         />
       </Box>
 
+
       <Button variant="contained" onClick={loadData} disabled={loading} sx={{ mb: 3 }}>
         {loading ? 'Loading...' : 'Load Vehicles'}
       </Button>
+
 
       {error && (
         <Typography color="error" sx={{ mb: 2 }}>
@@ -126,9 +140,11 @@ const VehiclesPage = () => {
         </Typography>
       )}
 
+
       <DataTable data={data} />
     </Box>
   );
 };
 
-export default VehiclesPage;
+
+export default APIvehicle;
