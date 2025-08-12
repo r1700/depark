@@ -32,12 +32,6 @@ if (!GOOGLE_CLIENT_ID) {
 app.use(cors({ origin: CORS_ORIGIN, credentials: true }));
 app.use(express.json());
 app.use(loggerRoutes);
-
-if (!GOOGLE_CLIENT_ID) {
-  throw new Error('Missing GOOGLE_CLIENT_ID');
-}
-
-
 app.use('/api/health', healthRoutes);
 app.use('/api/password', passwordRoutes);
 app.use('/api/vehicle', vehicleRoutes);
