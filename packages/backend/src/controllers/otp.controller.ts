@@ -1,5 +1,10 @@
-import { existUser, verifyOtp, createOtp } from '../services/otp.service';
+import { existUser, verifyOtp, createOtp, userIdByContact } from '../services/otp.service';
 import { sendOtpEmail, sendOtpSms } from '../utils/otp.sender';
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+dotenv.config();
+
+
 
 // Controller: Handle OTP creation request
 export async function handleCreateOtp(req: any, res: any) {
@@ -38,6 +43,9 @@ export async function handleCreateOtp(req: any, res: any) {
 export async function handleVerifyOtp(req: any, res: any) {
   const { contact, otp } = req.body;
 
+  const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret';
+  const TOKEN_EXPIRATION_MINUTES = parseInt(process.env.RESET_TOKEN_EXPIRATION_MINUTES || '15');
+
   if (!contact || !otp) {
     return res.status(400).json({ error: 'Missing fields' });
   }
@@ -47,6 +55,21 @@ export async function handleVerifyOtp(req: any, res: any) {
   if (!isValid) {
     return res.status(401).json({ error: 'Invalid or expired OTP' });
   }
-
-  return res.status(200).json({ message: 'OTP verified successfully' });
+  const userId = await userIdByContact(contact);
+  const token = jwt.sign(
+    {
+      userId: userId,
+      contact: contact
+    },
+    JWT_SECRET,
+    { expiresIn: `${TOKEN_EXPIRATION_MINUTES}m` }
+  );
+  return res.status(200).json({
+    message: 'OTP verified',
+    token,
+    user: {
+      id: userId,
+      contact: contact,
+    }
+  });
 }
