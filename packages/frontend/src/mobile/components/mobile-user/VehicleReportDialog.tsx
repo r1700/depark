@@ -72,8 +72,7 @@ export const VehicleReportDialog = ({ open, onClose, userId }: Props) => {
     setError("");
     try {
       ;
-      const response = await fetch(`/api/report?userId=${encodeURIComponent(userId || '')}`);
-      if (!response.ok) {
+const response = await fetch(`/api/report/${encodeURIComponent(userId || '')}`);      if (!response.ok) {
         const errRes = await response.json().catch(() => ({}));
         throw new Error(errRes.message || "Failed to fetch report data");
       }

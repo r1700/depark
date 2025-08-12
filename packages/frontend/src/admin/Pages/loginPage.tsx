@@ -1,44 +1,45 @@
-import React, { useState, useEffect, useCallback } from "react";
-import LoginScreen from '../components/screen-login/LoginScreen';
-import { Box, Button, Container, Typography } from "@mui/material";
+// import React, { useState, useEffect, useCallback } from "react";
+// import LoginScreen from '../components/screen-login/LoginScreen';
+// import { Box, Button, Container, Typography } from "@mui/material";
 
-const LoginPage: React.FC = () => {
-  // קריאה ראשונית מה־localStorage כדי לטעון אם המשתמש כבר מחובר
-  const [loggedIn, setLoggedIn] = useState<boolean>(() => {
-    return !!localStorage.getItem("token");
-  });
+// const LoginPage: React.FC = () => {
+//   // קריאה ראשונית מה־localStorage כדי לטעון אם המשתמש כבר מחובר
+//   const [loggedIn, setLoggedIn] = useState<boolean>(() => {
+//     return !!localStorage.getItem("token");
+//   });
 
-  // הפונקציה לטיפול בכניסה מוצלחת, מקבלת טוקן
-  const handleLogin = useCallback((token?: string) => {
-    if (token) {
-      localStorage.setItem("token", token);
-    }
-    setLoggedIn(true);
-  }, []);
+//   // הפונקציה לטיפול בכניסה מוצלחת, מקבלת טוקן
+//   const handleLogin = useCallback((token?: string) => {
+//     if (token) {
+//       localStorage.setItem("token", token);
+//     }
+//     setLoggedIn(true);
+//   }, []);
 
-  // פונקצית logout מוחקת את הטוקן ומעדכנת מצב
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    setLoggedIn(false);
-  };
+//   // פונקצית logout מוחקת את הטוקן ומעדכנת מצב
+//   const handleLogout = () => {
+//     localStorage.removeItem("token");
+//     setLoggedIn(false);
+//   };
 
-  return (
-    <Container maxWidth="sm" sx={{ mt: 8, textAlign: "center", direction: "ltr" }}>
-      {loggedIn ? (
-        <Box>
-          <Typography variant="h4" gutterBottom>
-            Welcome!
-          </Typography>
-          <Button variant="contained" onClick={handleLogout}>
-            Logout
-          </Button>
-        </Box>
-      ) : (
-        // כאן מוסיפים פרופס של onLogin שמקבלת טוקן
-        <LoginScreen onLogin={handleLogin} />
-      )}
-    </Container>
-  );
-};
+//   return (
+//     <Container maxWidth="sm" sx={{ mt: 8, textAlign: "center", direction: "ltr" }}>
+//       {loggedIn ? (
+//         <Box>
+//           <Typography variant="h4" gutterBottom>
+//             Welcome!
+//           </Typography>
+//           <Button variant="contained" onClick={handleLogout}>
+//             Logout
+//           </Button>
+//         </Box>
+//       ) : (
+//         // כאן מוסיפים פרופס של onLogin שמקבלת טוקן
+//         <LoginScreen onLogin={handleLogin} />
+//       )}
+//     </Container>
+//   );
+// };
 
-export default LoginPage;
+// export default LoginPage;
+export{}

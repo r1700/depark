@@ -5,26 +5,25 @@
 import express from "express";
 import { Vehicle } from "../../model/database-models/vehicle.model";
 import { ParkingSession } from "../../model/database-models/parkingstssion.model";
+import { Op } from "sequelize";
+import { count } from "console";
 
 
 const router = express.Router();
 
 
 // GET - vehicles
-router.get("/vehicles", async (req, res) => {
-  try {
-    const { userId } = req.query;
-    const vehicles = await Vehicle.findAll({
-      where: { userId },
-    });
 
-    const data = vehicles.map((vehicle: any) => ({
+router.get("/vehicles/:userId", async (req, res) => {
+  try {
+    let userId = req.params.userId; // שינוי מ-query ל-params
+    const vehicles = await Vehicle.findAll({ where: { userId } });
+    const data = vehicles.map(vehicle => ({
       ...vehicle.toJSON(),
       dimensionOverrides: typeof vehicle.dimensionOverrides === "string"
         ? JSON.parse(vehicle.dimensionOverrides)
         : vehicle.dimensionOverrides,
     }));
-
     res.json(data);
   } catch (err) {
     console.error("DB Error:", err);
@@ -34,6 +33,7 @@ router.get("/vehicles", async (req, res) => {
 
 // POST - add vehicle
 router.post("/vehicles2", async (req, res) => {
+
   const {
     userId,
     licensePlate,
@@ -67,6 +67,7 @@ const newVehicle = await Vehicle.create({
    dimensionsSource,
 
 } as any); 
+ 
 
     res.status(201).json(newVehicle);
   } catch (err) {
@@ -92,23 +93,21 @@ type VehicleGroup = {
   countMap: { [timestamp: string]: number };
 };
 
-router.get("/report", async (req, res) => {
+router.get("/report/:userId", async (req, res) => {
+  let userId = req.params.userId; 
   try {
-    let userId = req.query.userId;
-    if (!userId || typeof userId !== "string") {
-      userId = "user2";
-    }
-
+  
     const now = new Date(); 
+const vehiclesResult = await Vehicle.findAll({ 
+   where: {userId:userId.toString() },
+});
 
-    const vehiclesResult = await Vehicle.findAll({
-      where: { userId },
-    });
 
-    const vehicles = vehiclesResult.map((v: any) => ({
-      id: v.id,
-      licensePlate: v.licensePlate,
-    }));
+const vehicles = vehiclesResult.map((v: any) => ({
+  id: v.id,
+  licensePlate: v.licensePlate,
+}));
+
 
     if (vehicles.length === 0) {
       return res.status(404).json({ error: "No vehicles found for user" });
@@ -119,11 +118,16 @@ router.get("/report", async (req, res) => {
     );
     const vehicleIds = vehicles.map(v => v.id);
 
-    const sessionsResult = await ParkingSession.findAll({
-      where: { vehicleId: vehicleIds },
-    });
 
-    const sessions = sessionsResult.map((s: any) => s.toJSON());
+
+const sessionsResult = await ParkingSession.findAll({
+  where: { vehicleId: { [Op.in]: vehicleIds } },
+});
+
+
+
+const sessions = sessionsResult.map((s: any) => s.toJSON());
+
 
     if (sessions.length === 0) {
       return res.status(404).json({ error: "No parking sessions found for user's vehicles" });
