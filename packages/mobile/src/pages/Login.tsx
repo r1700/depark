@@ -89,25 +89,6 @@ export default function Login() {
     navigate('/otp');
   };
 
-//   return (
-//     <div className="flex flex-col items-center justify-center min-h-screen gap-4 bg-gray-100">
-//       <h2 className="text-xl font-semibold mb-4">Choose login method</h2>
-
-//       <button
-//         onClick={handleOtpLogin}
-//         className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
-//       >
-//         Sign in with Password / OTP
-//       </button>
-
-//       <div className="w-full flex justify-center items-center">
-//         <div id="googleSignInDiv" className="w-[240px] h-[50px]" />
-//       </div>
-
-//       {popup && <PopupMessage message={popup.message} color={popup.color} />}
-//     </div>
-//   );
-// }
 
 return (
     <Box
