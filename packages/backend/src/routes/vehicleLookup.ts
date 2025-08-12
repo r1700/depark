@@ -9,17 +9,17 @@ const router = express.Router();
 router.post('/lookup', async (req, res) => {
   const { licensePlate, timestamp, opcRequestId, lotId } = req.body;
 
-  if (!licensePlate || !timestamp || !opcRequestId || !lotId) {
+  if (!licensePlate || !timestamp || !lotId) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
 
   try {
-    const result = await isVehicleAllowed({
+    const result = await isVehicleAllowed([
       licensePlate,
-      timestamp: new Date(timestamp),
+      new Date(timestamp),
       opcRequestId,
-      lotId: Number(lotId),
-    });
+      Number(lotId),
+    ]);
 
     return res.json(result);
   } catch (err) {

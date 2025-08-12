@@ -10,12 +10,7 @@ import vehicleRoutes from './routes/vehicle';
 import exportToCSV from './routes/exportToCSV';
 import authRoutes from './routes/auth';
 import userGoogleAuthRoutes from './routes/userGoogle-auth';
-// import loggerRoutes from './middlewares/locallLoggerMiddleware';
-// import healthRoutes from './routes/health';
-// import passwordRoutes from './routes/user.routes';
-// import vehicleRoutes from './routes/vehicle';
-// import exportToCSV from './routes/exportToCSV';
-import googleAuth from './routes/google-auth';
+// import googleAuth from './routes/google-auth';
 import auth from './routes/auth';
 import vehicleLookupRouter from './routes/vehicleLookup';
 // import itemsRoutes from './routes/items';
@@ -57,41 +52,12 @@ app.use((req, res, next) => {
 
 
 // app.use(loggerRoutes);
-// app.use('/api/health', healthRoutes);
-// app.use('/api/password', passwordRoutes);
-// app.use('/api/vehicle', vehicleRoutes);
-// app.use('/api/exportToCSV', exportToCSV);
-app.use('/OAuth', googleAuth); // Ensure this route is correctly set up
+// app.use('/OAuth', googleAuth); // Ensure this route is correctly set up
 app.use('/auth', auth);
 app.use(loggerRoutes);
 app.use('/api/health', healthRoutes);
 app.use('/api/vehicle',vehicleLookupRouter);
 
-
-
-// app.listen(PORT, async () => {
-//   console.log(`🚀 Server running on port ${PORT}`);
-//   console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
-//   console.log(`🌐 CORS enabled for: ${CORS_ORIGIN}`);
-  
-  // Initialize database with sample data if using Supabase
-  // if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
-    // console.log('🗄️ Initializing database...');
-    // try {
-    //   databaseService.canInitialize();
-    //   try {
-    //     await databaseService.initializeSampleData();
-    //     console.log('✅ Database initialized successfully');  
-    //   } catch (error) {
-    //     console.error('❌ Database sample-data initialization failed');
-    //   }
-    // } catch (error) {
-    //   console.error('❌ Database not connected');
-    // }
-  // } else {
-    // console.log('📝 Using mock data - Supabase not configured');
-  // }
-// });
 
 // Test route
 app.get('/', (req, res) => {
