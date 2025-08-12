@@ -1,7 +1,7 @@
 import RetrievalQueue from '../../model/database-models/retrievalQueue.model';
-import axios, {AxiosResponse} from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import path from 'path';
-require('dotenv').config({path:path.resolve(__dirname, '../../../.env')});
+require('dotenv').config({ path: path.resolve(__dirname, '../../../.env') });
 
 const { APLICATION_QUOTA }: any = process.env || 'development';
 let aplicsationQuota: number = APLICATION_QUOTA;
@@ -60,7 +60,7 @@ async function getFirstQueuedQueue() {
   }
 }
 
-async function sendToBackend(endpoint: string, data: any): Promise<AxiosResponse<any>> {
+async function sendToOpc(endpoint: string, data: any): Promise<AxiosResponse<any>> {
   try {
     const baseUrl = 'http://localhost:5000'; // Backend base URL
     const url = `${baseUrl}${endpoint}`; // Combine base URL with the provided endpoint
@@ -78,17 +78,17 @@ export async function vehicleQueueService() {
     throw new Error('APLICATION_QUOTA is not defined in environment variables');
   }
   console.log(`Application Quota: ${APLICATION_QUOTA}`, `aplicationQuota: ${aplicsationQuota}`);
-  
+
   if (aplicsationQuota < APLICATION_QUOTA) {
     const firstQueuedQueue = await getFirstQueuedQueue();
     if (firstQueuedQueue) {
       try {
         // Use the general function to send data
-        const response = await sendToBackend('/plc/write/licensePlateExit/parkingSpot', {
+        const response = await sendToOpc('/plc/write/licensePlateExit/parkingSpot', {
           licensePlateExit: firstQueuedQueue.license_plate,
           parkingSpot: firstQueuedQueue.underground_spot,
         });
-
+        aplicsationQuota++;
         console.log('Response from OPC API:', response.data);
       } catch (error: any) {
         console.error('Error sending data to OPC API:', error.message);
