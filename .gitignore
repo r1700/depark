@@ -73,10 +73,32 @@ knexfile.js
 #package files
 yarn.lock
 
-# models
+# Generated files
 models/index.js
 
 # Temp files
 temp/*.json
 
+<<<<<<< HEAD
+=======
+# Project specific
+connection/
+knexfile.js
+packages/frontend/src/app/
+packages/frontend/src/components/screen-login/
+
+# IMPORTANT: Keep these essential files!
+# package.json ✅
+# package-lock.json ✅  
+# yarn.lock ✅
+# migrations/ ✅ - DON'T IGNORE MIGRATIONS!
+# Miscellaneous
+package.json
+package-lock.json
+packages/backend/package.json
+
+packages/mobile/package.json
+.env
+
+>>>>>>> 5d60df99940e01ab07afc21fc9ac835e0fbd4c13
 

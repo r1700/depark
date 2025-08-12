@@ -1,6 +1,6 @@
 import { OPCUAServer, Variant, DataType, StatusCodes } from "node-opcua";
-import { log } from "node:console";
 // Start an OPC-UA server simulating a PLC
+
 export async function createPlcOpcServer() {
   const server = new OPCUAServer({
     port: 4080,
@@ -12,6 +12,7 @@ export async function createPlcOpcServer() {
     },
   });
   await server.initialize();
+
   const addressSpace = server.engine.addressSpace!;
   const namespace = addressSpace.getOwnNamespace();
   console.log("Adding PLC object under:", addressSpace.rootFolder.objects.nodeId.toString());
@@ -19,6 +20,7 @@ export async function createPlcOpcServer() {
     organizedBy: addressSpace.rootFolder.objects,
     browseName: "PLC",
   });
+  
   console.log("objectsFolder:", addressSpace.rootFolder.objects.nodeId.toString());
   // Internal variables to simulate state
   // Each has its own nodeId
