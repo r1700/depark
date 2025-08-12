@@ -10,7 +10,9 @@ import vehicleRoutes from './routes/vehicle';
 import exportToCSV from './routes/exportToCSV';
 import authRoutes from './routes/auth';
 import userGoogleAuthRoutes from './routes/userGoogle-auth';
+import Exit from './routes/opc/exit'; // Import the exit route
 import session from 'express-session';
+import './cronJob'; // Import the cron job to ensure it runs on server start
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -53,6 +55,7 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use('/api/opc/:param', Exit);
 
 app.get('/', (req, res) => {
   res.json({ message: 'DePark Backend is running!' });
