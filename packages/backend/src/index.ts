@@ -10,7 +10,7 @@ import vehicleRoutes from './routes/vehicle';
 import exportToCSV from './routes/exportToCSV';
 import authRoutes from './routes/auth';
 import userGoogleAuthRoutes from './routes/userGoogle-auth';
-import adminConfigRoutes from './routes/adminConfig';
+
 const app = express();
 const PORT = process.env.PORT || 3001;
 const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:3000';
@@ -38,6 +38,8 @@ app.use((req, res, next) => {
   console.log(`[${req.method}] ${req.path}`, req.body);
   next();
 });
+
+
 app.get('/', (req, res) => {
   res.json({ message: 'DePark Backend is running!' });
 });
