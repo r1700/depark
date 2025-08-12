@@ -1,8 +1,6 @@
 import { Client } from 'pg';
 import dotenv from 'dotenv';
-
 dotenv.config();
-
 const client = new Client({
   user: process.env.DB_USER || 'postgres',
   host: process.env.DB_HOST || 'localhost',
@@ -10,13 +8,7 @@ const client = new Client({
   password: process.env.DB_PASSWORD || '1333',
   port: process.env.DB_PORT ? parseInt(process.env.DB_PORT) : 5432,
 });
-
 client.connect();
-console.log("DB_HOST:", process.env.DB_HOST);
-console.log("DB_USER:", process.env.DB_USER);
-console.log("DB_PASSWORD:", process.env.DB_PASSWORD);
-
-// קבלת ID לפי אימייל
 const getId = async (email: string) => {
   try {
     const result = await client.query(
@@ -28,13 +20,11 @@ const getId = async (email: string) => {
     console.error('Query error in getId:', err);
   }
 };
-
-// קבלת פרטי משתמש לפי ID
 const getRole = async (id: string) => {
   try {
     const result = await client.query(
       `
-      SELECT 
+      SELECT
         a.role,
         a.permissions,
         a.password_hash,
@@ -53,5 +43,4 @@ const getRole = async (id: string) => {
     console.error('Query error in getRole:', err);
   }
 };
-
 export { getId, getRole };
