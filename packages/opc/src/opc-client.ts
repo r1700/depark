@@ -4,14 +4,29 @@ import {
   AttributeIds,
   DataType,
   ClientSession,
+  ClientMonitoredItem,
+  ClientSubscription,
+  DataValue,
+  TimestampsToReturn,
   Variant
 } from 'node-opcua';
-const app = express();
-app.use(express.json());
+import { sendDataToBackend } from "./backendService";
+import dotenv from 'dotenv';
+dotenv.config();
+
 const endpointUrl: string = "opc.tcp://localhost:4080/UA/PLC";
 
 let opcClient: OPCUAClient | null = null;
 let opcSession: ClientSession | null = null;
+let subscription: ClientSubscription | null = null;
+let monitoredItems: ClientMonitoredItem[] = [];
+let isSessionActive = false;
+
+const nodesToMonitor = [
+  "ns=1;s=parkingSpot",
+  "ns=1;s=licensePlateExit",
+  "ns=1;s=licensePlateEntry",
+];
 
 // Function to check if the session is valid
 function isChannelValid(session: ClientSession | null): boolean {
@@ -79,9 +94,9 @@ function detectDataType(value: any): DataType {
       if (value instanceof Date) {
         return DataType.DateTime;
       }
-      return DataType.Variant; 
+      return DataType.Variant;
 
-      default:
+    default:
       throw new Error(`Unsupported data type: ${typeof value}`);
   }
 }
@@ -115,6 +130,98 @@ export async function writeNodeValues(
     };
   });
   await opcSession.write(nodesToWrite);
+}
+
+export async function createSubscription(): Promise<ClientSubscription> {
+
+  if (subscription) {
+    try {
+      await subscription.terminate();
+      console.log("✅ Previous subscription terminated");
+    } catch (e) {
+      console.warn("⚠️ Warning terminating subscription:", e);
+    }
+    subscription = null;
+  }
+  await ensureSession(); // Ensure the session exists
+  console.log("Creating OPC UA subscription...");
+  if (!opcSession) {
+    throw new Error("OPC session is not initialized");
+  }
+  subscription = ClientSubscription.create(opcSession, {
+    requestedPublishingInterval: 500,
+    requestedLifetimeCount: 100,
+    requestedMaxKeepAliveCount: 10,
+    maxNotificationsPerPublish: 10,
+    publishingEnabled: true,
+    priority: 10,
+  });
+
+  subscription.on("started", () => {
+    console.log(`Subscription started (ID=${subscription!.subscriptionId})`);
+  });
+
+  subscription.on("terminated", () => {
+    console.log("Subscription terminated");
+  });
+
+  subscription.on("keepalive", () => {
+    // console.log("Subscription keepalive");
+  });
+
+  subscription.on("status_changed", (status) => {
+    console.log("Subscription status changed:", status.toString());
+  });
+  return subscription;
+}
+
+export async function createMonitoredItems(subscription: ClientSubscription) {
+  // Cleanup previous monitored items
+  for (const item of monitoredItems) {
+    try {
+      await item.terminate();
+    } catch (e) {
+      console.warn("Warning terminating monitored item:", e);
+    }
+  }
+  monitoredItems = [];
+
+  nodesToMonitor.forEach((nodeId) => {
+    const monitoredItem = ClientMonitoredItem.create(
+      subscription,
+      {
+        nodeId,
+        attributeId: AttributeIds.Value,
+      },
+      {
+        samplingInterval: 100,
+        discardOldest: true,
+        queueSize: 10,
+      },
+      TimestampsToReturn.Both
+    );
+
+    monitoredItem.on("changed", (dataValue: DataValue) => {
+      const val = dataValue.value?.value;
+      let event: string = '';
+      if (nodeId === "ns=1;s=licensePlateExit") {
+        event = 'exit';
+      }
+      else if (nodeId === "ns=1;s=licensePlateEntry") {
+        event = 'entry';
+      }
+      else if (nodeId === "ns=1;s=parkingSpot") {
+        event = 'parkingSpot';
+      }
+      sendDataToBackend(event, val);
+    });
+
+    monitoredItem.on("err", (err) => {
+      console.error(`Monitored item error at ${nodeId}:`, err);
+    });
+
+    monitoredItems.push(monitoredItem);
+  });
 }
 
 process.on("SIGINT", async () => {

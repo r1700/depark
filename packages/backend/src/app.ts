@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 
-import adminConfigRouter from './routes/admin-config';
+// import adminConfigRouter from './routes/admin-config';
 
 const app = express();
 
@@ -13,7 +13,7 @@ app.use(express.urlencoded({ extended: true }));
 console.log('App file started');
 
 
-app.use('/api/admin', adminConfigRouter);
+// app.use('/api/admin', adminConfigRouter);
 
 
 app.get('/health', (req, res) => {
