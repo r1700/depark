@@ -7,7 +7,7 @@ import cors from 'cors';
 // import passwordRoutes from './routes/user.routes';
 // import vehicleRoutes from './routes/vehicle';
 // import exportToCSV from './routes/exportToCSV';
-import googleAuth from './routes/google-auth';
+// import googleAuth from './routes/google-auth';
 import auth from './routes/auth';
 import APIvehicle from './routes/APIvehicle';
 const app = express();
@@ -24,7 +24,7 @@ app.use(express.json());
 // app.use('/api/password', passwordRoutes);
 // app.use('/api/vehicle', vehicleRoutes);
 // app.use('/api/exportToCSV', exportToCSV);
-app.use('/OAuth', googleAuth); // Ensure this route is correctly set up
+// app.use('/OAuth', googleAuth); // Ensure this route is correctly set up
 app.use('/auth', auth);
 app.use('/api/vehicles', APIvehicle); // Ensure this route is correctly set up
 app.get('/', (req, res) => {
