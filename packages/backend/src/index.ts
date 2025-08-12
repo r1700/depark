@@ -39,21 +39,21 @@ app.use('/api/exportToCSV', exportToCSV);
 app.use('/api/auth', authRoutes);
 app.use('/api/auth', userGoogleAuthRoutes);
 
-app.use((req, res, next) => {
-  console.log(`[${req.method}] ${req.path}`, req.body);
-  next();
-});
+// app.use((req, res, next) => {
+//   console.log(`[${req.method}] ${req.path}`, req.body);
+//   next();
+// });
 
 
-app.get('/', (req, res) => {
-  res.json({ message: 'DePark Backend is running!' });
-});
-app.get('/health', (req, res) => {
-  res.json({
-    status: 'OK',
-    timestamp: new Date().toISOString(),
-  });
-});
+// app.get('/', (req, res) => {
+//   res.json({ message: 'DePark Backend is running!' });
+// });
+// app.get('/health', (req, res) => {
+//   res.json({
+//     status: 'OK',
+//     timestamp: new Date().toISOString(),
+//   });
+// });
 if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
   console.log(':file_cabinet: Initializing database...');
 } else {
