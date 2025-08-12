@@ -1,4 +1,4 @@
-CREATE TABLE "adminusers" (
+CREATE TABLE "AdminUsers" (
   "id" SERIAL PRIMARY KEY,
   "passwordHash" VARCHAR NOT NULL,
   "role" VARCHAR CHECK ("role" IN ('hr', 'admin')) NOT NULL,
@@ -9,7 +9,7 @@ CREATE TABLE "adminusers" (
 );
 
 -- ביצוע ה-Bulk Insert
-INSERT INTO "adminusers" ("passwordHash", "role", "permissions", "lastLoginAt", "createdAt", "updatedAt")
+INSERT INTO "AdminUsers" ("passwordHash", "role", "permissions", "lastLoginAt", "createdAt", "updatedAt")
 VALUES
   ('hashed_password_1', 'admin', ARRAY['read', 'write', 'delete'], NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
   ('hashed_password_2', 'hr', ARRAY['read', 'write'], CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),

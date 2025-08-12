@@ -12,7 +12,7 @@ A comprehensive system to manage automated multi-level parking facilities, from 
 
 ```bash
 # Clone the repository
-git clone https://github.com/diversi-tech/Depark
+git clone https://github.com/diversi-tech/depark
 cd depark
 
 # Install all dependencies

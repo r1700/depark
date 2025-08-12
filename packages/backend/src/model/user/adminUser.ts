@@ -1,15 +1,15 @@
 import Joi from 'joi';
-import { baseuser } from './baseUser';  // Imports baseuser
+import { BaseUser } from './baseUser';  // Imports BaseUser
 
-export class AdminUser extends baseuser {
+export class AdminUser extends BaseUser {
   static schema = Joi.object({
-    id: baseuser.schema.extract('id'),
-    idNumber: baseuser.schema.extract('idNumber'),
-    email: baseuser.schema.extract('email'),
-    firstName: baseuser.schema.extract('firstName'),
-    lastName: baseuser.schema.extract('lastName'),
-    createdAt: baseuser.schema.extract('createdAt'),
-    updatedAt: baseuser.schema.extract('updatedAt'),
+    id: BaseUser.schema.extract('id'),
+    idNumber: BaseUser.schema.extract('idNumber'),
+    email: BaseUser.schema.extract('email'),
+    firstName: BaseUser.schema.extract('firstName'),
+    lastName: BaseUser.schema.extract('lastName'),
+    createdAt: BaseUser.schema.extract('createdAt'),
+    updatedAt: BaseUser.schema.extract('updatedAt'),
     passwordHash: Joi.string().required(),
     role: Joi.string().valid('hr', 'admin').required(),
     permissions: Joi.array().items(Joi.string()).required(),
@@ -34,7 +34,7 @@ export class AdminUser extends baseuser {
     lastLoginAt?: Date,
     public id?: number // identty
   ) {
-    super(idNumber, email, firstName, lastName, createdAt, updatedAt, id); // קריאה ל-baseuser constructor
+    super(idNumber, email, firstName, lastName, createdAt, updatedAt, id); // קריאה ל-BaseUser constructor
     this.passwordHash = passwordHash;
     this.role = role;
     this.permissions = permissions;

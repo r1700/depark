@@ -5,7 +5,7 @@ export class RetrievalQueue {
   static schema = Joi.object({
     id: Joi.number().integer().positive().optional(),
     sessionId: Joi.number().integer().positive().required(),//reference to ParkingSession
-    userId:Joi.number().integer().positive().optional().allow(null),//reference to baseuser
+    userId:Joi.number().integer().positive().optional().allow(null),//reference to BaseUser
     licensePlate: Joi.string().required(),
     undergroundSpot: Joi.string().required(),
     requestedAt: Joi.date().required(),

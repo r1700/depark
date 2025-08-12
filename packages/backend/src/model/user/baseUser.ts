@@ -1,7 +1,7 @@
 import Joi from 'joi';
 
-// Creating a baseuser class
-export class baseuser {
+// Creating a BaseUser class
+export class BaseUser {
   static schema = Joi.object({
     id: Joi.number().integer().positive().optional(),
     idNumber: Joi.string().required(),
@@ -22,11 +22,11 @@ export class baseuser {
     public id?: number // identty
   ) { }
 
-  // Function to create a baseuser object
-  static create(data: any): baseuser {
+  // Function to create a BaseUser object
+  static create(data: any): BaseUser {
     const { error, value } = this.schema.validate(data);
     if (error) throw error;
-    return new baseuser( value.idNumber, value.email, value.firstName, value.lastName, value.createdAt, value.updatedAt,value.id);
+    return new BaseUser( value.idNumber, value.email, value.firstName, value.lastName, value.createdAt, value.updatedAt,value.id);
   }
 }
 
