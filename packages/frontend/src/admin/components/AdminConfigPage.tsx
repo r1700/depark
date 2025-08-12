@@ -151,7 +151,7 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
 
   // Helper function to get current user info
   const getCurrentUser = () => {
-    let user = JSON.parse(localStorage.getItem("user") || "{}");
+    let user = JSON.parse(localStorage.getItem("user") || "{s83jsdf7g3h8j3khsdf8972k3jhsdf98734hsdf982374}");
     
     // If no user data exists, create mock user for development
     if (!user.firstName || !user.lastName) {
