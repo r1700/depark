@@ -3,9 +3,12 @@
 
 
 import express from "express";
+import { Vehicle } from "../../model/database-models/vehicle.model";
+import { ParkingSession } from "../../model/database-models/parkingstssion.model";
 
 
 const router = express.Router();
+
 
 // GET - vehicles
 router.get("/vehicles", async (req, res) => {
