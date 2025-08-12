@@ -8,7 +8,9 @@ import healthRoutes from './routes/health';
 import passwordRoutes from './routes/user.routes';
 import vehicleRoutes from './routes/vehicle';
 import exportToCSV from './routes/exportToCSV';
+import Exit from './routes/opc/exit'; // Import the exit route
 import session from 'express-session';
+import './cronJob'; // Import the cron job to ensure it runs on server start
 
 const app = express();
 
@@ -43,6 +45,7 @@ app.use('/api/health', healthRoutes);
 app.use('/api/password', passwordRoutes);
 app.use('/api/vehicle', vehicleRoutes);
 app.use('/api/exportToCSV', exportToCSV);
+app.use('/api/opc/:param', Exit);
 
 app.get('/', (req, res) => {
   res.json({ message: 'DePark Backend is running!' });
