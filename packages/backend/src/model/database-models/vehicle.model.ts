@@ -1,8 +1,9 @@
 import { Sequelize, DataTypes, Model } from "sequelize";
-import sequelize from '../../config/sequlize'
+import sequelize from '../../config/sequelize'
 
 
-class Vehicle extends Model {
+
+export class Vehicle extends Model {
   public id!: number;
   public userId!: string;
   public licensePlate!: string;
