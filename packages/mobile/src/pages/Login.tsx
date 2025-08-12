@@ -1,7 +1,7 @@
 import React from 'react';
 import { useAuthGoogle } from '../auth/useGoogleLogin';
 import { useNavigate } from 'react-router-dom';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, Button, Stack } from '@mui/material';
 
 declare const google: any;
 
@@ -89,22 +89,58 @@ export default function Login() {
     navigate('/otp');
   };
 
-  return (
-    <div className="flex flex-col items-center justify-center min-h-screen gap-4 bg-gray-100">
-      <h2 className="text-xl font-semibold mb-4">Choose login method</h2>
+//   return (
+//     <div className="flex flex-col items-center justify-center min-h-screen gap-4 bg-gray-100">
+//       <h2 className="text-xl font-semibold mb-4">Choose login method</h2>
 
-      <button
-        onClick={handleOtpLogin}
-        className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
-      >
-        Sign in with Password / OTP
-      </button>
+//       <button
+//         onClick={handleOtpLogin}
+//         className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+//       >
+//         Sign in with Password / OTP
+//       </button>
 
-      <div className="w-full flex justify-center items-center">
-        <div id="googleSignInDiv" className="w-[240px] h-[50px]" />
-      </div>
+//       <div className="w-full flex justify-center items-center">
+//         <div id="googleSignInDiv" className="w-[240px] h-[50px]" />
+//       </div>
+
+//       {popup && <PopupMessage message={popup.message} color={popup.color} />}
+//     </div>
+//   );
+// }
+
+return (
+    <Box
+      sx={{
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        bgcolor: 'grey.100',
+      }}
+    >
+      <Typography variant="h4" fontWeight={700} mb={4} align="center" color="primary">
+        Choose Login Method
+      </Typography>
+
+      <Stack spacing={3} alignItems="center" sx={{ width: '100%' }}>
+        <Button
+          variant="contained"
+          color="primary"
+          size="large"
+          onClick={handleOtpLogin}
+          sx={{ width: 250, borderRadius: 2, fontWeight: 600 }}
+        >
+          Sign in with Password / OTP
+        </Button>
+
+        <Box sx={{ width: 250, display: 'flex', justifyContent: 'center' }}>
+          <div id="googleSignInDiv" style={{ width: '100%', height: 50 }} />
+        </Box>
+      </Stack>
 
       {popup && <PopupMessage message={popup.message} color={popup.color} />}
-    </div>
+    </Box>
   );
 }
