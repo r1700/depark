@@ -10,7 +10,10 @@ package-lock.json
 package.json
 packages/opc/package.json
 packages/plc-mock/package.json
+<<<<<<< HEAD
 
+=======
+>>>>>>> b44feb118f72ff958582c260af0bee4e26d0c98f
 
 # Environment variables
 .env
@@ -66,4 +69,24 @@ models/index.js
 
 # Temp files
 temp/*.json
+
+
+# Project specific
+connection/
+knexfile.js
+packages/frontend/src/app/
+packages/frontend/src/components/screen-login/
+
+# IMPORTANT: Keep these essential files!
+# package.json ✅
+# package-lock.json ✅  
+# yarn.lock ✅
+# migrations/ ✅ - DON'T IGNORE MIGRATIONS!
+# Miscellaneous
+package.json
+package-lock.json
+packages/backend/package.json
+
+packages/mobile/package.json
+.env
 

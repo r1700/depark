@@ -59,6 +59,7 @@ app.use((req, res, next) => {
 
 app.use('/api/opc', Exit);
 
+// Start server - בסוף!
 app.get('/', (req, res) => {
   res.json({ message: 'DePark Backend is running!' });
 });
@@ -75,10 +76,25 @@ if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
 }
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`:memo: Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`:globe_with_meridians: CORS enabled for: ${CORS_ORIGIN}`);
-  console.log(':white_check_mark: Password reset API ready!');
-  console.log(':link: Available routes:');
+  console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`🌐 CORS enabled for: ${CORS_ORIGIN}`);
+  console.log('✅ APIs ready!');
+  
+  console.log('🔗 Available routes:');
+  console.log('   GET  /');
+  console.log('   GET  /health');
+  console.log('   GET  /api/health');
+  console.log('   POST /api/password/reset');
+  console.log('   GET  /api/vehicle');
+  console.log('   GET  /api/exportToCSV');
+  
+  if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
+    console.log('🗄️ Database: Supabase configured');
+  } else {
+    console.log('📝 Database: Using mock data');
+  }
+  console.log('✅ Password reset API ready!');
+  console.log('🔗 Available routes:');
   console.log('   GET  /');
   console.log('   GET  /health');
   console.log('   GET  /api/auth/users');
