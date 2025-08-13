@@ -4,6 +4,38 @@ import { Request, Response } from 'express';
 import { QueryTypes } from 'sequelize';
 // import { Op } from 'sequelize';
 
+
+
+
+// import { QueryTypes } from 'sequelize';
+// import sequelize from '../config/sequelize';
+export async function getAllUsersWithBaseuser() {
+    const results = await sequelize.query(
+        `
+        SELECT
+            bu.id AS baseuser_id,
+            bu.first_name,
+            bu.last_name,
+            bu.email,
+            u.phone,
+            u.status,
+            u.department,
+            u.employee_id,
+            u.google_id,
+            u.max_cars_allowed_parking,
+            u.created_by,
+            u.approved_by,
+            u.approved_at
+        FROM baseuser bu
+        LEFT JOIN users u ON u.baseuser_id = bu.id
+        `,
+        { type: QueryTypes.SELECT }
+    );
+    return results;
+}
+
+
+
 function buildLiteral(tableName: string, whereClause: string) {
     const query = `(
     SELECT *
@@ -88,11 +120,11 @@ function buildWhereClauseFromInput(input: SearchInput, getDateRange: (dateStr: s
             ` OR phone ILIKE '${likePattern}' OR email ILIKE '${likePattern}')`
         );
     }
-   
+
     // חיפושים מדויקים
     if (input.status !== undefined) conditions.push(`status = ${input.status}`);
     if (input.max_cars_allowed_parking !== undefined) conditions.push(`max_cars_allowed_parking >= ${input.max_cars_allowed_parking}`);
-   
+
 
     // תאריכים
     const dateFields: (keyof SearchInput)[] = ['created_at', 'updated_at', 'approved_at'];
@@ -121,7 +153,7 @@ function convertQueryToSearchInput(req: Request): SearchInput {
         if (Array.isArray(query.department)) {
             input.department = query.department.filter(dep => typeof dep === 'string');
         } else if (typeof query.department === 'string') {
-            
+
             if (query.department.includes(',')) {
                 input.department = query.department.split(',').map(dep => dep.trim());
             } else {
@@ -133,7 +165,7 @@ function convertQueryToSearchInput(req: Request): SearchInput {
     if (query.freeSearch) input.freeSearch = query.freeSearch as string;
     if (query.phone) input.phone = query.phone as string;
     if (query.email) input.email = query.email as string;
-   
+
     if (query.status) input.status = Number(query.status);
     if (query.max_cars_allowed_parking) input.max_cars_allowed_parking = Number(query.max_cars_allowed_parking);
 
@@ -152,33 +184,33 @@ function convertQueryToSearchInput(req: Request): SearchInput {
 
 export async function handleUserFilter(req: Request, res: Response) {
     try {
-
         const input: SearchInput = convertQueryToSearchInput(req);
-
-
         const whereClause = buildWhereClauseFromInput(input, getDateRange);
-
-
         const lit = buildLiteral('users', whereClause);
-
 
         const results = await sequelize.query(
             `
-      SELECT
-          bu.id AS baseuser_id,
-          bu.first_name,
-          bu.last_name,
-          bu.email,
-          u.phone,
-          u.status,
-          u.department
-      FROM baseuser bu
-      LEFT JOIN users u ON u.baseuser_id = bu.id
-      WHERE ${whereClause}
-      `,
+            SELECT
+                bu.id AS baseuser_id,
+                bu.first_name,
+                bu.last_name,
+                bu.email,
+                u.id AS id,
+                u.phone,
+                u.status,
+                u.department,
+                u.employee_id,
+                u.google_id,
+                u.max_cars_allowed_parking,
+                u.created_by,
+                u.approved_by,
+                u.approved_at
+            FROM baseuser bu
+            LEFT JOIN users u ON u.baseuser_id = bu.id
+            WHERE ${whereClause}
+            `,
             { type: QueryTypes.SELECT }
         );
-
 
         res.json({
             whereClause,
@@ -189,3 +221,4 @@ export async function handleUserFilter(req: Request, res: Response) {
         res.status(400).json({ error: (error as Error).message });
     }
 }
+

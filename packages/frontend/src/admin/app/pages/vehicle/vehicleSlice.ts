@@ -4,7 +4,7 @@ import { Vehicle } from '../../types/Vehicle';
 
 
 
-interface VehicleState {
+export interface VehicleState {
   vehicles: Vehicle[];
   loading: boolean;
   error: string | null;
