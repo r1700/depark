@@ -10,6 +10,12 @@ import vehicleRoutes from './routes/vehicle';
 import exportToCSV from './routes/exportToCSV';
 import authRoutes from './routes/auth';
 import userGoogleAuthRoutes from './routes/userGoogle-auth';
+// import googleAuth from './routes/google-auth';
+import auth from './routes/auth';
+import vehicleLookupRouter from './routes/vehicleLookup';
+// import itemsRoutes from './routes/items';
+// import { databaseService } from './services/database';
+
 
 const app = express();
 const PORT = process.env.PORT || 3001;
