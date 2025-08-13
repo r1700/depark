@@ -1,9 +1,8 @@
 import React from 'react';
 import { useAuthGoogle } from '../auth/useGoogleLogin';
 import { useNavigate } from 'react-router-dom';
-import { Box, Typography } from '@mui/material';
-
-declare const google: any;
+import { Box, Typography, Button, Stack, CircularProgress } from '@mui/material';
+import { GoogleLogin } from '@react-oauth/google';
 
 const PopupMessage = ({ message, color }: { message: string; color: 'error' | 'success' }) => (
   <Box
@@ -21,7 +20,6 @@ const PopupMessage = ({ message, color }: { message: string; color: 'error' | 's
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
-      animation: color === 'success' ? 'fadeIn 0.5s ease-out' : 'slideIn 0.3s ease-out',
     }}
   >
     <Typography variant="body1" sx={{ mr: 2 }}>
@@ -30,10 +28,64 @@ const PopupMessage = ({ message, color }: { message: string; color: 'error' | 's
   </Box>
 );
 
+function GoogleButtonWrapper({
+  onSuccess,
+  onError,
+}: {
+  onSuccess: (res: any) => void;
+  onError: () => void;
+}) {
+  const [scriptLoaded, setScriptLoaded] = React.useState<boolean>(() => !!(window as any).google);
+
+  React.useEffect(() => {
+    if ((window as any).google) {
+      setScriptLoaded(true);
+      return;
+    }
+
+    const t = setTimeout(() => {
+      setScriptLoaded(!!(window as any).google);
+    }, 500);
+
+    return () => clearTimeout(t);
+  }, []);
+
+  return (
+    <Box
+      sx={{
+        width: '100%',
+        maxWidth: 350,
+        minHeight: 56,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        overflow: 'hidden',
+        borderRadius: 1,
+        '& iframe': {
+          width: '100% !important',
+          height: '100% !important',
+          display: 'block',
+        },
+      }}
+    >
+      {!scriptLoaded ? (
+        <CircularProgress size={24} />
+      ) : (
+        <GoogleLogin
+          onSuccess={onSuccess}
+          onError={onError}
+          theme="outline"
+          size="large"
+          width="350"
+        />
+      )}
+    </Box>
+  );
+}
+
 export default function Login() {
   const navigate = useNavigate();
   const { handleGoogleLogin } = useAuthGoogle();
-
   const [popup, setPopup] = React.useState<{ message: string; color: 'error' | 'success' } | null>(null);
 
   const showPopup = (message: string, color: 'error' | 'success') => {
@@ -41,18 +93,16 @@ export default function Login() {
     setTimeout(() => setPopup(null), 3000);
   };
 
-  const handleCredentialResponse = async (response: any) => {
-    if (response?.credential) {
+  const handleGoogleSuccess = async (credentialResponse: any) => {
+    if (credentialResponse?.credential) {
       try {
-        const success = await handleGoogleLogin(response.credential);
-
+        const success = await handleGoogleLogin(credentialResponse.credential);
         if (!success) {
           showPopup('Email not registered in the system', 'error');
           return;
         }
-
         navigate('/dashboard');
-      } catch (e) {
+      } catch {
         showPopup('Login failed', 'error');
       }
     } else {
@@ -60,51 +110,69 @@ export default function Login() {
     }
   };
 
-
-  React.useEffect(() => {
-    const interval = setInterval(() => {
-      const google = (window as any).google;
-      if (google && google.accounts && google.accounts.id) {
-        google.accounts.id.initialize({
-          client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID!,
-          callback: handleCredentialResponse,
-        });
-
-        google.accounts.id.renderButton(
-          document.getElementById('googleSignInDiv')!,
-          {
-            theme: 'outline',
-            size: 'large',
-            width: 250,
-          }
-        );
-        clearInterval(interval);
-      }
-    }, 100);
-
-    return () => clearInterval(interval);
-  }, []);
-
   const handleOtpLogin = () => {
     navigate('/otp');
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen gap-4 bg-gray-100">
-      <h2 className="text-xl font-semibold mb-4">Choose login method</h2>
-
-      <button
-        onClick={handleOtpLogin}
-        className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+    <Box
+      sx={{
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        bgcolor: 'grey.100',
+        px: 2,
+      }}
+    >
+      <Typography
+        variant="h1"
+        fontWeight={800}
+        mb={6}
+        align="center"
+        color="primary"
+        sx={{
+          fontSize: 'clamp(3rem, 7vw, 7rem)',
+          letterSpacing: '-0.02em',
+          textShadow: '2px 2px 6px rgba(0,0,0,0.25)', 
+        }}
       >
-        Sign in with Password / OTP
-      </button>
+        Wellcome
+      </Typography>
 
-      <div className="w-full flex justify-center items-center">
-        <div id="googleSignInDiv" className="w-[240px] h-[50px]" />
-      </div>
+      <Stack
+        spacing={3}
+        alignItems="center"
+        justifyContent="center"
+        sx={{ width: '100%', maxWidth: 350, mx: 'auto' }}
+      >
+        <Button
+          variant="contained"
+          color="primary"
+          size="large"
+          onClick={handleOtpLogin}
+          sx={{
+            width: '100%',
+            minWidth: 200,
+            maxWidth: 350,
+            borderRadius: 2,
+            fontWeight: 600,
+            fontSize: { xs: '1rem', sm: '1.1rem' },
+            py: 1.5,
+          }}
+        >
+          Sign in with OTP
+        </Button>
+
+        <GoogleButtonWrapper
+          onSuccess={handleGoogleSuccess}
+          onError={() => showPopup('Google login failed', 'error')}
+        />
+      </Stack>
 
       {popup && <PopupMessage message={popup.message} color={popup.color} />}
-    </div>
+    </Box>
   );
 }
+
