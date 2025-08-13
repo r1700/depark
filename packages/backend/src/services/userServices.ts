@@ -6,7 +6,6 @@ import { QueryTypes } from 'sequelize';
 
 
 
-
 // import { QueryTypes } from 'sequelize';
 // import sequelize from '../config/sequelize';
 export async function getAllUsersWithBaseuser() {
@@ -33,7 +32,6 @@ export async function getAllUsersWithBaseuser() {
     );
     return results;
 }
-
 
 
 function buildLiteral(tableName: string, whereClause: string) {
@@ -84,19 +82,16 @@ function formatDateForSQL(date: Date): string {
     return date.toISOString().split('T')[0];
 }
 
-
 function getDateRange(dateStr: string): [Date, Date] {
     const startDate = new Date(dateStr);
 
     const today = new Date();
-
 
     startDate.setHours(0, 0, 0, 0);
     today.setHours(23, 59, 59, 999);
 
     return [startDate, today];
 }
-
 
 
 
@@ -124,7 +119,6 @@ function buildWhereClauseFromInput(input: SearchInput, getDateRange: (dateStr: s
     // חיפושים מדויקים
     if (input.status !== undefined) conditions.push(`status = ${input.status}`);
     if (input.max_cars_allowed_parking !== undefined) conditions.push(`max_cars_allowed_parking >= ${input.max_cars_allowed_parking}`);
-
 
     // תאריכים
     const dateFields: (keyof SearchInput)[] = ['created_at', 'updated_at', 'approved_at'];
@@ -221,4 +215,5 @@ export async function handleUserFilter(req: Request, res: Response) {
         res.status(400).json({ error: (error as Error).message });
     }
 }
+
 
