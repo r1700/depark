@@ -8,12 +8,15 @@ import {
   ClientSubscription,
   DataValue,
   TimestampsToReturn,
-  Variant
+  Variant,
+  MessageSecurityMode,
+  SecurityPolicy,
+  UserTokenType,
 } from 'node-opcua';
 import { sendDataToBackend } from "./backendService";
 import dotenv from 'dotenv';
 dotenv.config();
-const { TARGET_URL } = process.env ;
+const {TARGET_URL, PLC_USERNAME, PLC_PASSWORD} = process.env;
 
 const endpointUrl: string = `opc.tcp://${TARGET_URL}}/UA/PLC`;
 
@@ -42,7 +45,15 @@ function isConnected(client: OPCUAClient | null): boolean {
 // Create a single client
 async function getOpcClient(): Promise<OPCUAClient> {
   if (!opcClient || !isConnected(opcClient)) {
-    opcClient = OPCUAClient.create({ endpointMustExist: false });
+    opcClient = OPCUAClient.create({
+      endpointMustExist: false,
+      securityMode: MessageSecurityMode.Sign,
+      securityPolicy: SecurityPolicy.Basic256Sha256,
+      connectionStrategy: {
+        initialDelay: 1000,
+        maxRetry: 3
+      }
+    });
     await opcClient.connect(endpointUrl);
   }
   return opcClient;
@@ -56,7 +67,11 @@ export async function ensureSession(): Promise<ClientSession> {
         await opcClient.disconnect();
       }
       opcClient = await getOpcClient();
-      opcSession = await opcClient.createSession();
+      opcSession = await opcClient.createSession({
+        type: UserTokenType.UserName,
+        userName: PLC_USERNAME || "admin",
+        password: PLC_PASSWORD || "password"
+      });
     }
     return opcSession;
   } catch (err) {
