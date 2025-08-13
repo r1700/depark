@@ -10,6 +10,9 @@ import AdminDashboard from './admin/components/adminDashboard/AdminDashboard';
 import Layout from './admin/components/layout/layout';
 import UsersPage from './admin/Pages/UsersPage';
 import { VehicleRow } from './mobile/components/mobile-user/VehicleList';
+import UsersTable from './admin/components/users/usersTable';
+import { Provider } from 'react-redux';
+import { store } from './admin/app/store'; // ודא/י שהנתיב נכון
 
 const user = JSON.parse(localStorage.getItem("user") || "{}");
 
@@ -20,7 +23,7 @@ const handleLogout = () => {
 const routers = createBrowserRouter([
   {
     path: '/', element: <App />, children: [
-      { path: '', element: <LoginScreen /> },
+      { path: '', element: <UsersPage /> },
       {
         path: 'layout', element: <Layout user={user} onLogout={handleLogout} />, children: [
           { path: 'admin-dashboard', element: <AdminDashboard /> },
@@ -39,7 +42,9 @@ const root = ReactDOM.createRoot(
 );
 root.render(
   <React.StrictMode>
+    <Provider store={store}>
     <RouterProvider router={routers}></RouterProvider>
+    </Provider>
   </React.StrictMode>,
 );
 

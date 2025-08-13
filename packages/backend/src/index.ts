@@ -15,6 +15,7 @@ import auth from './routes/auth';
 import vehicleLookupRouter from './routes/vehicleLookup';
 // import itemsRoutes from './routes/items';
 // import { databaseService } from './services/database';
+import users from './routes/userApi';
 
 
 const app = express();
@@ -41,14 +42,8 @@ app.use('/api/health', healthRoutes);
 app.use('/api/password', passwordRoutes);
 app.use('/api/vehicle', vehicleRoutes);
 app.use('/api/exportToCSV', exportToCSV);
-// app.use('/api/users', userFilter);
-app.use('/api/auth', authRoutes);
-app.use('/api/auth', userGoogleAuthRoutes);
+app.use('/api/users', users);
 
-// app.use((req, res, next) => {
-//   console.log(`[${req.method}] ${req.path}`, req.body);
-//   next();
-// });
 
 
 // app.get('/', (req, res) => {
