@@ -17,12 +17,14 @@ import './cronJob'; // Import the cron job to ensure it runs on server start
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+
 app.use(session({
-  secret: 'your-secret-key', 
+  secret: process.env.SESSION_SECRET || 'keyboard cat',
   resave: false,
-  saveUninitialized: true,
-  cookie: { secure: false } 
+  saveUninitialized: false,
+  cookie: { secure: process.env.NODE_ENV === 'production' }
 }));
+
 // Middleware
 const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:3000';
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
@@ -55,7 +57,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/api/opc/:param', Exit);
+app.use('/api/opc', Exit);
 
 app.get('/', (req, res) => {
   res.json({ message: 'DePark Backend is running!' });

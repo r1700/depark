@@ -1,8 +1,8 @@
 import { Router } from 'express';
 
-const router = Router();
+const router : Router = Router();
 
-router.post('/', (req, res) => {       
+router.post('/:param', (req, res) => {       
     res.json({  value: req.body.value });
 });
 

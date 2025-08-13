@@ -1,6 +1,5 @@
 import express, { Request, Response } from 'express';
 import { writeNodeValues, WriteItem } from './opc-client';
-import { it } from 'node:test';
 
 const app = express();
 app.use(express.json());

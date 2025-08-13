@@ -1,32 +1,37 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "target": "ES2020",
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "lib": [
-      "ES2020"
-    ],
-    "outDir": "./dist",
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true,
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
-    "jsx": "react-jsx"
+  "target": "ES2020",
+  "module": "commonjs",
+  "moduleResolution": "node",
+  "lib": ["ES2020"],
+  "outDir": "./dist",
+  "strict": true,
+  "esModuleInterop": true,
+  "skipLibCheck": true,
+  "forceConsistentCasingInFileNames": true,
+  "resolveJsonModule": true,
+  "declaration": true,
+  "declarationMap": true,
+  "sourceMap": true,
+  "jsx": "react-jsx",
+  "typeRoots": [
+  "./src/types",
+  "./node_modules/@types"
+  ]
   },
   "include": [
-    "src/**/*",
-    "backend/**/*"
-, "tests/controllers/otpController.test.ts"  ],
+  "src//*",
+  "backend//*",
+  "tests/controllers/otpController.test.ts"
+  ],
   "exclude": [
-    "node_modules",
-    "dist"
+  "node_modules",
+  "dist"
   ],
   "ts-node": {
-    "esm": false
+  "esm": false
   }
-}
+  }
+  
+  

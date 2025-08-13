@@ -13,8 +13,9 @@ import {
 import { sendDataToBackend } from "./backendService";
 import dotenv from 'dotenv';
 dotenv.config();
+const { TARGET_URL } = process.env ;
 
-const endpointUrl: string = "opc.tcp://localhost:4080/UA/PLC";
+const endpointUrl: string = `opc.tcp://${TARGET_URL}}/UA/PLC`;
 
 let opcClient: OPCUAClient | null = null;
 let opcSession: ClientSession | null = null;
