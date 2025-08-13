@@ -1,9 +1,10 @@
-import express from 'express';
+
+import express, { Application } from 'express';
 import cors from 'cors';
 
 // import adminConfigRouter from './routes/admin-config';
 
-const app = express();
+const app: Application = express()
 
 // Middleware
 app.use(cors());
