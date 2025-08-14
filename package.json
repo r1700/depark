@@ -14,7 +14,9 @@
     "start:backend": "npm start --workspace packages/backend",
     "dev:opc": "npm run dev --workspace=packages/opc",
     "dev:backend": "npm run dev --workspace=packages/backend",
-    "dev:frontend": "npm run start --workspace=packages/frontend"
+    "dev:frontend": "npm run start --workspace=packages/frontend",
+    "build:backend": "npm run build --workspace=packages/backend",
+    "build:frontend": "npm run build --workspace=packages/frontend"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",

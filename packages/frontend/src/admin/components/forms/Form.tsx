@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Button, TextField, Typography, Paper, MenuItem, Autocomplete, Checkbox, FormControlLabel } from '@mui/material';
+import { Box, Button, TextField, Typography, Paper, Autocomplete, Checkbox, FormControlLabel } from '@mui/material';
 
 
 export type FieldConfig<T> = {

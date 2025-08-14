@@ -57,11 +57,9 @@ export const fetchUsers = createAsyncThunk(
         },
       ];
             
-return mockUsers;
-
-
-       const response = await axios.get<User[]>('/api/users');
-       return response.data;
+      return mockUsers;
+      // const response = await axios.get<User[]>('/api/users');
+      // return response.data;
     } catch (error: any) {
       return thunkAPI.rejectWithValue(error.response.data);
     }

@@ -1,9 +1,6 @@
-
 import React, { useState } from 'react';
 import { Button, Box, Typography, Modal, Fade, Backdrop } from '@mui/material';
 import UserForm from '../app/pages/user/UserForm/UserForm';
-
-
 
 const styleModal = {
   position: 'absolute' as 'absolute',
@@ -30,16 +27,16 @@ const [showAddUserModal, setShowAddUserModal] = useState(false);
 
 
 
-  const handleLogout = () => {
-    localStorage.removeItem('user');
-  };
-
-  let user= JSON.parse(localStorage.getItem("user") || "{}");
-
- user = {
-    firstName: user.firstName || '',
-    lastName: user.lastName || ''
-  };
+ //  const handleLogout = () => {
+ //    localStorage.removeItem('user');
+ //  };
+ //
+ //  let user= JSON.parse(localStorage.getItem("user") || "{}");
+ //
+ // user = {
+ //    firstName: user.firstName || '',
+ //    lastName: user.lastName || ''
+ //  };
 
   return (<>
     <Box sx={{ display: 'flex' }}>

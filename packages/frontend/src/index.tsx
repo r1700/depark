@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import { BrowserRouter, createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import LoginScreen from './admin/components/screen-login/LoginScreen';
 import HrDashboard from './admin/components/hrDashboard/HrDashboard';
 import AdminDashboard from './admin/components/adminDashboard/AdminDashboard';
@@ -11,7 +11,7 @@ import Layout from './admin/components/layout/layout';
 import UsersPage from './admin/Pages/UsersPage';
 import { VehicleRow } from './mobile/components/mobile-user/VehicleList';
 import Otp from './mobile/components/otp';
-import HomePage from './tablet/pages/HomePage';
+// import HomePage from './tablet/pages/HomePage';
 
 const user = JSON.parse(localStorage.getItem("user") || "{}");
 
