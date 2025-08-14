@@ -1,9 +1,7 @@
-
 import React, { useState } from 'react';
 import { Button, Box, Typography, Modal, Fade, Backdrop } from '@mui/material';
 import UserForm from '../app/pages/user/UserForm/UserForm';
-
-
+import UsersTable from '../app/pages/user/UserTable/userTable'; // ← הייבוא החדש
 
 const styleModal = {
   position: 'absolute' as 'absolute',
@@ -17,95 +15,80 @@ const styleModal = {
 };
 
 const UsersPage: React.FC = () => {
+  const [showAddUserModal, setShowAddUserModal] = useState(false);
 
-const [showAddUserModal, setShowAddUserModal] = useState(false);
-
-  const openAddUserModal = () => {
-    setShowAddUserModal(true);
-  };
-
-  const closeAddUserModal = () => {
-    setShowAddUserModal(false);
-  };
-
-
+  const openAddUserModal = () => setShowAddUserModal(true);
+  const closeAddUserModal = () => setShowAddUserModal(false);
 
   const handleLogout = () => {
     localStorage.removeItem('user');
   };
 
-  let user= JSON.parse(localStorage.getItem("user") || "{}");
-
- user = {
+  let user = JSON.parse(localStorage.getItem("user") || "{}");
+  user = {
     firstName: user.firstName || '',
     lastName: user.lastName || ''
   };
 
-  return (<>
-    <Box sx={{ display: 'flex' }}>
-      <Box sx={{ flexGrow: 1, p: 3 }}>
-        
-        <Typography 
-          variant="h4" 
-          sx={{
-            fontWeight: 'bold',      
-            color: '#1976d2',         
-            marginBottom: 3,         
-            textAlign: 'center',    
-          }}
-        >
-          Users
-        </Typography>
-       
-        <Button
-          variant="contained"
-          color="primary"
-          sx={{ marginRight: 2 }}
-          onClick={openAddUserModal}
+  return (
+    <>
+      <Box sx={{ display: 'flex' }}>
+        <Box sx={{ flexGrow: 1, p: 3 }}>
+          <Typography
+            variant="h4"
+            sx={{
+              fontWeight: 'bold',
+              color: '#1976d2',
+              marginBottom: 3,
+              textAlign: 'center',
+            }}
+          >
+            Users
+          </Typography>
 
-        >
-          add user
-        </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            sx={{ marginRight: 2 }}
+            onClick={openAddUserModal}
+          >
+            add user
+          </Button>
 
-        
-        <Button
-          variant="contained" 
-          color="primary" 
-        >
-          export to CSV
-        </Button>
+          <Button
+            variant="contained"
+            color="primary"
+          >
+            export to CSV
+          </Button>
+
+          <UsersTable />
+        </Box>
       </Box>
-    </Box>
 
-
-
-        <Modal
-          open={showAddUserModal}
-          onClose={closeAddUserModal}
-          aria-labelledby="add-user-modal-title"
-          aria-describedby="add-user-modal-description"
-          closeAfterTransition
-          keepMounted
-          slots={{ backdrop: Backdrop }}
-          slotProps={{
-            backdrop: {
-              timeout: 500,
-              sx: { backgroundColor: 'transparent' }
-            },
-          }}
-        >
-          <Fade in={showAddUserModal}>
-            <Box sx={styleModal}>
-              <UserForm
-              onClose={closeAddUserModal}
-              ></UserForm>
-            </Box>
-          </Fade>
-        </Modal>
-        </>
+      <Modal
+        open={showAddUserModal}
+        onClose={closeAddUserModal}
+        aria-labelledby="add-user-modal-title"
+        aria-describedby="add-user-modal-description"
+        closeAfterTransition
+        keepMounted
+        slots={{ backdrop: Backdrop }}
+        slotProps={{
+          backdrop: {
+            timeout: 500,
+            sx: { backgroundColor: 'transparent' }
+          },
+        }}
+      >
+        <Fade in={showAddUserModal}>
+          <Box sx={styleModal}>
+            <UserForm onClose={closeAddUserModal} />
+          </Box>
+        </Fade>
+      </Modal>
+    </>
   );
 };
 
 export default UsersPage;
-
-
