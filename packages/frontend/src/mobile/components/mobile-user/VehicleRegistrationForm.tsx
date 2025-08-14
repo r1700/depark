@@ -68,15 +68,8 @@ export const VehicleRegistrationForm = ({ onSuccess }: VehicleRegistrationFormPr
     setSuccess(false);
   }
 };
-
-
-
-
-
-
   return (
     <>
-    
       <Box textAlign="center" my={2}>
         <Button
           variant="contained"
@@ -89,8 +82,6 @@ export const VehicleRegistrationForm = ({ onSuccess }: VehicleRegistrationFormPr
           
         </Button>
       </Box>
-      
-
       <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth>
         <DialogTitle>Register New Vehicle</DialogTitle>
         <DialogContent>
@@ -128,7 +119,6 @@ export const VehicleRegistrationForm = ({ onSuccess }: VehicleRegistrationFormPr
                 <TextField label="Length" fullWidth type="number" size="small" {...register("length")} />
                 <TextField label="Weight" fullWidth type="number" size="small" {...register("weight")} />
               </Box>
-
               <TextField
                 label="Dimensions Source"
                 fullWidth
@@ -137,8 +127,6 @@ export const VehicleRegistrationForm = ({ onSuccess }: VehicleRegistrationFormPr
                 error={!!errors.dimensionsSource}
                 helperText={errors.dimensionsSource?.message}
               />
-             
-
               {serverError && <Alert severity="error">{serverError}</Alert>}
               {success && <Alert severity="success">Vehicle registered successfully!</Alert>}
             </Stack>
