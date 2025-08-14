@@ -2,16 +2,8 @@
 import { Sequelize, DataTypes, Model } from 'sequelize';
 import dotenv from 'dotenv';
 dotenv.config();
-import sequelize from '../../config/instance';
+import sequelize from '../../config/sequelize';
 
-// export const sequelize = new Sequelize({
-//     dialect: 'postgres', // שנה לפי הצורך
-//     host: process.env.HOST_DB,
-//     username: process.env.USER_DB,
-//     password: process.env.PASSWORD_DB,
-//     database: process.env.DATABASE_DB,
-//     logging: false,
-// });
 
 
 // --- Model User ---
