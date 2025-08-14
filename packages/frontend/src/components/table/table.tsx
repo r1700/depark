@@ -51,7 +51,7 @@ const DataTable: React.FC<DataTableProps> = ({ data, stickyColumns = [] }) => {
       if (containerRect) {
         const left = containerRect.left + window.scrollX;
         const width = containerRect.width;
-        const bottom = 56; // נשאיר ברירת מחדל; אפשר להתאים אם צריך
+        const bottom = 56;     
         setHorizPos({ left, width, bottom });
       }
     };

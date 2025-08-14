@@ -12,27 +12,19 @@ import {
   Chip,
 } from '@mui/material';
 
-/**
- * Generic Field config - name is constrained to keys of T (as string)
- */
 export type FieldConfigGeneric<T> = {
   name: Extract<keyof T, string>;
   label?: string;
   placeholder?: string;
-  // common union for types used in your original component
   type: 'free' | 'select' | 'multiSelect' | 'date' | 'dateRange' | 'number';
-  // for select / multiSelect
   options?: string[];
-  // for select when backend expects array value
   valueAsArray?: boolean;
-  // for dateRange: if different keys in T are used
   fromKey?: Extract<keyof T, string>;
   toKey?: Extract<keyof T, string>;
 };
 
 interface FilterPanelProps<T extends Record<string, any>> {
   fields: FieldConfigGeneric<T>[];
-  // Partial so callers can pass only active filters
   filters: Partial<T>;
   onChange: (filters: Partial<T>) => void;
   onClear: () => void;
@@ -44,7 +36,6 @@ const FilterPanel = <T extends Record<string, any>>({
   onChange,
   onClear,
 }: FilterPanelProps<T>) => {
-  // helper to update a field: cast to Record<string, any> to allow dynamic key
   const update = (key: string, value: any) => {
     onChange({ ...(filters as Record<string, any>), [key]: value } as Partial<T>);
   };
@@ -53,7 +44,7 @@ const FilterPanel = <T extends Record<string, any>>({
     if (!val) return '';
     const d = new Date(val);
     if (isNaN(d.getTime())) return '';
-    return d.toISOString().slice(0, 10); // YYYY-MM-DD
+    return d.toISOString().slice(0, 10); 
   };
 
   return (
