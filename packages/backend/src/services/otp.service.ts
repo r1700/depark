@@ -1,6 +1,6 @@
 import { error, log } from "console";
 const otpGenerator = require('otp-generator');
-import { User, UserSession } from '../model/database-models/user.model'; // ודא שיש לך מודלים כאלה
+import { baseuser, usersessions } from '../model/database-models/user.model'; // ודא שיש לך מודלים כאלה
 import { Op } from 'sequelize';
 import sequelize from "../model/database-models/user.model";
 
@@ -22,9 +22,9 @@ export async function createOtp(contact: string): Promise<string> {
   const expiresAt = Date.now() + 5 * 60 * 1000; // 5 minutes expiry (מספר, לא ISO)
   const userId = await userIdByContact(contact);
 
-  await UserSession.update(
-    { tempToken: otp, expiresAt },
-    { where: { userId } }
+  await usersessions.update(
+    { temp_token: otp, expires_at: expiresAt },
+    { where: { baseuser_id: userId } }
   );
 
   return otp;
@@ -34,15 +34,15 @@ export async function createOtp(contact: string): Promise<string> {
 export async function getOtpEntry(contact: string): Promise<OtpEntry | undefined> {
   const userId = await userIdByContact(contact);
 
-  const session = await UserSession.findOne({
-    where: { userId }
+  const session = await usersessions.findOne({
+    where: { baseuser_id: userId }
   });
 
   if (!session) return undefined;
 
   return {
-    otp: session.tempToken,
-    expiresAt: Number(session.expiresAt),
+    otp: session.temp_token,
+    expiresAt: Number(session.expires_at),
   };
 }
 
@@ -50,9 +50,9 @@ export async function getOtpEntry(contact: string): Promise<OtpEntry | undefined
 export async function removeOtp(contact: string): Promise<void> {
   const userId = await userIdByContact(contact);
 
-  await UserSession.update(
-    { tempToken: null },
-    { where: { userId } }
+  await usersessions.update(
+    { temp_token: null },
+    { where: { baseuser_id: userId } }
   );
 }
 
@@ -73,7 +73,7 @@ export async function existUser(contact: string): Promise<boolean> {
     
     const userId:string = await userIdByContact(contact);
     if (userId) {
-      const session = await UserSession.findOne({ where: { userId } });
+      const session = await usersessions.findOne({ where: { baseuser_id: userId } });
       return !!session;
     }
     else {
@@ -88,7 +88,7 @@ export async function existUser(contact: string): Promise<boolean> {
 // Get user ID by email or phone
 export async function userIdByContact(contact: string): Promise<string> {
 
-  const user = await User.findOne({
+  const user = await baseuser.findOne({
     where: {
       [Op.or]: [
         { email: contact },
