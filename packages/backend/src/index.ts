@@ -17,6 +17,7 @@ import './cronJob'; // Import the cron job to ensure it runs on server start
 // import adminConfigRouter from './routes/adminConfig';
 // import retrieveRoute from './routes/RetrivalQueue';
 import vehicleLookupRoute from './routes/vehicleLookup';
+
 const app = express();
 const PORT = process.env.PORT || 3001;
 
@@ -30,20 +31,15 @@ app.use(session({
 
 // Middleware
 const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:3000';
-const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
-
-
-
+// const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 app.use(cors({
   origin: CORS_ORIGIN,
   credentials: true,
 }));
 app.use(express.json());
-
-if (!GOOGLE_CLIENT_ID) {
-  throw new Error('Missing GOOGLE_CLIENT_ID');
-}
-
+// if (!GOOGLE_CLIENT_ID) {
+//   throw new Error('Missing GOOGLE_CLIENT_ID');
+// }
 app.use(cors({ origin: CORS_ORIGIN, credentials: true }));
 app.use(express.json());
 app.use(loggerRoutes);

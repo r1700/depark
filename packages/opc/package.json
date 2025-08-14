@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "ts-node src/app.ts",
+    "dev": "ts-node app.ts",
     "test": "jest",
     "start": "ts-node ./src/index.ts"
   },

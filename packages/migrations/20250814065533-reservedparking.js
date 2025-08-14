@@ -10,11 +10,11 @@ module.exports = {
         allowNull: false,
         autoIncrement: true,
       },
-      adminusersId: {
+      baseuser_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'adminusers'
+          model: 'baseuser'
         }
       },
       parking_number: {
