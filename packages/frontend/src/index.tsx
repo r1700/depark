@@ -9,8 +9,8 @@ import HrDashboard from './admin/components/hrDashboard/HrDashboard';
 import AdminDashboard from './admin/components/adminDashboard/AdminDashboard';
 import Layout from './admin/components/layout/layout';
 import UsersPage from './admin/Pages/UsersPage';
-import ParkingStatsPage from './admin/app/pages/adminDashBoard/parkingStats';
-import SurfaceStatsPage from './admin/app/pages/adminDashBoard/surfaceStats';
+import ParkingStatsPage from './admin/Pages/parkingStats';
+import SurfaceStatsPage from './admin/Pages/surfaceStats';
 
 const user = JSON.parse(localStorage.getItem("user") || "{}");
 

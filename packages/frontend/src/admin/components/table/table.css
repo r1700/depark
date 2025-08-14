@@ -1,33 +1,51 @@
-
-table {
+.icon-button{
+  direction: ltr;
+  position: fixed;
+}
+.table-container {
+  max-width: 90%;
+  margin: 5%;
+  overflow-y: auto;
+  display: block;
+  margin-top: 2rem;
+  background-color: #fff;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  position: relative;
+  height: auto;
+  border-bottom: solid 0.5px #173164;
+}
+.table-body {
+  height: auto;
+}
+.table {
+  border: solid 0.5px #173164;
+  min-width: 650px;
   width: 100%;
-  border-collapse: collapse;
-  margin-top: 1rem;
-  font-family: Arial, sans-serif;
 }
-
-/* כותרות הטבלה */
-th {
-  background-color: #104292; /* כחול */
-  color: white;
+.table-head {
+  background-color: #1E3687;
+  font-size: 30px;
   font-weight: bold;
-  padding: 12px;
-  border: 1px solid #d1d5db;
-  text-align: right;
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
-
-
-td {
-  padding: 10px;
-  border: 1px solid #d1d5db;
-  text-align: right;
+.table-head th {
+  padding: 0.5rem;
+  color: #fff;
+  font-weight: bold;
 }
-tbody tr:nth-child(even) {
-  background-color: #878a8d;
+.table-body .actions {
+  display: flex;
+  gap: 0.5rem;
 }
-
-/* האבר: כשעוברים עם העכבר */
-tbody tr:hover {
-  background-color: #929597;
-  cursor: pointer;
+.table-pagination {
+  color: #FCFBFB;
+  border-top: 1px solid #C4BDBD;
+  padding: 0.5rem;
+  font-size: 14px;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
 }

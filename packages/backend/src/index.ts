@@ -7,6 +7,8 @@ import cors from 'cors';
 // import passwordRoutes from './routes/user.routes';
 // import vehicleRoutes from './routes/vehicle';
 // import exportToCSV from './routes/exportToCSV';
+import vehicleStatsRoutes from './routes/parkingStat';
+import surfaceStatsRoutes from './routes/surfaceStat';
 import googleAuth from './routes/google-auth';
 import auth from './routes/auth';
 
@@ -24,6 +26,8 @@ app.use(express.json());
 // app.use('/api/password', passwordRoutes);
 // app.use('/api/vehicle', vehicleRoutes);
 // app.use('/api/exportToCSV', exportToCSV);
+app.use('/api/parking-stats', vehicleStatsRoutes);
+app.use('/api/surface-stats', surfaceStatsRoutes);
 app.use('/OAuth', googleAuth); // Ensure this route is correctly set up
 app.use('/auth', auth);
 app.get('/', (req, res) => {

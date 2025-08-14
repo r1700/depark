@@ -22,8 +22,8 @@ import AssessmentIcon from '@mui/icons-material/Assessment';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import { text } from 'stream/consumers';
-import ParkingStatsPage from '../../app/pages/adminDashBoard/parkingStats';
-import SurfaceStatsPage from '../../app/pages/adminDashBoard/surfaceStats';
+import ParkingStatsPage from '../../Pages/parkingStats';
+import SurfaceStatsPage from '../../Pages/surfaceStats';
 const drawerWidth = 240;
 interface User {
     firstName: string;
