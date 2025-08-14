@@ -16,7 +16,12 @@ export class Vehicle extends Model {
     public updated_at!: Date;
 }
 Vehicle.init({
-    id: { type: DataTypes.UUID, primaryKey: true },
+   id: {
+  type: DataTypes.INTEGER,
+  primaryKey: true,
+  autoIncrement: true,
+  allowNull: false,
+},
     baseuser_id: { type: DataTypes.STRING, field: 'baseuser_id' },
     license_plate: { type: DataTypes.STRING, field: 'license_plate' },
     vehicle_model_id: { type: DataTypes.STRING, field: 'vehicle_model_id' },
