@@ -29,7 +29,6 @@ import {
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip);
 
-
 interface ReportData {
   totalTime: number;
   averageTime: number;
@@ -50,13 +49,11 @@ interface Props {
   userId: string | null;
 }
 
-
 const formatDuration = (minutes: number): string => {
   const h = Math.floor(minutes / 60);
   const m = Math.round(minutes % 60);
   return `${h}h ${m}m`;
 };
-
 
 const minutesToHours = (minutes: number): number => {
   return Math.floor(minutes / 60); 
@@ -72,8 +69,7 @@ export const VehicleReportDialog = ({ open, onClose, userId }: Props) => {
     setError("");
     try {
       ;
-      const response = await fetch(`/api/report?userId=${encodeURIComponent(userId || '')}`);
-      if (!response.ok) {
+const response = await fetch(`/api/report/${encodeURIComponent(userId || '')}`);      if (!response.ok) {
         const errRes = await response.json().catch(() => ({}));
         throw new Error(errRes.message || "Failed to fetch report data");
       }
@@ -201,4 +197,5 @@ export const VehicleReportDialog = ({ open, onClose, userId }: Props) => {
     </Dialog>
   );
 };
+
 
