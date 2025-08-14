@@ -48,6 +48,7 @@ import path from 'path';
 // import adminConfigRouter from './routes/adminConfig';
 // import retrieveRoute from './routes/RetrivalQueue';
 import vehicleLookupRoute from './routes/vehicleLookup';
+
 const app = express();
 const server = http.createServer(app);
 export const wss = new WebSocketServer({ server })
@@ -101,13 +102,8 @@ if (!GOOGLE_CLIENT_ID) {
     throw new Error('Missing GOOGLE_CLIENT_ID');
 }
 
-
-// Global request logger — מדפיס כל בקשה נכנסת
-app.use((req, res, next) => {
-    console.log(`[REQ] ${ new Date().toISOString() } ${ req.method } ${ req.originalUrl } body:`, req.body);
-    next();
-});
-
+app.use(cors({ origin: CORS_ORIGIN, credentials: true }));
+app.use(express.json());
 app.use(loggerRoutes);
 
 // Global request logger — מדפיס כל בקשה נכנסת
