@@ -45,6 +45,9 @@ import  VehicleModelRouter  from './routes/vehicleModel';
 import pritectedRoute from './routes/protected';
 
 import path from 'path';
+// import adminConfigRouter from './routes/adminConfig';
+// import retrieveRoute from './routes/RetrivalQueue';
+import vehicleLookupRoute from './routes/vehicleLookup';
 const app = express();
 const server = http.createServer(app);
 export const wss = new WebSocketServer({ server })
@@ -129,6 +132,7 @@ app.use('/api/health', healthRoutes);
 app.use('/api/password', passwordRoutes);
 app.use('/api/auth', passwordRoutes);
 app.use('/api/vehicle', vehicleRoutes);
+app.use('/api/vehicle', vehicleLookupRoute);
 app.use('/api/exportToCSV', exportToCSV);
 app.use('/api', userRoutes);
 // app.use('/api/auth', authRoutes);
