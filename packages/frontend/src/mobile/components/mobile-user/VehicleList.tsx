@@ -37,32 +37,10 @@ export const VehicleRow = () => {
   
   const [userId, setUserId] = useState<string | null>(null);
   
-
-  const fetchVehicles = () => {
-    fetch(`/api/vehicles?userId=${userId}`)
-    
-      .then(async (res) => {
-        if (!res.ok) {
-          const text = await res.text();
-          throw new Error(text || "Server Error");
-        }
-        return res.json();
-      })
-      .then((data) => {
-        setVehicles(data);
-        setCurrentIndex(data.length - 1); 
-      })
-      .catch((err) => {
-        console.error("Fetch error:", err.message);
-      });
-  };
-
-  useEffect(() => {
-    fetchVehicles();
-  }, []);
-
-  useEffect(() => {
+ useEffect(() => {
   const userStr = localStorage.getItem('user');
+  let user= userStr ? JSON.parse(userStr) : null;
+
   if (userStr !== null) {
     try {
       const user = JSON.parse(userStr);
@@ -74,6 +52,32 @@ export const VehicleRow = () => {
     }
   }
 }, []);
+
+  useEffect(() => {
+    if(userId)
+    fetchVehicles();
+  }, [userId]);
+
+const fetchVehicles = async () => {
+if (userId == null || userId === "" || userId === "null") {
+console.warn("No userId — skipping fetch");
+return;
+}
+
+try {
+const res = await fetch(`/api/vehicles/${userId}`);
+if (!res.ok) {
+const text = await res.text();
+throw new Error(text || "Server Error");
+}
+const data = await res.json();
+setVehicles(data);
+setCurrentIndex(data.length - 1);
+} catch (err) {
+console.error("Fetch error:", err);
+}
+};
+ 
 
   const getVehicleCategory = (v: Vehicle) => {
     const dims = v.dimensionOverrides;
@@ -94,11 +98,6 @@ export const VehicleRow = () => {
       case "truck_light": return <LocalTaxiIcon {...iconProps} />;
       default: return <HelpOutlineIcon {...iconProps} />;
     }
-  };
-
-  const requestVehicle = (vehicleId: string) => {
-    const pos = Math.floor(Math.random() * 10) + 1;
-    setQueuePosition((prev) => ({ ...prev, [vehicleId]: pos }));
   };
 
   const vehicle = vehicles[currentIndex];
@@ -135,7 +134,7 @@ export const VehicleRow = () => {
               <Button
                 fullWidth
                 size="small"
-                onClick={() => requestVehicle(vehicle.id)}
+              
                 sx={{ mt: 1, textTransform: 'none' }}
                 variant="contained"
               >
@@ -185,4 +184,3 @@ export const VehicleRow = () => {
     </Box>
   );
 };
-
