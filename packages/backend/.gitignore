@@ -11,7 +11,7 @@ build/
 
 # Dependencies (handled by root)
 node_modules/
-
+package.json
 # Logs
 logs
 *.log

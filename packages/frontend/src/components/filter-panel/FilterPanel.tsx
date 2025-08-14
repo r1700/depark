@@ -1,4 +1,3 @@
-// src/components/FilterPanel.tsx
 import React from 'react';
 import {
   Box,
@@ -12,18 +11,42 @@ import {
   Autocomplete,
   Chip,
 } from '@mui/material';
-import { FieldConfig } from '../../app/pages/adminUser/adminUserTypes';
 
-interface FilterPanelProps {
-  fields: FieldConfig[];
-  filters: Record<string, any>;
-  onChange: (filters: Record<string, any>) => void;
+/**
+ * Generic Field config - name is constrained to keys of T (as string)
+ */
+export type FieldConfigGeneric<T> = {
+  name: Extract<keyof T, string>;
+  label?: string;
+  placeholder?: string;
+  // common union for types used in your original component
+  type: 'free' | 'select' | 'multiSelect' | 'date' | 'dateRange' | 'number';
+  // for select / multiSelect
+  options?: string[];
+  // for select when backend expects array value
+  valueAsArray?: boolean;
+  // for dateRange: if different keys in T are used
+  fromKey?: Extract<keyof T, string>;
+  toKey?: Extract<keyof T, string>;
+};
+
+interface FilterPanelProps<T extends Record<string, any>> {
+  fields: FieldConfigGeneric<T>[];
+  // Partial so callers can pass only active filters
+  filters: Partial<T>;
+  onChange: (filters: Partial<T>) => void;
   onClear: () => void;
 }
 
-const FilterPanel: React.FC<FilterPanelProps> = ({ fields, filters, onChange, onClear }) => {
+const FilterPanel = <T extends Record<string, any>>({
+  fields,
+  filters,
+  onChange,
+  onClear,
+}: FilterPanelProps<T>) => {
+  // helper to update a field: cast to Record<string, any> to allow dynamic key
   const update = (key: string, value: any) => {
-    onChange({ ...filters, [key]: value });
+    onChange({ ...(filters as Record<string, any>), [key]: value } as Partial<T>);
   };
 
   const formatISODate = (val: any) => {
@@ -45,7 +68,7 @@ const FilterPanel: React.FC<FilterPanelProps> = ({ fields, filters, onChange, on
               <TextField
                 key={name}
                 label={label}
-                value={filters[name] ?? ''}
+                value={(filters as Record<string, any>)[name] ?? ''}
                 onChange={(e) => update(name, e.target.value)}
                 size="small"
                 placeholder={field.placeholder}
@@ -53,11 +76,11 @@ const FilterPanel: React.FC<FilterPanelProps> = ({ fields, filters, onChange, on
             );
 
           case 'select': {
-            // valueAsArray: אם במודל הערך מאוחסן כמערך אך ה-ui הוא select יחיד (לדוגמה roles בעבר)
             const valueAsArray = !!field.valueAsArray;
+            const raw = (filters as Record<string, any>)[name];
             const currentValue = valueAsArray
-              ? (Array.isArray(filters[name]) ? filters[name][0] ?? '' : '')
-              : (filters[name] ?? '');
+              ? (Array.isArray(raw) ? raw[0] ?? '' : '')
+              : (raw ?? '');
             return (
               <FormControl size="small" key={name}>
                 <InputLabel>{label}</InputLabel>
@@ -85,7 +108,7 @@ const FilterPanel: React.FC<FilterPanelProps> = ({ fields, filters, onChange, on
           }
 
           case 'multiSelect': {
-            const current = (filters[name] ?? []) as string[];
+            const current = ((filters as Record<string, any>)[name] ?? []) as string[];
             return (
               <Autocomplete
                 key={name}
@@ -113,7 +136,7 @@ const FilterPanel: React.FC<FilterPanelProps> = ({ fields, filters, onChange, on
                 label={label}
                 type="date"
                 size="small"
-                value={formatISODate(filters[name])}
+                value={formatISODate((filters as Record<string, any>)[name])}
                 onChange={(e) => update(name, e.target.value || undefined)}
                 InputLabelProps={{ shrink: true }}
                 InputProps={{
@@ -136,7 +159,7 @@ const FilterPanel: React.FC<FilterPanelProps> = ({ fields, filters, onChange, on
                   label="From"
                   type="date"
                   size="small"
-                  value={formatISODate(filters[fromKey])}
+                  value={formatISODate((filters as Record<string, any>)[fromKey])}
                   onChange={(e) => update(fromKey, e.target.value || undefined)}
                   InputLabelProps={{ shrink: true }}
                   InputProps={{
@@ -150,7 +173,7 @@ const FilterPanel: React.FC<FilterPanelProps> = ({ fields, filters, onChange, on
                   label="To"
                   type="date"
                   size="small"
-                  value={formatISODate(filters[toKey])}
+                  value={formatISODate((filters as Record<string, any>)[toKey])}
                   onChange={(e) => update(toKey, e.target.value || undefined)}
                   InputLabelProps={{ shrink: true }}
                   InputProps={{
@@ -170,7 +193,7 @@ const FilterPanel: React.FC<FilterPanelProps> = ({ fields, filters, onChange, on
                 key={name}
                 label={label}
                 type="number"
-                value={filters[name] ?? ''}
+                value={(filters as Record<string, any>)[name] ?? ''}
                 onChange={(e) =>
                   update(name, e.target.value ? Number(e.target.value) : undefined)
                 }

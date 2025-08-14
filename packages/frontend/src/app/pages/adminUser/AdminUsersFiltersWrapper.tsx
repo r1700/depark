@@ -1,8 +1,12 @@
-// src/components/AdminUsersFiltersWrapper.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Drawer, Box } from '@mui/material';
 import FilterPanel from '../../../components/filter-panel/FilterPanel';
-import { AdminUserFilters, FieldConfig, AVAILABLE_PERMISSIONS, AVAILABLE_ROLES } from './adminUserTypes';
+import {
+  AdminUserFilters,
+  FieldConfig,
+  AVAILABLE_PERMISSIONS,
+  AVAILABLE_ROLES,
+} from './adminUserTypes';
 
 interface Props {
   filters: AdminUserFilters;
@@ -11,7 +15,22 @@ interface Props {
   setEnabled: (value: boolean) => void;
 }
 
-const AdminUsersFiltersWrapper: React.FC<Props> = ({ filters, setFilters, enabled, setEnabled }) => {
+/**
+ * סוג מקומי שמאפשר להשתמש ב-FieldConfig המוגדר במקום,
+ * אבל מחזק ש-fromKey/toKey ו-name יהיו מפתחות מתוך AdminUserFilters.
+ */
+type FieldConfigForAdmin = Omit<FieldConfig, 'name' | 'fromKey' | 'toKey'> & {
+  name: Extract<keyof AdminUserFilters, string>;
+  fromKey?: Extract<keyof AdminUserFilters, string>;
+  toKey?: Extract<keyof AdminUserFilters, string>;
+};
+
+const AdminUsersFiltersWrapper: React.FC<Props> = ({
+  filters,
+  setFilters,
+  enabled,
+  setEnabled,
+}) => {
   const [open, setOpen] = useState(false);
 
   const [localFilters, setLocalFilters] = useState<AdminUserFilters>({ ...filters });
@@ -24,7 +43,7 @@ const AdminUsersFiltersWrapper: React.FC<Props> = ({ filters, setFilters, enable
 
   const [isFilterActive, setIsFilterActive] = useState(false);
   useEffect(() => {
-    const active = Object.entries(filters).some(([key, val]) => {
+    const active = Object.entries(filters).some(([_, val]) => {
       if (val === undefined || val === null) return false;
       if (typeof val === 'string') return val.trim() !== '';
       if (Array.isArray(val)) return val.length > 0;
@@ -34,7 +53,6 @@ const AdminUsersFiltersWrapper: React.FC<Props> = ({ filters, setFilters, enable
     setIsFilterActive(active);
   }, [filters]);
 
-  // איפוס פילטרים בממשק וב-State האב
   const clearFilters = () => {
     const cleared: AdminUserFilters = { limit: 20, offset: 0 };
     setLocalFilters(cleared);
@@ -43,21 +61,47 @@ const AdminUsersFiltersWrapper: React.FC<Props> = ({ filters, setFilters, enable
     setOpen(false);
   };
 
-  // לחיצה על Apply מעדכנת את פילטרים ב-Parent ומפעילה את הפילטרים בפועל
   const applyFilters = () => {
     setFilters(localFilters);
     setEnabled(true);
     setOpen(false);
   };
 
-  // הגדרת ה־fields לצורך שימוש ב־FilterPanel הגנרי (הקונפיג של ה־AdminUsers)
-  const fieldsConfig: FieldConfig[] = [
-    { name: 'searchTerm', type: 'free', label: 'Search by Last Name or Email', placeholder: 'Last name or email' },
-    // roles: UI הוא select יחיד אבל הערך ב-state הוא מערך עם פריט יחיד -> valueAsArray: true
-    { name: 'roles', type: 'select', label: 'Role', options: [...AVAILABLE_ROLES], valueAsArray: true },
-    { name: 'permissionsInclude', type: 'multiSelect', label: 'Permissions Include', options: [...AVAILABLE_PERMISSIONS] },
-    { name: 'created', type: 'dateRange', label: 'Created Between', fromKey: 'createdAfter', toKey: 'createdBefore' },
-    { name: 'activeLastNDays', type: 'number', label: 'Active Last N Days' },
+  // שימו לב: 'createdAfter' / 'createdBefore' הם מפתחות שקיימים ב-AdminUserFilters.
+  // לכן אנחנו משתמשים ב-'createdAfter' כשם השדה הראשי (לקבוצה dateRange).
+  const fieldsConfig: FieldConfigForAdmin[] = [
+    {
+      name: 'searchTerm',
+      type: 'free',
+      label: 'Search by Last Name or Email',
+      placeholder: 'Last name or email',
+    },
+    {
+      name: 'roles',
+      type: 'select',
+      label: 'Role',
+      options: [...AVAILABLE_ROLES],
+      valueAsArray: true,
+    },
+    {
+      name: 'permissionsInclude',
+      type: 'multiSelect',
+      label: 'Permissions Include',
+      options: [...AVAILABLE_PERMISSIONS],
+    },
+    {
+      // changed from 'created' to an actual AdminUserFilters key 'createdAfter'
+      name: 'createdAfter',
+      type: 'dateRange',
+      label: 'Created Between',
+      fromKey: 'createdAfter',
+      toKey: 'createdBefore',
+    },
+    {
+      name: 'activeLastNDays',
+      type: 'number',
+      label: 'Active Last N Days',
+    },
   ];
 
   return (
@@ -72,10 +116,12 @@ const AdminUsersFiltersWrapper: React.FC<Props> = ({ filters, setFilters, enable
 
       <Drawer anchor="right" open={open} onClose={() => setOpen(false)}>
         <Box sx={{ width: 320, p: 2 }}>
-          <FilterPanel
-            fields={fieldsConfig}
+          <FilterPanel<AdminUserFilters>
+            fields={fieldsConfig as any}
             filters={localFilters}
-            onChange={setLocalFilters}
+            onChange={(partial) =>
+              setLocalFilters((prev) => ({ ...(prev as AdminUserFilters), ...(partial as Partial<AdminUserFilters>) }))
+            }
             onClear={clearFilters}
           />
 
