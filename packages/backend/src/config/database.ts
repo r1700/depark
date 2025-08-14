@@ -5,12 +5,12 @@ dotenv.config();
 
 const sequelize = new Sequelize(
   process.env.DATABASE || '',
-  process.env.DATA_USERNAME || '',
+  process.env.USER  || '',
   process.env.PASSWORD || '',
   {
     host: process.env.HOST || 'localhost',
     dialect: 'postgres',
-    port: process.env.PGPORT ? parseInt(process.env.PGPORT, 10) : 5432,
+    port: process.env.PG_PORT ? parseInt(process.env.PG_PORT, 10) : 5432,
     logging: false, 
   }
 );

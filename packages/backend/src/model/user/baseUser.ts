@@ -29,4 +29,3 @@ export class BaseUser {
     return new BaseUser( value.idNumber, value.email, value.firstName, value.lastName, value.createdAt, value.updatedAt,value.id);
   }
 }
-

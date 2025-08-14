@@ -1,7 +1,6 @@
 import { Model, DataTypes, Optional } from 'sequelize';
-import sequelize from '../config/database';
-import { AdminUser } from './AdminUser';
-// טיפוסים עבור BaseUser
+import sequelize from '../config/database'; // נתיב למיקום קובץ sequelize שלך
+
 interface BaseUserAttributes {
   id: number;
   idNumber: string;
@@ -24,47 +23,22 @@ export class BaseUser extends Model<BaseUserAttributes, BaseUserCreationAttribut
   public createdAt!: Date;
   public updatedAt!: Date;
 }
-BaseUser.hasOne(AdminUser, { foreignKey: 'baseUserId', as: 'adminUser' });
 
 BaseUser.init(
   {
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-      allowNull: false,
-    },
-    idNumber: {
-      type: DataTypes.STRING(255),
-      allowNull: false,
-      unique: true,
-    },
-    email: {
-      type: DataTypes.STRING(255),
-      allowNull: false,
-      unique: true,
-    },
-    firstName: {
-      type: DataTypes.STRING(255),
-      allowNull: false,
-    },
-    lastName: {
-      type: DataTypes.STRING(255),
-      allowNull: false,
-    },
-    createdAt: {
-      type: DataTypes.DATE,
-      allowNull: false,
-    },
-    updatedAt: {
-      type: DataTypes.DATE,
-      allowNull: false,
-    },
+    id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+    idNumber: { type: DataTypes.STRING, allowNull: false },
+    email: { type: DataTypes.STRING, allowNull: false, unique: true },
+    firstName: { type: DataTypes.STRING, allowNull: false },
+    lastName: { type: DataTypes.STRING, allowNull: false },
+    createdAt: { type: DataTypes.DATE, allowNull: false },
+    updatedAt: { type: DataTypes.DATE, allowNull: false },
   },
   {
     sequelize,
-    modelName: 'BaseUser',
-    tableName: 'BaseUsers',
-    timestamps: false, // כי יש לך שדות createdAt ו-updatedAt בטבלה
+    tableName: 'BaseUser',
+    timestamps: false, // משתמשים בעמודות createdAt, updatedAt שטוחות
   }
 );
+
+export default BaseUser;

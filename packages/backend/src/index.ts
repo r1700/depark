@@ -9,15 +9,18 @@ import healthRoutes from './routes/health';
 import passwordRoutes from './routes/user.routes';
 import vehicleRoutes from './routes/vehicle';
 import exportToCSV from './routes/exportToCSV';
-import googleAuth from './routes/google-auth';
+// import googleAuth from './routes/google-auth';
 import adminConfigRouter from './routes/admin-config';
+import sequelize from './config/database';   // אתחול חיבור DB
+import { setupAssociations } from './models/assocations';  // פונקציה שמגדירה קשרים בין המודלים
 
-dotenv.config(); 
+dotenv.config();
 
 const app = express();
 
 const PORT = process.env.PORT || 3001;
 const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:3000';
+setupAssociations();
 
 // Middleware
 app.use(cors({
@@ -36,7 +39,7 @@ app.use('/api/health', healthRoutes);
 app.use('/api/password', passwordRoutes);
 app.use('/api/vehicle', vehicleRoutes);
 app.use('/api/exportToCSV', exportToCSV);
-app.use('/OAuth', googleAuth);
+// app.use('/OAuth', googleAuth);
 
 // basic routes
 app.get('/', (req, res) => {

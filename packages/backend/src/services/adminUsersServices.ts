@@ -1,421 +1,341 @@
-import pool from '../config/database';
-import { AdminUser } from '../model/user/adminUser';
+import { Op, WhereOptions, FindOptions, literal, Transaction } from 'sequelize';
+import sequelize from '../config/database';
+import AdminUser from '../models/AdminUser';
+import BaseUser from '../models/BaseUser';
+import bcrypt from 'bcrypt';
 
-async function checkUniqueBaseUser(
-  idNumber: string,
-  email: string,
-  excludeBaseUserId?: number
-): Promise<void> {
-  let query = `
-    SELECT 1 FROM "BaseUser"
-    WHERE ("idNumber" = $1 OR "email" = $2)
-  `;
-  const params: (string | number)[] = [idNumber, email];
+import { Permission, PermissionLabels } from '../enums/permissions';
 
-  if (excludeBaseUserId) {
-    query += ' AND id <> $3';
-    params.push(excludeBaseUserId);
-  }
 
-  query += ' LIMIT 1';
+export function encodePermissions(permissions: string[]): number {
+  // קוד פשוט: כל הרשאה מוצאת את המפתח שלה ב-PermissionLabels ומרכיבה מחרוזת
+  const digits = permissions.map(p => {
+    // מוצאים מפתח לפי הערך
+    const found = Object.entries(PermissionLabels).find(([, label]) => label === p);
+    return found ? found[0] : '';
+  }).filter(d => d !== '');
 
-  const { rowCount } = await pool.query(query, params);
-  if ((rowCount ?? 0) > 0) {
-    throw new Error('User with same idNumber or email already exists');
-  }
+  // מחברים למחרוזת ואז ממירים למספר
+  const permNumberStr = digits.join('');
+  return permNumberStr ? Number(permNumberStr) : 0;
 }
 
-async function getAdminUserById(id: number): Promise<AdminUser> {
-  const query = `
-    SELECT 
-      a.id,
-      a."baseUserId",
-      b."idNumber",
-      b."email",
-      b."firstName",
-      b."lastName",
-      a."passwordHash",
-      a."role",
-      a."permissions",
-      a."lastLoginAt",
-      a."createdAt",
-      a."updatedAt"
-    FROM "AdminUsers" a
-    JOIN "BaseUser" b ON a."baseUserId" = b.id
-    WHERE a.id = $1;
-  `;
-  const { rows } = await pool.query(query, [id]);
-  if (rows.length === 0) throw new Error(`AdminUser with id ${id} not found`);
+export function decodePermissions(permNumber: number): string[] {
+  if (typeof permNumber !== 'number' || permNumber <= 0) return [];
 
-  if (typeof rows[0].permissions === 'string') {
-    try {
-      rows[0].permissions = JSON.parse(rows[0].permissions);
-    } catch {
-      rows[0].permissions = [];
+  // המרת מספר למחרוזת, פירוק לכל ספרה
+  const digits = permNumber.toString().split('');
+
+  const permissions: string[] = [];
+
+  for (const digit of digits) {
+    const num = Number(digit);
+    if (num && PermissionLabels[num]) {
+      permissions.push(PermissionLabels[num]);
     }
   }
-  const { baseUserId, ...dataWithoutBaseUserId } = rows[0];
 
-  return AdminUser.create(dataWithoutBaseUserId);
+  return permissions;
 }
-
-export async function addAdminUser(data: any): Promise<AdminUser> {
-  const now = new Date();
-  const adminUser = AdminUser.create({
-    ...data,
-    createdAt: now,
-    updatedAt: now,
-    lastLoginAt: now, 
-  });
-
-  await checkUniqueBaseUser(adminUser.idNumber, adminUser.email);
-
-  const baseUserQuery = `
-    INSERT INTO "BaseUser"
-    ("idNumber", "email", "firstName", "lastName", "createdAt", "updatedAt")
-    VALUES ($1, $2, $3, $4, $5, $6)
-    RETURNING id
-  `;
-  const baseUserValues = [
-    adminUser.idNumber,
-    adminUser.email,
-    adminUser.firstName,
-    adminUser.lastName,
-    adminUser.createdAt,
-    adminUser.updatedAt,
-  ];
-  const baseUserResult = await pool.query(baseUserQuery, baseUserValues);
-  const baseUserId = baseUserResult.rows[0].id;
-
-  const adminUserQuery = `
-    INSERT INTO "AdminUsers" (
-      "baseUserId", "passwordHash", "role", "permissions", "lastLoginAt", "createdAt", "updatedAt"
-    ) VALUES ($1, $2, $3, $4, $5, $6, $7)
-    RETURNING id
-  `;
-  const adminUserValues = [
-    baseUserId,
-    adminUser.passwordHash,
-    adminUser.role,
-    JSON.stringify(adminUser.permissions),
-    adminUser.lastLoginAt,
-    adminUser.createdAt,
-    adminUser.updatedAt,
-  ];
-  const adminUserResult = await pool.query(adminUserQuery, adminUserValues);
-  const newAdminUserId = adminUserResult.rows[0].id;
-
-  return await getAdminUserById(newAdminUserId);
-}
-
-export async function updateAdminUser(id: number, data: any): Promise<AdminUser> {
-  const updatedAt = new Date();
-
-  // תחילה, קבלת המשתמש הקיים (כולל כל השדות הדרושים)
-  const existingAdminUser = await getAdminUserById(id);
-
-  if (!existingAdminUser) {
-    throw new Error(`AdminUser with id ${id} not found`);
-  }
-
-  // מיזוג השדות המעודכנים (data) לשדות הקיימים
-  const mergedData = {
-    ...existingAdminUser,
-    ...data,
-    updatedAt,        // עדכון שדה זמן העדכון
-  };
-
-  const adminUser = AdminUser.create(mergedData);
-
-  // המשך הכתיבה ל-DB (כדוגמה שלך)
-  // קודם כל למצוא baseUserId - אם אין אותו ב mergedData, נשאל מה-DB
-  const baseUserIdResult = await pool.query(`SELECT "baseUserId" FROM "AdminUsers" WHERE id = $1`, [id]);
-  if (baseUserIdResult.rowCount === 0) {
-    throw new Error(`AdminUser with id ${id} not found`);
-  }
-  const baseUserId = baseUserIdResult.rows[0].baseUserId;
-
-  // בדיקת ייחודיות idNumber ו-email
-  await checkUniqueBaseUser(adminUser.idNumber, adminUser.email, baseUserId);
-
-  // עדכון טבלת BaseUser
-  const baseUserUpdateQuery = `
-    UPDATE "BaseUser"
-    SET "idNumber"=$1, "email"=$2, "firstName"=$3, "lastName"=$4, "updatedAt"=$5
-    WHERE id = $6
-  `;
-  const baseUserValues = [
-    adminUser.idNumber,
-    adminUser.email,
-    adminUser.firstName,
-    adminUser.lastName,
-    updatedAt,
-    baseUserId,
-  ];
-  await pool.query(baseUserUpdateQuery, baseUserValues);
-
-  // עדכון טבלת AdminUsers
-  const adminUserUpdateQuery = `
-    UPDATE "AdminUsers"
-    SET "passwordHash"=$1, "role"=$2, "permissions"=$3, "lastLoginAt"=$4, "updatedAt"=$5
-    WHERE id = $6
-  `;
-  const adminUserValues = [
-    adminUser.passwordHash,
-    adminUser.role,
-    JSON.stringify(adminUser.permissions),
-    adminUser.lastLoginAt ?? null,
-    updatedAt,
-    id,
-  ];
-  const result = await pool.query(adminUserUpdateQuery, adminUserValues);
-
-  if (result.rowCount === 0) {
-    throw new Error(`AdminUser with id ${id} not found`);
-  }
-
-  return await getAdminUserById(id);
-}
-
-export async function deleteAdminUser(id: number): Promise<void> {
-  const deleteResult = await pool.query(`DELETE FROM "AdminUsers" WHERE id = $1`, [id]);
-  if (deleteResult.rowCount === 0) {
-    throw new Error(`AdminUser with id ${id} not found`);
-  }
-  // מחיקת BaseUser מתבצעת אוטומטית על ידי FK עם ON DELETE CASCADE בבסיס הנתונים
-}
-
-interface AdminUserFilters {
-  lastNameStartsWith?: string;
-  roles?: string[];
+export interface AdminUserFilters {
+  searchTerm?: string;
+  roles?: Array<'hr' | 'admin'>;
   permissionsInclude?: string[];
   lastLoginAfter?: Date;
-  lastLoginBefore?: Date;        
-
-
-  createdAfter?: Date;           
-  createdBefore?: Date;           
-
-  updatedAfter?: Date;           
-  updatedBefore?: Date;            
-
-  lastActivityAfter?: Date;      
-  lastActivityBefore?: Date;    
-
-
+  lastLoginBefore?: Date;
+  createdBetween?: { from?: Date; to?: Date };
+  createdAfter?: Date;
+  createdBefore?: Date;
+  updatedAfter?: Date;
+  updatedBefore?: Date;
   activeLastNDays?: number;
-
-  sortBy?: 'lastLoginAt' | 'lastName' | 'createdAt' | 'permissions';
+  sortBy?: string;
   sortDirection?: 'asc' | 'desc';
   limit?: number;
   offset?: number;
 }
 
-export async function getFilteredAdminUsers(filters: AdminUserFilters = {}) {
-  const {
-    lastNameStartsWith,
-    roles,
-    permissionsInclude,
-    lastLoginAfter,
-    lastLoginBefore,
-    createdAfter,
-    createdBefore,
-    updatedAfter,
-    updatedBefore,
-    lastActivityAfter,
-    lastActivityBefore,
-    activeLastNDays,
-    sortBy,
-    sortDirection = 'asc',
+// עזר קטן לסינון תאריכים במבנה where
+export function addDateCondition<T>(
+  where: any, // נותן גמישות מלאה, נמנע שגיאות טיפוס פה
+  field: keyof T,
+  operator: symbol,
+  value: Date
+) {
+  if (!where[field]) {
+    where[field] = {};
+  }
+  where[field][operator] = value;
+}
+
+export async function getFilteredAdminUsers(filters: AdminUserFilters) {
+  const whereAdmin: WhereOptions = {};
+  const whereBaseUser: WhereOptions = {};
+
+  if (filters.searchTerm) {
+    if (filters.searchTerm.includes('@')) {
+      whereBaseUser.email = { [Op.iLike]: `${filters.searchTerm}%` };
+    } else {
+      whereBaseUser.lastName = { [Op.iLike]: `${filters.searchTerm}%` };
+    }
+  }
+
+  if (filters.roles && filters.roles.length > 0) {
+    whereAdmin.role = { [Op.in]: filters.roles };
+  }
+
+  if (filters.lastLoginAfter) {
+    addDateCondition(whereAdmin, 'lastLoginAt', Op.gte, filters.lastLoginAfter);
+  }
+
+  if (filters.lastLoginBefore) {
+    addDateCondition(whereAdmin, 'lastLoginAt', Op.lte, filters.lastLoginBefore);
+  }
+
+  // helper מקומי בתוך הפונקציה
+  const normalizeDate = (val: any, name: string): Date | undefined => {
+    if (val === undefined || val === null) return undefined;
+    if (val instanceof Date) {
+      if (isNaN(val.getTime())) throw new Error(`${name} is not a valid date`);
+      return val;
+    }
+    if (typeof val === 'string') {
+      const d = new Date(val);
+      if (isNaN(d.getTime())) throw new Error(`${name} is not a valid ISO date`);
+      return d;
+    }
+    throw new Error(`${name} must be a Date or an ISO date string`);
+  };
+
+  if (filters.createdBetween) {
+    const from = normalizeDate(filters.createdBetween.from, 'createdBetween.from');
+    const to = normalizeDate(filters.createdBetween.to, 'createdBetween.to');
+
+    if (from && to && from.getTime() > to.getTime()) {
+      throw new Error('createdBetween.from must be earlier than or equal to createdBetween.to');
+    }
+
+    if (from) addDateCondition(whereAdmin, 'createdAt', Op.gte, from);
+    if (to) addDateCondition(whereAdmin, 'createdAt', Op.lte, to);
+  } else {
+    const createdAfter = normalizeDate(filters.createdAfter, 'createdAfter');
+    const createdBefore = normalizeDate(filters.createdBefore, 'createdBefore');
+
+    if (createdAfter && createdBefore && createdAfter.getTime() > createdBefore.getTime()) {
+      throw new Error('createdAfter must be earlier than or equal to createdBefore');
+    }
+
+    if (createdAfter) addDateCondition(whereAdmin, 'createdAt', Op.gte, createdAfter);
+    if (createdBefore) addDateCondition(whereAdmin, 'createdAt', Op.lte, createdBefore);
+  }
+  
+  if (filters.updatedAfter) {
+    addDateCondition(whereAdmin, 'updatedAt', Op.gte, filters.updatedAfter);
+  }
+  if (filters.updatedBefore) {
+    addDateCondition(whereAdmin, 'updatedAt', Op.lte, filters.updatedBefore);
+  }
+
+  if (filters.activeLastNDays && filters.activeLastNDays > 0) {
+    const fromDate = new Date();
+    fromDate.setDate(fromDate.getDate() - filters.activeLastNDays);
+    addDateCondition(whereAdmin, 'lastLoginAt', Op.gte, fromDate);
+  }
+
+  let whereFinal: WhereOptions = whereAdmin;
+
+  if (filters.permissionsInclude && filters.permissionsInclude.length > 0) {
+    const encodedPerm = encodePermissions(filters.permissionsInclude);
+    whereFinal = {
+      [Op.and]: [
+        whereAdmin,
+        literal(`"AdminUser"."permissions" & ${encodedPerm} = ${encodedPerm}`)
+      ]
+    };
+  }
+
+  const orderBy = filters.sortBy || 'createdAt';
+  const orderDir = filters.sortDirection?.toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
+
+  const limit = filters.limit && filters.limit > 0 ? filters.limit : 100;
+  const offset = filters.offset && filters.offset >= 0 ? filters.offset : 0;
+
+  const baseUserAttrs = ['email', 'firstName', 'lastName'];
+
+  const findOptions: FindOptions = {
+    where: whereFinal,
+    include: [
+      {
+        model: BaseUser,
+        as: 'baseUser',
+        where: whereBaseUser,
+        required: true,
+        attributes: baseUserAttrs,
+      },
+    ],
     limit,
     offset,
-  } = filters;
+    order: [[orderBy, orderDir]],
+    attributes: ['id', 'role', 'lastLoginAt', 'createdAt', 'updatedAt', 'permissions'],
+  };
 
-  const selectFields = [
-    'a.id',
-    'a."baseUserId"',
-    'b."idNumber"',
-    'b."email"',
-    'b."firstName"',
-    'b."lastName"',
-    'a."passwordHash"',
-    'a."role"',
-    'a."permissions"',
-    'a."lastLoginAt"',
-    'a."createdAt"',
-    'a."updatedAt"',
-    `
-    s."id" AS "sessionId",
-    s."expiresAt" AS "sessionExpiresAt",
-    s."ipAddress" AS "sessionIpAddress",
-    s."userAgent" AS "sessionUserAgent",
-    s."isActive" AS "sessionIsActive"
-    `,
-    `
-    ua."lastActivityTimestamp",
-    ua."lastAction"
-    `
-  ].join(',\n');
+  const results = await AdminUser.findAll(findOptions);
 
-  let baseQuery = `
-  SELECT
-    ${selectFields}
-  FROM "AdminUsers" a
-  JOIN "BaseUser" b ON a."baseUserId" = b.id
-  LEFT JOIN LATERAL (
-    SELECT *
-    FROM "UserSessions" us
-    WHERE us."userId" = b.id::text
-      AND us."userType" = 'admin'
-      AND us."isActive" = true
-    ORDER BY us."lastActivity" DESC
-    LIMIT 1
-  ) s ON TRUE
-  LEFT JOIN LATERAL (
-    SELECT 
-      MAX("timestamp") AS "lastActivityTimestamp",
-      MAX(CASE WHEN "timestamp" = (
-        SELECT MAX("timestamp")
-        FROM "UserActivities"
-        WHERE "userId" = b.id::text AND "userType" = 'admin'
-      ) THEN "action" ELSE NULL END) AS "lastAction"
-    FROM "UserActivities" ua
-    WHERE ua."userId" = b.id::text AND ua."userType" = 'admin'
-  ) ua ON TRUE
-  `;
-
-  const whereClauses: string[] = [];
-  const params: any[] = [];
-
-  if (lastNameStartsWith) {
-    params.push(`${lastNameStartsWith}%`);
-    whereClauses.push(`b."lastName" ILIKE $${params.length}`);
+  return results.map(u => {
+    const user = u.toJSON() as any;
+    user.permissions = decodePermissions(user.permissions);
+    return user;
+  });
+}
+interface UpdateAdminUserData {
+  idNumber?: string;
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+  passwordHash?: string;
+  role?: 'admin' | 'hr'; // בהתאם לenum הקיים שלך
+  permissions?: string[]; // מערך הרשאות
+  lastLoginAt?: Date | null;
+  // הוסיפי שדות נוספים במידת הצורך
+}
+export async function checkUniqueBaseUser(
+  idNumber: string,
+  email: string,
+  excludeBaseUserId?: number
+): Promise<void> {
+  const whereClause: any = {
+    [Op.or]: [{ idNumber }, { email }]
+  };
+  if (excludeBaseUserId !== undefined) {
+    whereClause.id = { [Op.ne]: excludeBaseUserId };
   }
 
-  if (roles && roles.length > 0) {
-    params.push(roles);
-    whereClauses.push(`a."role" = ANY($${params.length})`);
-  }
+  const exist = await BaseUser.findOne({ where: whereClause });
+  if (exist) throw new Error('User with same idNumber or email already exists');
+}
 
-  if (permissionsInclude && permissionsInclude.length > 0) {
+export async function getAdminUserById(
+  id: number,
+  options?: { transaction?: Transaction }
+): Promise<any> {
+  const adminUser = await AdminUser.findByPk(id, {
+    include: [{ model: BaseUser, as: 'baseUser' }],
+    transaction: options?.transaction,  // כאן המשתנה מגיע מ-options
+  });
 
-    params.push(permissionsInclude);
-    whereClauses.push(`a."permissions" ?| $${params.length}`);
-  }
+  if (!adminUser) throw new Error(`AdminUser with id ${id} not found`);
 
-  if (lastLoginAfter) {
-    params.push(lastLoginAfter);
-    whereClauses.push(`a."lastLoginAt" > $${params.length}`);
-  }
+  const json = adminUser.toJSON() as any;
+  json.permissions = decodePermissions(json.permissions ?? 0);
 
-  if (lastLoginBefore) {
-    params.push(lastLoginBefore);
-    whereClauses.push(`a."lastLoginAt" < $${params.length}`);
-  }
+  delete json.passwordHash;
 
-  if (createdAfter) {
-    params.push(createdAfter);
-    whereClauses.push(`a."createdAt" >= $${params.length}`);
-  }
-  if (createdBefore) {
-    params.push(createdBefore);
-    whereClauses.push(`a."createdAt" < $${params.length}`);
-  }
+  return json;
+}
+export async function updateAdminUser(id: number, data: UpdateAdminUserData): Promise<any> {
+  const now = new Date();
 
-  if (updatedAfter) {
-    params.push(updatedAfter);
-    whereClauses.push(`a."updatedAt" >= $${params.length}`);
-  }
-  if (updatedBefore) {
-    params.push(updatedBefore);
-    whereClauses.push(`a."updatedAt" < $${params.length}`);
-  }
-  if (lastActivityAfter) {
-    params.push(lastActivityAfter);
-    whereClauses.push(`ua."lastActivityTimestamp" >= $${params.length}`);
-  }
-  if (lastActivityBefore) {
-    params.push(lastActivityBefore);
-    whereClauses.push(`ua."lastActivityTimestamp" < $${params.length}`);
-  }
-  if (activeLastNDays !== undefined && activeLastNDays !== null) {
-    const cutOffDate = new Date(Date.now() - activeLastNDays * 24 * 60 * 60 * 1000);
-    params.push(cutOffDate);
-    whereClauses.push(`ua."lastActivityTimestamp" >= $${params.length}`);
-  }
-  if (whereClauses.length > 0) {
-    baseQuery += ` WHERE ${whereClauses.join(' AND ')}`;
-  }
+  // מוצא את ה-AdminUser על פי המזהה שלו
+  const adminUser = await AdminUser.findByPk(id);
+  if (!adminUser) throw new Error(`AdminUser with id ${id} not found`);
 
-  if (sortBy) {
-    if (sortBy === 'permissions') {
-      baseQuery += ` ORDER BY jsonb_array_length(a."permissions") ${sortDirection.toUpperCase()}`;
-    } else if (sortBy === 'lastName') {
-      baseQuery += ` ORDER BY b."lastName" ${sortDirection.toUpperCase()}`;
-    } else if (sortBy === 'createdAt' || sortBy === 'lastLoginAt') {
-      baseQuery += ` ORDER BY a."${sortBy}" ${sortDirection.toUpperCase()}`;
-    }
-    else if (sortBy === 'lastActivityTimestamp') {
-      baseQuery += ` ORDER BY ua."lastActivityTimestamp" ${sortDirection.toUpperCase()}`;
-    }
+  // מוצא את ה-BaseUser המקושר אליו
+  const baseUser = await BaseUser.findByPk(adminUser.baseUserId);
+  if (!baseUser) throw new Error('Associated BaseUser not found');
+
+  // בודק שאין חפיפה עבור idNumber או מייל במשתמשים אחרים (למעט המשתמש הנוכחי)
+  await checkUniqueBaseUser(
+    data.idNumber ?? baseUser.idNumber,
+    data.email ?? baseUser.email,
+    baseUser.id
+  );
+
+  // ביצוע עדכון טרנזקציוני של שתי הטבלאות
+  return sequelize.transaction(async (t) => {
+    // עדכון ב-BaseUser
+    await baseUser.update(
+      {
+        idNumber: data.idNumber ?? baseUser.idNumber,
+        email: data.email ?? baseUser.email,
+        firstName: data.firstName ?? baseUser.firstName,
+        lastName: data.lastName ?? baseUser.lastName,
+        updatedAt: now,
+      },
+      { transaction: t }
+    );
+
+    // קידוד הרשאות (אם סופקו), אחרת שומר על ההרשאות הקיימות
+    const permissionsNumber = data.permissions ? encodePermissions(data.permissions) : adminUser.permissions;
+
+    // עדכון ב-AdminUser
+    await adminUser.update(
+      {
+        passwordHash: data.passwordHash ?? adminUser.passwordHash,
+        role: data.role ?? adminUser.role,
+        permissions: permissionsNumber,
+        lastLoginAt: data.lastLoginAt ?? adminUser.lastLoginAt,
+        updatedAt: now,
+      },
+      { transaction: t }
+    );
+
+    // החזרת המידע המעודכן לאחר ביצוע העדכונים
+    return getAdminUserById(adminUser.id);
+  });
+}
+interface BaseUserData {
+  idNumber: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+}
+
+interface AdminUserData {
+  passwordHash: string;
+  role: 'hr' | 'admin';
+  permissions: string[];
+  lastLoginAt?: Date | null;
+}
+
+
+export async function addAdminUser(data: BaseUserData & AdminUserData): Promise<any> {
+  if (!data.idNumber || !data.email) {
+    throw new Error("Missing required idNumber or email");
   }
+  const now = new Date();
 
-  if (limit) {
-    params.push(limit);
-    baseQuery += ` LIMIT $${params.length}`;
-  }
+  // לוודא ייחודיות
+  await checkUniqueBaseUser(data.idNumber, data.email);
 
-  if (offset) {
-    params.push(offset);
-    baseQuery += ` OFFSET $${params.length}`;
-  }
+  // חשיפת סיסמא - הצפנה (שנה אלגוריתם במידת הצורך)
+  const SALT_ROUNDS = 10;
+  const hashedPassword = await bcrypt.hash(data.passwordHash, SALT_ROUNDS);
 
-  const { rows } = await pool.query(baseQuery, params);
-  console.log(filters.limit)
-  return rows.map(row => {
-    if (typeof row.permissions === 'string') {
-      try {
-        row.permissions = JSON.parse(row.permissions);
-      } catch {
-        row.permissions = [];
-      }
-    }
+  return sequelize.transaction(async (t) => {
+    const baseUser = await BaseUser.create({
+      idNumber: data.idNumber,
+      email: data.email,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      createdAt: now,
+      updatedAt: now,
+    }, { transaction: t });
 
-    const {
-      baseUserId,
-      passwordHash,
-      sessionId, 
-      sessionExpiresAt,
-      sessionIpAddress,
-      sessionUserAgent,
-      sessionIsActive,
-      lastActivityTimestamp,
-      lastAction,
-      ...adminUserData 
-    } = row;
+    const permissionsNumber = encodePermissions(data.permissions);
 
-    const adminUser = AdminUser.create({
-      ...adminUserData,
-      passwordHash,
-    });
+    const adminUser = await AdminUser.create({
+      baseUserId: baseUser.id,
+      passwordHash: hashedPassword,
+      role: data.role,
+      permissions: permissionsNumber,
+      lastLoginAt: data.lastLoginAt ?? null,
+      createdAt: now,
+      updatedAt: now,
+    }, { transaction: t });
 
-    const { passwordHash: _, ...adminUserFullWithoutPassword } = adminUser;
+    console.log('AdminUser created with id:', adminUser.id);
 
-    const {
-      createdAt,
-      updatedAt,
-      idNumber,
-      lastLoginAt,
-      id,
-      ...adminUserWithoutFilteredFields
-    } = adminUserFullWithoutPassword;
-
-    return {
-      adminUser: adminUserWithoutFilteredFields,
-      lastUserActivity: lastActivityTimestamp ? {
-        lastActivityTimestamp,
-        lastAction,
-      } : null,
-    };
+    // כאן התיקון: מעבירים את הטרנזקציה לפונקציה!
+    return getAdminUserById(adminUser.id, { transaction: t });
   });
 }

@@ -1,14 +1,45 @@
-// src/redux/store.ts
-import { configureStore } from '@reduxjs/toolkit';
-import adminUsersReducer from './adminUserSlice';
+import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
+import { AdminUser } from './adminUserTypes';
+import { fetchAdminUsersAPI } from './adminUsersAPI';
 
-const store = configureStore({
-  reducer: {
-    adminUsers: adminUsersReducer,
+interface AdminUsersState {
+  users: AdminUser[];
+  loading: boolean;
+  error: string | null;
+}
+
+const initialState: AdminUsersState = {
+  users: [],
+  loading: false,
+  error: null,
+};
+
+export const fetchAdminUsers = createAsyncThunk(
+  'adminUsers/fetchAdminUsers',
+  async () => {
+    return await fetchAdminUsersAPI();
+  }
+);
+
+const adminUsersSlice = createSlice({
+  name: 'adminUsers',
+  initialState,
+  reducers: {},
+  extraReducers: builder => {
+    builder
+      .addCase(fetchAdminUsers.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchAdminUsers.fulfilled, (state, action: PayloadAction<AdminUser[]>) => {
+        state.loading = false;
+        state.users = action.payload;
+      })
+      .addCase(fetchAdminUsers.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message ?? 'Failed to fetch admin users';
+      });
   },
 });
 
-// הוספת טיפוס ל-Dispatch
-export type AppDispatch = typeof store.dispatch;  // טיפוס של dispatch
-export type RootState = ReturnType<typeof store.getState>; // טיפוס של ה-state
-export default store;
+export default adminUsersSlice.reducer;

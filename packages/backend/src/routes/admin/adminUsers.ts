@@ -5,9 +5,11 @@ const router = express.Router();
 const now = new Date().toISOString();
 
 router.get('/users', async (req: Request, res: Response) => {
-   try {
+  console.log('Request received at /some-endpoint:', req.query);
+
+  try {
     const {
-      lastNameStartsWith,
+      searchTerm,
       roles,
       permissionsInclude,
       lastLoginAfter,
@@ -27,10 +29,9 @@ router.get('/users', async (req: Request, res: Response) => {
 
     const filters: any = {};
 
-    if (lastNameStartsWith && typeof lastNameStartsWith === 'string') {
-      filters.lastNameStartsWith = lastNameStartsWith;
+    if (searchTerm && typeof searchTerm === 'string') {
+      filters.searchTerm = searchTerm;
     }
-
     if (roles) {
       if (Array.isArray(roles)) {
         filters.roles = roles;
@@ -47,7 +48,7 @@ router.get('/users', async (req: Request, res: Response) => {
       }
     }
 
-    const parseAndValidateDate = (dateStr: any, paramName: string) => {
+    const parseAndValidateDate = (dateStr: any, paramName: string): Date => {
       if (typeof dateStr !== 'string') {
         throw new Error(`${paramName} must be a string in ISO date format`);
       }
@@ -55,9 +56,9 @@ router.get('/users', async (req: Request, res: Response) => {
       if (isNaN(date.getTime())) {
         throw new Error(`${paramName} is not a valid ISO date`);
       }
-      return date.toISOString();
+      return date;
     };
-    
+
     if (lastLoginAfter) {
       filters.lastLoginAfter = parseAndValidateDate(lastLoginAfter, 'lastLoginAfter');
     }
@@ -69,9 +70,24 @@ router.get('/users', async (req: Request, res: Response) => {
     if (createdAfter) {
       filters.createdAfter = parseAndValidateDate(createdAfter, 'createdAfter');
     }
-
     if (createdBefore) {
       filters.createdBefore = parseAndValidateDate(createdBefore, 'createdBefore');
+    }
+
+    if (req.query.createdBetweenFrom || req.query.createdBetweenTo) {
+      let from: Date | undefined;
+      let to: Date | undefined;
+
+      if (req.query.createdBetweenFrom) {
+        from = parseAndValidateDate(req.query.createdBetweenFrom, 'createdBetweenFrom');
+      }
+      if (req.query.createdBetweenTo) {
+        to = parseAndValidateDate(req.query.createdBetweenTo, 'createdBetweenTo');
+      }
+
+      filters.createdBetween = {};
+      if (from) filters.createdBetween.from = from;
+      if (to) filters.createdBetween.to = to;
     }
 
     if (updatedAfter) {
@@ -85,7 +101,7 @@ router.get('/users', async (req: Request, res: Response) => {
     if (lastActivityAfter) {
       filters.lastActivityAfter = parseAndValidateDate(lastActivityAfter, 'lastActivityAfter');
     }
-    
+
     if (lastActivityBefore) {
       filters.lastActivityBefore = parseAndValidateDate(lastActivityBefore, 'lastActivityBefore');
     }
@@ -170,18 +186,18 @@ router.put('/users/:id', async (req: Request, res: Response) => {
   }
 });
 
-router.delete('/users/:id', async (req: Request, res: Response) => {
-  try {
-    const id = Number(req.params.id);
-    if (isNaN(id)) {
-      return res.status(400).json({ success: false, message: 'Invalid user id' });
-    }
-    await adminUsersService.deleteAdminUser(id);
-    res.json({ success: true });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ success: false, message: 'Internal Server Error' });
-  }
-});
+// router.delete('/users/:id', async (req: Request, res: Response) => {
+//   try {
+//     const id = Number(req.params.id);
+//     if (isNaN(id)) {
+//       return res.status(400).json({ success: false, message: 'Invalid user id' });
+//     }
+//     await adminUsersService.deleteAdminUser(id);
+//     res.json({ success: true });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ success: false, message: 'Internal Server Error' });
+//   }
+// });
 
 export default router;

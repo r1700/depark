@@ -1,13 +1,6 @@
-// src/redux/adminUsersSlice.ts
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
-
-// הגדרת סוגי הנתונים
-interface AdminUser {
-  id: string;
-  name: string;
-  email: string;
-}
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { AdminUser,AdminUserFilters } from './adminUserTypes';
+import { fetchAdminUsersAPI } from './adminUsersAPI';
 
 interface AdminUsersState {
   users: AdminUser[];
@@ -15,38 +8,38 @@ interface AdminUsersState {
   error: string | null;
 }
 
-// פעולה אסינכרונית לקרוא את המשתמשים
-export const fetchAdminUsers = createAsyncThunk<AdminUser[], Record<string, any>>(
+const initialState: AdminUsersState = {
+  users: [],
+  loading: false,
+  error: null,
+};
+
+export const fetchAdminUsers = createAsyncThunk(
   'adminUsers/fetchAdminUsers',
-  async (filters = {}) => {
-    const response = await axios.get('/api/admin/users', { params: filters });
-    return response.data;  // מחזירים את הנתונים שהתקבלו
+  async (filters?: AdminUserFilters) => {
+    return await fetchAdminUsersAPI(filters);
   }
 );
 
-// יצירת ה-slice
 const adminUsersSlice = createSlice({
   name: 'adminUsers',
-  initialState: {
-    users: [] as AdminUser[],  // טיפוס נכון עבור users
-    loading: false,
-    error: null as string | null  // טיפוס נכון עבור error
-  } as AdminUsersState,  // טיפוס ראשוני מתאים עבור ה-state
+  initialState,
   reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(fetchAdminUsers.pending, (state) => {
-        state.loading = true;  // עדכון מצב ה-loading
+        state.loading = true;
+        state.error = null;
       })
-      .addCase(fetchAdminUsers.fulfilled, (state, action) => {
-        state.loading = false;  // עדכון מצב ה-loading
-        state.users = action.payload;  // הוספת המשתמשים שהתקבלו ל-state
+      .addCase(fetchAdminUsers.fulfilled, (state, action: PayloadAction<AdminUser[]>) => {
+        state.loading = false;
+        state.users = action.payload;
       })
       .addCase(fetchAdminUsers.rejected, (state, action) => {
-        state.loading = false;  // עדכון מצב ה-loading
-        state.error = action.error.message || null;  // שמירת השגיאה אם יש
+        state.loading = false;
+        state.error = action.error.message ?? 'Failed to fetch admin users';
       });
-  }
+  },
 });
 
 export default adminUsersSlice.reducer;

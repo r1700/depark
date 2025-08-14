@@ -142,5 +142,6 @@ packages/frontend/src/components/screen-login/
 
 # Miscellaneous
 package-lock.json
+package.json
 .env
-
+index.js

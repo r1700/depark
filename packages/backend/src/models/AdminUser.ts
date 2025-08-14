@@ -1,64 +1,48 @@
 import { Model, DataTypes, Optional } from 'sequelize';
 import sequelize from '../config/database';
-import { BaseUser } from './BaseUser';  // בהנחה שיש לך גם את BaseUser מוגדר
 
-// טיפוסים עבור שדות AdminUser
-interface AdminUserAttributes {
+// ממשק טיפוס המאפיינים של AdminUser
+export interface AdminUserAttributes {
   id: number;
   baseUserId: number;
   passwordHash: string;
   role: 'hr' | 'admin';
-  permissions: number;  // טיפוס INT
   lastLoginAt?: Date | null;
   createdAt: Date;
   updatedAt: Date;
+  permissions: number;
 }
 
-// אילו שדות אופציונליים ביצירה (id ו-lastLoginAt אוטומטיים)
-interface AdminUserCreationAttributes extends Optional<AdminUserAttributes, 'id' | 'lastLoginAt'> {}
+// בשביל יצירת רשומה חדשה, חלק מהשדות אופציונליים (למשל id)
+export interface AdminUserCreationAttributes extends Optional<AdminUserAttributes, 'id' | 'lastLoginAt'> {}
 
+// מחלקת המודל עצמה עם הטיפוסים שצוינו
 export class AdminUser extends Model<AdminUserAttributes, AdminUserCreationAttributes>
   implements AdminUserAttributes {
-
   public id!: number;
   public baseUserId!: number;
   public passwordHash!: string;
   public role!: 'hr' | 'admin';
-  public permissions!: number;
   public lastLoginAt?: Date | null;
   public createdAt!: Date;
   public updatedAt!: Date;
+  public permissions!: number;
 
-  // קשרים אפשריים (או פונקציות עזר) יתווספו כאן
-
-  static associate() {
-    AdminUser.belongsTo(BaseUser, {
-      foreignKey: 'baseUserId',
-      as: 'baseUser',
-      onDelete: 'CASCADE',
-      onUpdate: 'NO ACTION',
-    });
-  }
+  // אופציונלי - תוסיף כאן כל מתודת עזר שתצטרך בעתיד
 }
 
+// הגדרת המודל עם השדות והתכונות
 AdminUser.init(
   {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
-      allowNull: false,
     },
     baseUserId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       unique: true,
-      references: {
-        model: 'BaseUser',
-        key: 'id',
-      },
-      onDelete: 'CASCADE',
-      onUpdate: 'NO ACTION',
     },
     passwordHash: {
       type: DataTypes.STRING(255),
@@ -68,11 +52,6 @@ AdminUser.init(
       type: DataTypes.ENUM('hr', 'admin'),
       allowNull: false,
     },
-    permissions: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      defaultValue: 0,
-    },
     lastLoginAt: {
       type: DataTypes.DATE,
       allowNull: true,
@@ -80,18 +59,22 @@ AdminUser.init(
     createdAt: {
       type: DataTypes.DATE,
       allowNull: false,
-      defaultValue: DataTypes.NOW,
     },
     updatedAt: {
       type: DataTypes.DATE,
       allowNull: false,
-      defaultValue: DataTypes.NOW,
-    }
+    },
+    permissions: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
+    },
   },
   {
     sequelize,
     tableName: 'AdminUsers',
-    modelName: 'AdminUser',
-    timestamps: false,
+    timestamps: false, // כי הטבלה כבר כוללת createdAt ו-updatedAt בעצמה
   }
 );
+
+export default AdminUser;
