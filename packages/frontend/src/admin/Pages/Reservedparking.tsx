@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { Button, Box, Typography, Modal, Fade, Backdrop } from '@mui/material';
 // דוגמה: ייבוא קומפוננטות רלוונטיות
 // import ReservedParkingForm from '../app/pages/reservedParking/ReservedParkingForm/ReservedParkingForm';
-// import ReservedParkingTable from '../components/reservedParking/reservedParkingTable';
+import ReservedParkingTable from '../components/reservedParking/reservedParkingTable';
+
 
 const styleModal = {
   position: 'absolute' as 'absolute',
@@ -54,7 +55,7 @@ const ReservedParkingPage: React.FC = () => {
           </Button>
 
           {/* כאן תכניסי את הטבלה */}
-          {/* <ReservedParkingTable /> */}
+          <ReservedParkingTable />
         </Box>
       </Box>
 

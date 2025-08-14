@@ -16,7 +16,7 @@ import vehicleLookupRouter from './routes/vehicleLookup';
 // import itemsRoutes from './routes/items';
 // import { databaseService } from './services/database';
 import users from './routes/userApi';
-
+import reservedparking from './routes/reservedparkingApi';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -43,7 +43,7 @@ app.use('/api/password', passwordRoutes);
 app.use('/api/vehicle', vehicleRoutes);
 app.use('/api/exportToCSV', exportToCSV);
 app.use('/api/users', users);
-
+app.use('/api/reservedparking',reservedparking)
 
 
 // app.get('/', (req, res) => {
