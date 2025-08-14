@@ -2,7 +2,7 @@
 import { Sequelize, DataTypes, Model } from 'sequelize';
 import dotenv from 'dotenv';
 dotenv.config();
-import sequelize from '../../config/instance';
+import sequelize from '../../config/sequelize';
 
 // export const sequelize = new Sequelize({
 //     dialect: 'postgres', // שנה לפי הצורך
