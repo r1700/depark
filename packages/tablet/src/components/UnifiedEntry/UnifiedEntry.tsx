@@ -1,274 +1,205 @@
-import React, { useState, useEffect } from 'react';
-import VehicleQueue from '../VehicleQueue/VehicleQueue';
+import { useState, useEffect, useMemo } from 'react';
 import { sampleVehicles, employeeVehiclesMap } from '../../data';
-import { Box, Typography, MenuItem, Select, InputLabel, FormControl, SelectChangeEvent, Autocomplete, TextField, InputAdornment } from '@mui/material';
-import './UnifiedEntry.css';
+import { Box, Typography, MenuItem, Select, InputLabel, FormControl, SelectChangeEvent, Autocomplete, TextField, InputAdornment, Button, IconButton } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
-
+import { useNavigate } from 'react-router-dom';
+import './UnifiedEntry.css';
+import { ESTIMATED_TIME_PER_VEHICLE } from '../../data';
 
 const PopupMessage = ({ message, color }: { message: string; color: 'error' | 'success' }) => (
-    <Box
-        sx={{
-            position: 'fixed',
-            bottom: 20,
-            right: 20,
-            zIndex: 1300,
-            maxWidth: 500,
-            bgcolor: `${color}.main`,
-            color: 'white',
-            p: 2,
-            borderRadius: 3,
-            boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            animation: color === 'success' ? 'fadeIn 0.5s ease-out' : 'slideIn 0.3s ease-out',
-        }}
-    >
-        <Typography variant="body1" sx={{ mr: 2 }}>
-            {message}
-        </Typography>
+    <Box className={`popup-message ${color}`}>
+        <Typography variant="body1">{message}</Typography>
     </Box>
 );
 
-const UnifiedEntry = () => {
+export default function UnifiedEntry() {
+    const navigate = useNavigate();
     const [employeeId, setEmployeeId] = useState('');
-    const [employeeAutocompleteOpen, setEmployeeAutocompleteOpen] = useState(false);
     const [licensePlate, setLicensePlate] = useState('');
     const [employeeVehicles, setEmployeeVehicles] = useState<{ licensePlate: string }[]>([]);
-    const [selectedVehicle, setSelectedVehicle] = useState<string>('');
-    const [queue, setQueue] = useState<any[]>([]);
-    const [userVehicle, setUserVehicle] = useState<string>('');
-    const [error, setError] = useState<string | null>(null);
+    const [selectedVehicle, setSelectedVehicle] = useState('');
+    const [queues, setQueues] = useState<any[]>([]);
+    const [userVehicle, setUserVehicle] = useState('');
     const [popup, setPopup] = useState<{ message: string; color: 'error' | 'success' } | null>(null);
-    
-    const handleVehicleSelect = (e: SelectChangeEvent<string>) => {
-        const licensePlate = e.target.value;
-        setSelectedVehicle(licensePlate);
-        setUserVehicle(licensePlate);
-        setQueue(sampleVehicles);
-        const foundVehicle = sampleVehicles.find((v) => v.licensePlate === licensePlate);
-        if (!foundVehicle) {
-            setPopup({ message: 'The vehicle is not found in the system', color: 'error' });
-        } else {
-            const vehicleIndex = sampleVehicles.findIndex((v: { licensePlate: string }) => v.licensePlate === licensePlate);
-            setPopup({ message: `The vehicle is in the queue at position ${vehicleIndex + 1}`, color: 'success' });
-        }
+
+    const flatSampleVehicles = useMemo(() => sampleVehicles.flat(), []);
+    const employeeIds = useMemo(() => Object.keys(employeeVehiclesMap), []);
+    const licensePlates = useMemo(() => flatSampleVehicles.map(v => v.licensePlate), [flatSampleVehicles]);
+
+    const showPopup = (message: string, color: 'error' | 'success') => setPopup({ message, color });
+    const resetSearch = () => {
+        setEmployeeVehicles([]);
+        setSelectedVehicle('');
+        setQueues([]);
+        setUserVehicle('');
     };
+
+    const handleSearch = (type: 'plate' | 'employee', value: string) => {
+        resetSearch();
+        if (!value)
+            return showPopup(`Please enter a ${type === 'plate' ? 'license plate' : '5-digit employee ID'}`, 'error');
+
+        if (type === 'plate') {
+            let found = false;
+            let queueIndex = -1;
+            let positionInQueue = -1;
+
+            for (let i = 0; i < sampleVehicles.length; i++) {
+                const pos = sampleVehicles[i].findIndex(v => v.licensePlate === value);
+                if (pos !== -1) {
+                    found = true;
+                    queueIndex = i;
+                    positionInQueue = pos;
+                    break;
+                }
+            }
+
+            setUserVehicle(value);
+            setQueues(sampleVehicles);
+
+            if (!found) {
+                return showPopup('Vehicle not found in the system', 'error');
+            }
+
+            const waitTime = positionInQueue * ESTIMATED_TIME_PER_VEHICLE;
+            return showPopup(
+                `Vehicle is in queue #${queueIndex + 1} at position ${positionInQueue + 1} — Estimated wait time: ${waitTime} minutes`,
+                'success'
+            );
+        }
+
+        if (!/^\d{5}$/.test(value))
+            return showPopup('Please enter a 5-digit employee ID', 'error');
+        if (!employeeVehiclesMap[value])
+            return showPopup('No vehicles found for this employee', 'error');
+
+        setEmployeeVehicles(employeeVehiclesMap[value]);
+    };
+
+    const handleVehicleSelect = (plate: string) => {
+        let found = false;
+        let queueIndex = -1;
+        let positionInQueue = -1;
+
+        for (let i = 0; i < sampleVehicles.length; i++) {
+            const pos = sampleVehicles[i].findIndex(v => v.licensePlate === plate);
+            if (pos !== -1) {
+                found = true;
+                queueIndex = i;
+                positionInQueue = pos;
+                break;
+            }
+        }
+
+        setSelectedVehicle(plate);
+        setUserVehicle(plate);
+        setQueues(sampleVehicles);
+
+        if (!found) {
+            return showPopup('The vehicle is not found in the system', 'error');
+        }
+
+        const waitTime = positionInQueue * ESTIMATED_TIME_PER_VEHICLE;
+        return showPopup(
+            `The vehicle is in queue #${queueIndex + 1} at position ${positionInQueue + 1} — Estimated wait time: ${waitTime} minutes`,
+            'success'
+        );
+    };
+
     useEffect(() => {
         if (popup) {
-            const timer = setTimeout(() => setPopup(null), 3000);
+            const timer = setTimeout(() => setPopup(null), 4000);
             return () => clearTimeout(timer);
         }
     }, [popup]);
-    const employeeIds = Object.keys(employeeVehiclesMap);
-    const licensePlates = sampleVehicles.map((v) => v.licensePlate);
+
+    useEffect(() => {
+        setQueues(sampleVehicles);
+    }, []);
+
     return (
         <div className="license-plate-input-unified">
-            <div className="search-bar-wrapper">
-                <form
-                    onSubmit={e => {
-                        e.preventDefault();
-                        if (!licensePlate) {
-                            setPopup({ message: 'Please enter a license plate', color: 'error' });
-                            setEmployeeVehicles([]);
-                            setSelectedVehicle('');
-                            setQueue([]);
-                            setUserVehicle('');
-                            return;
-                        }
-                        const foundVehicle = sampleVehicles.find((v) => v.licensePlate === licensePlate);
-                        setEmployeeVehicles([]);
-                        setSelectedVehicle('');
-                        setUserVehicle(licensePlate);
-                        setQueue(sampleVehicles);
-                        if (!foundVehicle) {
-                            setPopup({ message: 'Vehicle not found in the system', color: 'error' });
-                        } else {
-                            const vehicleIndex = sampleVehicles.findIndex((v) => v.licensePlate === licensePlate);
-                            setPopup({ message: `Vehicle is in the queue at position ${vehicleIndex + 1}`, color: 'success' });
-                        }
-                    }}
-                    style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem' }}
-                >
-                    <Autocomplete
-    freeSolo
-    options={licensePlates}
-    inputValue={licensePlate}
-    onInputChange={(_, value) => {
-        setLicensePlate(value);
-        if (value) {
-            setEmployeeId('');
-        } else {
-            setQueue([]);
-            setUserVehicle('');
-        }
-    }}
-    open={!!licensePlate}
-    openOnFocus={false}
-    filterOptions={(options, { inputValue }) =>
-        inputValue ? options.filter(option => option.includes(inputValue)) : []
-    }
-    renderInput={(params) => (
-        <TextField
-            {...params}
-            className="input-field"
-            label="Enter license plate"
-            variant="outlined"
-            disabled={!!employeeId}
-            InputProps={{
-                ...params.InputProps,
-                startAdornment: (
-                    <InputAdornment position="start">
-                        <SearchIcon
-                            sx={{ fontSize: 20, cursor: 'pointer' }}
-                            onClick={() => {
-                                if (licensePlate) {
-                                    const foundVehicle = sampleVehicles.find((v) => v.licensePlate === licensePlate);
-                                    setEmployeeVehicles([]);
-                                    setSelectedVehicle('');
-                                    setUserVehicle(licensePlate);
-                                    setQueue(sampleVehicles);
-                                    if (!foundVehicle) {
-                                        setPopup({ message: 'Vehicle not found in the system', color: 'error' });
-                                    } else {
-                                        const vehicleIndex = sampleVehicles.findIndex((v: { licensePlate: string }) => v.licensePlate === licensePlate);
-                                        setPopup({ message: `Vehicle is in the queue at position ${vehicleIndex + 1}`, color: 'success' });
-                                    }
-                                } else {
-                                    setPopup({ message: 'Please enter a license plate', color: 'error' });
-                                }
+            <form className="search-form" onSubmit={e => { e.preventDefault(); handleSearch('plate', licensePlate); }}>
+                <Autocomplete
+                    freeSolo
+                    options={licensePlates}
+                    inputValue={licensePlate}
+                    onInputChange={(_, v) => { setLicensePlate(v); if (v) setEmployeeId(''); }}
+                    filterOptions={(o, { inputValue }) => inputValue ? o.filter(opt => opt.includes(inputValue)) : []}
+                    renderInput={params => (
+                        <TextField
+                            {...params}
+                            label="Enter license plate"
+                            variant="outlined"
+                            fullWidth
+                            disabled={!!employeeId}
+                            className="autocomplete-textfield"
+                            InputProps={{
+                                ...params.InputProps,
+                                endAdornment: (
+                                    <InputAdornment position="start">
+                                        
+                                        <SearchIcon onClick={() => handleSearch('plate', licensePlate)} />
+                                        <IconButton />
+                                    </InputAdornment>
+                                )
                             }}
                         />
-                    </InputAdornment>
-                ),
-            }}
-        />
-    )}
-    disabled={!!employeeId}
-/>
-                </form>
-                <form
-                    onSubmit={e => {
-                        e.preventDefault();
-                        if (!/^\d{5}$/.test(employeeId)) {
-                            setPopup({ message: 'Please enter a 5-digit employee ID', color: 'error' });
-                            setEmployeeVehicles([]);
-                            setSelectedVehicle('');
-                            setQueue([]);
-                            setUserVehicle('');
-                            return;
-                        }
-                        if (!employeeVehiclesMap[employeeId]) {
-                            setEmployeeVehicles([]);
-                            setSelectedVehicle('');
-                            setQueue([]);
-                            setUserVehicle('');
-                            setPopup({ message: 'No vehicles found for this employee', color: 'error' });
-                        } else {
-                            setEmployeeVehicles(employeeVehiclesMap[employeeId]);
-                            setSelectedVehicle('');
-                            setQueue([]);
-                            setUserVehicle('');
-                            setPopup(null);
-                        }
-                    }}
-                    style={{ width: '100%', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '0.5rem' }}
-                >
-                    <Autocomplete
-    freeSolo
-    options={employeeIds}
-    inputValue={employeeId}
-    onInputChange={(_, value, reason) => {
-        setEmployeeId(value);
-        if (value) setLicensePlate('');
-        if (reason === 'reset') setEmployeeAutocompleteOpen(false);
-        else setEmployeeAutocompleteOpen(!!value);
-    }}
-    onOpen={() => setEmployeeAutocompleteOpen(true)}
-    onClose={() => setEmployeeAutocompleteOpen(false)}
-    open={employeeAutocompleteOpen}
-    openOnFocus={false}
-    filterOptions={(options, { inputValue }) =>
-        inputValue ? options.filter(option => option.includes(inputValue)) : []
-    }
-    onChange={(_, value) => {
-        if (value) {
-            setEmployeeId(value);
-            setEmployeeAutocompleteOpen(false);
-            setLicensePlate('');
-        }
-    }}
-    renderInput={(params) => (
-        <TextField
-            {...params}
-            className="input-field"
-            label="Enter employee ID"
-            variant="outlined"
-            disabled={!!licensePlate}
-            InputProps={{
-                ...params.InputProps,
-                startAdornment: (
-                    <InputAdornment position="start">
-                        <SearchIcon
-                            sx={{ fontSize: 20, cursor: 'pointer' }}
-                            onClick={() => {
-                                if (employeeId) {
-                                    if (!employeeVehiclesMap[employeeId]) {
-                                        setPopup({ message: 'No vehicles found for this employee', color: 'error' });
-                                    } else {
-                                        setEmployeeVehicles(employeeVehiclesMap[employeeId]);
-                                        setPopup(null);
-                                    }
-                                } else {
-                                    setPopup({ message: 'Please enter a 5-digit employee ID', color: 'error' });
-                                }
-                            }}
-                        />
-                    </InputAdornment>
-                ),
-            }}
-        />
-    )}
-    disabled={!!licensePlate}
-/>                  
-                </form>
-                {employeeVehicles.length > 0 && (
-                    <FormControl
-                        sx={{ mt: 2, minWidth: 180, width: '100%', maxWidth: 260, marginLeft: 'auto', marginRight: 'auto', display: 'block' }}
-                        className="rounded-select-form"
-                    >
-                        <InputLabel id="vehicle-select-label">Select vehicle</InputLabel>
-                        <Select
-                            labelId="vehicle-select-label"
-                            value={selectedVehicle}
-                            label="Select vehicle"
-                            onChange={handleVehicleSelect}
-                            aria-label="Select vehicle"
-                            className="rounded-select"
-                            MenuProps={{
-                                PaperProps: {
-                                    className: 'rounded-select-dropdown',
-                                    style: { borderRadius: '1.2rem', minWidth: 180, maxWidth: 260, width: 260 }
-                                }
-                            }}>
-                            {employeeVehicles.map((v) => (
-                                <MenuItem key={v.licensePlate} value={v.licensePlate}>{v.licensePlate}</MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
-                )}
-            </div>
-            <div className="queue-section">
-                {userVehicle && queue.length > 0 &&
-                    !error && !(popup && popup.color === 'error') && (
-                        <VehicleQueue vehicles={queue} userVehicle={userVehicle} />
                     )}
-            </div>
-            {error && <PopupMessage message={error} color="error" />}
+                />
+            </form>
+
+            <form className="search-form" onSubmit={e => { e.preventDefault(); handleSearch('employee', employeeId); }}>
+                <Autocomplete
+                    freeSolo
+                    options={employeeIds}
+                    inputValue={employeeId}
+                    onInputChange={(_, v) => { setEmployeeId(v); if (v) setLicensePlate(''); }}
+                    filterOptions={(o, { inputValue }) => inputValue ? o.filter(opt => opt.includes(inputValue)) : []}
+                    renderInput={params => (
+                        <TextField
+                            {...params}
+                            label="Enter employee ID"
+                            disabled={!!licensePlate}
+                            className="autocomplete-textfield"
+                            InputProps={{
+                                ...params.InputProps,
+                                endAdornment: (
+                                    <InputAdornment position="start">
+                                        <SearchIcon onClick={() => handleSearch('employee', employeeId)} />
+                                        <IconButton />
+                                    </InputAdornment>
+                                )
+                            }}
+                        />
+                    )}
+                />
+            </form>
+
+            {employeeVehicles.length > 0 && (
+                <FormControl >
+                    <InputLabel>Select vehicle</InputLabel>
+                    <Select
+                        value={selectedVehicle}
+                        onChange={(e: SelectChangeEvent<string>) => handleVehicleSelect(e.target.value)}
+                        MenuProps={{ PaperProps: { style: { borderRadius: '8px' } } }}
+                    >
+                        {employeeVehicles.map(v => (
+                            <MenuItem key={v.licensePlate} value={v.licensePlate}>
+                                {v.licensePlate}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+            )}
+
+            <Button
+                variant="contained"
+                className="show-queues-btn"
+                onClick={() => navigate('/VehicleQueue', { state: { queues, userVehicle } })}
+            >Show queues</Button>
+
             {popup && <PopupMessage message={popup.message} color={popup.color} />}
         </div>
     );
-};
-export default UnifiedEntry;
-
+}

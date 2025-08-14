@@ -7,8 +7,10 @@ interface VehicleInQueueProps {
         licensePlate: string;
         model?: string;
     };
+    queueNumber: number;
     position: number;
     userVehicle: string;
+    estimatedWaitTime: number;
 }
 
 const VehicleInQueue: React.FC<VehicleInQueueProps> = ({ vehicle, position, userVehicle }) => {
