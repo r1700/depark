@@ -3,7 +3,6 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@mui/material';
 import VehicleInQueue from '../VehicleInQueue/VehicleInQueue';
 import { ESTIMATED_TIME_PER_VEHICLE } from '../../data';
-import { sampleVehicles } from '../../data';
 import './VehicleQueue.css';
 
 export interface Vehicle {
@@ -56,7 +55,7 @@ const VehicleQueue: React.FC = () => {
                   <ul>
                     {queue.map((v, idx) => (
                       <li key={idx}>
-                        {idx + 1}. {v.licensePlate} — Estimated wait time: {idx * ESTIMATED_TIME_PER_VEHICLE} דק
+                        {idx + 1}. {v.licensePlate} — Estimated wait time: {idx * ESTIMATED_TIME_PER_VEHICLE} min
                       </li>
                     ))}
                   </ul>
