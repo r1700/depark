@@ -2,30 +2,32 @@ import Joi from 'joi';
 
 export class ParkingConfigurationModel {
   static schema = Joi.object({
-    id: Joi.number().integer().positive().allow(null).optional(),
+    id: Joi.number().allow(null).optional(),
     facilityName: Joi.string().required(),
-    totalSurfaceSpots: Joi.number().integer().min(1).required(),
+    totalSpots: Joi.number().integer().min(1).required(), // Changed to match frontend
     surfaceSpotIds: Joi.array().items(Joi.string()).required(),
     avgRetrievalTimeMinutes: Joi.number().integer().min(0).default(1).optional(),
     maxQueueSize: Joi.number().integer().min(1).required(),
-    operatingHours: Joi.object({
-      start: Joi.string().pattern(/^\d{2}:\d{2}$/).required(), // "07:00"
-      end: Joi.string().pattern(/^\d{2}:\d{2}$/).required() // "19:00"
-    }).required(),
+    maxParallelRetrievals: Joi.number().integer().min(1).default(1).optional(), // Added missing field
+    operatingHours: Joi.object().required(), // More flexible for daily hours
     timezone: Joi.string().required(),
+    maintenanceMode: Joi.boolean().default(false).optional(), // Added missing field
+    showAdminAnalytics: Joi.boolean().default(false).optional(), // Added missing field
     updatedAt: Joi.date().required(),
     updatedBy: Joi.string().required()
   });
 
   constructor(
-    
     public facilityName: string,
-    public totalSurfaceSpots: number,
+    public totalSpots: number, // Changed name
     public surfaceSpotIds: string[],
     public avgRetrievalTimeMinutes: number,
     public maxQueueSize: number,
-    public operatingHours: { start: string; end: string },
+    public maxParallelRetrievals: number, // Added missing field
+    public operatingHours: object, // More flexible
     public timezone: string,
+    public maintenanceMode: boolean, // Added missing field
+    public showAdminAnalytics: boolean, // Added missing field
     public updatedAt: Date,
     public updatedBy: string,
     public id?: number
@@ -36,14 +38,16 @@ export class ParkingConfigurationModel {
     if (error) return Promise.reject(error);
 
     return Promise.resolve(new ParkingConfigurationModel(
-      
       value.facilityName,
-      value.totalSurfaceSpots,
+      value.totalSpots,
       value.surfaceSpotIds,
       value.avgRetrievalTimeMinutes,
       value.maxQueueSize,
+      value.maxParallelRetrievals || 1,
       value.operatingHours,
       value.timezone,
+      value.maintenanceMode || false,
+      value.showAdminAnalytics || false,
       new Date(value.updatedAt),
       value.updatedBy,
       value.id
@@ -53,26 +57,3 @@ export class ParkingConfigurationModel {
 
 // Example usage of ParkingConfigurationModel
 
-const parkingConfigData = {
-  id:1,
-  facilityName: "Main Street Parking",
-  totalSurfaceSpots: 100,
-  surfaceSpotIds: ["1", "2", "3", "4", "5", "6"],
-  avgRetrievalTimeMinutes: 1,
-  maxQueueSize: 50,
-  operatingHours: {
-    start: "08:00",
-    end: "20:00"
-  },
-  timezone: "Asia/Jerusalem",
-  updatedAt: new Date(),
-  updatedBy: "adminUser"
-};
-
-ParkingConfigurationModel.create(parkingConfigData)
-  .then(parkingConfig => {
-    console.log("Parking Configuration created successfully:", parkingConfig);
-  })
-  .catch(error => {
-    console.error("Error creating parking configuration:", error);
-  });
