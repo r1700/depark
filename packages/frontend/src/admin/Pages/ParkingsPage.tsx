@@ -78,42 +78,44 @@ const ParkingsPage: React.FC<ParkingsPageProps> = () => {
           </Typography>
         </Box>
 
+        {/* Add New Lot Button */}
+        <Box sx={{ textAlign: 'center', mb: 6 }}>
+          <Button
+            onClick={() => {
+              console.log('🔄 Add New Lot clicked');
+              navigate('/admin-config');
+            }}
+            sx={{ minWidth: 500,
+                  bgcolor: 'primary.main',
+                  color: 'white',
+                  boxShadow: '0 4px 16px rgba(25, 118, 210, 0.10)',
+                  borderRadius: 3,
+                  fontWeight: 800,
+                  letterSpacing: 1,
+                  transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)',
+                  '&:hover': {
+                    bgcolor: 'primary.dark',
+                    boxShadow: '0 8px 32px rgba(25, 118, 210, 0.18)',
+                    transform: 'translateY(-2px) scale(1.03)'
+                  },
+                  '&.Mui-disabled': {
+                    bgcolor: 'grey.400',
+                    color: 'white',
+                    boxShadow: 'none',
+                    opacity: 0.7
+                  }
+                }}
+          >
+            + Add New Lot
+          </Button>
+        </Box>
+
         {/* Data Table */}
         <DataTable 
           data={tableData} 
           editPath="/admin-config"
           deletePath="/api/admin"
         />
-        <Box sx={{ textAlign: 'center', mb: 6 }}>
-            <Button
-              onClick={() => {
-                console.log('🔄 Add New Lot clicked');
-                navigate('/admin-config');
-              }}
-              sx={{ minWidth: 500,
-                        bgcolor: 'primary.main',
-                        color: 'white',
-                        boxShadow: '0 4px 16px rgba(25, 118, 210, 0.10)',
-                        borderRadius: 3,
-                        fontWeight: 800,
-                        letterSpacing: 1,
-                        transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)',
-                        '&:hover': {
-                          bgcolor: 'primary.dark',
-                          boxShadow: '0 8px 32px rgba(25, 118, 210, 0.18)',
-                          transform: 'translateY(-2px) scale(1.03)'
-                        },
-                        '&.Mui-disabled': {
-                          bgcolor: 'grey.400',
-                          color: 'white',
-                          boxShadow: 'none',
-                          opacity: 0.7
-                        }
-                      }}
-            >
-              + Add New Lot
-            </Button>
-          </Box>
       </Paper>
     </Container>
   );
