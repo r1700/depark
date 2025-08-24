@@ -140,19 +140,17 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
   
   // Helper function to get headers with authorization
   const getAuthHeaders = () => {
-  const token = localStorage.getItem('token') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJkZXZAZXhhbXBsZS5jb20iLCJmaXJzdE5hbWUiOiJEZXYiLCJsYXN0TmFtZSI6IlVzZXIiLCJpYXQiOjE3MDEwMDAwMDAsImV4cCI6MjAwMDAwMDAwMH0.2wQwQwQwQwQwQwQwQwQwQwQwQwQwQwQwQwQwQwQwQwQwQwQwQwQwQwQwQwQwQwQwQwQwQwQwQwQw';
     return {
       'Content-Type': 'application/json',
       'Cache-Control': 'no-cache',
-      'Pragma': 'no-cache',
-      'Authorization': `Bearer ${token}`
+      'Pragma': 'no-cache'
+      // No Authorization header needed for dev/demo
     };
   };
 
   // Helper function to get current user info
   const getCurrentUser = () => {
-    let user = JSON.parse(localStorage.getItem("user") || "{s83jsdf7g3h8j3khsdf8972k3jhsdf98734hsdf982374}");
-    
+    let user = JSON.parse(localStorage.getItem("user") || '{}');
     // If no user data exists, create mock user for development
     if (!user.firstName || !user.lastName) {
       user = {
@@ -160,10 +158,8 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
         lastName: 'User',
         email: 'dev-user@example.com'
       };
-      // Optionally save mock user to localStorage
       localStorage.setItem("user", JSON.stringify(user));
     }
-    
     return user;
   };
 
