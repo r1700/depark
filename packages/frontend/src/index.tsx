@@ -12,6 +12,7 @@ import UsersPage from './admin/Pages/UsersPage';
 import { VehicleRow } from './mobile/components/mobile-user/VehicleList';
 import Otp from './mobile/components/otp';
 import HomePage from './tablet/pages/HomePage';
+import RetrievalQueue from './tablet/my-task-ofline/QueueTable';
 
 const user = JSON.parse(localStorage.getItem("user") || "{}");
 
@@ -35,6 +36,7 @@ const routers = createBrowserRouter([
         ]
       },
       {path: 'VehicleRow', element: <VehicleRow />},
+      {path: 'retrieval', element: <RetrievalQueue />},
     ]
   }
 ])
