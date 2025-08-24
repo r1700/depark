@@ -36,5 +36,8 @@ export const employeeVehiclesMap: Record<string, { licensePlate: string }[]> = {
         { licensePlate: '345678' },
         { licensePlate: '901234' },
     ],
+    '55555': [
+        
+    ],
 };
 

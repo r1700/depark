@@ -7,7 +7,7 @@ export default {
         dialectOptions: undefined, // No SSL in development
 
     migrations: {
-      path: path.resolve(__dirname, '../../migrations'),
+      path: path.resolve(__dirname, '../../../migrations'),
       pattern: /\.(js|ts)$/,
     },
   },
