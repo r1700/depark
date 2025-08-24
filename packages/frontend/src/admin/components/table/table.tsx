@@ -72,7 +72,11 @@ const DataTable: React.FC<DataTableProps> = ({
     <>
       <TableContainer
         className="table-container"
-        sx={{ maxHeight: maxHeight, overflow: 'auto' }}
+        sx={
+          enablePagination
+            ? { maxHeight: maxHeight, overflow: 'auto' }   // אם משתמשים בעמודיות - שומרים גלגול פנימי
+            : { maxHeight: 'unset', overflow: 'visible' }  // אחרת תנו לטבלה לגדול - גלגול רק בדף
+        }
       >
         <Table
           className="table"
