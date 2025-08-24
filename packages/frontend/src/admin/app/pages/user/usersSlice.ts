@@ -1,10 +1,9 @@
-import { createSlice} from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 import { addUser, fetchUsers, updateUser } from './userThunks';
 import { User } from '../../types/User'
 
 
-interface UserState {
-  map(arg0: (user: any) => string): string[] | undefined;
+export interface UserState {
   users: User[];
   loading: boolean;
   error: string | null;
@@ -14,9 +13,6 @@ const initialState: UserState = {
   users: [],
   loading: false,
   error: null,
-  map: function (arg0: (user: any) => string): string[] | undefined {
-    throw new Error('Function not implemented.');
-  }
 };
 
 const userSlice = createSlice({
@@ -35,7 +31,8 @@ const userSlice = createSlice({
       })
       .addCase(fetchUsers.fulfilled, (state, action) => {
         state.loading = false;
-        state.error = action.payload as unknown as string;
+        state.users = action.payload; // חשוב!
+        state.error = null;
       })
       .addCase(fetchUsers.rejected, (state, action) => {
         state.loading = false;
@@ -46,7 +43,7 @@ const userSlice = createSlice({
       })
       .addCase(addUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.users.push(action.payload); 
+        state.users.push(action.payload);
       })
       .addCase(addUser.rejected, (state, action) => {
         state.loading = false;

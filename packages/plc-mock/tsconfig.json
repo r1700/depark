@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
 "extends": "../../tsconfig.json",
 "compilerOptions": {
 "target": "ES2020",
@@ -10,3 +11,22 @@
 },
 "include": ["src/**/*"]
 }
+=======
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+  "target": "ES2020",
+  "module": "commonjs",
+  "outDir": "dist",
+  "rootDir": "src",
+  "strict": true,
+  "esModuleInterop": true
+  },
+  "include": [
+  "src/**/*"
+  ],
+  "exclude": [
+  "node_modules",
+  "dist"
+  ]
+  }
+>>>>>>> ba82dbaf8fd3394be7c3414359abbd439d104ef3

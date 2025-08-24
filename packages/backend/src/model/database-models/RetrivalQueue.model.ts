@@ -1,115 +1,131 @@
 import { DataTypes, Model, Op } from 'sequelize';
-
 import sequelize from '../../config/sequelize';
-
 
 // Vehicle
 export class Vehicle extends Model {
-    public id!: number;
-    public userId!: string;
-    public licensePlate!: string;
-    public vehicleModelId!: string;
+    public id!: string;
+    public baseuser_id!: string;
+    public license_plate!: string;
+    public vehicle_model_id!: string;
     public color!: string;
-    public isActive!: boolean;
-    public isCurrentlyParked!: boolean;
-    public addedBy!: 'user' | 'hr';
-    public dimensionOverrides!: any;
-    public dimensionsSource!: 'model_reference' | 'manual_override' | 'government_db';
-    public createdAt!: Date;
-    public updatedAt!: Date;
+    public is_active!: boolean;
+    public is_currently_parked!: boolean;
+    public added_by!: string;
+    public dimension_overrides!: any;
+    public dimensions_source!: string;
+    public created_at!: Date;
+    public updated_at!: Date;
 }
 Vehicle.init({
     id: { type: DataTypes.UUID, primaryKey: true },
-    userId: DataTypes.STRING,
-    licensePlate: DataTypes.STRING,
-    vehicleModelId: DataTypes.STRING,
+    baseuser_id: { type: DataTypes.STRING, field: 'baseuser_id' },
+    license_plate: { type: DataTypes.STRING, field: 'license_plate' },
+    vehicle_model_id: { type: DataTypes.STRING, field: 'vehicle_model_id' },
     color: DataTypes.STRING,
-    isActive: DataTypes.BOOLEAN,
-    isCurrentlyParked: DataTypes.BOOLEAN,
-    addedBy: DataTypes.ENUM('user', 'hr'),
-    dimensionOverrides: DataTypes.JSONB,
-    dimensionsSource: DataTypes.ENUM('model_reference', 'manual_override', 'government_db'),
-    createdAt: DataTypes.DATE,
-    updatedAt: DataTypes.DATE,
-}, { sequelize, tableName: 'Vehicles' });
+    is_active: { type: DataTypes.BOOLEAN, field: 'is_active' },
+    is_currently_parked: { type: DataTypes.BOOLEAN, field: 'is_currently_parked' },
+    added_by: { type: DataTypes.STRING, field: 'added_by' },
+    dimension_overrides: { type: DataTypes.JSONB, field: 'dimension_overrides' },
+    dimensions_source: { type: DataTypes.STRING, field: 'dimensions_source' },
+    created_at: { type: DataTypes.DATE, field: 'created_at' },
+    updated_at: { type: DataTypes.DATE, field: 'updated_at' },
+}, { sequelize, tableName: 'vehicles', timestamps: false });
 
 // ParkingSession
 export class ParkingSession extends Model {
-    public id!: number;
-    public userId!: string;
-    public vehicleId!: string;
-    public licensePlate!: string;
-    public surfaceSpot!: string;
-    public undergroundSpot!: string;
-    public status!: 'parked' | 'retrieval_requested' | 'completed';
-    public entryTime!: Date;
-    public exitTime!: Date;
-    public retrievalRequestTime!: Date;
-    public actualRetrievalTime!: Date;
-    public pickupSpot!: string;
-    public requestedBy!: 'mobile' | 'tablet';
+    public id!: string;
+    public baseuser_id!: string;
+    public vehicle_id!: string;
+    public parking_spots_id!: string;
+    public license_plate!: string;
+    public surface_spot!: string;
+    public underground_spot!: string;
+    public status!: number;  //1=parked, 2=retrieval_requested, 3=completed
+    public entry_time!: Date;
+    public exit_time!: Date;
+    public retrieval_request_time!: Date;
+    public actual_retrieval_time!: Date;
+    public pickup_spot!: string;
+    public requested_by!: number;//1=mobile, 2=tablet
 }
 ParkingSession.init({
     id: { type: DataTypes.UUID, primaryKey: true },
-    userId: DataTypes.STRING,
-    vehicleId: DataTypes.STRING,
-    licensePlate: DataTypes.STRING,
-    surfaceSpot: DataTypes.STRING,
-    undergroundSpot: DataTypes.STRING,
-    status: DataTypes.ENUM('parked', 'retrieval_requested', 'completed'),
-    entryTime: DataTypes.DATE,
-    exitTime: DataTypes.DATE,
-    retrievalRequestTime: DataTypes.DATE,
-    actualRetrievalTime: DataTypes.DATE,
-    pickupSpot: DataTypes.STRING,
-    requestedBy: DataTypes.ENUM('mobile', 'tablet'),
-}, {
-    sequelize,
-    tableName: 'ParkingSessions',
-    timestamps: false 
-});
+    baseuser_id: { type: DataTypes.STRING, field: 'baseuser_id' },
+    vehicle_id: { type: DataTypes.STRING, field: 'vehicle_id' },
+    parking_spots_id: { type: DataTypes.STRING, field: 'parking_spots_id' },
+    license_plate: { type: DataTypes.STRING, field: 'license_plate' },
+    surface_spot: { type: DataTypes.STRING, field: 'surface_spot' },
+    underground_spot: { type: DataTypes.STRING, field: 'underground_spot' },
+    status: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 1,//1=parked, 2=retrieval_requested, 3=completed
+        validate: {
+            isIn: [[1, 2, 3]],
+        },
+    },
+    entry_time: { type: DataTypes.DATE, field: 'entry_time' },
+    exit_time: { type: DataTypes.DATE, field: 'exit_time' },
+    retrieval_request_time: { type: DataTypes.DATE, field: 'retrieval_request_time' },
+    actual_retrieval_time: { type: DataTypes.DATE, field: 'actual_retrieval_time' },
+    pickup_spot: { type: DataTypes.STRING, field: 'pickup_spot' },
+    requested_by: {
+        type: DataTypes.INTEGER,
+        field: 'requested_by',
+        validate: {
+            isIn: [[1, 2]],
+        },
+    },
+}, { sequelize, tableName: 'parkingsessions', timestamps: false });
 
 // RetrievalQueue
 export class RetrievalQueue extends Model {
-    public id!: number;
-    public sessionId!: string;
-    public userId!: string;
-    public licensePlate!: string;
-    public undergroundSpot!: string;
-    public requestedAt!: Date;
-    public estimatedTime!: Date;
+    public id!: string;
+    public baseuser_id!: string;
+    public parking_session_id!: string;
+    public license_plate!: string;
+    public underground_spot!: string;
+    public requested_at!: Date;
+    public estimated_time!: Date;
     public position!: number;
-    public status!: 'queued' | 'processing' | 'ready' | 'completed';
-    public assignedPickupSpot!: string;
-    public requestSource!: 'mobile' | 'tablet';
-    public createdAt!: Date;
-    public updatedAt!: Date;
+    public status!: number;
+    public assigned_pickup_spot!: string;
+    public request_source!: number;
 }
 RetrievalQueue.init({
     id: { type: DataTypes.UUID, primaryKey: true },
-    sessionId: DataTypes.STRING,
-    userId: DataTypes.STRING,
-    licensePlate: DataTypes.STRING,
-    undergroundSpot: DataTypes.STRING,
-    requestedAt: DataTypes.DATE,
-    estimatedTime: { type: DataTypes.DATE, allowNull: true }, // opc זמן משוער להשלמת הבקשה
+    parking_session_id: { type: DataTypes.STRING, field: 'parking_session_id' },
+    baseuser_id: { type: DataTypes.STRING, field: 'baseuser_id' },
+    license_plate: { type: DataTypes.STRING, field: 'license_plate' },
+    underground_spot: { type: DataTypes.STRING, field: 'underground_spot' },
+    requested_at: { type: DataTypes.DATE, field: 'requested_at' },
+    estimated_time: { type: DataTypes.DATE, allowNull: true, field: 'estimated_time' },
     position: DataTypes.INTEGER,
-    status: DataTypes.ENUM('queued', 'processing', 'ready', 'completed'),
-    assignedPickupSpot: DataTypes.STRING,
-    requestSource: DataTypes.ENUM('mobile', 'tablet'),
-    createdAt: DataTypes.DATE,
-    updatedAt: DataTypes.DATE,
+    status: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 1, // 1=queued, 2=processing, 3=ready, 4=completed
+      validate: {
+        isIn: [[1, 2, 3, 4]],
+        // isIn: [['queued', 'processing', 'ready', 'completed']],
+      },
+    },
+    assigned_pickup_spot: { type: DataTypes.STRING, field: 'assigned_pickup_spot' },
+    request_source: {
+        type: DataTypes.INTEGER,
+        field: 'request_source',
+        validate: {
+            isIn: [[1, 2]],
+        },
+    },
 }, {
     sequelize,
-    tableName: 'RetrievalQueues',
+    tableName: 'retrievalqueues',
+    timestamps: false,
     indexes: [{
         unique: true,
         name: 'unique_active_vehicle',
-        fields: ['licensePlate'],
-        where: {
-            status: {
-                [Op.ne]: 'completed'
-            }
-        }
+        fields: ['license_plate'],
+        where: { status: { [Op.ne]: 4 } }
     }]
 });

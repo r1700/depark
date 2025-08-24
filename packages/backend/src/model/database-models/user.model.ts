@@ -6,27 +6,18 @@ import sequelize from '../../config/sequelize';
 
 
 
-// --- Model User ---
-export class User extends Model {
+// --- Model baseuser ---
+export class baseuser extends Model {
     public id!: string;
-
     public email!: string;
-    public firstName!: string;
-    public lastName!: string;
-    public department!: string;
-    public employeeId!: string;
-    public googleId!: string;
-    public status!: string;
-    public maxCarsAllowedParking!: number;
-    public createdBy!: string;
-    public approvedBy!: string;
-    public approvedAt!: Date;
-    public createdAt!: Date;
-    public updatedAt!: Date;
+    public first_name!: string;
+    public last_name!: string;
+    public created_at!: Date;
+    public updated_at!: Date;
     public phone!: string;
 }
 
-User.init(
+baseuser.init(
     {
         id: {
             type: DataTypes.STRING,
@@ -34,21 +25,13 @@ User.init(
 
         },
         email: { type: DataTypes.STRING, allowNull: false },
-        firstName: DataTypes.STRING,
-        lastName: DataTypes.STRING,
-        department: DataTypes.STRING,
-        employeeId: DataTypes.STRING,
-        googleId: DataTypes.STRING,
-        status: DataTypes.STRING,
-        maxCarsAllowedParking: DataTypes.INTEGER,
-        createdBy: DataTypes.STRING,
-        approvedBy: DataTypes.STRING,
-        approvedAt: DataTypes.DATE,
-        createdAt: {
+        first_name: DataTypes.STRING,
+        last_name: DataTypes.STRING,
+        created_at: {
             type: DataTypes.DATE,
             defaultValue: DataTypes.NOW,
         },
-        updatedAt: {
+        updated_at: {
             type: DataTypes.DATE,
             defaultValue: DataTypes.NOW,
         },
@@ -56,61 +39,61 @@ User.init(
     },
     {
         sequelize,
-        tableName: 'Users',
-        timestamps: true,
+        tableName: 'baseuser',
+        timestamps: false,
     }
 );
 
-// --- Model UserSession ---
-export class UserSession extends Model {
+// --- Model usersessions ---
+export class usersessions extends Model {
     public id!: string;
-    public userId!: string;
-    public userType!: string;
+    public baseuser_id!: string;
+    public user_type!: string;
     public token!: string;
-    public refreshToken!: string;
-    public expiresAt!: Date;
-    public isActive!: boolean;
-    public ipAddress!: string;
-    public userAgent!: string;
-    public createdAt!: Date;
-    public lastActivity!: Date;
-    public tempToken!: string;
+    public refresh_token!: string;
+    public expires_at!: Date;
+    public is_active!: boolean;
+    public ip_address!: string;
+    public user_agent!: string;
+    public created_at!: Date;
+    public last_activity!: Date;
+    public temp_token!: string;
 }
 
-UserSession.init(
+usersessions.init(
     {
         id: {
             type: DataTypes.STRING,
             primaryKey: true,
 
         },
-        userId: {
+        baseuser_id: {
             type: DataTypes.STRING,
             allowNull: false,
         },
-        userType: DataTypes.STRING,
+        user_type: DataTypes.STRING,
         token: DataTypes.STRING,
-        refreshToken: DataTypes.STRING,
-        expiresAt: DataTypes.DATE,
-        isActive: DataTypes.BOOLEAN,
-        ipAddress: DataTypes.STRING,
-        userAgent: DataTypes.STRING,
-        createdAt: {
+        refresh_token: DataTypes.STRING,
+        expires_at: DataTypes.DATE,
+        is_active: DataTypes.BOOLEAN,
+        ip_address: DataTypes.STRING,
+        user_agent: DataTypes.STRING,
+        created_at: {
             type: DataTypes.DATE,
             defaultValue: DataTypes.NOW,
         },
-        lastActivity: DataTypes.DATE,
-        tempToken: DataTypes.STRING,
+        last_activity: DataTypes.DATE,
+        temp_token: DataTypes.STRING,
     },
     {
         sequelize,
-        tableName: 'UserSessions',
+        tableName: 'usersessions',
         timestamps: false,
     }
 );
 
 // קשרים
-User.hasMany(UserSession, { foreignKey: 'userId' });
-UserSession.belongsTo(User, { foreignKey: 'userId' });
+baseuser.hasMany(usersessions, { foreignKey: 'baseuser_id' });
+usersessions.belongsTo(baseuser, { foreignKey: 'baseuser_id' });
 
 export default sequelize;
