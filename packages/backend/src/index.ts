@@ -12,6 +12,7 @@ import authRoutes from './routes/auth';
 import userGoogleAuthRoutes from './routes/userGoogle-auth';
 import Exit from './routes/opc/exit'; // Import the exit route
 import session from 'express-session';
+import adminConfigRouter from './routes/adminConfig';
 import './cronJob'; // Import the cron job to ensure it runs on server start
 
 const app = express();
@@ -51,7 +52,7 @@ app.use('/api/exportToCSV', exportToCSV);
 // app.use('/api/users', userFilter);
 app.use('/api/auth', authRoutes);
 app.use('/api/auth', userGoogleAuthRoutes);
-
+app.use('/api/admin', adminConfigRouter);
 app.use((req, res, next) => {
   console.log(`[${req.method}] ${req.path}`, req.body);
   next();
