@@ -140,7 +140,7 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
   
   // Helper function to get headers with authorization
   const getAuthHeaders = () => {
-    const token = localStorage.getItem('token') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJkZXZAZXhhbXBsZS5jb20iLCJmaXJzdE5hbWUiOiJEZXYiLCJsYXN0TmFtZSI6IlVzZXIiLCJpYXQiOjE3NTQ5OTI2NTcsImV4cCI6MTc1NTA3OTA1N30.w8cTcjsGjx4cNJg7-NZRSoI81ZTDdvuF-CrvbcwwNIk';
+  const token = localStorage.getItem('token') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJkZXZAZXhhbXBsZS5jb20iLCJmaXJzdE5hbWUiOiJEZXYiLCJsYXN0TmFtZSI6IlVzZXIiLCJpYXQiOjE3MDEwMDAwMDAsImV4cCI6MjAwMDAwMDAwMH0.2wQwQwQwQwQwQwQwQwQwQwQwQwQwQwQwQwQwQwQwQwQwQwQwQwQwQwQwQwQwQwQwQwQwQwQwQwQw';
     return {
       'Content-Type': 'application/json',
       'Cache-Control': 'no-cache',

@@ -1,5 +1,5 @@
 import { DataTypes, Model } from 'sequelize';
-import sequelize from '../../config/sequelize.instance';
+import sequelize from '../../config/sequelize'; // השתמש בחיבור המרכזי
 
 class RetrievalQueue extends Model {
   public id!: number;
