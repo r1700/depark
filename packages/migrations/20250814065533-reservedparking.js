@@ -3,18 +3,18 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
-    await queryInterface.createTable('Reservedparking', {
+    await queryInterface.createTable('reservedparking', {
      id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
         allowNull: false,
         autoIncrement: true,
       },
-      adminusersId: {
+      baseuser_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'adminusers'
+          model: 'baseuser'
         }
       },
       parking_number: {
@@ -41,7 +41,7 @@ module.exports = {
   },
 
   async down (queryInterface, Sequelize) {
-    await queryInterface.dropTable('Reservedparking');
+    await queryInterface.dropTable('reservedparking');
   }
 };
 

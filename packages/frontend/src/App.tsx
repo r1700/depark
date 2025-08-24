@@ -7,7 +7,19 @@ import HomePage from "./tablet/pages/HomePage";
 const App: React.FC = () => {
 
   return (
-    <Outlet />
+    <Router>
+    <Routes>
+  
+        <Route path="/" element={<LoginPage />} />
+        <Route path="/admin" element={<LoginPage />} />
+        <Route path="/mobile" element={<Otp />} />
+        <Route path="/tablet" element={<HomePage />} />
+        <Route path="/parkings" element={<ParkingsPage />} />
+        <Route path="/admin-config" element={<AdminConfigPage />} />
+        <Route path="/admin-config/:lotId" element={<AdminConfigPage />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  </Router>
   );
 };
 
