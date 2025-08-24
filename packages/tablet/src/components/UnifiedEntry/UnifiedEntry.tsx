@@ -1,10 +1,12 @@
 import { useState, useEffect, useMemo } from 'react';
 import { sampleVehicles, employeeVehiclesMap } from '../../data';
-import { Box, Typography, MenuItem, Select, InputLabel, FormControl, SelectChangeEvent, Autocomplete, TextField, InputAdornment, Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import { Box, Typography, Autocomplete, TextField, InputAdornment, Button, IconButton, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
+import ClearIcon from '@mui/icons-material/Clear';
 import { useNavigate } from 'react-router-dom';
 import './UnifiedEntry.css';
 import { ESTIMATED_TIME_PER_VEHICLE } from '../../data';
+import { sendVehicleData } from '../../services/api';
 
 const PopupMessage = ({ message, color }: { message: string; color: 'error' | 'success' }) => (
     <Box className={`popup-message ${color}`}>
@@ -21,25 +23,27 @@ export default function UnifiedEntry() {
     const [queues, setQueues] = useState<any[]>([]);
     const [userVehicle, setUserVehicle] = useState('');
     const [popup, setPopup] = useState<{ message: string; color: 'error' | 'success' } | null>(null);
-    const [openModal, setOpenModal] = useState(false); // לפתוח את המודל כאשר מזהה עובד הוזן
+    const [openModal, setOpenModal] = useState(false);
 
     const flatSampleVehicles = useMemo(() => sampleVehicles.flat(), []);
     const employeeIds = useMemo(() => Object.keys(employeeVehiclesMap), []);
     const licensePlates = useMemo(() => flatSampleVehicles.map(v => v.licensePlate), [flatSampleVehicles]);
+    const floorNumber = localStorage.getItem("floorNumber");
 
     const showPopup = (message: string, color: 'error' | 'success') => setPopup({ message, color });
+
     const resetSearch = () => {
         setEmployeeVehicles([]);
         setSelectedVehicle('');
-        setQueues([]);
+        setQueues(sampleVehicles);
         setUserVehicle('');
     };
 
-    const handleSearch = (type: 'plate' | 'employee', value: string) => {
+    const handleSearch = async (type: 'plate' | 'employee', value: string) => {
         resetSearch();
         if (!value)
             return showPopup(`Please enter a ${type === 'plate' ? 'license plate' : '5-digit employee ID'}`, 'error');
-        if (type === 'plate') {
+        if (type === 'plate') {            
             let found = false;
             let queueIndex = -1;
             let positionInQueue = -1;
@@ -54,30 +58,42 @@ export default function UnifiedEntry() {
                 }
             }
             setUserVehicle(value);
-            setQueues(sampleVehicles);
             if (!found) {
                 return showPopup('Vehicle not found in the system', 'error');
             }
+
             const waitTime = positionInQueue * ESTIMATED_TIME_PER_VEHICLE;
-            return showPopup(
+            showPopup(
                 `Vehicle is in queue #${queueIndex + 1} at position ${positionInQueue + 1} — Estimated wait time: ${waitTime} minutes`, 'success'
             );
         }
 
-        if (!/^\d{5}$/.test(value))
-            return showPopup('Please enter a 5-digit employee ID', 'error');
-        if (!employeeVehiclesMap[value])
-            return showPopup('No vehicles found for this employee', 'error');
+        if (type === 'employee') {
+            if (employeeVehiclesMap[value].length===0)
+                return showPopup('No vehicles found for this employee', 'error');
 
-        // ברגע שמזינים מספר עובד, מציגים את הרכבים בהודעה קופצת
-        setEmployeeVehicles(employeeVehiclesMap[value]);
-        setOpenModal(true); // פותחים את המודל של רכבים לעובד
+            setEmployeeVehicles(employeeVehiclesMap[value]);
+            setOpenModal(true);
+        }
+
+        try {
+            await sendVehicleData({
+                licensePlate: value,
+                floorNumber: floorNumber
+            });
+        } catch (err) {
+            console.error("Failed to send data to API", err);
+        }
+
+        return;
     };
 
     const handleVehicleSelect = (plate: string) => {
         setSelectedVehicle(plate);
-        setLicensePlate(plate); // לאחר בחירת רכב, מספר הרישוי נכנס לתיבת הבחירה
-        setOpenModal(false); // סוגרים את המודל
+        setLicensePlate(plate);
+        setOpenModal(false);
+        handleSearch('plate', plate);
+
     };
 
     useEffect(() => {
@@ -93,7 +109,6 @@ export default function UnifiedEntry() {
 
     return (
         <div className="license-plate-input-unified">
-
             <form className="search-form" onSubmit={e => { e.preventDefault(); handleSearch('employee', employeeId); }}>
                 <Autocomplete
                     freeSolo
@@ -110,9 +125,20 @@ export default function UnifiedEntry() {
                             InputProps={{
                                 ...params.InputProps,
                                 endAdornment: (
-                                    <InputAdornment position="start">
-                                        <SearchIcon onClick={() => handleSearch('employee', employeeId)} />
-                                    </InputAdornment>
+                                    <>
+                                        <InputAdornment position="end">
+                                            <IconButton onClick={() => handleSearch('employee', employeeId)}>
+                                                <SearchIcon />
+                                            </IconButton>
+                                        </InputAdornment>
+                                        {employeeId && (
+                                            <InputAdornment position="end">
+                                                <IconButton onClick={() => setEmployeeId('')}>
+                                                    <ClearIcon />
+                                                </IconButton>
+                                            </InputAdornment>
+                                        )}
+                                    </>
                                 )
                             }}
                         />
@@ -158,9 +184,20 @@ export default function UnifiedEntry() {
                             InputProps={{
                                 ...params.InputProps,
                                 endAdornment: (
-                                    <InputAdornment position="start">
-                                        <SearchIcon onClick={() => handleSearch('plate', licensePlate)} />
-                                    </InputAdornment>
+                                    <>
+                                        <InputAdornment position="end">
+                                            <IconButton onClick={() => handleSearch('plate', licensePlate)}>
+                                                <SearchIcon />
+                                            </IconButton>
+                                        </InputAdornment>
+                                        {licensePlate && (
+                                            <InputAdornment position="end">
+                                                <IconButton onClick={() => setLicensePlate('')}>
+                                                    <ClearIcon />
+                                                </IconButton>
+                                            </InputAdornment>
+                                        )}
+                                    </>
                                 )
                             }}
                         />
@@ -170,7 +207,7 @@ export default function UnifiedEntry() {
 
             <Button
                 variant="contained" className="show-queues-btn"
-                onClick={() =>{ navigate('/VehicleQueue', { state: { queues, userVehicle } })}}>
+                onClick={() => { navigate('/VehicleQueue', { state: { queues, userVehicle } }) }}>
                 Show queues
             </Button>
 

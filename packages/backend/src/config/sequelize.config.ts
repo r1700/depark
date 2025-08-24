@@ -6,7 +6,7 @@ export default {
     ...appDbConfig,
     dialectOptions: undefined,
     migrations: {
-      path: path.resolve(__dirname, '../../migrations'),
+      path: path.resolve(__dirname, '../../../migrations'),
       pattern: /\.(js|ts)$/,
     },
   },

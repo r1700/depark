@@ -13,7 +13,7 @@ export const appDbConfig = {
     ssl: { require: true, rejectUnauthorized: false }
   },
   migrations: {
-    path: path.resolve(__dirname, '../../migrations'),
+    path: path.resolve(__dirname, '../../../migrations'),
     pattern: /\.(js|ts)$/,
   },
 };
