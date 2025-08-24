@@ -16,6 +16,11 @@ export class ParkingSessions extends Model {
     //   public vehicle_id!: number;
 }
 
+export class ResevedParking extends Model {
+    public id!: number;
+    public baseuser_id!: number;
+}
+
 User.init({
     id: {
         type: DataTypes.INTEGER,
@@ -55,6 +60,24 @@ ParkingSessions.init({
     timestamps: false,
 });
 
+ResevedParking.init({
+    id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+    },
+    baseuser_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+    },
+}, {
+    sequelize,
+    tableName: 'resevedparking',
+    modelName: 'ResevedParking',
+    timestamps: false,
+});
+
+
 const canUserPark = async (baseuser_id: number): Promise<boolean> => {
   try {
     // how many active parking sessions does the user have?
@@ -79,6 +102,18 @@ const canUserPark = async (baseuser_id: number): Promise<boolean> => {
   }
 };
 
+const isParkingReserved = async (baseuser_id: number): Promise<boolean> => {
+  try {
+    const reservedParking = await ResevedParking.findOne({
+      where: { baseuser_id }
+    });
+    return !!reservedParking; // Returns true if a reserved parking exists for the user
+  } catch (err) {
+    console.error('Error checking reserved parking', err);
+    return false;
+  }
+}
+
 // canUserPark(1)
 // .then(canPark => {
 //   console.log(`User can park: ${canPark}`);
@@ -87,4 +122,12 @@ const canUserPark = async (baseuser_id: number): Promise<boolean> => {
 //   console.error('Error checking if user can park:', err);
 // }); 
 
-export default canUserPark;
+// isParkingReserved(1)
+// .then(isReserved => {
+//   console.log(`User has reserved parking: ${isReserved}`);
+// })
+// .catch(err => {
+//   console.error('Error checking if user has reserved parking:', err);
+// });
+
+export  {canUserPark,isParkingReserved};
