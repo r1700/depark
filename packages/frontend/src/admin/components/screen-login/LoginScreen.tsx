@@ -9,7 +9,7 @@ import GoogleAuth from "../google-auth/GoogleAuth";
 interface IFormInputs {
   email: string;
   password: string;
-  
+
 }
 
 const schema = yup
@@ -20,16 +20,16 @@ const schema = yup
   .required();
 
 const LoginScreen: React.FC = () => {
-  const [login, setLogin] = useState<boolean>(false); 
+  
+  const [login, setLogin] = useState<boolean>(false);
   const [serverError, setServerError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     if (login) {
-      const role = JSON.parse(localStorage.getItem("user") || "{}").role;
-      if (role === 1) navigate("/layout/hr-dashboard");
-      else if (role === 2) navigate("/layout/admin-dashboard");
+      console.log('loading user from localStorage:', localStorage.getItem('user'));      
+      navigate('/admin');      
     }
   }, [login, navigate]);
 
@@ -59,11 +59,11 @@ const LoginScreen: React.FC = () => {
       }
 
       if (result.success === true) {
-        setLogin(true); 
+        setLogin(true);
 
         const { user, token, expiresAt } = result;
-        console.log(user+ " logged in successfully");
-        
+        console.log(user + " logged in successfully");
+
         localStorage.setItem("token", token);
         localStorage.setItem("user", JSON.stringify(user));
         localStorage.setItem("expiresAt", expiresAt);
