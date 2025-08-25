@@ -1,44 +1,48 @@
-import GenericForm from '../../../../components/forms/Form';
-import { FieldConfig } from '../../../../components/forms/Form';
-import { useAppDispatch, useAppSelector } from '../../../store';
-import { addVehicle, fetchVehicles, updateVehicle } from '../vehicleThunks';
-import { Vehicle } from '../../../types/Vehicle';
-import { mockUsers } from '../../../types/User';
-import UserForm from '../../user/UserForm/UserForm';
+import { useAppDispatch} from '../../../store';
+import { FieldConfig, GenericForm } from '../../../../components/forms/Form';
+import { addVehicle, updateVehicle } from '../vehicleThunks';
 
 
-const AddOrEditVehicleForm = ({ onClose, vehicleToEdit=null }
+const AddOrEditVehicleForm = ({ onClose, vehicleToEdit = null }
   : {
     onClose: () => void;
-    vehicleToEdit?: Partial<Vehicle> | null;
+    vehicleToEdit?: any | null;
   }) => {
 
   const dispatch = useAppDispatch();
-  const users = useAppSelector((state) => state.users.users) || mockUsers
-  const newUsers: string[] = mockUsers.map((user) => `${user.firstName} ${user.lastName}`) || [];
+  const users: any[] =  []
 
-
-  const VehicleFields: FieldConfig<Vehicle>[] = [
+  const VehicleFields: FieldConfig[] = [
     { name: 'licensePlate', label: 'License Plate', required: true, type: 'text' },
-    { name: 'user', label: 'User', required: true, type: 'select', options: newUsers },
-    { name: 'width', label: 'Width', type: 'number' },
-    { name: 'height', label: 'Height', type: 'number' },
-    { name: 'length', label: 'Length', type: 'number' },
-    { name: 'weight', label: 'Weight', type: 'number' },
-    {name: 'dimensionsSource', label: 'dimensionsSource', type: 'select', 
-     options: ['model_reference' ,'manual_override', 'government_db'],required: true},
-    ]
-  return (
-    <GenericForm<Vehicle>
+    {
+      name: 'user', label: 'User', required: true, type: 'select', options: users.map(user => ({
+        label: `${user.firstName} ${user.lastName}`,
+        value: user.id,
+      }))
+    },
+    { name: 'vehicleModelId', label: 'Vehicle Model', required: true, type: 'number' },
+    { name: 'width', label: 'Width', type: 'number', disabled: (data) => data.dimensionsSource === 'government_db' },
+    { name: 'height', label: 'Height', type: 'number', disabled: (data) => data.dimensionsSource === 'government_db' },
+    { name: 'length', label: 'Length', type: 'number', disabled: (data) => data.dimensionsSource === 'government_db' },
+    { name: 'weight', label: 'Weight', type: 'number', disabled: (data) => data.dimensionsSource === 'government_db' },
+    { name: 'dimensionsSource', label: 'dimensionsSource', type: 'select',options: 
+      [{ label: 'model_reference', value: 'model_reference' },
+      { label: 'manual_override', value: 'manual_override' },
+      { label: 'government_db', value: 'government_db' }], required: true
+    },
+  ]
+  return (  
+    <GenericForm
       title={vehicleToEdit ? 'Edit Vehicle' : 'Add Vehicle'}
       fields={VehicleFields}
-      initialState={{ 'user': undefined, 'licensePlate': '','dimensionsSource':'manual_override'}}
-      onSubmit={(data) => vehicleToEdit ? dispatch(updateVehicle(data)) : dispatch(addVehicle(data))}
+      initialState={{ user: undefined, licensePlate: '', dimensionsSource: 'manual_override' }}
+      onSubmit={(data:any) => vehicleToEdit ? dispatch(updateVehicle(data)) : dispatch(addVehicle(data))}
       onClose={onClose}
-      entityToEdit={vehicleToEdit}
-    />
+      entityToEdit={vehicleToEdit}/>
   );
-  
 }
 
 export default AddOrEditVehicleForm;
+
+
+
