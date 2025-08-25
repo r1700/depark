@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction, } from '@reduxjs/toolkit';
 import { addVehicle, updateVehicle } from './vehicleThunks';
-import { Vehicle } from '../../types/Vehicle';
+import { Vehicle } from '../../../../../../backend/src/model/vehicle/vehicle'; 
 
 
 

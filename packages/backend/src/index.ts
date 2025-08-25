@@ -14,6 +14,7 @@ import Exit from './routes/opc/exit'; // Import the exit route
 import session from 'express-session';
 import adminConfigRouter from './routes/adminConfig';
 import './cronJob'; // Import the cron job to ensure it runs on server start
+import vehicle from './routes/vehicleRoute';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -52,7 +53,9 @@ app.use('/api/exportToCSV', exportToCSV);
 // app.use('/api/users', userFilter);
 app.use('/api/auth', authRoutes);
 app.use('/api/auth', userGoogleAuthRoutes);
+app.use('/api/vehicles',vehicle)
 app.use('/api/admin', adminConfigRouter);
+
 app.use((req, res, next) => {
   console.log(`[${req.method}] ${req.path}`, req.body);
   next();
