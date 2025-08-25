@@ -4,19 +4,20 @@ import { Vehicle } from '../../types/Vehicle';
 
 
 
-interface VehicleState {
+export interface VehicleState {
   vehicles: Vehicle[];
   loading: boolean;
   error: string | null;
 }
 
-const initialState: VehicleState = {
+ const initialState: VehicleState = {
   vehicles: [],
   loading: false,
   error: null,
 };
 
-const vehicleSlice = createSlice({
+
+ const vehicleSlice = createSlice({
   name: 'vehicles',
   initialState,
   reducers: {

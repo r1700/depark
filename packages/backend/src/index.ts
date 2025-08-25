@@ -14,6 +14,9 @@ import Exit from './routes/opc/exit'; // Import the exit route
 import session from 'express-session';
 import adminConfigRouter from './routes/adminConfig';
 import './cronJob'; // Import the cron job to ensure it runs on server start
+import  GoogleAuth  from './routes/google-auth';
+import parkingReport from './routes/parkingStat';
+import surfaceReport from './routes/surfaceStat';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -52,7 +55,11 @@ app.use('/api/exportToCSV', exportToCSV);
 // app.use('/api/users', userFilter);
 app.use('/api/auth', authRoutes);
 app.use('/api/auth', userGoogleAuthRoutes);
+app.use('/OAuth', GoogleAuth);
 app.use('/api/admin', adminConfigRouter);
+app.use('/api/parking-stats', parkingReport);
+app.use('/api/surface-stats', surfaceReport);
+
 app.use((req, res, next) => {
   console.log(`[${req.method}] ${req.path}`, req.body);
   next();

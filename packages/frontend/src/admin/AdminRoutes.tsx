@@ -7,7 +7,9 @@ import Layout from "./components/layout/layout";
 import AdminDashboard from "./components/adminDashboard/AdminDashboard";
 import HrDashboard from "./components/hrDashboard/HrDashboard";
 import AdminConfigPage from "./components/AdminConfigPage";
-import ParkingsPage from "./Pages/ParkingsPage"; // עדכני נתיב אם צריך
+import ParkingsPage from "./Pages/ParkingsPage";
+import ParkingStatsPage from "./app/pages/parkingStats/parkingStats";
+import SurfaceStatsPage from "./app/pages/surfaceStats/surfaceStats";
 
 function getUserFromStorage() {
   try {
@@ -31,16 +33,14 @@ const AdminRoutes: React.FC = () => {
 
   return (
     <Routes>
-      {/* Login */}
       <Route path="login" element={<LoginScreen />} />
 
-      {/* /admin -> אם לא מחובר -> לוגין, אחרת ניתוב לפי role */}
       <Route
         path=""
         element={
           !user ? (
             <Navigate to="login" replace />
-          ) : user.role === 2 ? ( // role 2 = admin
+          ) : String(user.role) === "2" ? (
             <Navigate to="layout/admin" replace />
           ) : (
             <Navigate to="layout/hr-dashboard" replace />
@@ -48,7 +48,7 @@ const AdminRoutes: React.FC = () => {
         }
       />
 
-      {/* Layout wrapper – nested routes תחת /admin/layout/* */}
+      {/* Layout wrapper – כל ה-routes תחת /admin/layout/* */}
       <Route
         path="layout/*"
         element={
@@ -59,15 +59,23 @@ const AdminRoutes: React.FC = () => {
           )
         }
       >
+        {/* Dashboard / pages */}
         <Route path="admin" element={<AdminDashboard />} />
         <Route path="hr-dashboard" element={<HrDashboard />} />
         <Route path="admin-config" element={<AdminConfigPage />} />
         <Route path="parkings" element={<ParkingsPage />} />
-        {/* default inside layout */}
+
+        {/* Reports כניסה כילדים של layout */}
+        <Route path="reports">
+          <Route path="parking-stats" element={<ParkingStatsPage />} />
+          <Route path="surface-stats" element={<SurfaceStatsPage />} />
+        </Route>
+
+        {/* default בתוך ה-layout */}
         <Route
           index
           element={
-            user?.role === 2 ? <Navigate to="admin" replace /> : <Navigate to="hr-dashboard" replace />
+            String(user?.role) === "2" ? <Navigate to="admin" replace /> : <Navigate to="hr-dashboard" replace />
           }
         />
       </Route>

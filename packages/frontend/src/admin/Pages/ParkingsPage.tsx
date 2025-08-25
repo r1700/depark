@@ -79,11 +79,11 @@ const ParkingsPage: React.FC<ParkingsPageProps> = () => {
         </Box>
 
         {/* Data Table */}
-        <DataTable 
+        {/* <DataTable 
           data={tableData} 
           editPath="/admin-config"
           deletePath="/api/admin"
-        />
+        /> */}
         <Box sx={{ textAlign: 'center', mb: 6 }}>
             <Button
               onClick={() => {
