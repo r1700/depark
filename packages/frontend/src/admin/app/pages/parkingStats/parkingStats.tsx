@@ -41,12 +41,9 @@ const ParkingStatsPage: React.FC = () => {
   const [retryDay, setRetryDay] = useState(0);
 
   // Main fetch with abort
-   useEffect(() => {
+  useEffect(() => {
     mainAbortRef.current?.abort();
-    // const controller = new AbortController();
-    // mainAbortRef.current = controller;
     dispatch(fetchParkingStats(true));
-    // return () => controller.abort();
     return () => {};
     // eslint-disable-next-line
   }, [dispatch, retryMain]);
@@ -134,9 +131,6 @@ const ParkingStatsPage: React.FC = () => {
     }
     if (!isValid(parsed)) return;
     setSelectedRow(period);
-    // dayAbortRef.current?.abort();
-    // const controller = new AbortController();
-    // dayAbortRef.current = controller;
     dispatch(fetchParkingDayDetails(period));
   }, [dispatch, dayLoading]);
 
@@ -149,7 +143,7 @@ const ParkingStatsPage: React.FC = () => {
   const handleTodayClick = useCallback(() => {
     if (dayLoading) return;
     const today = format(new Date(), 'yyyy-MM-dd');
-    setSelectedRow(today);    
+    setSelectedRow(today);
     dispatch(fetchParkingDayDetails(today));
   }, [dispatch, dayLoading]);
 
@@ -163,6 +157,10 @@ const ParkingStatsPage: React.FC = () => {
     } catch {}
     return selectedDay;
   }, [selectedDay]);
+
+  // determine if "Today" is already active
+  const todayStr = useMemo(() => format(new Date(), 'yyyy-MM-dd'), []);
+  const isTodayActive = (selectedRow === todayStr) || (selectedDay === todayStr);
 
   // Loading indicator
   const renderLoading = (size = 22) => (
@@ -191,16 +189,19 @@ const ParkingStatsPage: React.FC = () => {
   return (
     <>
       <div style={{ margin: 0, display: 'flex', gap: 12, alignItems: 'center', marginBottom: 12, justifyContent: 'flex-end' }}>
-        <Button
-          variant="outlined"
-          onClick={handleTodayClick}
-          size="small"
-          disabled={dayLoading}
-          style={{ minWidth: 90 }}
-        >
-          Today
-          {dayLoading && !selectedDayData && <CircularProgress size={16} style={{ marginLeft: 8 }} />}
-        </Button>
+        {!isTodayActive && (
+          <Button
+            variant="outlined"
+            onClick={handleTodayClick}
+            size="small"
+            disabled={dayLoading}
+            style={{ minWidth: 90 }}
+          >
+            Today
+            {dayLoading && !selectedDayData && <CircularProgress size={16} style={{ marginLeft: 8 }} />}
+          </Button>
+        )}
+
         {selectedDayData && (
           <Button
             variant="outlined"

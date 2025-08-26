@@ -24,8 +24,7 @@ import MuiTooltip from '@mui/material/Tooltip';
 import { TabContext, TabList } from '@mui/lab';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import { toPng } from 'html-to-image';
-import { exportImageDataToPdf } from '../exportPDF'; // עדכן נתיב לפי מבנה הפרויקט
-
+import { exportImageDataToPdf } from '../exportPDF'; // update path according to your project structure
 
 const COLORS = [
   '#1976D2', '#00C49F', '#FFBB28', '#FF8042',
@@ -183,6 +182,10 @@ const GenericStatsChart: React.FC<GenericStatsChartProps> = ({
     return { columns: cols, rows };
   })();
 
+  // determine if there is any data to show (either chart or table)
+  const hasData = (chartData && chartData.length > 0) ||
+                  (dataTablePayload && dataTablePayload.rows && dataTablePayload.rows.length > 0);
+
   const boxWidth = wrapperRect ? Math.min(wrapperRect.width, maxTabsWidth) : Math.min(900, maxTabsWidth);
   const boxLeft = wrapperRect ? Math.round(wrapperRect.left + (wrapperRect.width - boxWidth) / 2) : undefined;
 
@@ -193,12 +196,12 @@ const GenericStatsChart: React.FC<GenericStatsChartProps> = ({
   // Export handler: rasterize chart to PNG and send image data + title to exportImageDataToPdf
   const handleExportPdf = async () => {
     if (!wrapperRef.current) {
-      alert('אין אזור לייצוא');
+      alert('No export area available');
       return;
     }
     const chartNode = wrapperRef.current.querySelector('.chart-box') as HTMLElement | null;
     if (!chartNode) {
-      alert('לא נמצא גרף לייצוא (chart-box)');
+      alert('No chart found to export (chart-box)');
       return;
     }
 
@@ -227,7 +230,7 @@ const GenericStatsChart: React.FC<GenericStatsChartProps> = ({
       });
     } catch (err) {
       console.error('Export failed', err);
-      alert('שגיאה ביצוא ה‑PDF');
+      alert('Error exporting PDF');
     } finally {
       setExporting(false);
     }
@@ -246,82 +249,108 @@ const GenericStatsChart: React.FC<GenericStatsChartProps> = ({
             </div>
           )}
 
-          {view === 'table' && (
-            <div className="table-wrapper">
-              <DataTable
-                data={dataTablePayload}
-                onRowClick={onTableRowClick}
-                enablePagination={false}
-                showActions={false}
-                maxHeight={420}
-                dense={true}
-              />
-            </div>
-          )}
-
-          {view === 'bar' && (
-            <div className="chart-box">
-              <ResponsiveContainer width="80%" height={360}>
-                <BarChart
-                  data={chartData}
-                  margin={{ top: 20, right: 30, left: 20, bottom: 80 }}
-                  barCategoryGap={12}
-                  barGap={6}
-                >
-                  <CartesianGrid vertical={false} horizontal={true} strokeDasharray="3 3" stroke="#eee" />
-                  <XAxis
-                    dataKey={xKey}
-                    interval={0}
-                    angle={0}
-                    textAnchor="middle"
-                    height={60}
-                    tick={{ fontSize: 14, fill: '#333' }}
-                    label={{
-                      value: xLabel || '',
-                      position: 'insideBottom',
-                      offset: 0,
-                      className: 'chart-x-label' as any,
-                    }}
-                  />
-                  <RechartsTooltip cursor={{ fill: 'rgba(0,0,0,0.06)' }} />
-                  {barKeys.map((key) => (
-                    <Bar key={key} dataKey={key} isAnimationActive={false}>
-                      {chartData.map((entry, idx) => (
-                        <Cell key={`cell-bar-${idx}-${key}`} fill={colorsByEntry[idx % colorsByEntry.length]} />
-                      ))}
-                      <LabelList dataKey={key} position="inside" style={{ fill: '#fff', fontWeight: 700 }} />
-                    </Bar>
-                  ))}
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          )}
-
-          {view === 'pie' && (
-            <div className="chart-box chart-box--center">
-              <div className="pie-column">
-                <ResponsiveContainer width="80%" height={360}>
-                  <PieChart>
-                    <Pie
-                      data={pieData}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={({ name, percent }) => `${name}: ${((percent ?? 0) * 100).toFixed(0)}%`}
-                      outerRadius={140}
-                      dataKey="value"
-                    >
-                      {pieData.map((entry, idx) => (
-                        <Cell key={`cell-pie-${idx}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <RechartsTooltip />
-                  </PieChart>
-                </ResponsiveContainer>
-
-                {xLabel && <div className="pie-xlabel">{xLabel}</div>}
+          {/* Show a centered "no data" message when there's nothing to display */}
+          {!hasData ? (
+            <div
+              className="no-data"
+              role="status"
+              aria-live="polite"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                minHeight: 320,
+                padding: 24,
+                textAlign: 'center',
+                color: '#444',
+                background: 'transparent',
+              }}
+            >
+              <div>
+                <div style={{ fontSize: 20, fontWeight: 700, marginBottom: 6 }}>No data to display</div>
+                <div style={{ fontSize: 14, color: '#666' }}>No records matched the criteria</div>
               </div>
             </div>
+          ) : (
+            <>
+              {view === 'table' && (
+                <div className="table-wrapper">
+                  <DataTable
+                    data={dataTablePayload}
+                    onRowClick={onTableRowClick}
+                    enablePagination={false}
+                    showActions={false}
+                    maxHeight={420}
+                    dense={true}
+                  />
+                </div>
+              )}
+
+              {view === 'bar' && (
+                <div className="chart-box">
+                  <ResponsiveContainer width="80%" height={360}>
+                    <BarChart
+                      data={chartData}
+                      margin={{ top: 20, right: 30, left: 20, bottom: 80 }}
+                      barCategoryGap={12}
+                      barGap={6}
+                    >
+                      <CartesianGrid vertical={false} horizontal={true} strokeDasharray="3 3" stroke="#eee" />
+                      <XAxis
+                        dataKey={xKey}
+                        interval={0}
+                        angle={0}
+                        textAnchor="middle"
+                        height={60}
+                        tick={{ fontSize: 14, fill: '#333' }}
+                        label={{
+                          value: xLabel || '',
+                          position: 'insideBottom',
+                          offset: 0,
+                          className: 'chart-x-label' as any,
+                        }}
+                      />
+                      <RechartsTooltip cursor={{ fill: 'rgba(0,0,0,0.06)' }} />
+                      {barKeys.map((key) => (
+                        <Bar key={key} dataKey={key} isAnimationActive={false}>
+                          {chartData.map((entry, idx) => (
+                            <Cell key={`cell-bar-${idx}-${key}`} fill={colorsByEntry[idx % colorsByEntry.length]} />
+                          ))}
+                          <LabelList dataKey={key} position="inside" style={{ fill: '#fff', fontWeight: 700 }} />
+                        </Bar>
+                      ))}
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
+
+              {view === 'pie' && (
+                <div className="chart-box chart-box--center">
+                  <div className="pie-column">
+                    <ResponsiveContainer width="80%" height={360}>
+                      <PieChart>
+                        <Pie
+                          data={pieData}
+                          cx="50%"
+                          cy="50%"
+                          labelLine={false}
+                          label={({ name, percent }) => `${name}: ${((percent ?? 0) * 100).toFixed(0)}%`}
+                          outerRadius={140}
+                          dataKey="value"
+                        >
+                          {pieData.map((entry, idx) => (
+                            <Cell key={`cell-pie-${idx}`} fill={entry.color} />
+                          ))}
+                        </Pie>
+                        <RechartsTooltip />
+                      </PieChart>
+                    </ResponsiveContainer>
+
+                    {xLabel && <div className="pie-xlabel">{xLabel}</div>}
+                  </div>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
@@ -364,8 +393,8 @@ const GenericStatsChart: React.FC<GenericStatsChartProps> = ({
             </TabContext>
           </Box>
 
-          {/* Export button: מחוץ ל-box המרכזי כדי לא לשנות את המיקום של ה‑TabList */}
-          {(view === 'bar' || view === 'pie') && (
+          {/* Export button: positioned outside the centered box so it doesn't move the TabList */}
+          {(view === 'bar' || view === 'pie') && hasData && (
             <div
               style={{
                 position: 'absolute',

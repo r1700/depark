@@ -112,3 +112,18 @@
 @media (max-width: 768px) {
   .chart-wrapper { padding-bottom: calc(var(--bottom-bar-height) + 12px); }
 }
+
+.no-data {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 320px;
+  padding: 24px;
+  text-align: center;
+  color: #444;
+  background: transparent;
+}
+
+.no-data div div:last-child {
+  color: #6b6b6b;
+}
