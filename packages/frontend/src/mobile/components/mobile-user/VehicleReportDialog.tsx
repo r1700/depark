@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect, useCallback } from "react";
 import {
   Dialog,
@@ -29,13 +27,12 @@ import {
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip);
 
-
 interface ReportData {
   totalTime: number;
   averageTime: number;
   averageWaitTime: number;
   vehicles: {
-    licensePlate: string;
+    license_plate: string;
     totalTime: number;
     averageTime: number;
     averageWaitTime: number;
@@ -46,10 +43,8 @@ interface ReportData {
 interface Props {
   open: boolean;
   onClose: () => void;
-  
   userId: string | null;
 }
-
 
 const formatDuration = (minutes: number): string => {
   const h = Math.floor(minutes / 60);
@@ -57,9 +52,8 @@ const formatDuration = (minutes: number): string => {
   return `${h}h ${m}m`;
 };
 
-
 const minutesToHours = (minutes: number): number => {
-  return Math.floor(minutes / 60); 
+  return Math.floor(minutes / 60);
 };
 
 export const VehicleReportDialog = ({ open, onClose, userId }: Props) => {
@@ -71,8 +65,7 @@ export const VehicleReportDialog = ({ open, onClose, userId }: Props) => {
     setLoading(true);
     setError("");
     try {
-      ;
-      const response = await fetch(`/api/report?userId=${encodeURIComponent(userId || '')}`);
+      const response = await fetch(`/api/report/${encodeURIComponent(userId || '')}`);
       if (!response.ok) {
         const errRes = await response.json().catch(() => ({}));
         throw new Error(errRes.message || "Failed to fetch report data");
@@ -96,17 +89,16 @@ export const VehicleReportDialog = ({ open, onClose, userId }: Props) => {
     }
   }, [open, fetchReport]);
 
- 
   const getTotalTimeGraph = () => {
     return (
       <Bar
         style={{ marginTop: 30 }}
         data={{
-          labels: report?.vehicles.map((vehicle) => vehicle.licensePlate), 
+          labels: report?.vehicles.map((vehicle) => vehicle.license_plate),
           datasets: [
             {
-              label: "Total Parking Time (in hours)", 
-              data: report?.vehicles.map((vehicle) => minutesToHours(vehicle.totalTime)), 
+              label: "Total Parking Time (in hours)",
+              data: report?.vehicles.map((vehicle) => minutesToHours(vehicle.totalTime)),
               backgroundColor: "rgba(53, 162, 235, 0.5)",
               borderColor: "rgba(53, 162, 235, 1)",
               borderWidth: 1,
@@ -118,7 +110,7 @@ export const VehicleReportDialog = ({ open, onClose, userId }: Props) => {
           plugins: {
             title: {
               display: true,
-              text: "Total Parking Time per Vehicle (in hours)", 
+              text: "Total Parking Time per Vehicle (in hours)",
             },
             tooltip: { enabled: true },
           },
@@ -126,7 +118,7 @@ export const VehicleReportDialog = ({ open, onClose, userId }: Props) => {
             y: {
               beginAtZero: true,
               ticks: {
-                stepSize: 1, 
+                stepSize: 1,
               },
             },
           },
@@ -164,19 +156,19 @@ export const VehicleReportDialog = ({ open, onClose, userId }: Props) => {
         ) : report?.vehicles?.length ? (
           <>
             <Table size="small" sx={{ width: "100%" }}>
-              <TableHead>
-                <TableRow>
-                  <TableCell>License</TableCell>
-                  <TableCell>Total</TableCell>
-                  <TableCell>Avg Park</TableCell>
-                  <TableCell>Avg Wait</TableCell>
-                  <TableCell>Records</TableCell>
-                </TableRow>
-              </TableHead>
+             <TableHead>
+  <TableRow>
+    <TableCell sx={{ backgroundColor: "#b9b5b5ff", color: "#333" }}>License</TableCell>
+    <TableCell sx={{ backgroundColor: "#b9b5b5ff", color: "#333" }}>Total</TableCell>
+    <TableCell sx={{ backgroundColor:"#b9b5b5ff", color: "#333" }}>Avg Park</TableCell>
+    <TableCell sx={{ backgroundColor: "#b9b5b5ff", color: "#333" }}>Avg Wait</TableCell>
+    <TableCell sx={{ backgroundColor: "#b9b5b5ff", color: "#333" }}>Records</TableCell>
+  </TableRow>
+</TableHead>
               <TableBody>
                 {report.vehicles.map((v, idx) => (
                   <TableRow key={idx}>
-                    <TableCell>{v.licensePlate}</TableCell>
+                    <TableCell>{v.license_plate}</TableCell>
                     <TableCell>{formatDuration(v.totalTime)}</TableCell>
                     <TableCell>{formatDuration(v.averageTime)}</TableCell>
                     <TableCell>{formatDuration(v.averageWaitTime)}</TableCell>
@@ -201,4 +193,3 @@ export const VehicleReportDialog = ({ open, onClose, userId }: Props) => {
     </Dialog>
   );
 };
-

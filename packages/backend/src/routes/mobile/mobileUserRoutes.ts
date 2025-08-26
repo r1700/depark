@@ -1,30 +1,21 @@
-
-
-
-
 import express from "express";
 import { Vehicle } from "../../model/database-models/vehicle.model";
 import { ParkingSession } from "../../model/database-models/parkingstssion.model";
-
+import { Op } from "sequelize";
 
 const router = express.Router();
 
-
 // GET - vehicles
-router.get("/vehicles", async (req, res) => {
+router.get("/vehicles/:userId", async (req, res) => {
   try {
-    const { userId } = req.query;
-    const vehicles = await Vehicle.findAll({
-      where: { userId },
-    });
-
-    const data = vehicles.map((vehicle: any) => ({
+    let userId = req.params.userId;
+    const vehicles = await Vehicle.findAll({ where: { baseuser_id: userId } });
+    const data = vehicles.map(vehicle => ({
       ...vehicle.toJSON(),
-      dimensionOverrides: typeof vehicle.dimensionOverrides === "string"
-        ? JSON.parse(vehicle.dimensionOverrides)
-        : vehicle.dimensionOverrides,
+      dimensionOverrides: typeof vehicle.dimension_overrides === "string"
+        ? JSON.parse(vehicle.dimension_overrides)
+        : vehicle.dimension_overrides,
     }));
-
     res.json(data);
   } catch (err) {
     console.error("DB Error:", err);
@@ -35,38 +26,34 @@ router.get("/vehicles", async (req, res) => {
 // POST - add vehicle
 router.post("/vehicles2", async (req, res) => {
   const {
-    userId,
-    licensePlate,
-    vehicleModelId,
+    baseuser_id,
+    license_plate,
+    vehicle_model_id,
     color,
-    addedBy,
-      ParkingSessionId,
+    added_by,
+    parking_session_id,
     height,
     width,
     length,
     weight,
-    dimensionsSource,
+    dimensions_source,
   } = req.body;
 
   try {
-  
-const newVehicle = await Vehicle.create({
- 
-  userId: userId,
-  licensePlate,
-  vehicleModelId,
-  isActive: false,
-  isCurrentlyParked: false,
-  color,
-  createdAt: new Date(),
-  updatedAt: new Date(),
-  addedBy,
-   ParkingSessionId, 
- 
-  dimensionOverrides: { height, width, length, weight },
-   dimensionsSource,
-
-} as any); 
+    const newVehicle = await Vehicle.create({
+      baseuser_id,
+      license_plate,
+      vehicle_model_id,
+      is_active: false,
+      is_currently_parked: false,
+      color,
+      created_at: new Date(),
+      updated_at: new Date(),
+      added_by,
+      parking_session_id,
+      dimension_overrides: { height, width, length, weight },
+      dimensions_source,
+    } as any);
 
     res.status(201).json(newVehicle);
   } catch (err) {
@@ -82,7 +69,7 @@ type RecordEntry = {
 };
 
 type VehicleGroup = {
-  licensePlate: string;
+  license_plate: string;
   totalTime: number;
   averageTime: number;
   averageWaitTime: number;
@@ -92,22 +79,17 @@ type VehicleGroup = {
   countMap: { [timestamp: string]: number };
 };
 
-router.get("/report", async (req, res) => {
+router.get("/report/:userId", async (req, res) => {
+  let userId = req.params.userId;
   try {
-    let userId = req.query.userId;
-    if (!userId || typeof userId !== "string") {
-      userId = "user2";
-    }
-
-    const now = new Date(); 
-
+    const now = new Date();
     const vehiclesResult = await Vehicle.findAll({
-      where: { userId },
+      where: { baseuser_id: userId.toString() },
     });
 
     const vehicles = vehiclesResult.map((v: any) => ({
       id: v.id,
-      licensePlate: v.licensePlate,
+      license_plate: v.license_plate,
     }));
 
     if (vehicles.length === 0) {
@@ -115,12 +97,12 @@ router.get("/report", async (req, res) => {
     }
 
     const vehicleMap = new Map<string, string>(
-      vehicles.map(v => [v.id, v.licensePlate])
+      vehicles.map(v => [v.id, v.license_plate])
     );
     const vehicleIds = vehicles.map(v => v.id);
 
     const sessionsResult = await ParkingSession.findAll({
-      where: { vehicleId: vehicleIds },
+      where: { vehicle_id: { [Op.in]: vehicleIds } },
     });
 
     const sessions = sessionsResult.map((s: any) => s.toJSON());
@@ -136,23 +118,23 @@ router.get("/report", async (req, res) => {
     const vehicleGroups: Record<string, VehicleGroup> = {};
 
     for (const s of sessions) {
-      const vehicleId: string = s.vehicleId;
-      const licensePlate = vehicleMap.get(vehicleId);
-      if (!licensePlate) continue;
+      const vehicleId: string = s.vehicle_id;
+      const license_plate = vehicleMap.get(vehicleId);
+      if (!license_plate) continue;
 
-      const entry = new Date(s.entryTime);
-      const exit = s.exitTime ? new Date(s.exitTime) : now;
+      const entry = new Date(s.entry_time);
+      const exit = s.exit_time ? new Date(s.exit_time) : now;
       const durationMin = (exit.getTime() - entry.getTime()) / 1000 / 60;
 
-      const waitMin = s.retrievalRequestTime
-        ? (new Date(s.retrievalRequestTime).getTime() - entry.getTime()) / 1000 / 60
+      const waitMin = s.retrieval_request_time
+        ? (new Date(s.retrieval_request_time).getTime() - entry.getTime()) / 1000 / 60
         : 0;
 
       const timestamp = entry.toISOString();
 
-      if (!vehicleGroups[licensePlate]) {
-        vehicleGroups[licensePlate] = {
-          licensePlate,
+      if (!vehicleGroups[license_plate]) {
+        vehicleGroups[license_plate] = {
+          license_plate,
           totalTime: 0,
           averageTime: 0,
           averageWaitTime: 0,
@@ -163,7 +145,7 @@ router.get("/report", async (req, res) => {
         };
       }
 
-      const group = vehicleGroups[licensePlate];
+      const group = vehicleGroups[license_plate];
       group.totalTime += durationMin;
       group.waitSum += waitMin;
       group.sessionCount += 1;
@@ -183,7 +165,7 @@ router.get("/report", async (req, res) => {
         );
 
       return {
-        licensePlate: group.licensePlate,
+        license_plate: group.license_plate,
         totalTime: group.totalTime,
         averageTime: group.totalTime / group.sessionCount,
         averageWaitTime: group.waitSum / group.sessionCount,
@@ -206,4 +188,3 @@ router.get("/report", async (req, res) => {
 });
 
 export default router;
-

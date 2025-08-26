@@ -2,7 +2,7 @@
 // בס"ד
 
 import isParkingLotActive from "./lotParking";
-import canUserPark from "./authorization";
+import {canUserPark,isParkingReserved} from "./authorization";
 import { isLicensePlateExists, vehicleModel } from "./licensePlate";
 
 // interface VehicleLookupRequest {
@@ -43,6 +43,12 @@ const isVehicleAllowed = async (vehicleReq: VehicleLookupRequest): Promise<Vehic
         const isActive = await isParkingLotActive(timestamp, lotId);
         if (!isActive.active) {
             return [true, [], vehicleDetails.userId, false, undefined, isActive.message]
+        }
+
+        // Check if the user has reserved place
+        const isReserved = await isParkingReserved(vehicleDetails.userId!);
+        if (isReserved) {
+            return [true, [], vehicleDetails.userId, true, true,undefined]
         }
 
         // Check if the user can park

@@ -1,3 +1,4 @@
+
 import 'reflect-metadata';
 import dotenv from 'dotenv';
 dotenv.config();
@@ -10,15 +11,29 @@ import vehicleRoutes from './routes/vehicle';
 import exportToCSV from './routes/exportToCSV';
 import authRoutes from './routes/auth';
 import userGoogleAuthRoutes from './routes/userGoogle-auth';
-// import googleAuth from './routes/google-auth';
-import auth from './routes/auth';
-import vehicleLookupRouter from './routes/vehicleLookup';
-// import itemsRoutes from './routes/items';
-// import { databaseService } from './services/database';
+import Exit from './routes/opc/exit'; // Import the exit route
+import session from 'express-session';
+import adminConfigRouter from './routes/adminConfig';
+import userRoutes from './routes/user.routes';
 
+import './cronJob'; // Import the cron job to ensure it runs on server start
+import vehicle from './routes/vehicleRoute';
+import  GoogleAuth  from './routes/google-auth';
+import parkingReport from './routes/parkingStat';
+import surfaceReport from './routes/surfaceStat';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+
+
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'keyboard cat',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { secure: process.env.NODE_ENV === 'production' }
+}));
+
+// Middleware
 const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:3000';
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 
@@ -41,25 +56,25 @@ app.use('/api/health', healthRoutes);
 app.use('/api/password', passwordRoutes);
 app.use('/api/vehicle', vehicleRoutes);
 app.use('/api/exportToCSV', exportToCSV);
+ app.use('/api', userRoutes);
 // app.use('/api/users', userFilter);
 app.use('/api/auth', authRoutes);
 app.use('/api/auth', userGoogleAuthRoutes);
+app.use('/api/vehicles',vehicle)
+app.use('/api/admin', adminConfigRouter);
+app.use('/OAuth', GoogleAuth);
+app.use('/api/admin', adminConfigRouter);
+app.use('/api/parking-stats', parkingReport);
+app.use('/api/surface-stats', surfaceReport);
 
 app.use((req, res, next) => {
   console.log(`[${req.method}] ${req.path}`, req.body);
   next();
 });
 
+app.use('/api/opc', Exit);
 
-// app.use(loggerRoutes);
-// app.use('/OAuth', googleAuth); // Ensure this route is correctly set up
-app.use('/auth', auth);
-app.use(loggerRoutes);
-app.use('/api/health', healthRoutes);
-app.use('/api/vehicle',vehicleLookupRouter);
-
-
-// Test route
+// Start server - בסוף!
 app.get('/', (req, res) => {
   res.json({ message: 'DePark Backend is running!' });
 });
@@ -76,10 +91,25 @@ if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
 }
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`:memo: Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`:globe_with_meridians: CORS enabled for: ${CORS_ORIGIN}`);
-  console.log(':white_check_mark: Password reset API ready!');
-  console.log(':link: Available routes:');
+  console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`🌐 CORS enabled for: ${CORS_ORIGIN}`);
+  console.log('✅ APIs ready!');
+  
+  console.log('🔗 Available routes:');
+  console.log('   GET  /');
+  console.log('   GET  /health');
+  console.log('   GET  /api/health');
+  console.log('   POST /api/password/reset');
+  console.log('   GET  /api/vehicle');
+  console.log('   GET  /api/exportToCSV');
+  
+  if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
+    console.log('🗄️ Database: Supabase configured');
+  } else {
+    console.log('📝 Database: Using mock data');
+  }
+  console.log('✅ Password reset API ready!');
+  console.log('🔗 Available routes:');
   console.log('   GET  /');
   console.log('   GET  /health');
   console.log('   GET  /api/auth/users');
