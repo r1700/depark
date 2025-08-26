@@ -1,24 +1,13 @@
-import React, { useState, useEffect, useCallback } from "react";
-import LoginPage from "./admin/Pages/loginPage";
-import Otp from "./mobile/components/otp";
-import HomePage from "./tablet/pages/HomePage";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+// src/App.tsx
+import React from "react";
+import TestToken from "./TestToken";
+import { AuthProvider } from "./context/AuthContext";
 
 const App: React.FC = () => {
-
   return (
-    <>
-      <Router>
-        <Routes>
-          <Route path="/admin" element={<LoginPage />} />
-
-          <Route path="/mobile" element={<Otp />} />
-
-          <Route path="/" element={<HomePage />} />
-        </Routes>
-      </Router>
-    </>
-
+    <AuthProvider>
+      <TestToken />
+    </AuthProvider>
   );
 };
 

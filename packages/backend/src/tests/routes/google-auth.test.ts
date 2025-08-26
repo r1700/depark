@@ -13,9 +13,8 @@ jest.mock('google-auth-library', () => ({
 
 
 
-import { auth, verifyGoogleToken } from '../../src/controllers/google-auth';
-import { getRoleById, getIdByEmail } from '../../src/db/operations';
-
+import { auth, verifyGoogleToken } from '../../controllers/google-auth';
+import { getRole, getId } from '../../services/db/operation'; 
 // Mock the necessary database functions
 
 describe('Google Auth Functions', () => {

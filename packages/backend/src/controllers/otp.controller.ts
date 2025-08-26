@@ -1,7 +1,7 @@
 import { existUser, verifyOtp, createOtp, userIdByContact } from '../services/otp.service';
 import { sendOtpEmail, sendOtpSms } from '../utils/otp.sender';
 import jwt from 'jsonwebtoken';
-import dotenv from 'dotenv';
+import * as dotenv from 'dotenv';
 dotenv.config();
 
 

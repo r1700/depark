@@ -1,6 +1,6 @@
 // otp.sender.ts
 
-import dotenv from 'dotenv';
+import * as dotenv from 'dotenv';
 const nodemailer = require('nodemailer');
 import axios from 'axios';
 
@@ -26,7 +26,7 @@ export async function sendOtpEmail(contact: string, otp: string) {
   const htmlContent = `
   <div style="font-family: Arial, sans-serif; line-height: 1.6; padding: 40px; background-color: #f9fbfc; border-radius: 12px; max-width: 600px; margin: 0 auto; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
     <div style="text-align: center; margin-bottom: 20px;">
-      <img src="../../../../images/depark.png" alt="dePark Logo" style="max-width: 200px; height: auto;">
+      <img src="../../../../images/Depark.png" alt="Depark Logo" style="max-width: 200px; height: auto;">
     </div>
     <h2 style="color: #4a90e2; text-align: center;">One-Time Verification Code</h2>
     <p style="text-align: center;">Your verification code is:</p>
@@ -43,7 +43,7 @@ export async function sendOtpEmail(contact: string, otp: string) {
 
   try {
     const res = await transporter.sendMail({
-      from: `"dePark - no replay" <${process.env.USER_EMAIL}>`,
+      from: `"Depark - no replay" <${process.env.USER_EMAIL}>`,
       to: contact,
       subject: 'One-Time Verification Code',
       html: htmlContent,
@@ -74,7 +74,7 @@ export async function sendOtpSms(phoneNumber: string, otp: string) {
     messages: [
       {
         channel: 'sms',
-        originator: 'depark-code',
+        originator: 'Depark-code',
         recipients: [
           phoneNumber.startsWith('+') ? phoneNumber : `+972${phoneNumber.slice(1)}`,
         ],

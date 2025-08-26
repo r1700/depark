@@ -1,6 +1,6 @@
 
 import { Sequelize, DataTypes, Model } from 'sequelize';
-import dotenv from 'dotenv';
+import * as dotenv from 'dotenv';
 dotenv.config();
 import sequelize from '../../config/instance';
 

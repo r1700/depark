@@ -1,37 +1,54 @@
 import React, { useState, useEffect } from "react";
-import { Box, Button, TextField, Typography, Link, Alert, Stack, Container, CircularProgress } from "@mui/material";
+import {
+  Box,
+  Button,
+  TextField,
+  Typography,
+  Link,
+  Alert,
+  Stack,
+  Container,
+  CircularProgress,
+} from "@mui/material";
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useNavigate } from "react-router-dom";
 import GoogleAuth from "../google-auth/GoogleAuth";
+import { apiRequest } from "../../../api";
 
 interface IFormInputs {
   email: string;
   password: string;
-  
+}
+
+interface LoginScreenProps {
+  onLogin: (token?: string) => void;
 }
 
 const schema = yup
   .object({
     email: yup.string().email("Invalid email format").required("Email is required"),
-    password: yup.string().required("Password is required").min(4, "Password must be at least 4 characters"),
+    password: yup
+      .string()
+      .required("Password is required")
+      .min(4, "Password must be at least 4 characters"),
   })
   .required();
 
-const LoginScreen: React.FC = () => {
-  const [login, setLogin] = useState<boolean>(false); 
-  const [serverError, setServerError] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(false);
+const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [serverError, setServerError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (login) {
+    if (isLoggedIn) {
       const role = JSON.parse(localStorage.getItem("user") || "{}").role;
       if (role === 1) navigate("/layout/hr-dashboard");
       else if (role === 2) navigate("/layout/admin-dashboard");
     }
-  }, [login, navigate]);
+  }, [isLoggedIn, navigate]);
 
   const { control, handleSubmit, formState: { errors, isValid } } = useForm<IFormInputs>({
     resolver: yupResolver(schema),
@@ -44,35 +61,34 @@ const LoginScreen: React.FC = () => {
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:3001/auth/login", {
+      const result = await apiRequest<{
+        success: boolean;
+        user: any;
+        token: string;
+        expiresAt: string;
+        message?: string;
+      }>("/auth/login", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: data,
       });
 
-      const result = await response.json();
       setLoading(false);
 
-      if (!response || result.status === "error") {
-        setServerError(result.success || "Login failed");
+      if (!result.success) {
+        setServerError(result.message || "Login failed");
         return;
       }
 
-      if (result.success === true) {
-        setLogin(true); 
+      setIsLoggedIn(true);
+      localStorage.setItem("token", result.token);
+      localStorage.setItem("user", JSON.stringify(result.user));
+      localStorage.setItem("expiresAt", result.expiresAt);
 
-        const { user, token, expiresAt } = result;
-        console.log(user+ " logged in successfully");
-        
-        localStorage.setItem("token", token);
-        localStorage.setItem("user", JSON.stringify(user));
-        localStorage.setItem("expiresAt", expiresAt);
-      } else {
-        setServerError("Unexpected server response");
-      }
+      onLogin(result.token);
+
     } catch (error) {
       setLoading(false);
-      setServerError("Network error: " + (error as Error).message);
+      setServerError((error as Error).message || "Network error");
     }
   };
 
@@ -109,7 +125,7 @@ const LoginScreen: React.FC = () => {
                 fullWidth
                 margin="normal"
                 error={!!errors.email}
-                helperText={errors.email ? errors.email.message : ""}
+                helperText={errors.email?.message}
                 autoComplete="email"
                 autoFocus
                 dir="ltr"
@@ -130,7 +146,7 @@ const LoginScreen: React.FC = () => {
                 margin="normal"
                 type="password"
                 error={!!errors.password}
-                helperText={errors.password ? errors.password.message : ""}
+                helperText={errors.password?.message}
                 autoComplete="current-password"
                 dir="ltr"
               />
@@ -155,7 +171,7 @@ const LoginScreen: React.FC = () => {
           </Button>
         </Box>
 
-        <GoogleAuth setLogin={setLogin} />
+        <GoogleAuth setLogin={setIsLoggedIn} />
 
         <Stack direction="row" justifyContent="space-between" sx={{ mt: 2 }} spacing={2}>
           <Link href="#" underline="hover" variant="body2" dir="ltr">

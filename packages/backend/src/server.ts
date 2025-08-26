@@ -1,5 +1,5 @@
 import express from 'express';
-import dotenv from 'dotenv';
+import * as dotenv from 'dotenv';
 import passwordRoutes from './routes/user.routes';
 
 dotenv.config(); // טוען משתני סביבה
