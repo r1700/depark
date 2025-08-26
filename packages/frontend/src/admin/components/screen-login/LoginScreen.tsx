@@ -40,10 +40,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin = () => {} }) => {
 
   useEffect(() => {
     if (login) {
-      const role = JSON.parse(localStorage.getItem('user') || '{}').role;
-      if (role === 1) navigate('/layout/hr-dashboard');
-      else if (role === 2) navigate('/layout/admin-dashboard');
-
+      navigate('/admin');
       const token = localStorage.getItem('token') || undefined;
       onLogin(token);
     }
