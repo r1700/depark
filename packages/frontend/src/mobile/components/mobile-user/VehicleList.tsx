@@ -18,10 +18,10 @@ import { VehicleRegistrationForm } from "./VehicleRegistrationForm";
 
 interface Vehicle {
   id: string;
-  licensePlate: string;
+  license_plate: string;
   model?: string;
   location?: string;
-  dimensionOverrides?: {
+  dimension_overrides?: {
     length?: string;
     weight?: string;
     width?: string;
@@ -34,53 +34,47 @@ export const VehicleRow = () => {
   const [queuePosition, setQueuePosition] = useState<Record<string, number>>({});
   const [currentIndex, setCurrentIndex] = useState(0);
   const [reportOpen, setReportOpen] = useState(false);
-  
   const [userId, setUserId] = useState<string | null>(null);
-  
- useEffect(() => {
-  const userStr = localStorage.getItem('user');
-  let user= userStr ? JSON.parse(userStr) : null;
-
-  if (userStr !== null) {
-    try {
-      const user = JSON.parse(userStr);
-      if (user?.userId) {
-        setUserId(user.userId);
-      }
-    } catch (e) {
-      console.error("Failed to parse user from localStorage", e);
-    }
-  }
-}, []);
 
   useEffect(() => {
-    if(userId)
-    fetchVehicles();
+    const userStr = localStorage.getItem('user');
+    if (userStr !== null) {
+      try {
+        const user = JSON.parse(userStr);
+        if (user?.userId) {
+          setUserId(user.userId);
+        }
+      } catch (e) {
+        console.error("Failed to parse user from localStorage", e);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (userId) fetchVehicles();
   }, [userId]);
 
-const fetchVehicles = async () => {
-if (userId == null || userId === "" || userId === "null") {
-console.warn("No userId — skipping fetch");
-return;
-}
-
-try {
-const res = await fetch(`/api/vehicles/${userId}`);
-if (!res.ok) {
-const text = await res.text();
-throw new Error(text || "Server Error");
-}
-const data = await res.json();
-setVehicles(data);
-setCurrentIndex(data.length - 1);
-} catch (err) {
-console.error("Fetch error:", err);
-}
-};
- 
+  const fetchVehicles = async () => {
+    if (!userId) {
+      console.warn("No userId — skipping fetch");
+      return;
+    }
+    try {
+      const res = await fetch(`/api/vehicles/${userId}`);
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(text || "Server Error");
+      }
+      const data = await res.json();
+      setVehicles(data);
+      setCurrentIndex(data.length - 1);
+    } catch (err) {
+      console.error("Fetch error:", err);
+    }
+  };
 
   const getVehicleCategory = (v: Vehicle) => {
-    const dims = v.dimensionOverrides;
+    const dims = v.dimension_overrides;
     if (!dims || !dims.length || !dims.weight) return "unknown";
     const length = parseInt(dims.length);
     const weight = parseInt(dims.weight);
@@ -129,12 +123,11 @@ console.error("Fetch error:", err);
           <Stack spacing={1} alignItems="center" justifyContent="center" sx={{ width: '100%' }}>
             {icon}
             <Typography fontWeight="bold">{vehicle.model}</Typography>
-            <Typography fontSize="0.9rem">Plate: {vehicle.licensePlate}</Typography>
+            <Typography fontSize="0.9rem">Plate: {vehicle.license_plate}</Typography>
             <Box width="100%">
               <Button
                 fullWidth
                 size="small"
-              
                 sx={{ mt: 1, textTransform: 'none' }}
                 variant="contained"
               >
@@ -178,8 +171,7 @@ console.error("Fetch error:", err);
       <VehicleReportDialog
         open={reportOpen}
         onClose={() => setReportOpen(false)}
-        
-        userId={userId ?? null} 
+        userId={userId ?? null}
       />
     </Box>
   );

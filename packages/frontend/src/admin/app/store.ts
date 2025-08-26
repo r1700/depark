@@ -2,6 +2,8 @@ import { configureStore } from '@reduxjs/toolkit';
 import parkingReducer from './pages/adminDashBoard/parkingSlice';
 import vehicleReducer from './pages/vehicle/vehicleSlice';
 import userReducer from './pages/user/usersSlice';
+import parkingStatsReducer from './pages/parkingStats/parkingStatsSlice';
+import surfaceStatsReducer from './pages/surfaceStats/surfaceStatsSlice';
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 
 
@@ -9,6 +11,8 @@ export const store = configureStore({
   reducer: { parking: parkingReducer ,
     vehicles: vehicleReducer,
     users: userReducer,
+    parkingStats: parkingStatsReducer,
+    surfaceStats: surfaceStatsReducer,
   },
 });
 

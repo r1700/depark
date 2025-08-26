@@ -22,14 +22,13 @@ export class Vehicle {
   });
 
   constructor(
-    
     public userId: number,
     public licensePlate: string,
     public isActive: boolean,
     public isCurrentlyParked: boolean,
     public createdAt: Date,
     public updatedAt: Date,
-    public addedBy: 'user' | 'hr',
+    public addedBy: 'user' | 'hr',    
     public dimensionsSource: 'model_reference' | 'manual_override' | 'government_db',
     public vehicleModelId?: number,
     public color?: string,

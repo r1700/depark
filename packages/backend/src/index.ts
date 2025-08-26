@@ -1,3 +1,4 @@
+
 import 'reflect-metadata';
 import dotenv from 'dotenv';
 dotenv.config();
@@ -13,7 +14,13 @@ import userGoogleAuthRoutes from './routes/userGoogle-auth';
 import Exit from './routes/opc/exit'; // Import the exit route
 import session from 'express-session';
 import adminConfigRouter from './routes/adminConfig';
+import userRoutes from './routes/user.routes';
+
 import './cronJob'; // Import the cron job to ensure it runs on server start
+import vehicle from './routes/vehicleRoute';
+import  GoogleAuth  from './routes/google-auth';
+import parkingReport from './routes/parkingStat';
+import surfaceReport from './routes/surfaceStat';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -49,10 +56,17 @@ app.use('/api/health', healthRoutes);
 app.use('/api/password', passwordRoutes);
 app.use('/api/vehicle', vehicleRoutes);
 app.use('/api/exportToCSV', exportToCSV);
+ app.use('/api', userRoutes);
 // app.use('/api/users', userFilter);
 app.use('/api/auth', authRoutes);
 app.use('/api/auth', userGoogleAuthRoutes);
+app.use('/api/vehicles',vehicle)
 app.use('/api/admin', adminConfigRouter);
+app.use('/OAuth', GoogleAuth);
+app.use('/api/admin', adminConfigRouter);
+app.use('/api/parking-stats', parkingReport);
+app.use('/api/surface-stats', surfaceReport);
+
 app.use((req, res, next) => {
   console.log(`[${req.method}] ${req.path}`, req.body);
   next();

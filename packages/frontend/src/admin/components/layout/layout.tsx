@@ -11,12 +11,14 @@ interface LayoutProps {
 }
 const Layout: React.FC<LayoutProps> = ({ user, onLogout }) => {
     return (
+        <>
         <Box sx={{ display: 'flex' }}>
             <Sidebar user={user} onLogout={onLogout} />
             <Box sx={{ flexGrow: 1, p: 3 }}>
                 <Outlet />
             </Box>
         </Box>
+        </>
     );
 };
 export default Layout;

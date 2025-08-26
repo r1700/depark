@@ -1,0 +1,129 @@
+:root {
+  --primary-blue: #1976D2;
+  --primary-blue-dark: #145fa8;
+  --bottom-bar-height: 64px;
+}
+
+
+/* container */
+.chart-container {
+  width: 100%;
+}
+
+/* spacing so content won't be hidden by fixed bottom bar */
+.chart-wrapper {
+  width: 100%;
+  box-sizing: border-box;
+  padding-bottom: calc(var(--bottom-bar-height) + 20px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+.pie-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  height: 80%;
+}
+
+.recharts-wrapper{
+  height: 80%;
+}
+
+.recharts-responsive-container{
+  height: 400px;
+}
+/* title */
+.component-title {
+  width: 100%;
+  text-align: center;
+  font-size: 24px;
+  font-weight: 700;
+  padding: 16px 12px;
+  /* margin-bottom: 8px; */
+  margin-top: 10px;
+  color: #4a4949;
+  /* position: sticky; */
+  /* top: 12px; */
+  /* z-index: 30; */
+  background: transparent;
+}
+
+/* table/graphs */
+.table-wrapper {
+  width: 100%;
+}
+.MuiTabs-list {
+  background-color: white;
+  position: relative;
+  width: 100%;
+}
+
+.chart-box {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+.chart-box--center {
+  align-items: center;
+}
+.chart-title {
+  margin-bottom: 12px;
+  font-family: 'Inter', sans-serif;
+}
+
+/* bottom bar area: transparent; inner Box is white */
+.bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: var(--bottom-bar-height);
+  background: transparent;
+  z-index: 1000;
+  display: block;
+  box-shadow: 0 -1px 6px rgba(0,0,0,0.06);
+  pointer-events: none;
+}
+
+/* Pie X label under pie */
+.pie-xlabel {
+  margin-top: 12px;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 400;
+  color: #767474;
+}
+
+/* Pie keys list (chips) */
+.pie-summary {
+  margin-top: 10px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+
+/* small screen tweaks */
+@media (max-width: 768px) {
+  .chart-wrapper { padding-bottom: calc(var(--bottom-bar-height) + 12px); }
+}
+
+.no-data {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 320px;
+  padding: 24px;
+  text-align: center;
+  color: #444;
+  background: transparent;
+}
+
+.no-data div div:last-child {
+  color: #6b6b6b;
+}
