@@ -26,6 +26,7 @@
     "express": "^4.17.1",
     "google-auth-library": "^10.2.0",
     "jsonwebtoken": "^9.0.2",
+    "multer": "^2.0.2",
     "pg": "^8.16.3",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
@@ -39,6 +40,7 @@
     "yup": "^1.6.1"
   },
   "devDependencies": {
+    "@types/multer": "^2.0.0",
     "@types/pg": "^8.15.5",
     "babel-loader": "^8.2.3",
     "eslint": "^8.57.1",
