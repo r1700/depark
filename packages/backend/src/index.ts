@@ -1,3 +1,4 @@
+
 import 'reflect-metadata';
 import dotenv from 'dotenv';
 dotenv.config();
@@ -13,6 +14,8 @@ import userGoogleAuthRoutes from './routes/userGoogle-auth';
 import Exit from './routes/opc/exit'; // Import the exit route
 import session from 'express-session';
 import adminConfigRouter from './routes/adminConfig';
+import userRoutes from './routes/user.routes';
+
 import './cronJob'; // Import the cron job to ensure it runs on server start
 import vehicle from './routes/vehicleRoute';
 import  GoogleAuth  from './routes/google-auth';
@@ -53,6 +56,7 @@ app.use('/api/health', healthRoutes);
 app.use('/api/password', passwordRoutes);
 app.use('/api/vehicle', vehicleRoutes);
 app.use('/api/exportToCSV', exportToCSV);
+ app.use('/api', userRoutes);
 // app.use('/api/users', userFilter);
 app.use('/api/auth', authRoutes);
 app.use('/api/auth', userGoogleAuthRoutes);
