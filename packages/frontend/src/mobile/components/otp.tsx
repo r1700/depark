@@ -152,6 +152,13 @@ const Otp: React.FC = () => {
                         >
                             Verify
                         </Button>
+                           {/* refactor */}
+                        <Button
+                            onClick={sendOtp}
+                            sx={{ color: 'black', background: 'none', border: 'none',  cursor: 'pointer', paddingTop: 2, textTransform: 'none', fontSize: '15px', marginTop: 1, ':hover': { textDecoration: 'underline' } }}
+                        >
+                             Request a new code
+                        </Button>
                     </Box>
                 )}
 
