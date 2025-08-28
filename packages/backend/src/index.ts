@@ -1,18 +1,19 @@
 
 import 'reflect-metadata';
+// import './cronJob'; // Import the cron job to ensure it runs on server start
 import dotenv from 'dotenv';
-dotenv.config();
 import express from 'express';
+import session from 'express-session';
 import cors from 'cors';
+dotenv.config();
+
 import loggerRoutes from './middlewares/locallLoggerMiddleware';
 import healthRoutes from './routes/health';
 import passwordRoutes from './routes/user.routes';
 import vehicleRoutes from './routes/vehicle';
 import exportToCSV from './routes/exportToCSV';
-import authRoutes from './routes/auth';
 import userGoogleAuthRoutes from './routes/userGoogle-auth';
 import Exit from './routes/opc/exit'; // Import the exit route
-import session from 'express-session';
 import adminConfigRouter from './routes/adminConfig';
 import userRoutes from './routes/user.routes';
 
@@ -23,6 +24,9 @@ import vehicle from './routes/vehicleRoute';
 import  GoogleAuth  from './routes/google-auth';
 import parkingReport from './routes/parkingStat';
 import surfaceReport from './routes/surfaceStat';
+import retrieveRoute from './routes/RetrivalQueue';
+import otpRoutes from './routes/otp.server';
+import authRoutes from './routes/auth';
 
 import path from 'path';
 const app = express();
@@ -43,7 +47,6 @@ const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:3000';
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 
 
-
 app.use(cors({
   origin: CORS_ORIGIN,
   credentials: true,
@@ -54,15 +57,13 @@ if (!GOOGLE_CLIENT_ID) {
   throw new Error('Missing GOOGLE_CLIENT_ID');
 }
 
-app.use(cors({ origin: CORS_ORIGIN, credentials: true }));
-app.use(express.json());
+
 app.use(loggerRoutes);
 app.use('/api/health', healthRoutes);
 app.use('/api/password', passwordRoutes);
 app.use('/api/vehicle', vehicleRoutes);
 app.use('/api/exportToCSV', exportToCSV);
  app.use('/api', userRoutes);
-// app.use('/api/users', userFilter);
 app.use('/api/auth', authRoutes);
 app.use('/api/auth', userGoogleAuthRoutes);
 app.use('/api/vehicles',vehicle)
@@ -71,6 +72,9 @@ app.use('/OAuth', GoogleAuth);
 app.use('/api/admin', adminConfigRouter);
 app.use('/api/parking-stats', parkingReport);
 app.use('/api/surface-stats', surfaceReport);
+app.use('/api/tablet', retrieveRoute);
+app.use('/api/otp', otpRoutes);
+
 
 app.use('/api/logos', logoRouter);
 app.use('/api/screentypes', screenTypeRouter);

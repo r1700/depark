@@ -1,12 +1,12 @@
 import { Client } from 'pg';
 import dotenv from 'dotenv';
 dotenv.config();
-const client = new Client({
-  user: process.env.DB_USER || 'postgres',
-  host: process.env.DB_HOST || 'localhost',
-  database: process.env.DB_DATABASE || 'depark',
-  password: process.env.DB_PASSWORD || '1333',
-  port: process.env.DB_PORT ? parseInt(process.env.DB_PORT) : 5432,
+const client = new Client({  
+  user: process.env.LOCAL_DB_USER || 'postgres',
+  host: process.env.LOCAL_DB_HOST || 'localhost',
+  database: process.env.LOCAL_DB_NAME || 'depark',
+  password: process.env.LOCAL_DB_PASSWORD || '1333',
+  port: process.env.LOCAL_DB_PORT ? parseInt(process.env.LOCAL_DB_PORT) : 5432,
 });
 client.connect();
 const getId = async (email: string) => {
