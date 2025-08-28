@@ -36,19 +36,40 @@ export default function AdminLogoManagement() {
   const [prevSelectedLogos, setPrevSelectedLogos] = useState<{ [key: string]: string[] }>({});
   const [overlayMessage, setOverlayMessage] = useState<string | null>(null);
   const [overlayType, setOverlayType] = useState<'success' | 'error' | null>(null);
-  // State for MUI Menu anchor elements per screen type
   const [anchorEl, setAnchorEl] = useState<{ [key: string]: HTMLElement | null }>({});
   const [overlayVisible, setOverlayVisible] = useState(false);
   const [logoDialogOpen, setLogoDialogOpen] = useState(false);
   const [selectedScreenType, setSelectedScreenType] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  // מערך לוגואים שממתינים להעלאה
-  // State for pending logos
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [errorVisible, setErrorVisible] = useState(false);
   const [pendingLogos, setPendingLogos] = useState<File[]>([]);
-  const [, setPendingLogosVersion] = useState(0);
+  const [pendingLogosVersion, setPendingLogosVersion] = useState(0);
+  // בדיקה האם יש שינוי בלוגואים של screenType
+  function isScreenTypeChanged(screenType: string) {
+    const current = selectedLogos[screenType] || [];
+    const prev = prevSelectedLogos[screenType] || [];
+    return JSON.stringify(current) !== JSON.stringify(prev);
+  }
 
-  // Remove prevSelectedLogos update on every logos/selectedLogos change
-  // Instead, update prevSelectedLogos only after successful save
+  // עדכן prevSelectedLogos רק אחרי טעינה ראשונית של screenTypeLogos
+  useEffect(() => {
+    const fetchScreenTypeLogos = async () => {
+      const result: { [key: string]: string[] } = {};
+      for (const type of SCREEN_TYPES) {
+        try {
+          const res = await fetch(`${API_BASE}/api/screentypes/${type}/logos`);
+          const data = await res.json();
+          result[type] = (data.logoIds || []).map(String);
+        } catch {
+          result[type] = [];
+        }
+      }
+      setSelectedLogos(result);
+      setPrevSelectedLogos(result); // עדכון ראשוני בלבד
+    };
+    fetchScreenTypeLogos();
+  }, []);
 
   useEffect(() => {
     fetch(`${API_BASE}/api/logos`)
@@ -128,6 +149,11 @@ export default function AdminLogoManagement() {
 
   // Save selected logos for a screen type to the server
   const handleSaveScreenTypeLogos = async (screenType: string) => {
+    if (!isScreenTypeChanged(screenType)) {
+      setOverlayMessage("לא בוצע שינוי בלוגואים");
+      setOverlayType('error');
+      return;
+    }
     const logoIds = selectedLogos[screenType] || [];
     setIsLoading(true);
     try {
@@ -140,8 +166,11 @@ export default function AdminLogoManagement() {
       if (response.ok) {
         setOverlayMessage(`Logos saved successfully for ${screenType}!`);
         setOverlayType('success');
-        // Update prevSelectedLogos only after successful save
-        setPrevSelectedLogos(prev => ({ ...prev, [screenType]: [...logoIds] }));
+        // עדכן את prevSelectedLogos לערך החדש
+        setPrevSelectedLogos(prev => ({
+          ...prev,
+          [screenType]: [...logoIds]
+        }));
       } else {
         const errorData = await response.json();
         if (errorData && errorData.missingIds) {
