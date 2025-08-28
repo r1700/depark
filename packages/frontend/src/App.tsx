@@ -8,6 +8,7 @@ import HomePage from "./tablet/pages/HomePage";
 import ForgotPassword from './admin/app/pages/resetPassword/ForgotPassword'
 import ResetPassword from './admin/app/pages/resetPassword/ResetPassword';
 import AdminRoutes from "./admin/AdminRoutes";
+import Login from "./mobile/pages/Login";
 
 const user = JSON.parse(localStorage.getItem("user") || '{}');
 const App: React.FC = () => {
@@ -18,8 +19,8 @@ const App: React.FC = () => {
   
         <Route path="/" element={<LoginPage />} />
         <Route path="/admin/*" element={<AdminRoutes />} />
-
-        <Route path="/mobile" element={<Otp />} />
+        <Route path="/mobile" element={<Login />} />
+        <Route path="/otp" element={<Otp />} />
         <Route path="/tablet" element={<HomePage />} />
         <Route path="/parkings" element={<ParkingsPage />} />
         <Route path="/admin-config" element={<AdminConfigPage />} />
