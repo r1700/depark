@@ -9,6 +9,7 @@ import ForgotPassword from './admin/app/pages/resetPassword/ForgotPassword'
 import ResetPassword from './admin/app/pages/resetPassword/ResetPassword';
 import AdminRoutes from "./admin/AdminRoutes";
 import Login from "./mobile/pages/Login";
+import { VehicleRow } from "./mobile/components/mobile-user/VehicleList";
 
 const user = JSON.parse(localStorage.getItem("user") || '{}');
 const App: React.FC = () => {
@@ -21,6 +22,7 @@ const App: React.FC = () => {
         <Route path="/admin/*" element={<AdminRoutes />} />
         <Route path="/mobile" element={<Login />} />
         <Route path="/otp" element={<Otp />} />
+        <Route path="/VehicleRow" element={<VehicleRow />} />
         <Route path="/tablet" element={<HomePage />} />
         <Route path="/parkings" element={<ParkingsPage />} />
         <Route path="/admin-config" element={<AdminConfigPage />} />
