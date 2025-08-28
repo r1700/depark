@@ -57,7 +57,6 @@ if (!GOOGLE_CLIENT_ID) {
   throw new Error('Missing GOOGLE_CLIENT_ID');
 }
 
-
 app.use(loggerRoutes);
 app.use('/api/health', healthRoutes);
 app.use('/api/password', passwordRoutes);
