@@ -32,8 +32,10 @@ export const fetchUsers = createAsyncThunk(
   'users/fetchUsers',
   async (_, thunkAPI) => {
     try {
+      // console.log('Fetching users...');
+
       const response = await axios.get<User[]>('/api/users');
-      console.log(response.data);
+      // console.log(response.data);
 
       return response.data;
     } catch (error: any) {

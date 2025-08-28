@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Box, Typography, Modal, Fade, Backdrop } from '@mui/material';
 import UserForm from '../app/pages/user/UserForm/UserForm';
-import UsersTable from '../app/pages/user/UserTable/userTable'; // ← הייבוא החדש
+import UsersTable from '../app/pages/user/UserTable/userTable'; 
 
 const styleModal = {
   position: 'absolute' as 'absolute',

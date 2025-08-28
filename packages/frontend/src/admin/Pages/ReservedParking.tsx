@@ -113,11 +113,11 @@ const ReservedParkingPage: React.FC = () => {
             + Add Reserved Parking
           </Button>
         </Box>
-        <DataTable
+        {/* <DataTable
           data={tableData}
-          // editPath="/admin-config-reservedparking"
+          editPath="/admin-config-reservedparking"
           deletePath="/api/reservedparking"
-        />
+        /> */}
       </Paper>
     </Container>
      );

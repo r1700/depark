@@ -27,7 +27,7 @@ if (STATUS === 'production') {
     DB_USER: process.env.LOCAL_DB_USER || 'postgres',
     DB_PASSWORD: process.env.LOCAL_DB_PASSWORD || 'postgres',
     DB_HOST: process.env.LOCAL_DB_HOST || 'localhost',
-    DB_NAME: process.env.LOCAL_DB_NAME || 'depark',
+    DB_NAME: process.env.LOCAL_DB_NAME || 'postgres',
     DB_DIALECT: 'postgres',
   };
 }

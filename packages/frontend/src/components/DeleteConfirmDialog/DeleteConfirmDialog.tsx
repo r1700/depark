@@ -42,7 +42,7 @@ const DeleteConfirmDialog = forwardRef<DeleteConfirmDialogRef, DeleteConfirmDial
       });
       
       if (response.ok) {
-        console.log('✅ Item deleted successfully');
+  console.log('✅ Item deleted successfully');
         closeDialog();
         if (onDeleteSuccess) {
           onDeleteSuccess();

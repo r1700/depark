@@ -3,6 +3,10 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import { validateLoginData } from '../../src/validation/check';
 import { getId, getRole } from '../../src/services/db/operation';
+import path from 'path';
+import dotenv from 'dotenv';
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
+
 const router = Router();
 const JWT_SECRET = process.env.JWT_SECRET;
 if (!JWT_SECRET) throw new Error("JWT_SECRET is not defined in environment variables");

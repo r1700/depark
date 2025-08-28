@@ -1,5 +1,5 @@
 export interface BaseUser {
-  id: string;
+  id: number;
   email: string;
   firstName: string;
   lastName: string;
@@ -21,7 +21,7 @@ export interface User extends BaseUser {
 export const mockUsers: Partial<User>[] = [
 
     {
-    id: '1',
+    id: 1,
     firstName: 'John',
     lastName: 'Doe',
     email: 'john.doe@example.com',
@@ -33,7 +33,7 @@ export const mockUsers: Partial<User>[] = [
 
   },
   {
-    id: '2',
+    id: 2,
     firstName: 'Jane',
     lastName: 'Smith',
     email: 'jane.smith@example.com',

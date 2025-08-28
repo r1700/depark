@@ -717,8 +717,8 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
         <Paper elevation={3} sx={{ p: 4, borderRadius: 3 }}>
           {/* Header */}
           <Box textAlign="center" mb={4}>
-            {/* Back Button */}
-            <Box sx={{ textAlign: 'left', mb: 2 }}>
+            {/* Back Buttons */}
+            <Box sx={{ textAlign: 'left', mb: 2, display: 'flex', gap: 2 }}>
               <Button
                 variant="outlined"
                 onClick={() => navigate('/parkings')}
@@ -729,11 +729,11 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
                     backgroundColor: 'primary.main',
                     color: 'white'
                   }
-                  }}
-                >
-                  ← Back to Parking Lots
-                </Button>
-              </Box>
+                }}
+              >
+                ← Back to Parking Lots
+              </Button>
+            </Box>
             
             <Typography variant="h3" component="h1" gutterBottom sx={{ 
               fontWeight: 400, 

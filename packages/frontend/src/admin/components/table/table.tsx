@@ -1,199 +1,266 @@
-// DataTable.tsx
-import React, { useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
-  Table, TableBody, TableCell, TableContainer,
-  TableHead, TableRow, TablePagination, IconButton
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TablePagination,
+  IconButton,
 } from '@mui/material';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import './table.css';
-import { useNavigate } from 'react-router-dom';
-import DeleteConfirmDialog from '../DeleteConfirmDialog/DeleteConfirmDialog';
 
-type DataTableProps = {
-  data: { columns: any[]; rows: any[] };
-  onRowClick?: (row: any) => void; // optional callback when clicking a row
-  enablePagination?: boolean; // default false -> show all rows + scrollbar
-  showActions?: boolean; // default false -> hide actions column/buttons
-  maxHeight?: number; // max height for table container (px)
-  dense?: boolean; // if true, use smaller row height
-  deletePath?: string; // path for delete API
-};
+interface DataTableProps {
+  data: { columns: any[]; rows: any[] } | undefined;
+  stickyColumns?: string[];
+}
 
-const DataTable: React.FC<DataTableProps> = ({
-  data,
-  onRowClick,
-  enablePagination = false,
-  showActions = false,
-  maxHeight = 360,
-  dense = true,
-  deletePath = '',
-}) => {
+const DataTable: React.FC<DataTableProps> = ({ data, stickyColumns = [] }) => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [order, setOrder] = useState<'asc' | 'desc'>('asc');
   const [orderBy, setOrderBy] = useState<string>('');
-  const [sortMenuOpen, setSortMenuOpen] = useState<boolean>(false);
-  const [selectedColumn, setSelectedColumn] = useState<string>('');
-  const [hoveredOption, setHoveredOption] = useState<'asc' | 'desc' | null>(null);
-  const [currentDeleteItem, setCurrentDeleteItem] = useState<any>(null);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [tableRows, setTableRows] = useState<any[]>(data.rows);
-  React.useEffect(() => {
-    setTableRows(data.rows);
-  }, [data.rows]);
+
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const tableRef = useRef<HTMLTableElement | null>(null);
+  const horizRef = useRef<HTMLDivElement | null>(null);
+  const externalInnerRef = useRef<HTMLDivElement | null>(null);
+
+  const [horizPos, setHorizPos] = useState<{ left: number; width: number; bottom: number }>({
+    left: 0,
+    width: 0,
+    bottom: 56,
+  });
+
+  const columns = data?.columns ?? [];
+  const rows = data?.rows ?? [];
+
+  useLayoutEffect(() => {
+    const update = () => {
+      const tableW = tableRef.current?.scrollWidth ?? 0;
+      if (externalInnerRef.current) {
+        externalInnerRef.current.style.width = `${tableW}px`;
+      }
+
+      const containerRect = containerRef.current?.getBoundingClientRect();
+      if (containerRect) {
+        const left = containerRect.left + window.scrollX;
+        const width = containerRect.width;
+        const bottom = 56;     
+        setHorizPos({ left, width, bottom });
+      }
+    };
+    const run = () => {
+      requestAnimationFrame(update);
+    };
+    run();
+
+    window.addEventListener('resize', run);
+    window.addEventListener('scroll', run);
+
+    return () => {
+      window.removeEventListener('resize', run);
+      window.removeEventListener('scroll', run);
+    };
+  }, [columns, rows, page, rowsPerPage]);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    const horiz = horizRef.current;
+    if (!container || !horiz) return;
+
+    const onHorizScroll = () => {
+      if (container.scrollLeft !== horiz.scrollLeft) {
+        container.scrollLeft = horiz.scrollLeft;
+      }
+    };
+
+    const onContainerScroll = () => {
+      if (horiz.scrollLeft !== container.scrollLeft) {
+        horiz.scrollLeft = container.scrollLeft;
+      }
+    };
+
+    horiz.addEventListener('scroll', onHorizScroll);
+    container.addEventListener('scroll', onContainerScroll);
+
+    horiz.scrollLeft = container.scrollLeft;
+
+    return () => {
+      horiz.removeEventListener('scroll', onHorizScroll);
+      container.removeEventListener('scroll', onContainerScroll);
+    };
+  }, [columns, rows]);
+
+  if (!data || !Array.isArray(columns) || !Array.isArray(rows) || rows.length === 0) {
+    return <p>No data to display.</p>;
+  }
 
   const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
     setPage(newPage);
   };
+
   const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
 
-  // Handle delete button click
-  const handleDelete = (row: any) => {
-    if (deletePath) {
-      setCurrentDeleteItem(row);
-      setDeleteDialogOpen(true);
-    }
-  };
-
   const stableSort = (array: any[], comparator: any) => {
-    const stabilizedArray = array.map((el, index) => [el, index] as any);
-    stabilizedArray.sort((a: any, b: any) => {
+    const stabilizedArray = array.map((el, index) => [el, index] as [any, number]);
+    stabilizedArray.sort((a, b) => {
       const orderRes = comparator(a[0], b[0]);
       if (orderRes !== 0) return orderRes;
       return a[1] - b[1];
     });
-    return stabilizedArray.map((el: any) => el[0]);
+    return stabilizedArray.map((el) => el[0]);
   };
 
   const comparator = (a: any, b: any) => {
     if (!orderBy) return 0;
-    if (a[orderBy] < b[orderBy]) return order === 'asc' ? -1 : 1;
-    if (a[orderBy] > b[orderBy]) return order === 'asc' ? 1 : -1;
+    if (a[orderBy] < b[orderBy]) {
+      return order === 'asc' ? -1 : 1;
+    }
+    if (a[orderBy] > b[orderBy]) {
+      return order === 'asc' ? 1 : -1;
+    }
     return 0;
   };
 
-  if (!data || !Array.isArray(data.columns) || !Array.isArray(data.rows) || data.rows.length === 0)
-    return <p>No data to display.</p>;
+  const stickyLeftPositions = stickyColumns.reduce<number[]>((acc, _colId, idx) => {
+    acc.push(idx * 150);
+    return acc;
+  }, []);
 
-  const columns = data.columns;
-  const rows = tableRows;
+  const getStickyStyle = (colId: string) => {
+    const idx = stickyColumns.indexOf(colId);
+    if (idx === -1) return {};
+    return {
+      position: 'sticky',
+      left: stickyLeftPositions[idx],
+      backgroundColor: '#f5f5f5',
+      minWidth: 150,
+      whiteSpace: 'nowrap',
+      boxShadow: '2px 0 5px -2px rgba(0,0,0,0.2)',
+    };
+  };
 
-  const sorted = stableSort(rows, comparator);
-  const visibleRows = enablePagination ? sorted.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) : sorted;
+  const handleSort = (columnId: string, dir: 'asc' | 'desc') => {
+    setOrder(dir);
+    setOrderBy(columnId);
+  };
 
   return (
     <>
-      <TableContainer
-        className="table-container"
-        sx={
-          enablePagination
-            ? { maxHeight: maxHeight, overflow: 'auto' }   // אם משתמשים בעמודיות - שומרים גלגול פנימי
-            : { maxHeight: 'unset', overflow: 'visible' }  // אחרת תנו לטבלה לגדול - גלגול רק בדף
-        }
-      >
+      <TableContainer className="table-container" sx={{ overflowX: 'auto' }} ref={containerRef}>
         <Table
           className="table"
           aria-label="data table"
+          ref={tableRef}
           sx={{
-            '& thead th': { width: '15%' },
-            '& tbody>tr, thead>tr': { height: dense ? '40px' : '60px' },
-            '& tbody>tr:hover': { backgroundColor: '#F5F5F5', border: 'none' },
-            '& th:hover': { backgroundColor: '#3d54a1ff', border: '-2' },
-            '& td, & th': { padding: dense ? '6px 12px' : '12px 16px' },
+            tableLayout: 'auto',
+            '& thead th': {
+              position: 'sticky',
+              top: 0,
+              height: 60,
+              backgroundColor: '#1e3687',
+              color: '#fff',
+              fontWeight: 'bold',
+              whiteSpace: 'nowrap',
+              zIndex: 20,
+            },
+            '& tbody > tr:hover': {
+              backgroundColor: '#f5f5f5',
+              border: 'none',
+            },
+            '& th:hover': {
+              backgroundColor: '#3d54a1ff',
+            },
           }}
         >
           <TableHead className="table-head">
             <TableRow>
               {columns.map((column) => (
-                <TableCell key={column.id}>
-                  <IconButton
-                    onClick={() => {
-                      setSortMenuOpen(!sortMenuOpen);
-                      setSelectedColumn(column.id);
-                    }}
-                    size="small"
-                    aria-label={`sort-${column.id}`}
-                  >
-                    <MoreVertIcon htmlColor='#c4c1d3ff' fontSize="small" />
-                  </IconButton>
-                  {sortMenuOpen && selectedColumn === column.id && (
-                    <div style={{ position: 'absolute', top: '50px', backgroundColor: '#fbfafeff', color: '#491fc7ff', border: '1px solid #ccc', padding: '10px', borderRadius: '4px' }}>
-                      <div
-                        onClick={() => {
-                          setOrder('asc');
-                          setOrderBy(column.id);
-                          setHoveredOption(null);
-                          setSortMenuOpen(false);
-                        }}
-                        onMouseEnter={() => setHoveredOption('asc')}
-                        onMouseLeave={() => setHoveredOption(null)}
-                        style={{
-                          padding: '7px',
-                          cursor: 'pointer',
-                          backgroundColor: hoveredOption === 'asc' ? '#d4daf3ff' : 'transparent',
-                          marginBottom: '2px'
-                        }}
-                      >
-                        Ascending
-                      </div>
-                      <div
-                        onClick={() => {
-                          setOrder('desc');
-                          setOrderBy(column.id);
-                          setHoveredOption(null);
-                          setSortMenuOpen(false);
-                        }}
-                        onMouseEnter={() => setHoveredOption('desc')}
-                        onMouseLeave={() => setHoveredOption(null)}
-                        style={{
-                          padding: '7px',
-                          cursor: 'pointer',
-                          backgroundColor: hoveredOption === 'desc' ? '#d4daf3ff' : 'transparent',
-                        }}
-                      >
-                        Descending
-                      </div>
-                    </div>
-                  )}
-                  {column.label}
+                <TableCell key={column.id} sx={getStickyStyle(column.id)}>
+                  <span className="sort-btn" aria-hidden="false">
+                    <button
+                      type="button"
+                      className={`triangle-btn up ${orderBy === column.id && order === 'asc' ? 'active' : ''}`}
+                      onClick={() => handleSort(column.id, 'asc')}
+                      aria-label={`sort ${column.id} ascending`}
+                      title="Sort ascending"
+                    />
+                    <button
+                      type="button"
+                      className={`triangle-btn down ${orderBy === column.id && order === 'desc' ? 'active' : ''}`}
+                      onClick={() => handleSort(column.id, 'desc')}
+                      aria-label={`sort ${column.id} descending`}
+                      title="Sort descending"
+                    />
+                  </span>
+
+                  <span style={{ marginLeft: 8 }}>{column.label}</span>
                 </TableCell>
               ))}
-              {showActions && <TableCell>Actions</TableCell>}
+              <TableCell sx={getStickyStyle('actions')}>Actions</TableCell>
             </TableRow>
           </TableHead>
 
           <TableBody>
-            {visibleRows.map((row, idx) => (
-              <TableRow
-                key={idx}
-                hover={!!onRowClick}
-                onClick={() => onRowClick && onRowClick(row)}
-                sx={{ cursor: onRowClick ? 'pointer' : 'default' }}
-              >
-                {columns.map((column) => (
-                  <TableCell key={column.id}>
-                    {typeof row[column.id] === 'boolean' ? (
-                      row[column.id] ? <CheckIcon color="success" fontSize="small" /> : <CloseIcon color="error" fontSize="small" />
-                    ) : (
-                      String(row[column.id])
-                    )}
+            {stableSort(rows, comparator)
+              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              .map((row, idx) => (
+                <TableRow key={idx} hover>
+                  {columns.map((column) => (
+                    <TableCell key={column.id} sx={getStickyStyle(column.id)}>
+                      {typeof row[column.id] === 'boolean' ? (
+                        row[column.id] ? (
+                          <CheckIcon color="success" />
+                        ) : (
+                          <CloseIcon color="error" />
+                        )
+                      ) : (
+                        String(row[column.id])
+                      )}
+                    </TableCell>
+                  ))}
+                  <TableCell className="actions" sx={getStickyStyle('actions')}>
+                    <IconButton color="success" aria-label="edit">
+                      <EditIcon />
+                    </IconButton>
+                    <IconButton color="error" aria-label="delete">
+                      <DeleteIcon />
+                    </IconButton>
                   </TableCell>
-                ))}
-                {showActions && (
-                  <TableCell className="actions">
-                    {/* אם רוצים אקשנים אפשר להכניס כאן */}
-                  </TableCell>
-                )}
-              </TableRow>
-            ))}
+                </TableRow>
+              ))}
           </TableBody>
         </Table>
+
+        <div style={{ height: 1, width: 0 }} />
       </TableContainer>
+
+      <div
+        ref={horizRef}
+        className="external-h-scroll"
+        style={{
+          position: 'fixed',
+          left: horizPos.left,
+          width: horizPos.width,
+          bottom: horizPos.bottom,
+          height: 18,
+          overflowX: 'auto',
+          overflowY: 'hidden',
+          zIndex: 9999,
+          background: 'transparent',
+        }}
+      >
+        <div ref={externalInnerRef} style={{ height: 1, width: 0 }} />
+      </div>
 
       <TablePagination
         sx={{
@@ -202,7 +269,7 @@ const DataTable: React.FC<DataTableProps> = ({
             backgroundColor: 'white',
           },
         }}
-        rowsPerPageOptions={[ 3, 5, 10,20]}
+        rowsPerPageOptions={[3, 5, 10, 20]}
         component="div"
         count={rows.length}
         rowsPerPage={rowsPerPage}
@@ -210,22 +277,6 @@ const DataTable: React.FC<DataTableProps> = ({
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
         className="table-pagination"
-      />
-
-      {/* Delete Confirmation Dialog */}
-      <DeleteConfirmDialog
-        itemData={currentDeleteItem}
-        deletePath={deletePath || ''}
-        open={deleteDialogOpen}
-        onClose={() => setDeleteDialogOpen(false)}
-        onDeleteResult={(result) => {
-          setDeleteDialogOpen(false);
-          if (result.success && currentDeleteItem) {
-            const itemId = currentDeleteItem.lotId || currentDeleteItem.id || currentDeleteItem.logoId;
-            setTableRows(prev => prev.filter(row => (row.lotId || row.id || row.logoId) !== itemId));
-          }
-          // Optionally handle error: show overlay, etc.
-        }}
       />
     </>
   );
