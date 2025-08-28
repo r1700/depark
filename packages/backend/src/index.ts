@@ -16,14 +16,19 @@ import session from 'express-session';
 import adminConfigRouter from './routes/adminConfig';
 import userRoutes from './routes/user.routes';
 
+import logoRouter from './routes/logos';
+import screenTypeRouter from './routes/screenType';
 import './cronJob'; // Import the cron job to ensure it runs on server start
 import vehicle from './routes/vehicleRoute';
 import  GoogleAuth  from './routes/google-auth';
 import parkingReport from './routes/parkingStat';
 import surfaceReport from './routes/surfaceStat';
 
+import path from 'path';
 const app = express();
 const PORT = process.env.PORT || 3001;
+// Serve static logos
+app.use('/logos', express.static(path.join(process.cwd(), 'public/logos')));
 
 
 app.use(session({
@@ -66,6 +71,10 @@ app.use('/OAuth', GoogleAuth);
 app.use('/api/admin', adminConfigRouter);
 app.use('/api/parking-stats', parkingReport);
 app.use('/api/surface-stats', surfaceReport);
+
+app.use('/api/logos', logoRouter);
+app.use('/api/screentypes', screenTypeRouter);
+app.use('/logos', express.static(path.join(process.cwd(), 'public/logos')));
 
 app.use((req, res, next) => {
   console.log(`[${req.method}] ${req.path}`, req.body);
@@ -117,7 +126,7 @@ app.listen(PORT, () => {
   console.log('   POST /api/auth/login');
   console.log('   GET  /api/admin/config');
   console.log('   PUT  /api/admin/config');
-
+  console.log('   POST /api/logos');
   if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
     console.log(':file_cabinet: Initializing database...');
   } else {
