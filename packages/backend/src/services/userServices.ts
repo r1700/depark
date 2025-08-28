@@ -17,7 +17,7 @@ export async function getAllUsersWithBaseuser() {
             bu.first_name,
             bu.last_name,
             bu.email,
-            u.phone,
+            bu.phone,
             u.status,
             u.department,
             u.employee_id,
