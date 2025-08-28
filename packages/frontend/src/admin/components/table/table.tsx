@@ -7,6 +7,8 @@ import {
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 import './table.css';
 import { useNavigate } from 'react-router-dom';
 import DeleteConfirmDialog from '../DeleteConfirmDialog/DeleteConfirmDialog';
@@ -186,7 +188,12 @@ const DataTable: React.FC<DataTableProps> = ({
                 ))}
                 {showActions && (
                   <TableCell className="actions">
-                    {/* אם רוצים אקשנים אפשר להכניס כאן */}
+                    <IconButton onClick={() => onRowClick && onRowClick(row)} aria-label="Edit" size="small">
+                      <EditIcon fontSize="small" />
+                    </IconButton>
+                    <IconButton onClick={() => handleDelete(row)} aria-label="Delete" size="small">
+                      <DeleteIcon fontSize="small" />
+                    </IconButton>
                   </TableCell>
                 )}
               </TableRow>
