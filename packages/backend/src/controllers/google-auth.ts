@@ -1,5 +1,6 @@
 import { OAuth2Client } from 'google-auth-library';
-import { getRoleById, getUserByEmail } from '../db/operations';
+import { getRoleById } from '../services/adminUsers';
+import { getUserByEmail } from '../services/baseUser';
 import { Err } from 'joi';
 
 const clientId = process.env.CLIENT_ID;

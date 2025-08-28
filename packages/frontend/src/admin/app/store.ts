@@ -3,6 +3,9 @@ import parkingReducer from './pages/adminDashBoard/parkingSlice';
 import vehicleReducer from './pages/vehicle/vehicleSlice';
 import userReducer from './pages/user/usersSlice';
 import reservedParkingReducer from './pages/reservedparking/reservedparkingSlice';
+
+import parkingStatsReducer from './pages/parkingStats/parkingStatsSlice';
+import surfaceStatsReducer from './pages/surfaceStats/surfaceStatsSlice';
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 
 
@@ -13,6 +16,9 @@ export const store = configureStore({
     vehicles: vehicleReducer,
     users: userReducer,
     reservedParking: reservedParkingReducer,
+    parkingStats: parkingStatsReducer,
+    surfaceStats: surfaceStatsReducer,
+
   },
 });
 

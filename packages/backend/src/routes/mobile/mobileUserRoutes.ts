@@ -2,21 +2,19 @@ import express from "express";
 import { Vehicle } from "../../model/database-models/vehicle.model";
 import { ParkingSession } from "../../model/database-models/parkingstssion.model";
 import { Op } from "sequelize";
-import { count } from "console";
 
 const router = express.Router();
 
 // GET - vehicles
-
 router.get("/vehicles/:userId", async (req, res) => {
   try {
-    let userId = req.params.userId; // שינוי מ-query ל-params
-    const vehicles = await Vehicle.findAll({ where: { userId } });
+    let userId = req.params.userId;
+    const vehicles = await Vehicle.findAll({ where: { baseuser_id: userId } });
     const data = vehicles.map(vehicle => ({
       ...vehicle.toJSON(),
-      dimensionOverrides: typeof vehicle.dimensionOverrides === "string"
-        ? JSON.parse(vehicle.dimensionOverrides)
-        : vehicle.dimensionOverrides,
+      dimensionOverrides: typeof vehicle.dimension_overrides === "string"
+        ? JSON.parse(vehicle.dimension_overrides)
+        : vehicle.dimension_overrides,
     }));
     res.json(data);
   } catch (err) {
@@ -27,41 +25,35 @@ router.get("/vehicles/:userId", async (req, res) => {
 
 // POST - add vehicle
 router.post("/vehicles2", async (req, res) => {
-
   const {
-    userId,
-    licensePlate,
-    vehicleModelId,
+    baseuser_id,
+    license_plate,
+    vehicle_model_id,
     color,
-    addedBy,
-      ParkingSessionId,
+    added_by,
+    parking_session_id,
     height,
     width,
     length,
     weight,
-    dimensionsSource,
+    dimensions_source,
   } = req.body;
 
   try {
-  
-const newVehicle = await Vehicle.create({
- 
-  userId: userId,
-  licensePlate,
-  vehicleModelId,
-  isActive: false,
-  isCurrentlyParked: false,
-  color,
-  createdAt: new Date(),
-  updatedAt: new Date(),
-  addedBy,
-   ParkingSessionId, 
- 
-  dimensionOverrides: { height, width, length, weight },
-   dimensionsSource,
-
-} as any); 
- 
+    const newVehicle = await Vehicle.create({
+      baseuser_id,
+      license_plate,
+      vehicle_model_id,
+      is_active: false,
+      is_currently_parked: false,
+      color,
+      created_at: new Date(),
+      updated_at: new Date(),
+      added_by,
+      parking_session_id,
+      dimension_overrides: { height, width, length, weight },
+      dimensions_source,
+    } as any);
 
     res.status(201).json(newVehicle);
   } catch (err) {
@@ -77,7 +69,7 @@ type RecordEntry = {
 };
 
 type VehicleGroup = {
-  licensePlate: string;
+  license_plate: string;
   totalTime: number;
   averageTime: number;
   averageWaitTime: number;
@@ -88,35 +80,32 @@ type VehicleGroup = {
 };
 
 router.get("/report/:userId", async (req, res) => {
-  let userId = req.params.userId; 
+  let userId = req.params.userId;
   try {
-  
-    const now = new Date(); 
-const vehiclesResult = await Vehicle.findAll({ 
-   where: {userId:userId.toString() },
-});
+    const now = new Date();
+    const vehiclesResult = await Vehicle.findAll({
+      where: { baseuser_id: userId.toString() },
+    });
 
-const vehicles = vehiclesResult.map((v: any) => ({
-  id: v.id,
-  licensePlate: v.licensePlate,
-}));
+    const vehicles = vehiclesResult.map((v: any) => ({
+      id: v.id,
+      license_plate: v.license_plate,
+    }));
 
     if (vehicles.length === 0) {
       return res.status(404).json({ error: "No vehicles found for user" });
     }
 
     const vehicleMap = new Map<string, string>(
-      vehicles.map(v => [v.id, v.licensePlate])
+      vehicles.map(v => [v.id, v.license_plate])
     );
     const vehicleIds = vehicles.map(v => v.id);
 
+    const sessionsResult = await ParkingSession.findAll({
+      where: { vehicle_id: { [Op.in]: vehicleIds } },
+    });
 
-const sessionsResult = await ParkingSession.findAll({
-  where: { vehicleId: { [Op.in]: vehicleIds } },
-});
-
-
-const sessions = sessionsResult.map((s: any) => s.toJSON());
+    const sessions = sessionsResult.map((s: any) => s.toJSON());
 
     if (sessions.length === 0) {
       return res.status(404).json({ error: "No parking sessions found for user's vehicles" });
@@ -129,23 +118,23 @@ const sessions = sessionsResult.map((s: any) => s.toJSON());
     const vehicleGroups: Record<string, VehicleGroup> = {};
 
     for (const s of sessions) {
-      const vehicleId: string = s.vehicleId;
-      const licensePlate = vehicleMap.get(vehicleId);
-      if (!licensePlate) continue;
+      const vehicleId: string = s.vehicle_id;
+      const license_plate = vehicleMap.get(vehicleId);
+      if (!license_plate) continue;
 
-      const entry = new Date(s.entryTime);
-      const exit = s.exitTime ? new Date(s.exitTime) : now;
+      const entry = new Date(s.entry_time);
+      const exit = s.exit_time ? new Date(s.exit_time) : now;
       const durationMin = (exit.getTime() - entry.getTime()) / 1000 / 60;
 
-      const waitMin = s.retrievalRequestTime
-        ? (new Date(s.retrievalRequestTime).getTime() - entry.getTime()) / 1000 / 60
+      const waitMin = s.retrieval_request_time
+        ? (new Date(s.retrieval_request_time).getTime() - entry.getTime()) / 1000 / 60
         : 0;
 
       const timestamp = entry.toISOString();
 
-      if (!vehicleGroups[licensePlate]) {
-        vehicleGroups[licensePlate] = {
-          licensePlate,
+      if (!vehicleGroups[license_plate]) {
+        vehicleGroups[license_plate] = {
+          license_plate,
           totalTime: 0,
           averageTime: 0,
           averageWaitTime: 0,
@@ -156,7 +145,7 @@ const sessions = sessionsResult.map((s: any) => s.toJSON());
         };
       }
 
-      const group = vehicleGroups[licensePlate];
+      const group = vehicleGroups[license_plate];
       group.totalTime += durationMin;
       group.waitSum += waitMin;
       group.sessionCount += 1;
@@ -176,7 +165,7 @@ const sessions = sessionsResult.map((s: any) => s.toJSON());
         );
 
       return {
-        licensePlate: group.licensePlate,
+        license_plate: group.license_plate,
         totalTime: group.totalTime,
         averageTime: group.totalTime / group.sessionCount,
         averageWaitTime: group.waitSum / group.sessionCount,

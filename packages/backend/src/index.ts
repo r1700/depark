@@ -1,3 +1,4 @@
+
 import 'reflect-metadata';
 import dotenv from 'dotenv';
 dotenv.config();
@@ -13,12 +14,25 @@ import userGoogleAuthRoutes from './routes/userGoogle-auth';
 import Exit from './routes/opc/exit'; // Import the exit route
 import session from 'express-session';
 import adminConfigRouter from './routes/adminConfig';
-import ResevedParking  from './routes/reservedparkingApi';
+import ResevedParking from './routes/reservedparkingApi';
 import UserApi from './routes/userApi';
 // import './cronJob'; // Import the cron job to ensure it runs on server start
 
+import userRoutes from './routes/user.routes';
+
+import logoRouter from './routes/logos';
+import screenTypeRouter from './routes/screenType';
+import './cronJob'; // Import the cron job to ensure it runs on server start
+import vehicle from './routes/vehicleRoute';
+import GoogleAuth from './routes/google-auth';
+import parkingReport from './routes/parkingStat';
+import surfaceReport from './routes/surfaceStat';
+
+import path from 'path';
 const app = express();
 const PORT = process.env.PORT || 3001;
+// Serve static logos
+app.use('/logos', express.static(path.join(process.cwd(), 'public/logos')));
 
 
 app.use(session({
@@ -26,7 +40,7 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   cookie: { secure: process.env.NODE_ENV === 'production' }
-}));
+}) as unknown as express.RequestHandler);
 
 // Middleware
 const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:3000';
@@ -53,9 +67,19 @@ app.use('/api/password', passwordRoutes);
 app.use('/api/vehicle', vehicleRoutes);
 app.use('/api/exportToCSV', exportToCSV);
 app.use('/api/users', UserApi);
-app.use('/api/auth', authRoutes);
+app.use('/api', userRoutes);
 app.use('/api/auth', userGoogleAuthRoutes);
+app.use('/api/vehicles', vehicle);
 app.use('/api/admin', adminConfigRouter);
+app.use('/OAuth', GoogleAuth);
+app.use('/api/admin', adminConfigRouter);
+app.use('/api/parking-stats', parkingReport);
+app.use('/api/surface-stats', surfaceReport);
+
+app.use('/api/logos', logoRouter);
+app.use('/api/screentypes', screenTypeRouter);
+app.use('/logos', express.static(path.join(process.cwd(), 'public/logos')));
+
 app.use((req, res, next) => {
   console.log(`[${req.method}] ${req.path}`, req.body);
   next();
@@ -83,7 +107,7 @@ app.listen(PORT, () => {
   console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`🌐 CORS enabled for: ${CORS_ORIGIN}`);
   console.log('✅ APIs ready!');
-  
+
   console.log('🔗 Available routes:');
   console.log('   GET  /');
   console.log('   GET  /health');
@@ -91,7 +115,7 @@ app.listen(PORT, () => {
   console.log('   POST /api/password/reset');
   console.log('   GET  /api/vehicle');
   console.log('   GET  /api/exportToCSV');
-  
+
   if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
     console.log('🗄️ Database: Supabase configured');
   } else {
@@ -106,7 +130,7 @@ app.listen(PORT, () => {
   console.log('   POST /api/auth/login');
   console.log('   GET  /api/admin/config');
   console.log('   PUT  /api/admin/config');
-
+  console.log('   POST /api/logos');
   if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
     console.log(':file_cabinet: Initializing database...');
   } else {

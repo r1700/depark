@@ -115,7 +115,7 @@ const ReservedParkingPage: React.FC = () => {
         </Box>
         <DataTable
           data={tableData}
-          editPath="/admin-config-reservedparking"
+          // editPath="/admin-config-reservedparking"
           deletePath="/api/reservedparking"
         />
       </Paper>
