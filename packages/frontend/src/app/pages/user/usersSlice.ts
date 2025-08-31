@@ -1,10 +1,8 @@
-import { createSlice} from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 import { addUser, fetchUsers, updateUser } from './userThunks';
 import { User } from '../../types/User'
 
-
 interface UserState {
-  map(arg0: (user: any) => string): string[] | undefined;
   users: User[];
   loading: boolean;
   error: string | null;
@@ -14,9 +12,6 @@ const initialState: UserState = {
   users: [],
   loading: false,
   error: null,
-  map: function (arg0: (user: any) => string): string[] | undefined {
-    throw new Error('Function not implemented.');
-  }
 };
 
 const userSlice = createSlice({
@@ -35,7 +30,8 @@ const userSlice = createSlice({
       })
       .addCase(fetchUsers.fulfilled, (state, action) => {
         state.loading = false;
-        state.error = action.payload as unknown as string;
+        state.error = null;
+        state.users = Array.isArray(action.payload) ? (action.payload as User[]) : [];
       })
       .addCase(fetchUsers.rejected, (state, action) => {
         state.loading = false;
@@ -46,11 +42,11 @@ const userSlice = createSlice({
       })
       .addCase(addUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.users.push(action.payload); 
+        state.users.push(action.payload as User);
       })
       .addCase(addUser.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as string;
+        state.error = (action.payload as string) ?? 'Add user failed';
       })
       .addCase(updateUser.pending, (state) => {
         state.loading = true;
@@ -58,9 +54,10 @@ const userSlice = createSlice({
       })
       .addCase(updateUser.fulfilled, (state, action) => {
         state.loading = false;
-        const index = state.users.findIndex((u) => u.id === action.payload.id);
+        const payload = action.payload as User;
+        const index = state.users.findIndex((u) => u.id === payload.id);
         if (index !== -1) {
-          state.users[index] = action.payload;
+          state.users[index] = payload;
         }
       })
       .addCase(updateUser.rejected, (state, action) => {

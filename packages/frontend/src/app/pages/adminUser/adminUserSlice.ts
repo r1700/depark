@@ -1,6 +1,6 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { AdminUser, AdminUserFilters, CreateAdminUserRequest,UpdateAdminUserRequest } from './adminUserTypes';
-import { fetchAdminUsersAPI, addAdminUserAPI ,updateAdminUserAPI} from './adminUsersAPI';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { AdminUser, AdminUserFilters, CreateAdminUserRequest, UpdateAdminUserRequest } from './adminUserTypes';
+import { fetchAdminUsersAPI, addAdminUserAPI, updateAdminUserAPI } from './adminUsersAPI';
 
 interface AdminUsersState {
   users: AdminUser[];
@@ -14,35 +14,56 @@ const initialState: AdminUsersState = {
   error: null,
 };
 
-export const fetchAdminUsers = createAsyncThunk(
+export const fetchAdminUsers = createAsyncThunk<AdminUser[], AdminUserFilters | undefined, { rejectValue: string }>(
   'adminUsers/fetchAdminUsers',
-  async (filters?: AdminUserFilters) => {
-    return await fetchAdminUsersAPI(filters);
-  }
-);
-export const addAdminUser = createAsyncThunk(
-  'adminUsers/addAdminUser',
-  async (payload: CreateAdminUserRequest, { rejectWithValue }) => {
+  async (filters, { rejectWithValue }) => {
     try {
-      const user = await addAdminUserAPI(payload);
-      return user;
+      const res = await fetchAdminUsersAPI(filters);
+      return res;
     } catch (err: any) {
-      return rejectWithValue(err.response?.data ?? err.message ?? 'Failed to add admin user');
+      return rejectWithValue(err.response?.data?.message ?? err.message ?? 'Failed to fetch admin users');
     }
   }
 );
 
-export const updateAdminUser = createAsyncThunk(
+export const addAdminUser = createAsyncThunk<AdminUser, CreateAdminUserRequest, { rejectValue: string }>(
+  'adminUsers/addAdminUser',
+  async (payload, { rejectWithValue }) => {
+    try {
+      const user = await addAdminUserAPI(payload);
+      return user;
+    } catch (err: any) {
+      return rejectWithValue(err.response?.data?.message ?? err.message ?? 'Failed to add admin user');
+    }
+  }
+);
+
+export const updateAdminUser = createAsyncThunk<AdminUser, UpdateAdminUserRequest, { rejectValue: string }>(
   'adminUsers/updateAdminUser',
-  async (payload: UpdateAdminUserRequest, { rejectWithValue }) => {
+  async (payload, { rejectWithValue }) => {
     try {
       const user = await updateAdminUserAPI(payload);
       return user;
     } catch (err: any) {
-      return rejectWithValue(err.response?.data ?? err.message ?? 'Failed to update admin user');
+      return rejectWithValue(err.response?.data?.message ?? err.message ?? 'Failed to update admin user');
     }
   }
 );
+function sanitizeAdminUser(u: any): AdminUser {
+  return {
+    id: u.id,
+    role: u.role ?? 'hr',
+    permissions: Array.isArray(u.permissions) ? [...u.permissions] : [],
+    lastLoginAt: u.lastLoginAt ?? null,
+    baseUser: {
+      email: u.baseUser?.email ?? '',
+      firstName: u.baseUser?.firstName ?? '',
+      lastName: u.baseUser?.lastName ?? '',
+      createdAt: u.baseUser?.createdAt ?? null,
+      updatedAt: u.baseUser?.updatedAt ?? null,
+    },
+  } as AdminUser;
+}
 
 const adminUsersSlice = createSlice({
   name: 'adminUsers',
@@ -50,43 +71,54 @@ const adminUsersSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
+      // FETCH
       .addCase(fetchAdminUsers.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchAdminUsers.fulfilled, (state, action: PayloadAction<AdminUser[]>) => {
-
-        console.log('fetchAdminUsers.fulfilled payload:', action.payload);
-        console.log('payload.isArray:', Array.isArray(action.payload));
-        console.log('payload ownProps:', Object.getOwnPropertyNames(action.payload ?? {}));
-        if (action.payload?.[0]) console.log('first item ownProps:', Object.getOwnPropertyNames(action.payload[0]));
-
+      .addCase(fetchAdminUsers.fulfilled, (state, action) => {
         state.loading = false;
-        state.users = action.payload;
+        state.error = null;
+        state.users = Array.isArray(action.payload) ? action.payload.map(sanitizeAdminUser) : [];
       })
       .addCase(fetchAdminUsers.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message ?? 'Failed to fetch admin users';
+        state.error = action.payload ?? action.error?.message ?? 'Failed to fetch admin users';
       })
+
+      // ADD
+      .addCase(addAdminUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(addAdminUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
+        state.users.push(sanitizeAdminUser(action.payload));
+      })
+      .addCase(addAdminUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload ?? action.error?.message ?? 'Failed to add admin user';
+      })
+
+      // UPDATE
       .addCase(updateAdminUser.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-    .addCase(updateAdminUser.fulfilled, (state, action: PayloadAction<AdminUser>) => {
-      state.loading = false;
-      const updated = action.payload;
-      const idx = state.users.findIndex(u => u.id === updated.id);
-      if (idx !== -1) {
-        state.users[idx] = updated;
-      } else {
-        state.users.unshift(updated);
-      }
-    })
-    .addCase(updateAdminUser.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.payload as string ?? action.error.message ?? 'Failed to update admin user';
-    });
-},
+      .addCase(updateAdminUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
+        if (action.payload && action.payload.id) {
+          const updated = sanitizeAdminUser(action.payload);
+          state.users = state.users.map(u => u.id === updated.id ? updated : u);
+        }
+      })
+      .addCase(updateAdminUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload ?? action.error?.message ?? 'Failed to update admin user';
+      });
+  },
 });
 
 export default adminUsersSlice.reducer;

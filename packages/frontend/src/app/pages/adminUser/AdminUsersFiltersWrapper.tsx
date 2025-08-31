@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { Button, Drawer, Box } from '@mui/material';
 import FilterPanel from '../../../components/filter-panel/FilterPanel';
 import {
@@ -27,41 +27,38 @@ const AdminUsersFiltersWrapper: React.FC<Props> = ({
   setEnabled,
 }) => {
   const [open, setOpen] = useState(false);
-
   const [localFilters, setLocalFilters] = useState<AdminUserFilters>({ ...filters });
 
+  // sync when drawer opens (so edits start from current filters)
   useEffect(() => {
-    if (open) {
-      setLocalFilters(filters);
-    }
+    if (open) setLocalFilters(filters);
   }, [open, filters]);
 
-  const [isFilterActive, setIsFilterActive] = useState(false);
-  useEffect(() => {
-    const active = Object.entries(filters).some(([_, val]) => {
-      if (val === undefined || val === null) return false;
-      if (typeof val === 'string') return val.trim() !== '';
-      if (Array.isArray(val)) return val.length > 0;
-      if (typeof val === 'number') return !isNaN(val);
-      return true;
-    });
-    setIsFilterActive(active);
-  }, [filters]);
+  const openDrawer = useCallback(() => setOpen(true), []);
+  const closeDrawer = useCallback(() => setOpen(false), []);
 
-  const clearFilters = () => {
+  const clearFilters = useCallback(() => {
     const cleared: AdminUserFilters = { limit: 20, offset: 0 };
     setLocalFilters(cleared);
     setFilters(cleared);
     setEnabled(false);
     setOpen(false);
-  };
+  }, [setFilters, setEnabled]);
 
-  const applyFilters = () => {
+  const applyFilters = useCallback(() => {
     setFilters(localFilters);
     setEnabled(true);
     setOpen(false);
-  };
-  const fieldsConfig: FieldConfigForAdmin[] = [
+  }, [localFilters, setFilters, setEnabled]);
+
+  const handleLocalChange = useCallback(
+    (partial: Partial<AdminUserFilters>) => {
+      setLocalFilters(prev => ({ ...(prev as AdminUserFilters), ...(partial as Partial<AdminUserFilters>) }));
+    },
+    []
+  );
+
+  const fieldsConfig = useMemo<FieldConfigForAdmin[]>(() => [
     {
       name: 'searchTerm',
       type: 'free',
@@ -93,29 +90,34 @@ const AdminUsersFiltersWrapper: React.FC<Props> = ({
       type: 'number',
       label: 'Active Last N Days',
     },
-  ];
+  ], []);
 
   return (
     <>
       <Button
         variant={enabled ? 'contained' : 'outlined'}
         color={enabled ? 'primary' : undefined}
-        onClick={() => setOpen(true)}
+        onClick={openDrawer}
+        aria-label="Open filters"
       >
         Filters
       </Button>
 
-      <Drawer anchor="right" open={open} onClose={() => setOpen(false)}>
+      <Drawer anchor="right" open={open} onClose={closeDrawer}>
         <Box sx={{ width: 320, p: 2 }}>
           <FilterPanel<AdminUserFilters>
             fields={fieldsConfig as any}
             filters={localFilters}
-            onChange={(partial) =>
-              setLocalFilters((prev) => ({ ...(prev as AdminUserFilters), ...(partial as Partial<AdminUserFilters>) }))
-            }
+            onChange={handleLocalChange}
             onClear={clearFilters}
           />
-          <Button variant="contained" fullWidth onClick={applyFilters} sx={{ mt: 2 }}>
+          <Button
+            variant="contained"
+            fullWidth
+            onClick={applyFilters}
+            sx={{ mt: 2 }}
+            aria-label="Apply filters"
+          >
             Apply
           </Button>
         </Box>

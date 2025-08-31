@@ -4,18 +4,11 @@ import AdminUsersFiltersWrapper from './AdminUsersFiltersWrapper';
 import { AdminUserFilters } from './adminUserTypes';
 
 interface AdminUsersPageHeaderProps {
-  isSortEnabled: boolean;
-  setIsSortEnabled: React.Dispatch<React.SetStateAction<boolean>>;
+  
   isFilterEnabled: boolean;
   setIsFilterEnabled: React.Dispatch<React.SetStateAction<boolean>>;
-  isSortPanelOpen: boolean;
-  setIsSortPanelOpen: React.Dispatch<React.SetStateAction<boolean>>;
   filters: AdminUserFilters;
   setFilters: (filters: AdminUserFilters) => void;
-  sortBy?: string;
-  setSortBy: (value?: string) => void;
-  sortDirection?: 'asc' | 'desc';
-  setSortDirection: (value?: 'asc' | 'desc') => void;
 }
 
 const AdminUsersPageHeader: React.FC<AdminUsersPageHeaderProps> = ({
@@ -66,8 +59,6 @@ const AdminUsersPageHeader: React.FC<AdminUsersPageHeaderProps> = ({
       >
         Admin Users Management
       </Typography>
-      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-      </Box>
     </Box>
   );
 };

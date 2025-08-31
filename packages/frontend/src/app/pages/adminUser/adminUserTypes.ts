@@ -49,8 +49,6 @@ export interface AdminUserFilters {
   updatedAfter?: string;
   updatedBefore?: string;
   activeLastNDays?: number;
-  sortBy?: string;
-  sortDirection?: 'asc' | 'desc';
   limit?: number;
   offset?: number;
 }
