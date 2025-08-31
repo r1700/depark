@@ -3,7 +3,6 @@ import { useAppDispatch, useAppSelector } from '../../store';
 import { fetchAdminUsers, addAdminUser, updateAdminUser } from './adminUserSlice';
 import DataTable from '../../../components/table/table';
 import GenericForm, { FieldConfig } from '../../../components/forms/Form';
-// import AddOrEditAdminUserForm from './AddAdminUser';
 import { AdminUser, AdminUserFilters } from './adminUserTypes';
 import { Box, CircularProgress, Typography, Button, Dialog, DialogContent } from '@mui/material';
 import AdminUsersPageHeader from './AdminUsersPageHeader';
@@ -139,15 +138,6 @@ const AdminUsersPage: React.FC = () => {
           : <Typography>No users found</Typography>
       )}
 
-      <Dialog open={showForm} onClose={handleCloseForm} maxWidth="sm" fullWidth>
-        <DialogContent>
-          {/* <AddOrEditAdminUserForm
-            entityToEdit={selectedUser ?? undefined}
-            onClose={handleCloseForm}
-            mode={formMode}
-          /> */}
-        </DialogContent>
-      </Dialog>
     </Box>
   );
 };

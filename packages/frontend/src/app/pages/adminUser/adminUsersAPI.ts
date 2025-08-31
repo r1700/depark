@@ -63,8 +63,9 @@ export async function updateAdminUserAPI(payload: UpdateAdminUserRequest): Promi
   const res = await axios.put('/admin/users/${encodeURIComponent(id)}', body, {
     headers: {
       'Content-Type': 'application/json',
-    }
+    }    
   });
+    console.log('ddddddddddddddddddddddd', res);
 
   if (res.data && res.data.data) {
     return res.data.data as AdminUser;
