@@ -19,6 +19,7 @@ export class ParkingSessions extends Model {
 export class ResevedParking extends Model {
     public id!: number;
     public baseuser_id!: number;
+    public parking_number!: number;
 }
 
 User.init({
@@ -70,6 +71,10 @@ ResevedParking.init({
         type: DataTypes.INTEGER,
         allowNull: false,
     },
+    parking_number: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+    },
 }, {
     sequelize,
     tableName: 'resevedparking',
@@ -102,15 +107,15 @@ const canUserPark = async (baseuser_id: number): Promise<boolean> => {
   }
 };
 
-const isParkingReserved = async (baseuser_id: number): Promise<boolean> => {
+const isParkingReserved = async (baseuser_id: number): Promise<number> => {
   try {
     const reservedParking = await ResevedParking.findOne({
       where: { baseuser_id }
     });
-    return !!reservedParking; // Returns true if a reserved parking exists for the user
+    return reservedParking!.parking_number; // Returns true if a reserved parking exists for the user
   } catch (err) {
     console.error('Error checking reserved parking', err);
-    return false;
+    return 0;
   }
 }
 

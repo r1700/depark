@@ -26,7 +26,7 @@ import { isLicensePlateExists, vehicleModel } from "./licensePlate";
 
 type VehicleLookupRequest = [string, Date, string, number];
 
-type VehicleLookupResponse = [boolean, (number | undefined)[], number | undefined, boolean, boolean | undefined, string | undefined];
+type VehicleLookupResponse = [number, (number | undefined)[], number | undefined, boolean, number | undefined, string | undefined];
 
 
 const isVehicleAllowed = async (vehicleReq: VehicleLookupRequest): Promise<VehicleLookupResponse> => {
@@ -36,36 +36,36 @@ const isVehicleAllowed = async (vehicleReq: VehicleLookupRequest): Promise<Vehic
         // Check if the vehicle is allowed to park
         const vehicleDetails = await isLicensePlateExists(licensePlate);
         if (!vehicleDetails.found) {
-            return [false, [], undefined, false, undefined, 'Vehicle not found'];
+            return [701, [], undefined, false, undefined, 'Vehicle not found'];
         }
 
         // Check if the parking lot is active at the given timestamp
         const isActive = await isParkingLotActive(timestamp, lotId);
         if (!isActive.active) {
-            return [true, [], vehicleDetails.userId, false, undefined, isActive.message]
+            return [702, [], vehicleDetails.userId, false, undefined, isActive.message]
         }
 
         // Check if the user has reserved place
-        const isReserved = await isParkingReserved(vehicleDetails.userId!);
-        if (isReserved) {
-            return [true, [], vehicleDetails.userId, true, true,undefined]
+        const ReservedPlace = await isParkingReserved(vehicleDetails.userId!);
+        if (ReservedPlace!==0) {
+            return [801, [], vehicleDetails.userId, true,ReservedPlace ,undefined]
         }
 
         // Check if the user can park
         const canPark = await canUserPark(vehicleDetails.userId!);
         if (!canPark) {
-            return [true, [], vehicleDetails.userId, false, undefined, 'User cannot park more vehicles']
+            return [703, [], vehicleDetails.userId, false, undefined, 'User cannot park more vehicles']
         }
 
         // If the vehicle is found and the user can park, return the vehicle model
         if (!vehicleDetails.vehicle_model_id) {
-            return [true, [], vehicleDetails.userId, true, true, 'this vehicle goes to reseved place']
+            return [802, [0,0,0], vehicleDetails.userId, true, undefined, 'vehicle model is not found']
         }
         const modelDetails = await vehicleModel(vehicleDetails.vehicle_model_id);
 
 
         // If all checks pass, return the vehicle details
-        return [true,
+        return [800,
             [modelDetails.vehicleDetails?.height, modelDetails.vehicleDetails?.width, modelDetails.vehicleDetails?.length],
             vehicleDetails.userId,
             true,
@@ -74,8 +74,8 @@ const isVehicleAllowed = async (vehicleReq: VehicleLookupRequest): Promise<Vehic
 
     } catch (err) {
         console.error('Error checking vehicle allowance', err);
-        return [false,[], undefined, false,
-            false,
+        return [700,[], undefined, false,
+            undefined,
             'Error checking vehicle allowance']
 
     };
