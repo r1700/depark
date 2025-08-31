@@ -11,7 +11,7 @@ const sequelize = new Sequelize(
 
     port: appDbConfig.port,  
     dialect: appDbConfig.dialect,
-    dialectOptions: process.env.STATUS === 'production' ? appDbConfig.dialectOptions : undefined,
+    dialectOptions: appDbConfig.dialectOptions, 
     logging: process.env.STATUS === 'development' ? console.log : false,
   }
 );
