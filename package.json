@@ -52,6 +52,7 @@
   },
   "devDependencies": {
     "@types/pg": "^8.15.5",
+    "@types/raf": "^3.4.3",
     "@types/socket.io": "^3.0.1",
     "babel-loader": "^8.2.3",
     "eslint": "^8.57.1",

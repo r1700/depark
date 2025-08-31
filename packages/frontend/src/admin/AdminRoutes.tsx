@@ -10,7 +10,7 @@ import AdminDashboard from "./components/adminDashboard/AdminDashboard";
 import HrDashboard from "./components/hrDashboard/HrDashboard";
 import AdminConfigPage from "./components/AdminConfigPage";
 import ParkingsPage from "./Pages/ParkingsPage";
-import ParkingStatsPage from "./app/pages/parkingStats/parkingStats";
+// import ParkingStatsPage from "./app/pages/parkingStats/parkingStats";
 import SurfaceStatsPage from "./app/pages/surfaceStats/surfaceStats";
 
 function getUserFromStorage() {
@@ -71,7 +71,7 @@ const AdminRoutes: React.FC = () => {
 
         {/* Reports as children of layout */}
         <Route path="reports">
-          <Route path="parking-stats" element={<ParkingStatsPage />} />
+          {/* <Route path="parking-stats" element={<ParkingStatsPage />} /> */}
           <Route path="surface-stats" element={<SurfaceStatsPage />} />
         </Route>
 
