@@ -1,61 +1,82 @@
-import express, { Request, Response } from 'express';
-import { writeNodeValues, WriteItem } from './opc-client';
+import express, { Request, Response, NextFunction } from 'express';
+import { writeNodeValues, WriteItem, waitForNodeChange } from './opc-client';
+import { DataValue } from 'node-opcua';
 
 const app = express();
 app.use(express.json());
 
-// POST /plc/write
-function extractNodeId(req: Request, res: Response, next: Function): void {
-  const paramsArray = Object.values(req.params);
-
-  console.log(paramsArray);
-
-  if (paramsArray.length < 1) {
-    res.status(400).send("At least one parameter is required");
-    return;
-  }
-  const itemArray = paramsArray.map(param => {
-    const nodeId = `ns=1;s=${param}`; // Create the nodeId from the param   
-    const value = req.body[param]; // Extract the value from the request body
-
-    if (!value) {
-      return;
-    }
-    return {
-      nodeId: nodeId,
-      value: value
-    };
-  });
-  if (itemArray.length === 0) {
-    res.status(400).send("No valid nodeId found");
-    return;
-  }
-  const items = itemArray.filter(item => item != null); // Filter out any undefined items
-  req.body.nodeId = items; // Assign the array to req.body.nodeId
-  next(); // Pass the request to the next handler
-}
-
-async function writeToPlc(req: Request, res: Response, next: Function): Promise<void> { 
-  const writeItems: WriteItem[] = req.body.nodeId || [];
-  if (!Array.isArray(writeItems) || writeItems.length === 0) {
-    res.status(400).send("No write items provided");
-    return;
-  }
+// Middleware to extract nodeId and prepare write item
+function extractNodeId(req: Request, res: Response, next: NextFunction): void {
   try {
-    await writeNodeValues(writeItems);
-    res.send("Values updated");
+    const param = req.params.nodeid; // Extract the param from the URL
+    const values = Object.values(req.body);
+    console.log('Values:', values, param);
+
+    let value: any = '';
+    if (values.length === 1) {
+      value = values[0];
+    } else {
+      value = values; // If multiple values, assign the entire array
+    }
+
+    const item: WriteItem = {
+      nodeId: `ns=1;s=${param}`,
+      value,
+    };
+    console.log('Write Item:', item);
+
+    req.body.nodeId = item; // Assign the write item to req.body.nodeId
+    next(); // Pass the request to the next handler
   } catch (err: any) {
-    res.status(500).send(err.message || "Unknown error");
+    console.error('Error in extractNodeId middleware:', err);
+    res.status(500).json({ error: 'Failed to process nodeId' });
   }
 }
 
+// Handler to write values to the PLC
+async function writeToPlc(req: Request, res: Response): Promise<void> {
+  const writeItems: WriteItem = req.body.nodeId;
+  try {
+    await writeNodeValues([writeItems]);
+    res.status(200).send('Values updated successfully');
+  } catch (err: any) {
+    console.error('Error in writeToPlc handler:', err);
+    res.status(500).json({ error: err.message || 'Failed to write values to PLC' });
+  }
+}
 
-app.post('/plc/write/:param/:param2', extractNodeId, writeToPlc);
-app.post('/plc/write/:param', extractNodeId, writeToPlc);
+// POST endpoint to write values to the PLC
+app.post('/plc/write/:nodeid', extractNodeId, writeToPlc);
 
+// POST endpoint to wait for a node change
+app.post('/api/wait-for-node-change', async (req: Request, res: Response) => {
+  try {
+    const { nodeId, samplingInterval, timeout, predicate } = req.body;
 
+    // Validate input
+    if (!nodeId) {
+      return res.status(400).json({ error: 'nodeId is required' });
+    }
+
+    // Call waitForNodeChange function
+    const value = await waitForNodeChange(nodeId, {
+      samplingInterval,
+      timeout,
+      predicate: predicate
+        ? (new Function('value', 'dataValue', predicate) as (v: any, dv?: DataValue) => boolean)
+        : undefined,
+    });
+
+    res.status(200).json({ value });
+  } catch (err: any) {
+    console.error('Error in /api/wait-for-node-change:', err);
+    res.status(500).json({ error: err.message || 'Internal server error' });
+  }
+});
+
+// Catch-all route for undefined endpoints
 app.use('/', (req: Request, res: Response) => {
-  res.status(404).send("Not Found");
+  res.status(404).json({ error: 'Not Found' });
 });
 
 export default app;
