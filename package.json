@@ -6,19 +6,15 @@
     "packages/*"
   ],
   "scripts": {
-    "prod-db:migrate": "npx sequelize-cli db:migrate --migrations-path ./packages/migrations --config ./sequelize.config.js --env production",
     "db:migrate": "npx sequelize-cli db:migrate --migrations-path ./packages/migrations --config ./sequelize.config.js",
     "db:migrate:undo": "npx sequelize-cli db:migrate:undo --migrations-path ./packages/migrations --config ./sequelize.config.js",
     "migration:generate": "npx sequelize-cli migration:generate --migrations-path ./packages/migrations --config ./sequelize.config.js",
-    "build": "tsc",
-    "test": "jest",
     "install:all": "npm install --workspaces",
     "start:frontend": "npm start --workspace packages/frontend",
     "start:backend": "npm start --workspace packages/backend",
     "dev:opc": "npm run dev --workspace=packages/opc",
     "dev:backend": "npm run dev --workspace=packages/backend",
     "dev:frontend": "npm run start --workspace=packages/frontend",
-    "dev:plc": "npm run dev --workspace=packages/plc-mock"
     "build:backend": "npm run build --workspace=packages/backend",
     "build:frontend": "npm run build --workspace=packages/frontend"
   },
@@ -33,13 +29,9 @@
     "chart.js": "^4.5.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.1",
-    "express": "^4.21.2",
-    "express-session": "^1.18.2",
+    "express": "^4.17.1",
     "google-auth-library": "^10.2.1",
     "jsonwebtoken": "^9.0.2",
-    "mime-db": "^1.54.0",
-    "node-cron": "^4.2.1",
-    "node-opcua": "^2.156.0",
     "pg": "^8.16.3",
     "react": "^19.1.1",
     "react-chartjs-2": "^5.3.0",
@@ -57,8 +49,8 @@
     "yup": "^1.6.1"
   },
   "devDependencies": {
-    "@types/express": "^4.17.23",
     "@types/express-session": "^1.18.2",
+    "@types/jest": "^30.0.0",
     "@types/pg": "^8.15.5",
     "@types/socket.io": "^3.0.1",
     "babel-loader": "^8.2.3",
@@ -68,7 +60,9 @@
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.2.0",
+    "jest": "^30.0.5",
     "postcss-preset-env": "^10.2.4",
+    "ts-jest": "^29.4.1",
     "webpack": "^5.64.4"
   }
 }
