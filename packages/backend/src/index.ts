@@ -18,7 +18,7 @@ import userRoutes from './routes/user.routes';
 
 import logoRouter from './routes/logos';
 import screenTypeRouter from './routes/screenType';
-import './cronJob'; // Import the cron job to ensure it runs on server start
+// import './cronJob'; // Import the cron job to ensure it runs on server start
 import vehicle from './routes/vehicleRoute';
 import  GoogleAuth  from './routes/google-auth';
 import parkingReport from './routes/parkingStat';
