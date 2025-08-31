@@ -16,7 +16,7 @@ interface VehicleInQueueProps {
 const VehicleInQueue: React.FC<VehicleInQueueProps> = ({ vehicle, position, userVehicle }) => {
     const isUserVehicle = vehicle.licensePlate === userVehicle;
     return (
-        <div className="vehicle">
+    <div className="vehicle-card">
             <DirectionsCarIcon style={{ fontSize: 50, color: '#007BFF' }} />
             <span className="license-plate">
                 {vehicle.licensePlate}
@@ -26,7 +26,7 @@ const VehicleInQueue: React.FC<VehicleInQueueProps> = ({ vehicle, position, user
             )}
             {isUserVehicle && (
                 <span className="queue-position">
-                    (מקום בתור: {position + 1})
+                    ( position: {position + 1})
                 </span>
             )}
         </div>

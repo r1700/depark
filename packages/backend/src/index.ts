@@ -9,13 +9,11 @@ import passwordRoutes from './routes/user.routes';
 import vehicleRoutes from './routes/vehicle';
 import exportToCSV from './routes/exportToCSV';
 import userGoogleAuthRoutes from './routes/userGoogle-auth';
-import Exit from './routes/opc/exit'; // Import the exit route
 import faultsRouter from './routes/opc/faults';
 import techniciansRoutes from "./routes/opc/technicians";
 import http from 'http';
 import { WebSocketServer } from 'ws';
 import session from 'express-session';
-import adminConfigRouter from './routes/adminConfig';
 import userRoutes from './routes/user.routes';
 import importFromCsv from './routes/importFromCsv';
 import logoRouter from './routes/logos';
@@ -33,6 +31,14 @@ import routes from './routes/mobile/mobileUserRoutes';
 import notifications from "./routes/mobile/notificationsRoutes"; 
 
 import path from 'path';
+import Retrival from './routes/RetrivalQueue';
+import './cronJob'; // Ensure the cron job runs on server start
+import Exit from './routes/opc/exit'; // Import the exit route
+// import session from 'express-session';
+import adminConfigRouter from './routes/adminConfig';
+import './cronJob'; // Import the cron job to ensure it runs on server start
+import Retrieval from './routes/RetrivalQueue';
+
 const app = express();
 const server = http.createServer(app);
 export const wss = new WebSocketServer({ server })
@@ -110,6 +116,7 @@ app.use('/api/screentypes', screenTypeRouter);
 app.use('/logos', express.static(path.join(process.cwd(), 'public/logos')));
 
 // Log all incoming requests
+app.use('/api/admin', adminConfigRouter);
 app.use((req, res, next) => {
     console.log(`[${ req.method }] ${ req.path }`, req.body);
     next();
