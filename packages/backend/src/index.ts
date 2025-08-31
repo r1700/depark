@@ -10,7 +10,6 @@ import passwordRoutes from './routes/user.routes';
 import vehicleRoutes from './routes/vehicle';
 import exportToCSV from './routes/exportToCSV';
 import userGoogleAuthRoutes from './routes/userGoogle-auth';
-import Exit from './routes/opc/exit'; // Import the exit route
 import faultsRouter from './routes/opc/faults';
 import techniciansRoutes from "./routes/opc/technicians";
 import http from 'http';
@@ -33,6 +32,9 @@ import retrieveRoute from './routes/RetrivalQueue';
 import otpRoutes from './routes/otp.server';
 import routes from './routes/mobile/mobileUserRoutes';
 import notifications from "./routes/mobile/notificationsRoutes"; 
+import Exit from './routes/opc/exit';
+import Retrival from './routes/RetrivalQueue';
+// import './cronJob'; // Ensure the cron job runs on server start
 
 import path from 'path';
 const app = express();
@@ -140,38 +142,16 @@ app.use('/api/logos', logoRouter);
 app.use('/api/screentypes', screenTypeRouter);
 app.use('/logos', express.static(path.join(process.cwd(), 'public/logos')));
 
+app.use('/api/tablet', Retrival);
+app.use('/api/opc', Exit);
+
 // Log all incoming requests
 app.use((req, res, next) => {
     console.log(`[${req.method}] ${req.path}`, req.body);
     next();
 });
 
-
-app.use("/api/opc", techniciansRoutes);
-app.use('/api/opc', faultsRouter);
-app.use('/api/opc', Exit);
-
-// Print registered routes (debug)
-function printRoutes() {
-    console.log("Registered routes:", app);
-    app._router?.stack?.forEach((middleware: any) => {
-        if (middleware.route) {
-            const methods = Object.keys(middleware.route.methods).join(',').toUpperCase();
-            console.log(`${methods} ${middleware.route.path}`);
-        } else if (middleware.name === 'router' && middleware.handle && middleware.handle.stack) {
-            middleware.handle.stack.forEach((handler: any) => {
-                if (handler.route) {
-                    const methods = Object.keys(handler.route.methods).join(',').toUpperCase();
-                    console.log(`${methods} ${handler.route.path}`);
-                }
-            });
-        }
-    });
-}
-
-printRoutes();
-
-// Start server - בסוף!
+// Root route
 app.get('/', (req, res) => {
     res.json({ message: 'DePark Backend is running!' });
 });
