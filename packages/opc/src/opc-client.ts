@@ -30,6 +30,7 @@ const nodesToMonitor = [
   "ns=1;s=parkingSpot",
   "ns=1;s=licensePlateExit",
   "ns=1;s=licensePlateEntry",
+  "ns=1;s=Queue",
 ];
 
 // Function to check if the session is valid
@@ -231,6 +232,9 @@ export async function createMonitoredItems(subscription: ClientSubscription) {
       else if (nodeId === "ns=1;s=parkingSpot") {
         event = 'parkingSpot';
       }
+      else if (nodeId === "ns=1;s=Queue") {
+        event = 'Queue';
+      }
       sendDataToBackend(event, val);
     });
 
@@ -247,3 +251,4 @@ process.on("SIGINT", async () => {
   await closeOpcConnection();
   process.exit(0);
 });
+
