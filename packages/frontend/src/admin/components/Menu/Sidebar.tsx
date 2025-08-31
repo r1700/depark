@@ -21,10 +21,12 @@ import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
+import LocalParkingIcon from '@mui/icons-material/LocalParking';
+import ParkingIcon from '@mui/icons-material/LocalParking';
+import { LogoDev } from '@mui/icons-material';
+import SettingsIcon from '@mui/icons-material/Settings';
 const drawerWidth = 240;
-
 type RoleName = 'admin' | 'hr' | 'guest';
-
 interface User {
     firstName: string;
     lastName: string;
@@ -35,7 +37,6 @@ interface SidebarProps {
     user: User;
     onLogout: () => void;
 }
-
 /** normalize role from various representations to 'admin'|'hr'|'guest' */
 function normalizeRole(role: number | string | undefined): RoleName {
     if (role === undefined || role === null) return 'guest';
@@ -44,7 +45,6 @@ function normalizeRole(role: number | string | undefined): RoleName {
     if (r === '1' || r === 'hr' || r.includes('hr') || r.includes('human')) return 'hr';
     return 'guest';
 }
-
 const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
     const [open, setOpen] = useState<boolean>(true);
     const [reportsOpen, setReportsOpen] = useState<boolean>(false);
@@ -55,42 +55,39 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
             setReportsOpen(false);
         }
     }, [open]);
-
     const userRole = normalizeRole(user?.role);
-
     const getUserInitials = (): string => {
-        return `${user.firstName?.[0] ?? ''}${user.lastName?.[0] ?? ''}`.toUpperCase();
+        if (!user) return '';
+        const first = user.firstName ? user.firstName[0] : '';
+        const last = user.lastName ? user.lastName[0] : '';
+        return `${first}${last}`.toUpperCase();
     };
-
     // menu items now include optional `allowed` array with roles that can see the item
     const menuItems: Array<{
         text: string;
         icon?: React.ReactNode;
         path?: string;
-        allowed?: RoleName[]; // אם לא קיים -> גלוי לכולם
+        allowed?: RoleName[];
         subMenu?: Array<{ text: string; path: string; allowed?: RoleName[] }>;
     }> = [
-            { text: 'Users', icon: <PeopleIcon />, path: '/layout/users', allowed: ['admin'] }, // רק מנהל
-            { text: 'Admin', icon: <PeopleIcon />, path: '/admin/layout/admin-users', allowed: ['admin'] },
-            { text: 'Vehicles', icon: <DirectionsCarIcon />, path: '/layout/vehicles', allowed: ['admin', 'hr'] }, // שניהם
-            {
-                text: 'Reports',
-                icon: <AssessmentIcon />,
-                path: '',
-                allowed: ['admin', 'hr'], 
-                subMenu: [
-                    { text: 'Parking Stats', path: '/admin/layout/reports/parking-stats', allowed: ['admin'] },
-                    { text: 'Surface Stats', path: '/admin/layout/reports/surface-stats', allowed: ['admin', 'hr'] },
-                ],
-            },
+        { text: 'Users', icon: <PeopleIcon />, path: '/layout/users' },
+        { text: 'Vehicles', icon: <DirectionsCarIcon />, path: '/layout/vehicles' },
+        {
+            text: 'Reports',
+            icon: <AssessmentIcon />,
+            path: '',
+            subMenu: [
+                { text: 'Parking Stats', path: '/layout/reports/parking-stats' },
+                { text: 'Surface Stats', path: '/layout/reports/surface-stats' },
+            ],
+        },
+        { text: 'Parking Config', icon: <SettingsIcon />, path: '/admin/layout/parkings' },
+        { text: 'Logo Management', icon: <SettingsIcon />, path: '/admin/layout/logos' },
+        { text: 'Settings', icon: <SettingsIcon />, path: '/layout/users' }
         ];
-
     // helper: check if current user role allowed to see item
-    const isAllowed = (allowed?: RoleName[]) => {
-        if (!allowed || allowed.length === 0) return true;
-        return allowed.includes(userRole);
-    };
-
+    // כל אחד יכול לראות הכל
+    const isAllowed = () => true;
     return (
         <Drawer
             variant="permanent"
@@ -139,11 +136,9 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
             <List>
                 {menuItems.map((item) => {
                     // skip item if not allowed for this user
-                    if (!isAllowed(item.allowed)) return null;
-
+                    if (!isAllowed()) return null;
                     // determine visible subMenu after filtering by allowed
-                    const visibleSubMenu = item.subMenu?.filter((s) => isAllowed(s.allowed)) ?? [];
-
+                    const visibleSubMenu = item.subMenu?.filter(() => isAllowed()) ?? [];
                     return (
                         <React.Fragment key={item.text}>
                             <ListItemButton
