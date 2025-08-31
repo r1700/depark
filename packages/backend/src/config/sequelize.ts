@@ -9,7 +9,9 @@ const sequelize = new Sequelize(
   appDbConfig.password,
   {
     host: appDbConfig.host,
+    port: appDbConfig.port,  
     dialect: appDbConfig.dialect,
+    dialectOptions: appDbConfig.dialectOptions, 
     logging: process.env.STATUS === 'development' ? console.log : false,
   }
 );
