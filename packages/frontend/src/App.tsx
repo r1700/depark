@@ -5,6 +5,11 @@ import ParkingsPage from "./admin/Pages/ParkingsPage";
 import LoginPage from "./admin/Pages/loginPage";
 import Otp from "./mobile/components/otp";
 import HomePage from "./tablet/pages/HomePage";
+import ForgotPassword from './admin/app/pages/resetPassword/ForgotPassword'
+import ResetPassword from './admin/app/pages/resetPassword/ResetPassword';
+import AdminRoutes from "./admin/AdminRoutes";
+
+const user = JSON.parse(localStorage.getItem("user") || '{}');
 const App: React.FC = () => {
 
   return (
@@ -12,13 +17,16 @@ const App: React.FC = () => {
     <Routes>
   
         <Route path="/" element={<LoginPage />} />
-        <Route path="/admin" element={<LoginPage />} />
+        <Route path="/admin/*" element={<AdminRoutes />} />
+
         <Route path="/mobile" element={<Otp />} />
         <Route path="/tablet" element={<HomePage />} />
         <Route path="/parkings" element={<ParkingsPage />} />
         <Route path="/admin-config" element={<AdminConfigPage />} />
         <Route path="/admin-config/:lotId" element={<AdminConfigPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
     </Routes>
   </Router>
   );

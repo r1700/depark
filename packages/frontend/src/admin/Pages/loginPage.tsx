@@ -35,7 +35,9 @@ const LoginPage: React.FC = () => {
         </Box>
       ) : (
         // כאן מוסיפים פרופס של onLogin שמקבלת טוקן
-        <LoginScreen onLogin={handleLogin} />
+        // <LoginScreen onLogin={handleLogin} />
+        <div>
+        </div>
       )}
     </Container>
   );
