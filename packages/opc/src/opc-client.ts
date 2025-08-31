@@ -315,4 +315,3 @@ process.on("SIGINT", async () => {
   await closeOpcConnection();
   process.exit(0);
 });
-
