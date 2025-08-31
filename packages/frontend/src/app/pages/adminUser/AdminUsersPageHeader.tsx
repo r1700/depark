@@ -1,7 +1,6 @@
 import React from 'react';
 import { Box, Typography, Switch, FormControlLabel } from '@mui/material';
 import AdminUsersFiltersWrapper from './AdminUsersFiltersWrapper';
-import AdminUsersSortWrapper from './AdminUsersSortWrapper';
 import { AdminUserFilters } from './adminUserTypes';
 
 interface AdminUsersPageHeaderProps {
@@ -20,18 +19,10 @@ interface AdminUsersPageHeaderProps {
 }
 
 const AdminUsersPageHeader: React.FC<AdminUsersPageHeaderProps> = ({
-  isSortEnabled,
-  setIsSortEnabled,
   isFilterEnabled,
   setIsFilterEnabled,
-  isSortPanelOpen,
-  setIsSortPanelOpen,
   filters,
   setFilters,
-  sortBy,
-  setSortBy,
-  sortDirection,
-  setSortDirection,
 }) => {
   return (
     <Box
@@ -43,7 +34,6 @@ const AdminUsersPageHeader: React.FC<AdminUsersPageHeaderProps> = ({
         px: 2,
       }}
     >
-      {/* צד שמאל - סינון */}
       <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
         <AdminUsersFiltersWrapper
           filters={filters}
@@ -63,8 +53,6 @@ const AdminUsersPageHeader: React.FC<AdminUsersPageHeaderProps> = ({
           }
         />
       </Box>
-
-      {/* כותרת מרכזית */}
       <Typography
         variant="h4"
         sx={{
@@ -78,28 +66,7 @@ const AdminUsersPageHeader: React.FC<AdminUsersPageHeaderProps> = ({
       >
         Admin Users Management
       </Typography>
-
-      {/* צד ימין - מיון */}
       <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-        <AdminUsersSortWrapper
-          sortBy={sortBy}
-          sortDirection={sortDirection}
-          setSortBy={setSortBy}
-          setSortDirection={setSortDirection}
-          enabled={isSortPanelOpen}
-          setEnabled={setIsSortPanelOpen}
-        />
-        <FormControlLabel
-          sx={{ mt: 1 }}
-          label={isSortEnabled ? 'Sort: ON' : 'Sort: OFF'}
-          control={
-            <Switch
-              checked={isSortEnabled}
-              onChange={() => setIsSortEnabled(prev => !prev)}
-              color="primary"
-            />
-          }
-        />
       </Box>
     </Box>
   );

@@ -4,7 +4,7 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { Provider } from 'react-redux';
-import {store} from './app/store'; // עדכן את הנתיב לפי המיקום האמיתי של ה-store שלך
+import {store} from './app/store'; 
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement

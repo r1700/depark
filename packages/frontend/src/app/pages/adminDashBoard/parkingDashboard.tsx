@@ -30,7 +30,7 @@ const ParkingDashboard = () => {
         ))}
       </div>
       {status === 'loading' && <p>Loading data...</p>}
-      {status === 'succeeded' && <DataTable data={items} />}
+      {status === 'succeeded' && <DataTable data={items} title="parking dashboard"  fields={[]} onSubmit={() => Promise.resolve()} />}
       {status === 'failed' && <p>Error loading data</p>}
     </div>
   );

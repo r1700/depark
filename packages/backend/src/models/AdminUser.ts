@@ -4,31 +4,27 @@ import sequelize from '../config/database';
 // ממשק טיפוס המאפיינים של AdminUser
 export interface AdminUserAttributes {
   id: number;
-  baseUserId: number;
-  passwordHash: string;
-  role: 'hr' | 'admin';
-  lastLoginAt?: Date | null;
-  createdAt: Date;
-  updatedAt: Date;
+  baseuser_id: number;
+  password_hash: string;
+  role: number;
   permissions: number;
+  last_login_at?: Date | null;
 }
 
 // בשביל יצירת רשומה חדשה, חלק מהשדות אופציונליים (למשל id)
-export interface AdminUserCreationAttributes extends Optional<AdminUserAttributes, 'id' | 'lastLoginAt'> {}
+export interface AdminUserCreationAttributes extends Optional<AdminUserAttributes, 'id' | 'last_login_at'> {}
 
 // מחלקת המודל עצמה עם הטיפוסים שצוינו
 export class AdminUser extends Model<AdminUserAttributes, AdminUserCreationAttributes>
   implements AdminUserAttributes {
   public id!: number;
-  public baseUserId!: number;
-  public passwordHash!: string;
-  public role!: 'hr' | 'admin';
-  public lastLoginAt?: Date | null;
-  public createdAt!: Date;
-  public updatedAt!: Date;
+  public baseuser_id!: number;
+  public password_hash!: string;
+  public role!: number;
   public permissions!: number;
-
-  // אופציונלי - תוסיף כאן כל מתודת עזר שתצטרך בעתיד
+  public last_login_at?: Date | null;
+  public created_at!: Date;
+  public updated_at!: Date;
 }
 
 // הגדרת המודל עם השדות והתכונות
@@ -39,41 +35,32 @@ AdminUser.init(
       primaryKey: true,
       autoIncrement: true,
     },
-    baseUserId: {
+    baseuser_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      unique: true,
     },
-    passwordHash: {
-      type: DataTypes.STRING(255),
+    password_hash: {
+      type: DataTypes.STRING,
       allowNull: false,
     },
     role: {
-      type: DataTypes.ENUM('hr', 'admin'),
-      allowNull: false,
-    },
-    lastLoginAt: {
-      type: DataTypes.DATE,
-      allowNull: true,
-    },
-    createdAt: {
-      type: DataTypes.DATE,
-      allowNull: false,
-    },
-    updatedAt: {
-      type: DataTypes.DATE,
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
     permissions: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      defaultValue: 0,
+    },
+    last_login_at: {
+      type: DataTypes.DATE,
+      allowNull: true,
     },
   },
   {
     sequelize,
-    tableName: 'AdminUsers',
-    timestamps: false, // כי הטבלה כבר כוללת createdAt ו-updatedAt בעצמה
+    tableName: 'adminusers', // שם הטבלה ב-DB
+    timestamps: false, // כי יש שדות זמן בטבלה
+    underscored: true, // שמות שדות ב-snake_case
   }
 );
 

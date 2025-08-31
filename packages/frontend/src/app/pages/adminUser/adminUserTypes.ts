@@ -1,18 +1,19 @@
 // adminUserTypes.ts
-export const AVAILABLE_PERMISSIONS = ['reports', 'admin', 'vehicle'] as const;
+export const AVAILABLE_PERMISSIONS = ['reportes', 'admin', 'vehicle'] as const;
+export const AVAILABLE_ROLES = ['admin', 'hr'] as const;
 export type Permission = typeof AVAILABLE_PERMISSIONS[number];
 
 export type FieldType = 'free' | 'select' | 'multiSelect' | 'dateRange' | 'date' | 'number';
 
 export interface FieldConfig {
-  name: string;                    // מפתח בשדה ה-filters (שמירה על שמות קיימים)
+  name: string;
   type: FieldType;
   label?: string;
-  options?: Array<string>;         // לשדות select / multiSelect
+  options?: Array<string>;
   placeholder?: string;
-  fromKey?: string;                // לשדה dateRange - מפתח של "from" (e.g. 'createdAfter')
-  toKey?: string;                  // לשדה dateRange - מפתח של "to" (e.g. 'createdBefore')
-  valueAsArray?: boolean;          // אם הערך במצב האב הוא מערך אך ה-ui הוא select יחיד (כמו roles בעבר)
+  fromKey?: string;
+  toKey?: string;
+  valueAsArray?: boolean;
   defaultValue?: any;
 }
 
@@ -30,7 +31,6 @@ export interface AdminUser {
   id: number;
   baseUserId: number;
   role: 'hr' | 'admin';
-  // שומרים את המודל של השרת כ-string[] כדי להיות גמישים
   permissions: string[];
   lastLoginAt?: string | null;
   createdAt?: string | Date;
@@ -41,16 +41,13 @@ export interface AdminUser {
 export interface AdminUserFilters {
   searchTerm?: string;
   roles?: Array<'hr' | 'admin'> | string[];
-  // אפשר להגדיר כאן Permission[] אם רוצים type-safe, או להשאיר string[] כדי להתאים לשרת
-  permissionsInclude?: string[]; // או: string[];
+  permissionsInclude?: string[];
   lastLoginAfter?: string;
   lastLoginBefore?: string;
   createdAfter?: string;
   createdBefore?: string;
   updatedAfter?: string;
   updatedBefore?: string;
-  lastActivityAfter?: string;
-  lastActivityBefore?: string;
   activeLastNDays?: number;
   sortBy?: string;
   sortDirection?: 'asc' | 'desc';
@@ -58,4 +55,37 @@ export interface AdminUserFilters {
   offset?: number;
 }
 
-export const AVAILABLE_ROLES = ['admin', 'hr'] as const;
+export interface CreateAdminUserRequest {
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  passwordHash: string; // plain password from client (server will hash)
+  role: 'admin' | 'hr';
+  permissions: string[]; // ['reportes', 'admin']
+  lastLoginAt?: string | null; // ISO string or null
+}
+
+export type AdminUserFormModel = {
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  passwordHash: string;
+  role: 'hr' | 'admin';
+  perm_reportes: boolean;
+  perm_admin: boolean;
+  perm_vehicle: boolean;
+  lastLoginAt?: string | null;
+};
+
+export type UpdateAdminUserRequest = {
+  id: string;
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+  passwordHash?: string;
+  role?: 'hr' | 'admin';
+  perm_reportes?: boolean;
+  perm_admin?: boolean;
+  perm_vehicle?: boolean;
+  lastLoginAt?: string | null;
+};

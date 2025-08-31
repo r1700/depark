@@ -12,7 +12,7 @@ const userFields: FieldConfig<User>[] = [
 ];
 
 const UserForm=({
-  onClose,
+    onClose,
   userToEdit=null,
 }: {
   onClose: () => void;
@@ -30,7 +30,7 @@ const UserForm=({
           entityToEdit={userToEdit} 
           />
   );
-}  
+}
 
 export default UserForm;
 

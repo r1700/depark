@@ -14,11 +14,6 @@ interface Props {
   enabled: boolean;
   setEnabled: (value: boolean) => void;
 }
-
-/**
- * סוג מקומי שמאפשר להשתמש ב-FieldConfig המוגדר במקום,
- * אבל מחזק ש-fromKey/toKey ו-name יהיו מפתחות מתוך AdminUserFilters.
- */
 type FieldConfigForAdmin = Omit<FieldConfig, 'name' | 'fromKey' | 'toKey'> & {
   name: Extract<keyof AdminUserFilters, string>;
   fromKey?: Extract<keyof AdminUserFilters, string>;
@@ -66,9 +61,6 @@ const AdminUsersFiltersWrapper: React.FC<Props> = ({
     setEnabled(true);
     setOpen(false);
   };
-
-  // שימו לב: 'createdAfter' / 'createdBefore' הם מפתחות שקיימים ב-AdminUserFilters.
-  // לכן אנחנו משתמשים ב-'createdAfter' כשם השדה הראשי (לקבוצה dateRange).
   const fieldsConfig: FieldConfigForAdmin[] = [
     {
       name: 'searchTerm',
@@ -90,7 +82,6 @@ const AdminUsersFiltersWrapper: React.FC<Props> = ({
       options: [...AVAILABLE_PERMISSIONS],
     },
     {
-      // changed from 'created' to an actual AdminUserFilters key 'createdAfter'
       name: 'createdAfter',
       type: 'dateRange',
       label: 'Created Between',
@@ -124,7 +115,6 @@ const AdminUsersFiltersWrapper: React.FC<Props> = ({
             }
             onClear={clearFilters}
           />
-
           <Button variant="contained" fullWidth onClick={applyFilters} sx={{ mt: 2 }}>
             Apply
           </Button>

@@ -2,51 +2,46 @@ import { Model, DataTypes, Optional } from 'sequelize';
 import sequelize from '../config/database';
 
 interface UserActivityAttributes {
-  id: string;
-  userId?: string;
-  userType: 'hr' | 'admin' | 'employee' | 'anonymous';
+  id: number;
+  baseuser_id: number;
+  user_type: number;
   action: string;
   details: object;
-  ipAddress?: string;
-  userAgent?: string;
+  ip_address?: string;
+  user_agent?: string;
   timestamp: Date;
-  createdAt: Date;
-  updatedAt: Date;
 }
 
 interface UserActivityCreationAttributes extends Optional<UserActivityAttributes, 'id'> {}
 
 export class UserActivity extends Model<UserActivityAttributes, UserActivityCreationAttributes>
   implements UserActivityAttributes {
-  public id!: string;
-  public userId?: string;
-  public userType!: 'hr' | 'admin' | 'employee' | 'anonymous';
+  public id!: number;
+  public baseuser_id!: number;
+  public user_type!: number;
   public action!: string;
   public details!: object;
-  public ipAddress?: string;
-  public userAgent?: string;
+  public ip_address?: string;
+  public user_agent?: string;
   public timestamp!: Date;
-  public createdAt!: Date;
-  public updatedAt!: Date;
 }
 
 UserActivity.init(
   {
-    id: { type: DataTypes.STRING, primaryKey: true },
-    userId: { type: DataTypes.STRING, allowNull: true },
-    userType: { type: DataTypes.ENUM('hr', 'admin', 'employee', 'anonymous'), allowNull: false },
+    id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+    baseuser_id: { type: DataTypes.INTEGER, allowNull: false },
+    user_type: { type: DataTypes.INTEGER, allowNull: false },
     action: { type: DataTypes.STRING, allowNull: false },
     details: { type: DataTypes.JSONB, allowNull: false },
-    ipAddress: { type: DataTypes.STRING, allowNull: true },
-    userAgent: { type: DataTypes.STRING, allowNull: true },
+    ip_address: { type: DataTypes.STRING, allowNull: true },
+    user_agent: { type: DataTypes.STRING, allowNull: true },
     timestamp: { type: DataTypes.DATE, allowNull: false },
-    createdAt: { type: DataTypes.DATE, allowNull: false },
-    updatedAt: { type: DataTypes.DATE, allowNull: false },
   },
   {
     sequelize,
-    tableName: 'UserActivities',
+    tableName: 'useractivities',
     timestamps: false,
+    underscored: true,
   }
 );
 
