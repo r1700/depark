@@ -23,7 +23,6 @@ import AssessmentIcon from '@mui/icons-material/Assessment';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import LocalParkingIcon from '@mui/icons-material/LocalParking';
-import ParkingIcon from '@mui/icons-material/LocalParking';
 import { LogoDev } from '@mui/icons-material';
 import SettingsIcon from '@mui/icons-material/Settings';
 const drawerWidth = 240;
