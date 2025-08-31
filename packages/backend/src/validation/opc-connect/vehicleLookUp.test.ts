@@ -446,7 +446,7 @@
 
 import { Model, DataTypes, QueryTypes } from "sequelize";
 import sequelize from '../../config/sequelize';
-import canUserPark from '../../services/vehicle-lookup/authorization';
+import {canUserPark} from '../../services/vehicle-lookup/authorization';
 import { isLicensePlateExists, vehicleModel } from '../../services/vehicle-lookup/licensePlate';
 import isParkingLotActive from '../../services/vehicle-lookup/lotParking';
 import isVehicleAllowed from '../../services/vehicle-lookup/vehicleLookup';
