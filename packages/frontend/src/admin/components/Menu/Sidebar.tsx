@@ -17,25 +17,24 @@ import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import MenuIcon from '@mui/icons-material/Menu';
 import LogoutIcon from '@mui/icons-material/Logout';
 import PeopleIcon from '@mui/icons-material/People';
+import SettingsIcon from '@mui/icons-material/Settings';
+import PhotoIcon from '@mui/icons-material/Photo';
+import LocalParkingIcon from '@mui/icons-material/LocalParking';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 const drawerWidth = 240;
-
 type RoleName = 'admin' | 'hr' | 'guest';
-
 interface User {
     firstName: string;
     lastName: string;
     role?: number | string; // מקור השרת
 }
-
 interface SidebarProps {
     user: User;
     onLogout: () => void;
 }
-
 /** normalize role from various representations to 'admin'|'hr'|'guest' */
 function normalizeRole(role: number | string | undefined): RoleName {
     if (role === undefined || role === null) return 'guest';
@@ -44,52 +43,48 @@ function normalizeRole(role: number | string | undefined): RoleName {
     if (r === '1' || r === 'hr' || r.includes('hr') || r.includes('human')) return 'hr';
     return 'guest';
 }
-
 const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
     const [open, setOpen] = useState<boolean>(true);
     const [reportsOpen, setReportsOpen] = useState<boolean>(false);
     const navigate = useNavigate();
-
     useEffect(() => {
         if (!open) {
             setReportsOpen(false);
         }
     }, [open]);
-
     const userRole = normalizeRole(user?.role);
-
     const getUserInitials = (): string => {
-        return `${user.firstName?.[0] ?? ''}${user.lastName?.[0] ?? ''}`.toUpperCase();
+        if (!user) return '';
+        const first = user.firstName ? user.firstName[0] : '';
+        const last = user.lastName ? user.lastName[0] : '';
+        return `${first}${last}`.toUpperCase();
     };
-
     // menu items now include optional `allowed` array with roles that can see the item
     const menuItems: Array<{
         text: string;
         icon?: React.ReactNode;
         path?: string;
-        allowed?: RoleName[]; // אם לא קיים -> גלוי לכולם
+        allowed?: RoleName[];
         subMenu?: Array<{ text: string; path: string; allowed?: RoleName[] }>;
     }> = [
-            { text: 'Users', icon: <PeopleIcon />, path: '/layout/users', allowed: ['admin'] }, // רק מנהל
-            { text: 'Vehicles', icon: <DirectionsCarIcon />, path: '/layout/vehicles', allowed: ['admin', 'hr'] }, // שניהם
-            {
-                text: 'Reports',
-                icon: <AssessmentIcon />,
-                path: '',
-                allowed: ['admin', 'hr'], // שניהם רואים Reports
-                subMenu: [
-                    { text: 'Parking Stats', path: '/admin/layout/reports/parking-stats', allowed: ['admin'] },
-                    { text: 'Surface Stats', path: '/admin/layout/reports/surface-stats', allowed: ['admin', 'hr'] },
-                ],
-            },
+    { text: 'Users', icon: <PeopleIcon />, path: '/admin/layout/users' },
+    { text: 'Vehicles', icon: <DirectionsCarIcon />, path: '/admin/layout/vehicles' },
+        {
+            text: 'Reports',
+            icon: <AssessmentIcon />,
+            path: '',
+            subMenu: [
+                { text: 'Parking Stats', path: '/admin/layout/reports/parking-stats' },
+                { text: 'Surface Stats', path: '/admin/layout/reports/surface-stats' },
+            ],
+        },
+    { text: 'Parking Config', icon: <LocalParkingIcon />, path: '/admin/layout/parkings' },
+    { text: 'Logo Management', icon: <PhotoIcon />, path: '/admin/layout/logos' },
+       
         ];
-
     // helper: check if current user role allowed to see item
-    const isAllowed = (allowed?: RoleName[]) => {
-        if (!allowed || allowed.length === 0) return true;
-        return allowed.includes(userRole);
-    };
-
+    // כל אחד יכול לראות הכל
+    const isAllowed = () => true;
     return (
         <Drawer
             variant="permanent"
@@ -126,7 +121,6 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
                     {open ? <MenuOpenIcon /> : <MenuIcon />}
                 </IconButton>
             </Box>
-
             {open && (
                 <Box sx={{ px: 2, mb: 3, display: 'flex', justifyContent: 'center' }}>
                     <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#fff' }}>
@@ -134,15 +128,12 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
                     </Typography>
                 </Box>
             )}
-
             <List>
                 {menuItems.map((item) => {
                     // skip item if not allowed for this user
-                    if (!isAllowed(item.allowed)) return null;
-
+                    if (!isAllowed()) return null;
                     // determine visible subMenu after filtering by allowed
-                    const visibleSubMenu = item.subMenu?.filter((s) => isAllowed(s.allowed)) ?? [];
-
+                    const visibleSubMenu = item.subMenu?.filter(() => isAllowed()) ?? [];
                     return (
                         <React.Fragment key={item.text}>
                             <ListItemButton
@@ -168,7 +159,6 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
                                     </IconButton>
                                 )}
                             </ListItemButton>
-
                             {item.subMenu && visibleSubMenu.length > 0 && (
                                 <Collapse in={reportsOpen} timeout="auto" unmountOnExit>
                                     <List component="div" disablePadding>
@@ -194,7 +184,6 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
                     );
                 })}
             </List>
-
             <Box sx={{ px: 2 }}>
                 <Divider sx={{ borderColor: 'rgba(255,255,255,0.3)', mb: 2 }} />
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
@@ -227,5 +216,4 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
         </Drawer>
     );
 };
-
 export default Sidebar;

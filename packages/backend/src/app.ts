@@ -5,7 +5,7 @@ import cors from 'cors';
 import adminConfigRouter from './routes/adminConfig';
 
 
-const app = express();
+const app:express.Application = express();
 
 // Middleware
 app.use(cors());
