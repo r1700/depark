@@ -52,6 +52,16 @@ const ParkingStatsPage: React.FC = () => {
   const data: ParkingStatItem[] = useMemo(() => {
     if (!Array.isArray(rawData)) return [];
     return rawData.map((item: any) => {
+      if (!item.period) {
+        return {
+          day: '',
+          hour: '',
+          period: '',
+          monthYear: '',
+          entries: Number(item.entries) || 0,
+          exits: Number(item.exits) || 0,
+        };
+      }
       const date = parseISO(item.period);
       return {
         day: format(date, 'd'),
@@ -67,6 +77,16 @@ const ParkingStatsPage: React.FC = () => {
   const selectedDayData: ParkingStatItem[] | null = useMemo(() => {
     if (!Array.isArray(rawDayData)) return null;
     return rawDayData.map((item: any) => {
+      if (!item.period) {
+        return {
+          day: '',
+          hour: '',
+          period: '',
+          monthYear: '',
+          entries: Number(item.entries) || 0,
+          exits: Number(item.exits) || 0,
+        };
+      }
       const date = parseISO(item.period);
       return {
         day: format(date, 'd'),

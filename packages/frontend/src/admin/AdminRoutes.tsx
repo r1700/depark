@@ -1,3 +1,5 @@
+import UsersPage from './Pages/UsersPage';
+import VehiclePage from './Pages/VehiclePage';
 // src/admin/AdminRoutes.tsx
 import React, { useCallback } from "react";
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
@@ -67,6 +69,8 @@ const AdminRoutes: React.FC = () => {
         <Route path="admin-config/:lotId" element={<AdminConfigPage />} />
         <Route path="parkings" element={<ParkingsPage />} />
         <Route path="logos" element={<AdminLogoManagement />} />
+        <Route path="users" element={<UsersPage />} />
+        <Route path="vehicles" element={<VehiclePage />} />
         <Route path="reports">
           <Route path="parking-stats" element={<ParkingStatsPage />} />
           <Route path="surface-stats" element={<SurfaceStatsPage />} />

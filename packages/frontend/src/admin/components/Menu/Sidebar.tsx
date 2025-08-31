@@ -18,6 +18,8 @@ import MenuIcon from '@mui/icons-material/Menu';
 import LogoutIcon from '@mui/icons-material/Logout';
 import PeopleIcon from '@mui/icons-material/People';
 import SettingsIcon from '@mui/icons-material/Settings';
+import PhotoIcon from '@mui/icons-material/Photo';
+import LocalParkingIcon from '@mui/icons-material/LocalParking';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
@@ -65,21 +67,20 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
         allowed?: RoleName[];
         subMenu?: Array<{ text: string; path: string; allowed?: RoleName[] }>;
     }> = [
-        { text: 'Users', icon: <PeopleIcon />, path: '/layout/users' },
-        { text: 'Vehicles', icon: <DirectionsCarIcon />, path: '/layout/vehicles' },
+    { text: 'Users', icon: <PeopleIcon />, path: '/admin/layout/users' },
+    { text: 'Vehicles', icon: <DirectionsCarIcon />, path: '/admin/layout/vehicles' },
         {
             text: 'Reports',
             icon: <AssessmentIcon />,
             path: '',
             subMenu: [
-                { text: 'Parking Stats', path: '/layout/reports/parking-stats' },
-                { text: 'Surface Stats', path: '/layout/reports/surface-stats' },
+                { text: 'Parking Stats', path: '/admin/layout/reports/parking-stats' },
+                { text: 'Surface Stats', path: '/admin/layout/reports/surface-stats' },
             ],
         },
-        { text: 'Parking Config', icon: <SettingsIcon />, path: '/admin/layout/parkings' },
-        { text: 'Logo Management', icon: <SettingsIcon />, path: '/admin/layout/logos' },
-        { text: 'Settings', icon: <SettingsIcon />, path: '/layout/users' },
-            { text: 'Settings', icon: <SettingsIcon />, path: '/layout/users' },
+    { text: 'Parking Config', icon: <LocalParkingIcon />, path: '/admin/layout/parkings' },
+    { text: 'Logo Management', icon: <PhotoIcon />, path: '/admin/layout/logos' },
+       
         ];
     // helper: check if current user role allowed to see item
     // כל אחד יכול לראות הכל
