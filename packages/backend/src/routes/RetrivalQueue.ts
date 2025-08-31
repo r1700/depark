@@ -1,22 +1,20 @@
 import express from 'express';
-import { ParkingSession, Vehicle, RetrievalQueue } from '../model/database-models/RetrivalQueue.model';
-import { log } from 'console';
-// import { RetrievalQueue } from '../models/RetrievalQueue';
+import { ParkingSession, Vehicle } from '../model/database-models/RetrivalQueue.model';
+import RetrievalQueue from '../model/database-models/retrievalQueue.model';
+import { callWaitForNodeChangeApi, callWriteToPlcApi } from '../services/opc/backend-opc';
 
-const router = express.Router();
+const router: express.Router = express.Router();
 
 // POST endpoint for retrieval request
 router.post('/retrieve', async (req, res) => {
-    console.log('Received retrieval request:', req.body);
-
     const { licensePlate, floor } = req.body;
 
-    // Input validation - license plate is required
+    // Input validation
     if (!licensePlate) {
-        return res.status(400).json({ error: 'licensePlate is required' });
+        return res.status(400).json({ error: 'License plate is required' });
     }
     if (!floor) {
-        return res.status(400).json({ error: 'floor is required' });
+        return res.status(400).json({ error: 'Floor is required' });
     }
 
     try {
@@ -24,71 +22,91 @@ router.post('/retrieve', async (req, res) => {
         const existing = await RetrievalQueue.findOne({
             where: {
                 license_plate: licensePlate,
-                status: [1, 2]
+                status: [1, 2] // 1=queued, 2=processing
             }
         });
         if (existing) {
-            return res.status(409).json({ error: 'Vehicle already in queue' });
+            return res.status(409).json({ error: 'Vehicle is already in the queue' });
         }
-        // Fetch vehicle by license plate-לוחית רישוי
-        const vehicle = await Vehicle.findOne({
-            where: {  license_plate: licensePlate, is_active: true }
-        }) as Vehicle | null;
 
+        // Fetch vehicle by license plate
+        const vehicle = await Vehicle.findOne({
+            where: { license_plate: licensePlate, is_active: true }
+        }) as Vehicle | null;
 
         if (!vehicle) {
             return res.status(404).json({ error: 'Vehicle not found' });
         }
-        // Fetch active session for vehicle
+
+        // Fetch active session for the vehicle
         const session = await ParkingSession.findOne({
             where: {
                 vehicle_id: vehicle.id,
                 status: 1 // 1=parked
             }
         }) as ParkingSession | null;
+
         if (!session) {
             return res.status(404).json({ error: 'No active parking session found' });
         }
 
-        // Calculate position – how many are already in the queue
-        const queueLength = await RetrievalQueue.count({
-            where: {
-                status: [1, 2]//1=queued, 2=processin
-            }
-        });
-        const position = queueLength + 1;
+        if (!session.underground_spot) {
+            return res.status(400).json({ error: 'Vehicle is not parked in an underground spot' });
+        }
 
-        // Get next ID
-        const lastRow = await RetrievalQueue.findOne({
-            order: [['id', 'DESC']]
-        });
-        const nextId = lastRow ? String(Number(lastRow.id) + 1) : "1";
-        //  add the vehicle to the queue
-        await RetrievalQueue.create({
-            id: nextId,
-            license_plate: licensePlate,
-            baseuser_id: vehicle.baseuser_id,
-            parking_session_id: session.id,
-            underground_spot: session.underground_spot||'',
-            assigned_pickup_spot: null,// המקום שבו הרכב ימתין לנוסע לאיסוף
-            request_source: 2,
-            requested_at: new Date(),
-            // estimatedTime: new Date(),//  not null!!--opc זמן משוער להשלמת הבקשה
-            estimated_time: null,//  opc זמן משוער להשלמת הבקשה
-            position,
-            status: 1 // 1=queued
-        });
-        return res.status(201).json({
-            success: true,
-            data: {
+        const underground_spot = session.underground_spot;
+
+        try {
+            await callWriteToPlcApi('VehicleExitRequest', { licensePlate, underground_spot, floor });
+            console.log('Successfully sent VehicleExitRequest to PLC');
+        } catch (plcError) {
+            console.error('Error writing to PLC:', plcError);
+            return res.status(500).json({ error: 'Failed to write to PLC' });
+        }
+
+        let value;
+        try {
+            value = await callWaitForNodeChangeApi();
+        } catch (opcError) {
+            console.error('Error waiting for node change from OPC server:', opcError);
+            return res.status(500).json({ error: 'Failed to communicate with OPC server' });
+        }
+
+        const position = parseInt(value[1], 10);
+        if (isNaN(position)) {
+            console.error(`Invalid position value received: ${value[1]}`);
+            return res.status(500).json({ error: 'Invalid position value received from OPC server' });
+        }
+
+        const estimated_time = new Date(new Date().getTime() + position * 5 * 60 * 1000).toISOString();
+
+        try {
+            await RetrievalQueue.create({
                 license_plate: licensePlate,
-                floor: floor, // Using the floor from the request body
-                underground_spot: session.underground_spot, //
-            }
+                baseuser_id: vehicle.baseuser_id,
+                parking_session_id: session.id,
+                underground_spot: session.underground_spot || '',
+                assigned_pickup_spot: value[2], // The spot where the vehicle will wait for the passenger
+                request_source: 2,
+                requested_at: new Date().toISOString(),
+                estimated_time: estimated_time,
+                position: position,
+                status: 1 // 1=queued
+            });
+        } catch (dbError) {
+            console.error('Error saving to database:', dbError);
+            return res.status(500).json({ error: 'Failed to save retrieval request to the database' });
+        }
+
+        return res.status(201).json({
+            licensePlate: value[0],
+            position,
+            assigned_pickup_spot: value[2],
+            estimated_time
         });
     } catch (err) {
-        console.error("❌❌❌ Error occurred:", err);
-        return res.status(500).json({ error: 'Database error' });
+        console.error('Unexpected error occurred:', err);
+        return res.status(500).json({ error: 'An unexpected error occurred' });
     }
 });
 

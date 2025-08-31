@@ -1,4 +1,4 @@
-import { OPCUAServer, Variant, DataType, StatusCodes } from "node-opcua";
+import { OPCUAServer, Variant, DataType, StatusCodes ,VariantArrayType} from "node-opcua";
 // Start an OPC-UA server simulating a PLC
 
 export async function createPlcOpcServer() {
@@ -27,6 +27,10 @@ export async function createPlcOpcServer() {
   let licensePlateEntry = "";
   let licensePlateExit = "";
   let parkingSpot = "";
+  let vehicleExitRequest = ["", "", ""];
+  //{ licensePlate: "", undergroundSpot: "", CustomerLocation: "" };
+  let exitRequestApproval = ["", "", ""];
+  //{ licensePlate: "", position: "", assignedPickupSpot: "" };
   // Add Outputs variables
   namespace.addVariable({
     componentOf: device,
@@ -50,7 +54,7 @@ export async function createPlcOpcServer() {
     minimumSamplingInterval: 1000,
     value: {
       get: () => new Variant({ dataType: DataType.String, value: licensePlateExit }),
-      set: (variant: Variant) => {
+      set: (variant: Variant) => {        
         licensePlateExit = variant.value;
         return StatusCodes.Good;
       },
@@ -71,12 +75,73 @@ export async function createPlcOpcServer() {
     },
   });
 
+  namespace.addVariable({
+    componentOf: device,
+    browseName: "VehicleExitRequest",
+    nodeId: "ns=1;s=VehicleExitRequest",
+    dataType: "String", // סוג הנתונים הוא מחרוזת
+    minimumSamplingInterval: 1000,
+    value: {
+      // בעת קריאה, המערך יוחזר ישירות
+      get: () => new Variant({
+        dataType: DataType.String,
+        arrayType: VariantArrayType.Array, // מציין שזה מערך
+        value: vehicleExitRequest,
+      }),
+      // בעת כתיבה, הערך המתקבל יומר למערך
+      set: (variant: Variant) => {
+        if (Array.isArray(variant.value) && variant.value.every(v => typeof v === "string")) {
+          vehicleExitRequest = variant.value;
+          console.log("VehicleExitRequest updated:", vehicleExitRequest); // לוג לערך החדש
+          return StatusCodes.Good;
+        } else {
+          console.error("Invalid data format for VehicleExitRequest. Expected an array of strings.");
+          return StatusCodes.BadInvalidArgument;
+        }
+      },
+    },
+  });
+  
+  namespace.addVariable({
+    componentOf: device,
+    browseName: "licensePlateEntry = `ABC-${Math.floor(Math.random() * 1000)}`",
+    nodeId: "ns=1;s=ExitRequestApproval",
+    dataType: "String", // סוג הנתונים הוא מחרוזת
+    minimumSamplingInterval: 1000,
+    value: {
+      // בעת קריאה, המערך יוחזר ישירות
+      get: () => new Variant({
+        dataType: DataType.String,
+        arrayType: VariantArrayType.Array, // מציין שזה מערך
+        value: exitRequestApproval,
+      }),
+      // בעת כתיבה, הערך המתקבל יומר למערך
+      set: (variant: Variant) => {
+        if (Array.isArray(variant.value) && variant.value.every(v => typeof v === "string")) {
+          exitRequestApproval = variant.value;
+          console.log("ExitRequestApproval updated:", exitRequestApproval); // לוג לערך החדש
+          return StatusCodes.Good;
+        } else {
+          console.error("Invalid data format for ExitRequestApproval. Expected an array of strings.");
+          return StatusCodes.BadInvalidArgument;
+        }
+      },
+    },
+  });
+  
+  
+
   // Function to update values periodically using setInterval
   setInterval(async () => {
     // Trigger value updates for monitored items in OPC-UA server
-    licensePlateEntry = `ABC-${Math.floor(Math.random() * 1000)}`;
-    licensePlateExit = `XYZ-${Math.floor(Math.random() * 1000)}`;
-    parkingSpot = `Spot-${Math.floor(Math.random() * 100)}`;
+    // licensePlateEntry = `ABC-${Math.floor(Math.random() * 1000)}`;
+    // licensePlateExit = `XYZ-${Math.floor(Math.random() * 1000)}`;
+    // parkingSpot = `Spot-${Math.floor(Math.random() * 100)}`;
+    exitRequestApproval = [
+      `ABC-${Math.floor(Math.random() * 1000)}`, // licensePlate
+      `${Math.floor(Math.random() * 10)}`, // position
+      `${Math.floor(Math.random() * 5)}:${Math.floor(Math.random() * 5)}` // assignedPickupSpot
+    ];
   }, 2000); // Every 2 seconds
 
   await server.start();

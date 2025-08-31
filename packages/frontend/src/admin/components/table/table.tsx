@@ -7,7 +7,11 @@ import {
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 import './table.css';
+import { useNavigate } from 'react-router-dom';
+import DeleteConfirmDialog from '../DeleteConfirmDialog/DeleteConfirmDialog';
 
 type DataTableProps = {
   data: { columns: any[]; rows: any[] };
@@ -16,6 +20,7 @@ type DataTableProps = {
   showActions?: boolean; // default false -> hide actions column/buttons
   maxHeight?: number; // max height for table container (px)
   dense?: boolean; // if true, use smaller row height
+  deletePath?: string; // path for delete API
 };
 
 const DataTable: React.FC<DataTableProps> = ({
@@ -25,6 +30,7 @@ const DataTable: React.FC<DataTableProps> = ({
   showActions = false,
   maxHeight = 360,
   dense = true,
+  deletePath = '',
 }) => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -33,6 +39,12 @@ const DataTable: React.FC<DataTableProps> = ({
   const [sortMenuOpen, setSortMenuOpen] = useState<boolean>(false);
   const [selectedColumn, setSelectedColumn] = useState<string>('');
   const [hoveredOption, setHoveredOption] = useState<'asc' | 'desc' | null>(null);
+  const [currentDeleteItem, setCurrentDeleteItem] = useState<any>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [tableRows, setTableRows] = useState<any[]>(data.rows);
+  React.useEffect(() => {
+    setTableRows(data.rows);
+  }, [data.rows]);
 
   const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
     setPage(newPage);
@@ -40,6 +52,14 @@ const DataTable: React.FC<DataTableProps> = ({
   const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
+  };
+
+  // Handle delete button click
+  const handleDelete = (row: any) => {
+    if (deletePath) {
+      setCurrentDeleteItem(row);
+      setDeleteDialogOpen(true);
+    }
   };
 
   const stableSort = (array: any[], comparator: any) => {
@@ -63,7 +83,7 @@ const DataTable: React.FC<DataTableProps> = ({
     return <p>No data to display.</p>;
 
   const columns = data.columns;
-  const rows = data.rows;
+  const rows = tableRows;
 
   const sorted = stableSort(rows, comparator);
   const visibleRows = enablePagination ? sorted.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) : sorted;
@@ -168,7 +188,12 @@ const DataTable: React.FC<DataTableProps> = ({
                 ))}
                 {showActions && (
                   <TableCell className="actions">
-                    {/* אם רוצים אקשנים אפשר להכניס כאן */}
+                    <IconButton onClick={() => onRowClick && onRowClick(row)} aria-label="Edit" size="small">
+                      <EditIcon fontSize="small" />
+                    </IconButton>
+                    <IconButton onClick={() => handleDelete(row)} aria-label="Delete" size="small">
+                      <DeleteIcon fontSize="small" />
+                    </IconButton>
                   </TableCell>
                 )}
               </TableRow>
@@ -177,24 +202,38 @@ const DataTable: React.FC<DataTableProps> = ({
         </Table>
       </TableContainer>
 
-      {enablePagination && (
-        <TablePagination
-          sx={{
-            '& .MuiTablePagination-toolbar': {
-              borderTop: '2px solid #c9c5dcff',
-              backgroundColor: 'white',
-            },
-          }}
-          rowsPerPageOptions={[3, 5, 10, 20]}
-          component="div"
-          count={rows.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-          className="table-pagination"
-        />
-      )}
+      <TablePagination
+        sx={{
+          '& .MuiTablePagination-toolbar': {
+            borderTop: '2px solid #c9c5dcff',
+            backgroundColor: 'white',
+          },
+        }}
+        rowsPerPageOptions={[ 3, 5, 10,20]}
+        component="div"
+        count={rows.length}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onPageChange={handleChangePage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
+        className="table-pagination"
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <DeleteConfirmDialog
+        itemData={currentDeleteItem}
+        deletePath={deletePath || ''}
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        onDeleteResult={(result) => {
+          setDeleteDialogOpen(false);
+          if (result.success && currentDeleteItem) {
+            const itemId = currentDeleteItem.lotId || currentDeleteItem.id || currentDeleteItem.logoId;
+            setTableRows(prev => prev.filter(row => (row.lotId || row.id || row.logoId) !== itemId));
+          }
+          // Optionally handle error: show overlay, etc.
+        }}
+      />
     </>
   );
 };
