@@ -5,6 +5,7 @@ import { appDbConfig } from './config';
 export default {
   development: {
     ...appDbConfig,
+    dialectOptions: undefined,
     migrations: {
       path: path.resolve(__dirname, '../../migrations'),
       pattern: /\.(js|ts)$/,
