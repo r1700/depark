@@ -7,6 +7,7 @@ export const appDbConfig = {
   password: dbConfig.DB_PASSWORD,
   database: dbConfig.DB_NAME,
   host: dbConfig.DB_HOST,
+  port: dbConfig.DB_PORT,
   dialect: dbConfig.DB_DIALECT,
   migrationStorageTableName: 'sequelize_meta',
   migrations: {

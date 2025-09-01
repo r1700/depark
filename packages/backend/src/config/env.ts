@@ -9,6 +9,7 @@ interface DBVars {
   DB_PASSWORD: string;
   DB_HOST: string;
   DB_NAME: string;
+  DB_PORT: number;
   DB_DIALECT: 'postgres'; 
 }
 
@@ -20,6 +21,7 @@ if (STATUS === 'production') {
     DB_PASSWORD: process.env.PROD_DB_PASSWORD || 'postgres',
     DB_HOST: process.env.PROD_DB_HOST || 'db',   
     DB_NAME: process.env.PROD_DB_NAME || 'postgres',
+    DB_PORT: process.env.PROD_DB_PORT ? parseInt(process.env.PROD_DB_PORT) : 5432,
     DB_DIALECT: 'postgres',
   };
 } else {
@@ -28,6 +30,7 @@ if (STATUS === 'production') {
     DB_PASSWORD: process.env.LOCAL_DB_PASSWORD || 'postgres',
     DB_HOST: process.env.LOCAL_DB_HOST || 'localhost',
     DB_NAME: process.env.LOCAL_DB_NAME || 'depark',
+    DB_PORT: process.env.LOCAL_DB_PORT ? parseInt(process.env.LOCAL_DB_PORT) : 5432,
     DB_DIALECT: 'postgres',
   };
 }

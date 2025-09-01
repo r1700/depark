@@ -1,4 +1,4 @@
-import client from '../../src/services/db/connection';
+import client from '../services/db/connection';
 export async function getAllVehicles(filters?: {
 search?: string;
 is_active?: boolean;
