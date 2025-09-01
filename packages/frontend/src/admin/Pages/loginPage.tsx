@@ -1,5 +1,4 @@
-import React, { useState, useCallback } from "react";
-import LoginScreen from '../components/screen-login/LoginScreen';
+import React, { useState } from "react";
 import { Box, Button, Container, Typography } from "@mui/material";
 
 const LoginPage: React.FC = () => {
@@ -9,12 +8,12 @@ const LoginPage: React.FC = () => {
   });
 
   // הפונקציה לטיפול בכניסה מוצלחת, מקבלת טוקן
-  const handleLogin = useCallback((token?: string) => {
-    if (token) {
-      localStorage.setItem("token", token);
-    }
-    setLoggedIn(true);
-  }, []);
+  // const handleLogin = useCallback((token?: string) => {
+  //   if (token) {
+  //     localStorage.setItem("token", token);
+  //   }
+  //   setLoggedIn(true);
+  // }, []);
 
   // פונקצית logout מוחקת את הטוקן ומעדכנת מצב
   const handleLogout = () => {
