@@ -5,10 +5,6 @@ dotenv.config();
 const { SOURCE_URL } = process.env;
 const backendBase = `http://${SOURCE_URL || "localhost:3001"}/api`;
 
-/**
- * שלח payload ל‑backend.
- * endpoint — חלק אחרי /api/ (למשל: 'opc/fault' או 'opc/fault/resolve')
- */
 async function sendDataToBackend(endpoint: string, payload: any) {
   const url = `${backendBase}/opc/${endpoint}`;
   try {

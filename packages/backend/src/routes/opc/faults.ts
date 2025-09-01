@@ -67,7 +67,6 @@ router.get("/faults/history", async (req, res) => {
     const severity = req.query.severity as "low" | "medium" | "high" | undefined;
     const assigneeId = req.query.assigneeId ? Number(req.query.assigneeId) : undefined;
     const limit = req.query.limit ? Number(req.query.limit) : 100;
-
     const faults = await getFaultHistory({ parkingId, status, severity, assigneeId, limit });
     res.json(faults);
   } catch (err) {

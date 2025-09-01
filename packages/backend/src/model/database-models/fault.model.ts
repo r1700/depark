@@ -3,12 +3,12 @@ import sequelize from "../../config/sequelize";
 
 export class Fault extends Model {
   public id!: number;
-  public parkingId!: number; // Update to parking_id (snake_case)
+  public parkingId!: number; 
   public faultDescription?: string | null;
   public status!: string;
-  public severity!: string; // Added severity
-  public resolvedAt?: Date | null; // Added resolved_at
-  public assigneeId?: number | null; // Added assignee_id (FK to technicians)
+  public severity!: string; 
+  public resolvedAt?: Date | null; 
+  public assigneeId?: number | null;
   public createdAt!: Date;
   public updatedAt!: Date;
 }

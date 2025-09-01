@@ -211,4 +211,4 @@ export async function createPlcOpcServer() {
 
   await server.start();
   console.log(":white_check_mark: OPC-UA server running at:", server.endpoints[0].endpointDescriptions()[0].endpointUrl);
-}
+} 

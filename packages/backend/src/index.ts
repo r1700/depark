@@ -14,6 +14,7 @@ import userGoogleAuthRoutes from './routes/userGoogle-auth';
 import Exit from './routes/opc/exit'; // Import the exit route
 import faultsRouter from './routes/opc/faults';
 import techniciansRoutes from "./routes/opc/technicians";
+import Retrival from "./routes/RetrivalQueue"
 import './cronJob'; // Import the cron job to ensure it runs on server start
 
 const app = express();

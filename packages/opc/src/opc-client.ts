@@ -20,7 +20,6 @@ import { sendDataToBackend } from "./backendService";
 dotenv.config();
 const { TARGET_URL, PLC_USERNAME, PLC_PASSWORD, TARGET_URL_MOCK } = process.env;
 
-// עדיף לשים את ה־endpoint מה־.env
 const endpointUrl: string = `opc.tcp://${TARGET_URL}/UA/PLC`;
 
 let opcClient: OPCUAClient | null = null;
@@ -31,7 +30,7 @@ const nodesToMonitor = [
   "ns=1;s=parkingSpot",
   "ns=1;s=licensePlateExit",
   "ns=1;s=licensePlateEntry",
-  "ns=1;s=ActiveFaultList", // רשימת תקלות
+  "ns=1;s=ActiveFaultList",
 ];
 
 // ----------------------------
