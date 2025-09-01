@@ -1,61 +1,45 @@
-import React, { useState, forwardRef, useImperativeHandle } from 'react';
+import React from 'react';
 import { Box, Typography, Button, Stack } from '@mui/material';
 
 interface DeleteConfirmDialogProps {
   itemData: any;
   deletePath: string;
-  onDeleteSuccess?: () => void;
+  onDeleteResult?: (result: { success: boolean; error?: string }) => void;
+  open: boolean;
+  onClose: () => void;
 }
 
-export interface DeleteConfirmDialogRef {
-  openDialog: () => void;
-}
-
-const DeleteConfirmDialog = forwardRef<DeleteConfirmDialogRef, DeleteConfirmDialogProps>(({
+const DeleteConfirmDialog = ({
   itemData,
   deletePath,
-  onDeleteSuccess
-}, ref) => {
-  const [open, setOpen] = useState(false);
-
-  // Function to open the dialog
-  const openDialog = () => {
-    setOpen(true);
-  };
-
-  // Function to close the dialog
-  const closeDialog = () => {
-    setOpen(false);
-  };
-
-  // Expose openDialog to parent component
-  useImperativeHandle(ref, () => ({
-    openDialog
-  }));
+  onDeleteResult,
+  open,
+  onClose
+}: DeleteConfirmDialogProps) => {
   // Confirm and execute delete
   const confirmDelete = async () => {
     if (!itemData || !deletePath) return;
-    
+    const itemId = itemData.lotId || itemData.id;
     try {
-      const response = await fetch(`${deletePath}/${itemData.id}`, {
-        method: 'DELETE'
+      const response = await fetch(`${deletePath}/${itemId}`, {
+        method: 'DELETE',
+        credentials: 'include'
       });
-      
       if (response.ok) {
-        console.log('✅ Item deleted successfully');
-        closeDialog();
-        if (onDeleteSuccess) {
-          onDeleteSuccess();
-        } else {
-          // Default behavior - refresh page
-          window.location.reload();
-        }
+        onClose();
+        if (onDeleteResult) onDeleteResult({ success: true });
       } else {
-        const errorData = await response.json();
-        console.error('❌ Failed to delete:', errorData.error);
+        let errorMsg = 'מחיקה נכשלה';
+        try {
+          const errorData = await response.json();
+          errorMsg = errorData.error || errorMsg;
+        } catch {}
+        onClose();
+        if (onDeleteResult) onDeleteResult({ success: false, error: errorMsg });
       }
     } catch (error) {
-      console.error('❌ Error deleting item:', error);
+      onClose();
+      if (onDeleteResult) onDeleteResult({ success: false, error: 'שגיאת רשת במחיקה' });
     }
   };
 
@@ -90,30 +74,30 @@ const DeleteConfirmDialog = forwardRef<DeleteConfirmDialogRef, DeleteConfirmDial
           ⚠️ Delete Confirmation
         </Typography>
         <Typography variant="body1" sx={{ mb: 3 }}>
-          Are you sure you want to delete{' '}
+          האם למחוק את
           <Box component="span" sx={{ fontWeight: 600, color: 'primary.main' }}>
-            "{itemData?.facilityName || itemData?.name || itemData?.id}"
+            "{itemData?.name || itemData?.id}"
           </Box>
           ?
         </Typography>
         <Stack direction="row" spacing={2} justifyContent="flex-end">
           <Button
             variant="outlined"
-            onClick={closeDialog}
+            onClick={onClose}
           >
-            Cancel
+            ביטול
           </Button>
           <Button
             variant="contained"
             color="error"
             onClick={confirmDelete}
           >
-            Delete
+            מחק
           </Button>
         </Stack>
       </Box>
     </Box>
   );
-});
+};
 
 export default DeleteConfirmDialog;
