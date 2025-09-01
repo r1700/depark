@@ -10,7 +10,6 @@ import passwordRoutes from './routes/user.routes';
 import vehicleRoutes from './routes/vehicle';
 import exportToCSV from './routes/exportToCSV';
 import userGoogleAuthRoutes from './routes/userGoogle-auth';
-import Exit from './routes/opc/exit'; // Import the exit route
 import faultsRouter from './routes/opc/faults';
 import techniciansRoutes from "./routes/opc/technicians";
 import http from 'http';
@@ -21,6 +20,10 @@ import userRoutes from './routes/user.routes';
 import logoRouter from './routes/logos';
 import screenTypeRouter from './routes/screenType';
 import './cronJob'; // Import the cron job to ensure it runs on server start
+import Exit from './routes/opc/exit';
+import Retrival from './routes/RetrivalQueue';
+// import './cronJob'; // Ensure the cron job runs on server start
+import userApprovalRoutes from './routes/userApprovalRoute';
 import vehicle from './routes/vehicleRoute';
 import GoogleAuth from './routes/google-auth';
 import parkingReport from './routes/parkingStat';

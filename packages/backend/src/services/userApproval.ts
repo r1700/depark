@@ -9,6 +9,7 @@ export async function updateUserStatus(
   adminId: string
 ) {
   try {
+    
     const [numberOfAffectedRowsBaseUser, [updatedBaseUser]] = await BaseUser.update(
       {
         status, 
