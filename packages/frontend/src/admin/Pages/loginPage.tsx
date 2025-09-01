@@ -1,14 +1,14 @@
-import React, { useState, useEffect, useCallback } from "react";
-import LoginScreen from '../components/screen-login/LoginScreen';
+import React, { useState, useCallback } from "react";
+import LoginScreen from "../components/screen-login/LoginScreen";
 import { Box, Button, Container, Typography } from "@mui/material";
 
 const LoginPage: React.FC = () => {
-  // קריאה ראשונית מה־localStorage כדי לטעון אם המשתמש כבר מחובר
+  // קריאה ראשונית מה־localStorage כדי לבדוק אם המשתמש מחובר
   const [loggedIn, setLoggedIn] = useState<boolean>(() => {
     return !!localStorage.getItem("token");
   });
 
-  // הפונקציה לטיפול בכניסה מוצלחת, מקבלת טוקן
+  // פונקציה לטיפול בכניסה מוצלחת
   const handleLogin = useCallback((token?: string) => {
     if (token) {
       localStorage.setItem("token", token);
@@ -16,14 +16,19 @@ const LoginPage: React.FC = () => {
     setLoggedIn(true);
   }, []);
 
-  // פונקצית logout מוחקת את הטוקן ומעדכנת מצב
+  // פונקציה ל־logout
   const handleLogout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    localStorage.removeItem("expiresAt");
     setLoggedIn(false);
   };
 
   return (
-    <Container maxWidth="sm" sx={{ mt: 8, textAlign: "center", direction: "ltr" }}>
+    <Container
+      maxWidth="sm"
+      sx={{ mt: 8, textAlign: "center", direction: "ltr" }}
+    >
       {loggedIn ? (
         <Box>
           <Typography variant="h4" gutterBottom>
@@ -34,10 +39,8 @@ const LoginPage: React.FC = () => {
           </Button>
         </Box>
       ) : (
-        // כאן מוסיפים פרופס של onLogin שמקבלת טוקן
-        // <LoginScreen onLogin={handleLogin} />
-        <div>
-        </div>
+        // כאן אנחנו מוסיפים את LoginScreen עם פרופס onLogin
+        <LoginScreen onLogin={handleLogin} />
       )}
     </Container>
   );
