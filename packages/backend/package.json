@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "nodemon src/index.ts",
     "build": "tsc",
-    "start": "node src/index.ts",
+    "start": "node dist/src/index.js",
     "clean": "rm -rf dist",
     "debug": "node --inspect src/index.ts",
     "db:migrate": "sequelize-cli db:migrate",
