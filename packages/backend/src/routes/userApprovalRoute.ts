@@ -18,7 +18,7 @@ router.post('/:id/approve', authenticateToken, async (req, res) => {
     if (!adminId) {
       return res.status(401).json({ error: 'Admin ID missing' });
     }
-
+    
     const updated = await updateUserStatus(id, id, UserStatusEnum.Approved, adminId);
 
     res.status(200).json({

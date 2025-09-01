@@ -92,7 +92,7 @@ yarn.lock
 # models
 models/index.js
 # migrations
-migrations/*.js
+# migrations/*.js
 # Specific JSON files to ignore (NOT all JSON!)
 config/database.json
 temp/*.json
