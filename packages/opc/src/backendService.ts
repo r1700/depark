@@ -1,23 +1,29 @@
-import axios from 'axios';
-import * as dotenv from 'dotenv';
-import { log } from 'node:console';
+import axios from "axios";
+import * as dotenv from "dotenv";
 dotenv.config();
 
-const { SOURCE_URL } = process.env
+const { SOURCE_URL } = process.env;
+const backendBase = `http://${SOURCE_URL || "localhost:3001"}/api`;
 
-const backendUrl = `http://${SOURCE_URL || "localhost:3001"}/api/opc`;
-
-// פונקציה לשליחת הנתון ל-backend
-async function sendDataToBackend(event: string, value: any) {
-    const url = `${backendUrl}/${event}`; // Adjust the endpoint as needed      
-    try {
-        const response = await axios.post(url, {
-            value: value
-        });
-        console.log("Backend response:", response.data);
-    } catch (error) {
-        console.error("Error sending data to backend:", error);
-    }
+/**
+ * שלח payload ל‑backend.
+ * endpoint — חלק אחרי /api/ (למשל: 'opc/fault' או 'opc/fault/resolve')
+ */
+async function sendDataToBackend(endpoint: string, payload: any) {
+  const url = `${backendBase}/opc/${endpoint}`;
+  try {
+    const response = await axios.post(url, payload, {
+      timeout: 5000,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    console.log(`Backend response [${endpoint}]:`, response.data);
+    return response.data;
+  } catch (error: any) {
+    console.error(`Error sending data to backend [${endpoint}]:`, error?.response?.data ?? error.message ?? error);
+    throw error;
+  }
 }
 
 export { sendDataToBackend };
