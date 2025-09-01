@@ -7,7 +7,8 @@ export type FieldConfig<T> = {
   label: string;
   type?: FieldType;
   required?: boolean;
-  options?: string[];
+  options?: (string | { label: string; value: any })[];
+  disabled?: (data: Partial<T>) => boolean;
 };
 
 export interface GenericFormProps<T> {
@@ -21,7 +22,7 @@ export interface GenericFormProps<T> {
 
 type FieldType = 'text' | 'number' | 'email' | 'select' | 'boolean';
 
-const GenericForm = <T extends { [key: string]: any }>({
+export const GenericForm = <T extends { [key: string]: any }>({
   title = 'Form',
   fields,
   initialState,
@@ -125,20 +126,27 @@ const GenericForm = <T extends { [key: string]: any }>({
             <Box sx={{ mb: 2 }}>
               <Autocomplete
                 disablePortal
+                disabled={field.disabled ? field.disabled(formData) : false}
                 options={field.options || []}
                 value={formData[field.name] ?? ''}
                 onChange={(event, newValue) => {
                   handleChange({ target: { name: field.name, value: newValue } });
                 }}
-
+                getOptionLabel={(option) => 
+                  typeof option === 'string' ? option : option.label || ''
+                }
+                isOptionEqualToValue={(option, value) => 
+                  typeof option === 'string' 
+                    ? option === value 
+                    : option.value === value
+                }
                 renderInput={(params) => <TextField required={field.required}
                   error={!!errors[field.name]}
                   helperText={errors[field.name]}
                   key={field.label} {...params} label={field.label} onChange={handleChange} />}
                 renderOption={(props, option) => (
                   <li {...props}>
-                    {option}
-
+                    {typeof option === 'string' ? option : option.label}
                   </li>
                 )}
                 ListboxComponent={(props) => (
@@ -184,6 +192,7 @@ const GenericForm = <T extends { [key: string]: any }>({
                 required={field.required}
                 error={!!errors[field.name]}
                 helperText={errors[field.name]}
+                disabled={field.disabled ? field.disabled(formData) : false}
                 InputLabelProps={{
                   style: { whiteSpace: 'normal' }
                 }}

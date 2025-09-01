@@ -2,6 +2,16 @@ import { useAppDispatch} from '../../../store';
 import { FieldConfig, GenericForm } from '../../../../components/forms/Form';
 import { addVehicle, updateVehicle } from '../vehicleThunks';
 
+interface VehicleFormData {
+  licensePlate: string;
+  user: string;
+  vehicleModelId: number;
+  width: number;
+  height: number;
+  length: number;
+  weight: number;
+  dimensionsSource: string;
+}
 
 const AddOrEditVehicleForm = ({ onClose, vehicleToEdit = null }
   : {
@@ -12,7 +22,7 @@ const AddOrEditVehicleForm = ({ onClose, vehicleToEdit = null }
   const dispatch = useAppDispatch();
   const users: any[] =  []
 
-  const VehicleFields: FieldConfig[] = [
+  const VehicleFields: FieldConfig<VehicleFormData>[] = [
     { name: 'licensePlate', label: 'License Plate', required: true, type: 'text' },
     {
       name: 'user', label: 'User', required: true, type: 'select', options: users.map(user => ({
