@@ -9,10 +9,11 @@ import {
   TimestampsToReturn,
   Variant,
   VariantArrayType,
-  UserTokenType,
   MessageSecurityMode,
-  SecurityPolicy
+  SecurityPolicy,
+  UserTokenType,
 } from "node-opcua";
+
 import dotenv from "dotenv";
 import { sendDataToBackend } from "./backendService";
 
@@ -26,7 +27,6 @@ let opcClient: OPCUAClient | null = null;
 let opcSession: ClientSession | null = null;
 let subscription: ClientSubscription | null = null;
 let monitoredItems: ClientMonitoredItem[] = [];
-
 const nodesToMonitor = [
   "ns=1;s=parkingSpot",
   "ns=1;s=licensePlateExit",
@@ -93,12 +93,12 @@ export async function ensureSession(): Promise<ClientSession> {
 async function closeOpcConnection() {
   if (opcSession) {
     await opcSession.close();
-    console.log("Session closed");
+    console.log("OPC UA session closed");
     opcSession = null;
   }
   if (opcClient) {
     await opcClient.disconnect();
-    console.log("Client disconnected");
+    console.log("OPC UA client disconnected");
     opcClient = null;
   }
 }
@@ -136,6 +136,7 @@ function detectDataType(value: any): { dataType: DataType; arrayType?: VariantAr
   }
 }
 
+// Interface for write items
 export interface WriteItem {
   nodeId: string;
   value: any;
@@ -192,15 +193,24 @@ export async function createSubscription(): Promise<ClientSubscription> {
     console.log("Subscription terminated");
   });
 
+  subscription.on("keepalive", () => {
+    console.log("🔄 Subscription keepalive: Connection is active");
+  });
+
+  subscription.on("status_changed", (status) => {
+    console.log("⚠️ Subscription status changed:", status.toString());
+  });
+
   return subscription;
 }
 
-export async function createMonitoredItems(subscription: ClientSubscription) {
+export async function createMonitoredItems(subscription: ClientSubscription): Promise<void> {
+  // Cleanup previous monitored items
   for (const item of monitoredItems) {
     try {
       await item.terminate();
     } catch (e) {
-      console.warn("Warning terminating monitored item:", e);
+      console.warn("⚠️ Warning terminating monitored item:", e);
     }
   }
   monitoredItems = [];
@@ -213,7 +223,7 @@ export async function createMonitoredItems(subscription: ClientSubscription) {
       TimestampsToReturn.Both
     );
 
-    monitoredItem.on("changed", (dataValue: DataValue) => {
+    monitoredItem.on("changed", async (dataValue: DataValue) => {
       const val = dataValue.value?.value;
       let event: string = '';
       let payload: any = {};
@@ -256,7 +266,7 @@ export async function createMonitoredItems(subscription: ClientSubscription) {
     });
 
     monitoredItem.on("err", (err) => {
-      console.error(`Monitored item error at ${nodeId}:`, err);
+      console.error(`❌ Monitored item error at ${nodeId}:`, err);
     });
 
     monitoredItems.push(monitoredItem);
@@ -303,9 +313,9 @@ export async function waitForNodeChange(
   });
 }
 
-// ----------------------------
 process.on("SIGINT", async () => {
   console.log("Closing OPC UA connection...");
   await closeOpcConnection();
   process.exit(0);
 });
+

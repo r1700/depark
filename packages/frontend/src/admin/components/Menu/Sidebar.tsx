@@ -17,18 +17,31 @@ import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import MenuIcon from '@mui/icons-material/Menu';
 import LogoutIcon from '@mui/icons-material/Logout';
 import PeopleIcon from '@mui/icons-material/People';
+import SettingsIcon from '@mui/icons-material/Settings';
+import PhotoIcon from '@mui/icons-material/Photo';
+import LocalParkingIcon from '@mui/icons-material/LocalParking';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 const drawerWidth = 240;
+type RoleName = 'admin' | 'hr' | 'guest';
 interface User {
     firstName: string;
     lastName: string;
+    role?: number | string; // מקור השרת
 }
 interface SidebarProps {
     user: User;
     onLogout: () => void;
+}
+/** normalize role from various representations to 'admin'|'hr'|'guest' */
+function normalizeRole(role: number | string | undefined): RoleName {
+    if (role === undefined || role === null) return 'guest';
+    const r = String(role).toLowerCase();
+    if (r === '2' || r === 'admin' || r.includes('admin')) return 'admin';
+    if (r === '1' || r === 'hr' || r.includes('hr') || r.includes('human')) return 'hr';
+    return 'guest';
 }
 const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
     const [open, setOpen] = useState<boolean>(true);
@@ -39,23 +52,39 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
             setReportsOpen(false);
         }
     }, [open]);
+    const userRole = normalizeRole(user?.role);
     const getUserInitials = (): string => {
-        return `${user.firstName[0] ?? ''}${user.lastName[0] ?? ''}`.toUpperCase();
+        if (!user) return '';
+        const first = user.firstName ? user.firstName[0] : '';
+        const last = user.lastName ? user.lastName[0] : '';
+        return `${first}${last}`.toUpperCase();
     };
-    const menuItems = [
-        { text: 'Users', icon: <PeopleIcon />, path: '/layout/users' },
-        { text: 'Vehicles', icon: <DirectionsCarIcon />, path: '/vehicles' },
+    // menu items now include optional `allowed` array with roles that can see the item
+    const menuItems: Array<{
+        text: string;
+        icon?: React.ReactNode;
+        path?: string;
+        allowed?: RoleName[];
+        subMenu?: Array<{ text: string; path: string; allowed?: RoleName[] }>;
+    }> = [
+    { text: 'Users', icon: <PeopleIcon />, path: '/admin/layout/users' },
+    { text: 'Vehicles', icon: <DirectionsCarIcon />, path: '/admin/layout/vehicles' },
         {
             text: 'Reports',
             icon: <AssessmentIcon />,
             path: '',
             subMenu: [
-                { text: 'Report 1', path: '/reports/report1' },
-                { text: 'Report 2', path: '/reports/report2' },
-                { text: 'Report 3', path: '/reports/report3' }
-            ]
+                { text: 'Parking Stats', path: '/admin/layout/reports/parking-stats' },
+                { text: 'Surface Stats', path: '/admin/layout/reports/surface-stats' },
+            ],
         },
-    ];
+    { text: 'Parking Config', icon: <LocalParkingIcon />, path: '/admin/layout/parkings' },
+    { text: 'Logo Management', icon: <PhotoIcon />, path: '/admin/layout/logos' },
+       
+        ];
+    // helper: check if current user role allowed to see item
+    // כל אחד יכול לראות הכל
+    const isAllowed = () => true;
     return (
         <Drawer
             variant="permanent"
@@ -76,16 +105,6 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
                     paddingBottom: 2,
                     overflowX: 'hidden',
                     transition: 'width 0.3s ease',
-                    '&::-webkit-scrollbar': {
-                        width: '8px',
-                    },
-                    '&::-webkit-scrollbar-thumb': {
-                        backgroundColor: 'rgba(255, 255, 255, 0.5)',
-                        borderRadius: '4px',
-                    },
-                    '&::-webkit-scrollbar-track': {
-                        backgroundColor: '#1976D2',
-                    },
                 },
             }}
         >
@@ -110,61 +129,65 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
                 </Box>
             )}
             <List>
-                {menuItems.map((item) => (
-                    <React.Fragment key={item.text}>
-                        <ListItemButton
-                            onClick={() => {
-                                if (item.text === 'Reports') {
-                                    setReportsOpen(!reportsOpen);
-                                } else {
-                                    navigate(item.path);
-                                }
-                            }}
-                            sx={{
-                                color: '#fff',
-                                '&:hover': {
-                                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                                },
-                            }}
-                        >
-                            {item.icon}
-                            {open && <ListItemText primary={item.text} sx={{ ml: 2 }} />}
-                            {item.text === 'Reports' && (
-                                <IconButton sx={{ color: '#fff', ml: 2 }}>
-                                    {reportsOpen ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />}
-                                </IconButton>
+                {menuItems.map((item) => {
+                    // skip item if not allowed for this user
+                    if (!isAllowed()) return null;
+                    // determine visible subMenu after filtering by allowed
+                    const visibleSubMenu = item.subMenu?.filter(() => isAllowed()) ?? [];
+                    return (
+                        <React.Fragment key={item.text}>
+                            <ListItemButton
+                                onClick={() => {
+                                    if (item.subMenu) {
+                                        setReportsOpen(!reportsOpen);
+                                    } else if (item.path) {
+                                        navigate(item.path);
+                                    }
+                                }}
+                                sx={{
+                                    color: '#fff',
+                                    '&:hover': {
+                                        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                                    },
+                                }}
+                            >
+                                {item.icon}
+                                {open && <ListItemText primary={item.text} sx={{ ml: 2 }} />}
+                                {item.subMenu && open && (
+                                    <IconButton sx={{ color: '#fff', ml: 2 }}>
+                                        {reportsOpen ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />}
+                                    </IconButton>
+                                )}
+                            </ListItemButton>
+                            {item.subMenu && visibleSubMenu.length > 0 && (
+                                <Collapse in={reportsOpen} timeout="auto" unmountOnExit>
+                                    <List component="div" disablePadding>
+                                        {visibleSubMenu.map((subItem) => (
+                                            <ListItemButton
+                                                key={subItem.text}
+                                                onClick={() => navigate(subItem.path)}
+                                                sx={{
+                                                    color: '#fff',
+                                                    pl: 4,
+                                                    '&:hover': {
+                                                        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                                                    },
+                                                }}
+                                            >
+                                                <ListItemText primary={subItem.text} />
+                                            </ListItemButton>
+                                        ))}
+                                    </List>
+                                </Collapse>
                             )}
-                        </ListItemButton>
-                        {item.subMenu && (
-                            <Collapse in={reportsOpen} timeout="auto" unmountOnExit>
-                                <List component="div" disablePadding>
-                                    {item.subMenu.map((subItem) => (
-                                        <ListItemButton
-                                            key={subItem.text}
-                                            onClick={() => navigate(subItem.path)}
-                                            sx={{
-                                                color: '#fff',
-                                                pl: 4,
-                                                '&:hover': {
-                                                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                                                },
-                                            }}
-                                        >
-                                            <ListItemText primary={subItem.text} />
-                                        </ListItemButton>
-                                    ))}
-                                </List>
-                            </Collapse>
-                        )}
-                    </React.Fragment>
-                ))}
+                        </React.Fragment>
+                    );
+                })}
             </List>
             <Box sx={{ px: 2 }}>
                 <Divider sx={{ borderColor: 'rgba(255,255,255,0.3)', mb: 2 }} />
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                    <Avatar sx={{ bgcolor: '#1565C0', mr: 2, width: 40, height: 40 }}>
-                        {getUserInitials()}
-                    </Avatar>
+                    <Avatar sx={{ bgcolor: '#1565C0', mr: 2, width: 40, height: 40 }}>{getUserInitials()}</Avatar>
                     {open && (
                         <Typography noWrap>
                             {user.firstName} {user.lastName}

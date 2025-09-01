@@ -3,7 +3,7 @@ import { getVehicleDetailsByDegem } from '../services/vehicleService';
 
 const router = Router();
 
-router.get('/get-vehicle', async (req, res) => {
+router.get('/get-vehicle', async (req, res) => {  
   const degem = req.query.degem as string;
   if (!degem) {
     return res.status(400).json({ error: 'Please provide a vehicle model.' });

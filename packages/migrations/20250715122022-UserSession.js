@@ -58,7 +58,6 @@ module.exports = {
 
     await queryInterface.bulkInsert('usersessions', [
       {
-
         baseuser_id: 1,
         user_type: 1,
         token: 'token12345',

@@ -5,36 +5,30 @@ import ParkingsPage from "./admin/Pages/ParkingsPage";
 import LoginPage from "./admin/Pages/loginPage";
 import Otp from "./mobile/components/otp";
 import HomePage from "./tablet/pages/HomePage";
+import ForgotPassword from './admin/app/pages/resetPassword/ForgotPassword'
+import ResetPassword from './admin/app/pages/resetPassword/ResetPassword';
+import AdminRoutes from "./admin/AdminRoutes";
+
+const user = JSON.parse(localStorage.getItem("user") || '{}');
 const App: React.FC = () => {
 
   return (
     <Router>
-      <Routes>
-        {/* Default home route */}
-        <Route path="/" element={<ParkingsPage />} />
-        
-        {/* Admin login page */}
-        <Route path="/admin" element={<LoginPage />} />
-        
-        {/* Mobile OTP page */}
+    <Routes>
+  
+        <Route path="/" element={<LoginPage />} />
+        <Route path="/admin/*" element={<AdminRoutes />} />
+
         <Route path="/mobile" element={<Otp />} />
-        
-        {/* Tablet home page */}
         <Route path="/tablet" element={<HomePage />} />
-        
-        {/* Parkings list page */}
         <Route path="/parkings" element={<ParkingsPage />} />
-        
-        {/* Admin config page - for new parking lot */}
         <Route path="/admin-config" element={<AdminConfigPage />} />
-        
-        {/* Admin config page - for editing specific parking lot */}
         <Route path="/admin-config/:lotId" element={<AdminConfigPage />} />
-        
-        {/* Catch all - redirect to home */}
         <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </Router>
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+    </Routes>
+  </Router>
   );
 };
 

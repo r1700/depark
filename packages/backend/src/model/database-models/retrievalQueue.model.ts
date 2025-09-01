@@ -1,5 +1,5 @@
 import { DataTypes, Model } from 'sequelize';
-import sequelize from '../../config/sequelize.instance';
+import sequelize from '../../config/sequelize';
 
 class RetrievalQueue extends Model {
   public id!: number;
@@ -55,7 +55,7 @@ RetrievalQueue.init(
       allowNull: false,
       defaultValue: 0, // 0: queued, 1: processing, 2: ready, 3: completed
       validate: {
-        isIn: [['queued', 'processing', 'ready', 'completed']],
+        isIn: [[1, 2, 3, 4]], // Ensure status is one of the defined values
       },
     },
     assigned_pickup_spot: {
@@ -67,7 +67,7 @@ RetrievalQueue.init(
       allowNull: false,
       defaultValue: 0,
       validate: {
-        isIn: [['mobile', 'tablet']],
+        isIn: [[1, 2]], // 1: app, 2: kiosk
       },
     },
   },

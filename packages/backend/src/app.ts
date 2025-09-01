@@ -5,23 +5,19 @@ import cors from 'cors';
 import adminConfigRouter from './routes/adminConfig';
 
 
-const app = express();
+const app:express.Application = express();
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// הודעת התחלה
 console.log('App file started');
 
-// Routes עיקריים (קיימים)
 
-// API Routes חדשים
 app.use('/api/admin', adminConfigRouter);
 
 
-// Health check
 app.get('/health', (req, res) => {
     res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });

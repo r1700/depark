@@ -18,48 +18,21 @@ const ParkingsPage: React.FC<ParkingsPageProps> = () => {
     rows: []
   });
 
-  // Fetch parking lots data
-  const getAllParkingLots = async () => {
-    try {
-      console.log('🔄 FETCH_LOTS: Starting to fetch parking lots');
-      const response = await fetch('/api/admin/', {
-        headers: {
-          'Cache-Control': 'no-cache',
-          'Pragma': 'no-cache'
-        }
-      });
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      const result = await response.json();
-      console.log('🔄 FETCH_LOTS: Raw server response:', JSON.stringify(result, null, 2));
-      
-      if (result.success) {
-        const formattedData = result.parkingConfigs.map((config: any) => ({
-          id: config.id || '',
-          facilityName: config.facilityName || 'No Name'
-        }));
-        
-        console.log('🔄 FETCH_LOTS: Formatted data for table:', JSON.stringify(formattedData, null, 2));
-        return formattedData;
-      } else {
-        console.error('API returned error:', result.error);
-        return [];
-      }
-    } catch (error) {
-      console.error('Error fetching parking lots:', error);
-      return [];
-    }
-  };
-
-  // Load data on component mount
-  useEffect(() => {
-    const loadData = async () => {
-      const parkingLots = await getAllParkingLots();
-      setTableData(prev => ({ ...prev, rows: parkingLots || [] }));
-    };
-    loadData();
-  }, []);
+    useEffect(() => {
+      // Fetch parking lots data from backend
+      fetch('/api/admin/')
+        .then((res) => res.json())
+        .then((data) => {
+          // data.parkingConfigs is the array of parking lots
+          setTableData((prev) => ({
+            ...prev,
+            rows: data.parkingConfigs || []
+          }));
+        })
+        .catch((err) => {
+          console.error('Failed to fetch parking lots:', err);
+        });
+    }, []);
 
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
@@ -81,8 +54,14 @@ const ParkingsPage: React.FC<ParkingsPageProps> = () => {
         {/* Data Table */}
         <DataTable 
           data={tableData} 
-          editPath="/admin-config"
           deletePath="/api/admin"
+          showActions={true}
+          onRowClick={(row) => {
+            if (row.lotId || row.id) {
+              // Prefer lotId if exists, else fallback to id
+              navigate(`/admin-config/${row.lotId || row.id}`);
+            }
+          }}
         />
         <Box sx={{ textAlign: 'center', mb: 6 }}>
             <Button

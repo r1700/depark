@@ -15,7 +15,7 @@ const initialState: UserState = {
   error: null,
 };
 
-const userSlice = createSlice({
+export const userSlice = createSlice({
   name: 'users',
   initialState,
   reducers: {
@@ -31,7 +31,7 @@ const userSlice = createSlice({
       })
       .addCase(fetchUsers.fulfilled, (state, action) => {
         state.loading = false;
-        state.users = action.payload; // חשוב!
+        // state.users = action.payload; // חשוב!
         state.error = null;
       })
       .addCase(fetchUsers.rejected, (state, action) => {
