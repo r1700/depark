@@ -137,7 +137,10 @@ interface AdminConfigPageProps {}
 export default function AdminConfigPage({}: AdminConfigPageProps) {
   const navigate = useNavigate();
   const { lotId } = useParams<{ lotId?: string }>();
-  
+  const [tableData, setTableData] = useState({
+    rows: [],  // רשימת השורות (נתונים)
+    columns: [] // רשימת העמודות (אם יש לך מידע על העמודות)
+  });
   // Helper function to get headers with authorization
   const getAuthHeaders = () => {
     return {
@@ -205,9 +208,6 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [spotToDelete, setSpotToDelete] = useState<{index: number, name: string} | null>(null);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
-  const [updateLotId, setUpdateLotId] = useState('');
-  const [loadingUpdate, setLoadingUpdate] = useState(false);
-  const [addingNewLot, setAddingNewLot] = useState(false);
   const [deleteConfirmDialog, setDeleteConfirmDialog] = useState<{
     open: boolean;
     lotData: any;
@@ -368,16 +368,10 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
   };
 
   // Function to refresh the table
-  const refreshTable = async () => {
-    const parkingLots = await getAllParkingLots();
-    setTableData(prev => ({ ...prev, rows: parkingLots || [] }));
-  };
+  
 
   // Example of how to prepare data for the table
-  const [tableData, setTableData] = useState<{
-    columns: Array<{ id: string; label: string }>;
-    rows: Array<any>;
-  }>({
+({
     columns: [
       { id: 'id', label: 'ID' },
       { id: 'facilityName', label: 'Facility Name' }
@@ -386,13 +380,13 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
   });
 
   // Load table data only once
-  useEffect(() => {
-    const loadData = async () => {
-      const parkingLots = await getAllParkingLots();
-      setTableData(prev => ({ ...prev, rows: parkingLots || [] }));
-    };
-    loadData();
-  }, []); // Empty - will load only once
+useEffect(() => {
+  const loadData = async () => {
+    const parkingLots = await getAllParkingLots();
+    setTableData(prev => ({ ...prev, rows: parkingLots || [] }));
+  };
+  loadData();
+}, [getAllParkingLots]); // הוספתי את getAllParkingLots כתלות
 
   // Function to load a specific lot for editing
   
