@@ -11,10 +11,35 @@ import exportToCSV from './routes/exportToCSV';
 import authRoutes from './routes/auth';
 import userGoogleAuthRoutes from './routes/userGoogle-auth';
 import Exit from './routes/opc/exit'; // Import the exit route
+import faultsRouter from './routes/opc/faults';
+import techniciansRoutes from "./routes/opc/technicians";
 import session from 'express-session';
 import './cronJob'; // Import the cron job to ensure it runs on server start
 
 const app = express();
+app.use(express.json());
+
+// --- DEBUG: log incoming requests and who sends responses ---
+app.use((req, res, next) => {
+console.log(`[REQ] ${new Date().toISOString()} ${req.method} ${req.originalUrl} body:`, req.body);
+const origJson = res.json.bind(res);
+const origSend = res.send.bind(res);
+
+res.json = function (body) {
+console.log(`[DEBUG] res.json called for ${req.method} ${req.originalUrl} with body:`, body);
+console.trace();
+return origJson(body);
+};
+
+res.send = function (body) {
+console.log(`[DEBUG] res.send called for ${req.method} ${req.originalUrl} with body:`, body);
+console.trace();
+return origSend(body);
+};
+
+next();
+});
+// --- end DEBUG ---
 const PORT = process.env.PORT || 3001;
 
 
@@ -43,6 +68,12 @@ if (!GOOGLE_CLIENT_ID) {
 
 app.use(cors({ origin: CORS_ORIGIN, credentials: true }));
 app.use(express.json());
+
+// Global request logger — מדפיס כל בקשה נכנסת
+app.use((req, res, next) => {
+console.log(`[REQ] ${new Date().toISOString()} ${req.method} ${req.originalUrl} body:`, req.body);
+next();
+});
 app.use(loggerRoutes);
 app.use('/api/health', healthRoutes);
 app.use('/api/password', passwordRoutes);
@@ -57,7 +88,27 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use("/api/opc", techniciansRoutes);
+app.use('/api/opc', faultsRouter);
 app.use('/api/opc', Exit);
+// Print registered routes (debug)
+function printRoutes() {
+console.log("Registered routes:");
+app._router.stack.forEach((middleware: any) => {
+if (middleware.route) {
+const methods = Object.keys(middleware.route.methods).join(',').toUpperCase();
+console.log(`${methods} ${middleware.route.path}`);
+} else if (middleware.name === 'router' && middleware.handle && middleware.handle.stack) {
+middleware.handle.stack.forEach((handler: any) => {
+if (handler.route) {
+const methods = Object.keys(handler.route.methods).join(',').toUpperCase();
+console.log(`${methods} ${handler.route.path}`);
+}
+});
+}
+});
+}
+printRoutes();
 
 // Start server - בסוף!
 app.get('/', (req, res) => {
@@ -109,5 +160,3 @@ app.listen(PORT, () => {
     console.log(':memo: Using mock data - Supabase not configured');
   }
 });
-
-
