@@ -31,6 +31,7 @@ const nodesToMonitor = [
   "ns=1;s=licensePlateExit",
   "ns=1;s=licensePlateEntry",
   "ns=1;s=ActiveFaultList", // רשימת תקלות
+  "ns=1;s=Queue",
 ];
 
 // ----------------------------
@@ -226,33 +227,38 @@ export async function createMonitoredItems(subscription: ClientSubscription) {
       } else if (nodeId === "ns=1;s=parkingSpot") {
         event = 'parkingSpot';
         payload = { value: val };
+      }
+      else if (nodeId === "ns=1;s=Queue") {
+        event = 'Queue';
+        payload = { value: val };
       } else if (nodeId === "ns=1;s=ActiveFaultList") {
-          event = 'fault';
-          let faultObj = val;
-          if (typeof val === "string") {
-            try {
-              faultObj = JSON.parse(val);
-            } catch (e) {
-              console.warn("ActiveFaultList value is not valid JSON:", val);
-              return;
-            }
-          }
-          if (faultObj && typeof faultObj === "object") {
-            console.log("ActiveFaultList changed:", faultObj);
-            payload = {
-              parkingId: faultObj.parkingId,
-              faultDescription: faultObj.faultDescription,
-              severity: faultObj.severity || "medium",
-              assigneeId: faultObj.assigneeId ?? null,
-            };
-          } else {
+        event = 'fault';
+        let faultObj = val;
+        if (typeof val === "string") {
+          try {
+            faultObj = JSON.parse(val);
+          } catch (e) {
+            console.warn("ActiveFaultList value is not valid JSON:", val);
             return;
           }
-        } else {
-          return; // Unknown nodeId, do nothing
         }
+        if (faultObj && typeof faultObj === "object") {
+          console.log("ActiveFaultList changed:", faultObj);
+          payload = {
+            parkingId: faultObj.parkingId,
+            faultDescription: faultObj.faultDescription,
+            severity: faultObj.severity || "medium",
+            assigneeId: faultObj.assigneeId ?? null,
+          };
+        } else {
+          return;
+        }
+      } else {
+        return; // Unknown nodeId, do nothing
+      }
 
       sendDataToBackend(event, payload);
+
     });
 
     monitoredItem.on("err", (err) => {

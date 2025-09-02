@@ -16,7 +16,7 @@
   },
   "include": [
     "packages/**/*"
-  ],
+, "jest.config.js"  ],
   "exclude": [
     "node_modules",
     "dist"
