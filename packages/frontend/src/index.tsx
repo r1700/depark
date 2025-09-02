@@ -17,6 +17,9 @@ import LoginPage from './admin/Pages/loginPage';
 import ForgotPassword from './admin/app/pages/resetPassword/ForgotPassword';
 import ResetPassword from './admin/app/pages/resetPassword/ResetPassword';
 import AdminRoutes from './admin/AdminRoutes';
+import Login from './mobile/pages/Login';
+import { GoogleOAuthProvider } from '@react-oauth/google';
+import { AuthProvider } from './mobile/auth/AuthContext';
 
 const user = JSON.parse(localStorage.getItem("user") || "{}");
 
@@ -29,7 +32,8 @@ const routers = createBrowserRouter([
     path: '/', element: <App />, children: [
       { path: '', element: <LoginPage /> },
       { path: 'admin/*', element: <AdminRoutes /> },
-      { path: 'mobile', element: <Otp /> },
+      { path: 'mobile', element: <Login /> },
+      { path: 'otp', element: <Otp /> },
       { path: 'tablet', element: <HomePage /> },
       { path: 'parkings', element: <ParkingsPage /> },
       { path: 'admin-config', element: <AdminConfigPage /> },
@@ -52,9 +56,14 @@ const routers = createBrowserRouter([
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
+
 root.render(
   <React.StrictMode>
-    <RouterProvider router={routers}></RouterProvider>
+     <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID!}>
+      <AuthProvider>
+        <RouterProvider router={routers}></RouterProvider>
+      </AuthProvider>
+    </GoogleOAuthProvider>
   </React.StrictMode>,
 );
 
