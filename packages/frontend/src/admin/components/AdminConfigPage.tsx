@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, {useState, useEffect, useMemo, useCallback} from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   Container,
@@ -21,7 +21,6 @@ import {
   Divider,
   ThemeProvider,
   createTheme,
-  Checkbox,
   Radio,
   RadioGroup
 } from '@mui/material';
@@ -134,6 +133,7 @@ const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 
 
 interface AdminConfigPageProps {}
 
+// eslint-disable-next-line no-empty-pattern
 export default function AdminConfigPage({}: AdminConfigPageProps) {
   const navigate = useNavigate();
   const { lotId } = useParams<{ lotId?: string }>();
@@ -208,6 +208,11 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [spotToDelete, setSpotToDelete] = useState<{index: number, name: string} | null>(null);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+  // const [updateLotId, setUpdateLotId] = useState('');
+  // const [loadingUpdate, setLoadingUpdate] = useState(false);
+  // const [addingNewLot, setAddingNewLot] = useState(false);
+  const [, setAddingNewLot] = useState(false);
+
   const [deleteConfirmDialog, setDeleteConfirmDialog] = useState<{
     open: boolean;
     lotData: any;
@@ -285,7 +290,7 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
     };
     
     loadExistingConfig();
-  }, [lotId]); // Remove initialConfig dependency
+  }, [initialConfig, lotId]); // Remove initialConfig dependency
 
   // Auto-hide error popup after 3 seconds
   useEffect(() => {
@@ -336,7 +341,7 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
       }
     }));
   };
-  const getAllParkingLots = async () => {
+  const getAllParkingLots = useCallback(async () => {
     try {
       console.log('🔄 FETCH_LOTS: Starting to fetch parking lots');
       const response = await fetch('/api/admin/', {
@@ -347,14 +352,14 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
       }
       const result = await response.json();
       console.log('🔄 FETCH_LOTS: Raw server response:', JSON.stringify(result, null, 2));
-      
+
       if (result.success) {
         // Formats the data for the table with default values
         const formattedData = result.parkingConfigs.map((config: any) => ({
           id: config.id || '',
           facilityName: config.facilityName || 'No Name'
         }));
-        
+
         console.log('🔄 FETCH_LOTS: Formatted data for table:', JSON.stringify(formattedData, null, 2));
         return formattedData;
       } else {
@@ -365,13 +370,21 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
       console.error('Error fetching parking lots:', error);
       return [];
     }
-  };
+  }, []);
 
   // Function to refresh the table
-  
+  // const refreshTable = async () => {
+  //   const parkingLots = await getAllParkingLots();
+  //   setTableData(prev => ({ ...prev, rows: parkingLots || [] }));
+  // };
 
   // Example of how to prepare data for the table
-({
+  // const [tableData, setTableData] = useState<{
+  const [, setTableData] = useState<{
+    columns: Array<{ id: string; label: string }>;
+    rows: Array<any>;
+  }>({
+
     columns: [
       { id: 'id', label: 'ID' },
       { id: 'facilityName', label: 'Facility Name' }
@@ -380,13 +393,13 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
   });
 
   // Load table data only once
-useEffect(() => {
-  const loadData = async () => {
-    const parkingLots = await getAllParkingLots();
-    setTableData(prev => ({ ...prev, rows: parkingLots || [] }));
-  };
-  loadData();
-}, [getAllParkingLots]); // הוספתי את getAllParkingLots כתלות
+  useEffect(() => {
+    const loadData = async () => {
+      const parkingLots = await getAllParkingLots();
+      setTableData(prev => ({ ...prev, rows: parkingLots || [] }));
+    };
+    loadData();
+  }, [getAllParkingLots]); // Empty - will load only once
 
   // Function to load a specific lot for editing
   

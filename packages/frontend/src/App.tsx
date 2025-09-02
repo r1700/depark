@@ -1,3 +1,5 @@
+import React from "react";
+import { Outlet } from "react-router-dom";
   //  import React, { useState, useCallback } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import AdminConfigPage from "./admin/components/AdminConfigPage";
@@ -11,25 +13,7 @@ import AdminRoutes from "./admin/AdminRoutes";
 
   // const user = JSON.parse(localStorage.getItem("user") || '{}');
 const App: React.FC = () => {
-
-  return (
-    <Router>
-    <Routes>
-  
-        <Route path="/" element={<LoginPage />} />
-        <Route path="/admin/*" element={<AdminRoutes />} />
-
-        <Route path="/mobile" element={<Otp />} />
-        <Route path="/tablet" element={<HomePage />} />
-        <Route path="/parkings" element={<ParkingsPage />} />
-        <Route path="/admin-config" element={<AdminConfigPage />} />
-        <Route path="/admin-config/:lotId" element={<AdminConfigPage />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
-    </Routes>
-  </Router>
-  );
+  return <Outlet />;
 };
 
 export default App;

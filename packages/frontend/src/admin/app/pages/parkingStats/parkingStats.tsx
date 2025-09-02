@@ -8,7 +8,7 @@ import {
   fetchParkingStats,
   fetchParkingDayDetails,
   clearParkingDayDetails,
-} from '../../pages/parkingStats/parkingStatsSlice';
+} from './parkingStatsSlice';
 
 interface ParkingStatItem {
   day: string;
@@ -33,10 +33,13 @@ const ParkingStatsPage: React.FC = () => {
 
   // AbortControllers
   const mainAbortRef = useRef<AbortController | null>(null);
+  // const dayAbortRef = useRef<AbortController | null>(null);
 
   // UI state
   const [selectedRow, setSelectedRow] = useState<string | null>(null);
   const [retryMain, setRetryMain] = useState(0);
+ // const [, setRetryDay] = useState(0);
+
 
   // Main fetch with abort
   useEffect(() => {
@@ -175,8 +178,11 @@ const ParkingStatsPage: React.FC = () => {
     </div>
   );
 
-  // Highlight selected row
-  
+  // // Highlight selected row
+  // const getRowProps = useCallback((row: any) => ({
+  //   style: selectedRow && row.period === selectedRow ? { background: '#e3f2fd' } : undefined
+  // }), [selectedRow]);
+
   // Main render
   if (loading) return renderLoading();
   if (error) return renderError(`Error: ${String(error)}`, () => setRetryMain(r => r + 1));

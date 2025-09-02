@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Container, Paper, Typography, Box, Button } from "@mui/material";
-import DataTable from "../components/table/table";
 import { useNavigate } from "react-router-dom";
 
 interface ParkingsPageProps {}
 
 const ParkingsPage: React.FC<ParkingsPageProps> = () => {
   const navigate = useNavigate();
-  const [tableData, setTableData] = useState<{
+  const [, setTableData] = useState<{
     columns: Array<{ id: string; label: string }>;
     rows: Array<any>;
   }>({
