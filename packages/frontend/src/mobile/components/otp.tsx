@@ -13,7 +13,7 @@ const Otp: React.FC = () => {
     const [message, setMessage] = useState('');
     const navigate = useNavigate();
 
-    const url = process.env.REACT_APP_URL || 'http://localhost:3000';
+    const url = process.env.REACT_APP_URL || 'http://localhost:3001';
 
     // Handle sending OTP
     const sendOtp = async () => {
@@ -31,7 +31,7 @@ const Otp: React.FC = () => {
         try {
             console.log('URL:', url);
 
-            const response = await fetch(`${url}/otp/create`, {
+            const response = await fetch(`${url}/api/otp/create`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ contact }),
@@ -61,7 +61,7 @@ const Otp: React.FC = () => {
         }
 
         try {
-            const response = await fetch(`${url}/otp/verify`, {
+            const response = await fetch(`${url}/api/otp/verify`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ contact, otp }),
@@ -151,6 +151,13 @@ const Otp: React.FC = () => {
                             sx={{ marginTop: 2, backgroundColor: '#1976d2', ':hover': { backgroundColor: '#0763bf' } }}
                         >
                             Verify
+                        </Button>
+                           {/* refactor */}
+                        <Button
+                            onClick={sendOtp}
+                            sx={{ color: 'black', background: 'none', border: 'none',  cursor: 'pointer', paddingTop: 2, textTransform: 'none', fontSize: '15px', marginTop: 1, ':hover': { textDecoration: 'underline' } }}
+                        >
+                             Request a new code
                         </Button>
                     </Box>
                 )}
