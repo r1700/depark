@@ -38,13 +38,7 @@ const routers = createBrowserRouter([
       { path: 'reset-password', element: <ResetPassword /> },
       { path: 'VehicleRow', element: <VehicleRow /> },
       
-      {
-        path: 'layout', element: <Layout user={user} onLogout={handleLogout} />, children: [
-          { path: 'admin-dashboard', element: <AdminDashboard /> },
-          { path: 'hr-dashboard', element: <HrDashboard /> },
-          { path: 'users', element: <UsersPage />},
-        ]
-      },
+      
     ]
   }
 ])

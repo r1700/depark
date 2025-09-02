@@ -1,6 +1,6 @@
 // src/admin/AdminRoutes.tsx
 import React, { useCallback } from "react";
-import { Route, Navigate, useNavigate } from "react-router-dom";
+import { Route, Navigate, useNavigate, Routes } from "react-router-dom";
 import { Provider } from "react-redux";
 import { store } from "./app/store"; 
 
@@ -35,6 +35,7 @@ const AdminRoutes: React.FC = () => {
 
   return (
     <>
+    <Routes>
       <Route path="login" element={<LoginScreen />} />
 
       <Route
@@ -88,6 +89,7 @@ const AdminRoutes: React.FC = () => {
       </Route>
 
       <Route path="*" element={<Navigate to="/admin" replace />} />
+      </Routes>
     </>
   );
 };
