@@ -27,6 +27,8 @@ import vehicle from './routes/vehicleRoute';
 import GoogleAuth from './routes/google-auth';
 import parkingReport from './routes/parkingStat';
 import surfaceReport from './routes/surfaceStat';
+import retrieveRoute from './routes/RetrivalQueue';
+import otpRoutes from './routes/otp.server';
 
 import path from 'path';
 const app = express();
@@ -78,8 +80,6 @@ if (!GOOGLE_CLIENT_ID) {
     throw new Error('Missing GOOGLE_CLIENT_ID');
 }
 
-app.use(cors({ origin: CORS_ORIGIN, credentials: true }));
-app.use(express.json());
 
 // Global request logger — מדפיס כל בקשה נכנסת
 app.use((req, res, next) => {
@@ -99,7 +99,7 @@ app.use('/api/tablet', Retrival);
 app.use('/api/opc', Exit);
 app.use('/api', userRoutes);
 // app.use('/api/users', userFilter);
-app.use('/api/auth', authRoutes);
+// app.use('/api/auth', authRoutes);
 app.use('/api/auth', userGoogleAuthRoutes);
 app.use('/api/vehicles', vehicle)
 app.use('/api/admin', adminConfigRouter);
@@ -107,6 +107,8 @@ app.use('/OAuth', GoogleAuth);
 app.use('/api/admin', adminConfigRouter);
 app.use('/api/parking-stats', parkingReport);
 app.use('/api/surface-stats', surfaceReport);
+app.use('/api/tablet', retrieveRoute);
+app.use('/api/otp', otpRoutes);
 
 app.use('/api/logos', logoRouter);
 app.use('/api/screentypes', screenTypeRouter);
