@@ -192,14 +192,6 @@ app.listen(PORT, () => {
   console.log('   GET  /api/admin/config');
   console.log('   PUT  /api/admin/config');
 
-<<<<<<< HEAD
-    if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
-        console.log(':file_cabinet: Initializing database...');
-    } else {
-        console.log(':memo: Using mock data - Supabase not configured');
-    }
-});
-=======
   if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
     console.log(':file_cabinet: Initializing database...');
   } else {
@@ -208,4 +200,3 @@ app.listen(PORT, () => {
 });
 
 export { wss }; 
->>>>>>> cd379d6d2b4b60df312644687a51c73523cfc7d0
