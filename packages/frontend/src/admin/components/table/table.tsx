@@ -19,7 +19,6 @@ type DataTableProps = {
   showActions?: boolean; // default false -> hide actions column/buttons
   maxHeight?: number; // max height for table container (px)
   dense?: boolean; // if true, use smaller row height
-  deletePath?: string; // path for delete API
 };
 
 const DataTable: React.FC<DataTableProps> = ({
