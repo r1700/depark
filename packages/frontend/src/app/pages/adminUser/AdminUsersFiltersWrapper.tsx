@@ -28,8 +28,6 @@ const AdminUsersFiltersWrapper: React.FC<Props> = ({
 }) => {
   const [open, setOpen] = useState(false);
   const [localFilters, setLocalFilters] = useState<AdminUserFilters>({ ...filters });
-
-  // sync when drawer opens (so edits start from current filters)
   useEffect(() => {
     if (open) setLocalFilters(filters);
   }, [open, filters]);

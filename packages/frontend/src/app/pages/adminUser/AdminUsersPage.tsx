@@ -1,4 +1,5 @@
-import React, { useEffect, useState, useMemo, useCallback } from 'react'; import { useAppDispatch, useAppSelector } from '../../store';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
+import { useAppDispatch, useAppSelector } from '../../store';
 import { fetchAdminUsers, addAdminUser, updateAdminUser } from './adminUserSlice';
 import DataTable from '../../../components/table/table';
 import GenericForm, { FieldConfig } from '../../../components/forms/Form';
@@ -162,7 +163,7 @@ const AdminUsersPage: React.FC = () => {
                 const u = users.find((x: AdminUser) => x.id === row.id);
                 if (u) openEdit(u);
               }}
-              title="Admin Users"
+               title="Admin Users"
               fields={fields}
               onSubmit={handleSubmit}
             />

@@ -61,8 +61,6 @@ interface ParkingConfig {
   updatedBy?: string;
 }
 
-// Styled Components
-// Alternative - blue glow border:
 const StyledCard = styled(Card)(({ theme }) => ({
   height: '100%',
   display: 'flex',

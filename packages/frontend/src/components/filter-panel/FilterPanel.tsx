@@ -110,9 +110,6 @@ const FilterPanel = <T extends Record<string, any>>({
                 onChange={(_, newValue) => {
                   update(name, newValue && newValue.length ? [...newValue] : undefined);
                 }}
-                renderTags={(value: readonly string[], getTagProps) =>
-                  value.map((option, index) => <Chip label={option} {...getTagProps({ index })} />)
-                }
                 renderInput={(params) => (
                   <TextField {...params} label={label} placeholder={field.placeholder} size="small" />
                 )}
@@ -129,13 +126,6 @@ const FilterPanel = <T extends Record<string, any>>({
                 size="small"
                 value={formatISODate((filters as Record<string, any>)[name])}
                 onChange={(e) => update(name, e.target.value || undefined)}
-                InputLabelProps={{ shrink: true }}
-                InputProps={{
-                  inputProps: {
-                    lang: 'en-US',
-                    title: '',
-                  },
-                }}
               />
             );
           }
