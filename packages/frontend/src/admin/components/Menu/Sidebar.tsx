@@ -124,7 +124,7 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
             {open && (
                 <Box sx={{ px: 2, mb: 3, display: 'flex', justifyContent: 'center' }}>
                     <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#fff' }}>
-                        DEPARK
+                        Depark
                     </Typography>
                 </Box>
             )}

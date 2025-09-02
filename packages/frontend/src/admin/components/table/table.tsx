@@ -17,6 +17,7 @@ type DataTableProps = {
   data: { columns: any[]; rows: any[] };
   onRowClick?: (row: any) => void; // optional callback when clicking a row
   enablePagination?: boolean; // default false -> show all rows + scrollbar
+            deletePath: string; // path to send delete requests to
   showActions?: boolean; // default false -> hide actions column/buttons
   maxHeight?: number; // max height for table container (px)
   dense?: boolean; // if true, use smaller row height
