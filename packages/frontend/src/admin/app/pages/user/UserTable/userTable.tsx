@@ -17,7 +17,15 @@ const columns = [
     { id: "max_cars_allowed_parking", label: "Max Cars Allowed Parking" },
     { id: "created_by", label: "Created By" },
     { id: "approved_by", label: "Approved By" },
-   { id: "approved_at", label:"Approved At" },
+    { id: "approved_at", label:"Approved At" },
+];
+
+const fields = [
+    { name: "fullName", label: "Name", type: "text", required: true },
+    { name: "email", label: "Email", type: "email", required: true },
+    { name: "phone", label: "Phone", type: "text" },
+    { name: "department", label: "Department", type: "text" },
+    // הוסיפי שדות נוספים לפי הצורך
 ];
 
 const UsersTable: React.FC = () => {
@@ -27,9 +35,7 @@ const UsersTable: React.FC = () => {
     useEffect(() => {
         dispatch(fetchUsers());
     }, [dispatch]);
-    console.log(users);
 
-    // מיפוי לפורמט שהטבלה צריכה
     const rows = users.map((user: any) => ({
         baseuser_id: user.baseuser_id,
         fullName: `${user.first_name ?? ""} ${user.last_name ?? ""}`,
@@ -42,12 +48,29 @@ const UsersTable: React.FC = () => {
         max_cars_allowed_parking: user.max_cars_allowed_parking ?? "-",
         created_by: user.created_by ?? "-",
         approved_by: user.approved_by ?? "-",
-         approved_at: user.approved_at ? new Date(user.approved_at).toLocaleString() : "-",
+        approved_at: user.approved_at ? new Date(user.approved_at).toLocaleString() : "-",
     }));
 
     return (
         <Box sx={{ mt: 4 }}>
-            <DataTable data={{ columns, rows }} />
+            <DataTable
+                data={{ columns, rows }}
+                title="Users Table"
+                showActions={true}
+                // fields={fields}
+                onRowClick={(row) => {
+                    // כאן אפשר לפתוח מודל עריכה או לנווט
+                    // לדוג' console.log("Edit user", row);
+                }}
+                onSubmit={async (data) => {
+                    // כאן אפשר לשמור עריכה
+                    // לדוג' dispatch(updateUser(data));
+                }}
+                // onDeleteClick={(row) => {
+                //     // כאן אפשר למחוק משתמש
+                //     // לדוג' dispatch(deleteUser(row.baseuser_id));
+                // }}
+            />
         </Box>
     );
 };

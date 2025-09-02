@@ -9,7 +9,7 @@ import healthRoutes from './routes/health';
 import passwordRoutes from './routes/user.routes';
 import vehicleRoutes from './routes/vehicle';
 import exportToCSV from './routes/exportToCSV';
-import authRoutes from './routes/auth';
+// import authRoutes from './routes/auth';
 import userGoogleAuthRoutes from './routes/userGoogle-auth';
 import Exit from './routes/opc/exit'; // Import the exit route
 import session from 'express-session';

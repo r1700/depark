@@ -1,10 +1,9 @@
 // Flexible date parsing
 
-import { literal } from 'sequelize';
+// import { literal } from 'sequelize';
 import sequelize from '../config/sequelize';
 // import { Request, Response } from 'express';
 import { QueryTypes } from 'sequelize';
-
 
 export async function getAllReservedParking() {
     const results = await sequelize.query(
@@ -14,16 +13,14 @@ export async function getAllReservedParking() {
     baseuser_id,
     parking_number,
     day_of_week,
-    \"createdAt\",
-    \"updatedAt\"
+    "createdAt",
+    "updatedAt"
 FROM reservedparking
         `,
         { type: QueryTypes.SELECT }
     );
     return results;
 }
-
-
 
 export async function addReservedParking(reservedparking: {
     baseuser_id: number;
@@ -78,21 +75,19 @@ export async function updateReservedParking(id: number, reservedparking: {
 }
 
 export async function deleteReservedParking(id: number) {
-  const results = await sequelize.query(
-    `
+    const results = await sequelize.query(
+        `
       DELETE FROM reservedparking
       WHERE id = :id
       RETURNING *;
     `,
-    {
-      replacements: { id },
-      type: QueryTypes.DELETE
-    }
-  );
-  return results;
+        {
+            replacements: { id },
+            type: QueryTypes.DELETE
+        }
+    );
+    return results;
 }
-
-
 
 function parseFlexibleDate(dateStr: string): Date {
     dateStr = dateStr.replace(/^"+|"+$/g, '').trim();
@@ -125,59 +120,72 @@ type ReservedParkingSearchInput = {
     createdAt?: string;
     updatedAt?: string;
     freeSearch?: string;
+    email?: string;
     [key: string]: any;
 };
-
 function buildWhereClauseFromReservedParkingInput(input: ReservedParkingSearchInput): string {
     const conditions: string[] = [];
-    // parking_number: comma-separated list or single value
+    // parking_number
     if (input.parking_number) {
         if (Array.isArray(input.parking_number)) {
-            const nums = input.parking_number.map(num => `'${num}'`).join(', ');
-            conditions.push(`parking_number IN (${nums})`);
+            const nums = input.parking_number.map(num => {
+                const n = Number(num);
+                return !isNaN(n) ? n : `'${num}'`;
+            }).join(', ');
+            conditions.push(`reservedparking.parking_number IN (${nums})`);
         } else if (typeof input.parking_number === 'string' && input.parking_number.includes(',')) {
-            const nums = input.parking_number.split(',').map(num => `'${num.trim()}'`).join(', ');
-            conditions.push(`parking_number IN (${nums})`);
+            const nums = input.parking_number.split(',').map(num => {
+                const n = Number(num.trim());
+                return !isNaN(n) ? n : `'${num.trim()}'`;
+            }).join(', ');
+            conditions.push(`reservedparking.parking_number IN (${nums})`);
         } else {
-            conditions.push(`parking_number ILIKE '%${input.parking_number}%'`);
+            const n = Number(input.parking_number);
+            if (!isNaN(n)) {
+                // אם זה מספר, השתמש ב-=
+                conditions.push(`reservedparking.parking_number = ${n}`);
+            } else {
+                // אחרת, השתמש ב-LIKE
+                conditions.push(`reservedparking.parking_number ILIKE '%${input.parking_number}%'`);
+            }
         }
     }
-    // day_of_week: comma-separated list or single value
+    // ...existing code for other fields...
     if (input.day_of_week) {
         if (Array.isArray(input.day_of_week)) {
             const days = input.day_of_week.map(day => `'${day}'`).join(', ');
-            conditions.push(`day_of_week IN (${days})`);
+            conditions.push(`reservedparking.day_of_week IN (${days})`);
         } else if (typeof input.day_of_week === 'string' && input.day_of_week.includes(',')) {
             const days = input.day_of_week.split(',').map(day => `'${day.trim()}'`).join(', ');
-            conditions.push(`day_of_week IN (${days})`);
+            conditions.push(`reservedparking.day_of_week IN (${days})`);
         } else {
-            conditions.push(`day_of_week ILIKE '%${input.day_of_week}%'`);
+            conditions.push(`reservedparking.day_of_week ILIKE '%${input.day_of_week}%'`);
         }
     }
-    // freeSearch: search in parking_number and day_of_week
+    if (input.email) {
+        conditions.push(`baseuser.email ILIKE '%${input.email}%'`);
+    }
     if (input.freeSearch) {
         const safe = input.freeSearch.replace(/'/g, "''");
         const likePattern = `%${safe}%`;
         conditions.push(
-            `(parking_number ILIKE '${likePattern}' OR day_of_week ILIKE '${likePattern}')`
+            `(reservedparking.parking_number ILIKE '${likePattern}' OR reservedparking.day_of_week ILIKE '${likePattern}')`
         );
     }
-    // createdAt >= date
     if (input.createdAt) {
         try {
             const parsedDate = parseFlexibleDate(input.createdAt as string);
             const startStr = formatDateForSQL(parsedDate);
-            conditions.push(`"createdAt" >= '${startStr}'`);
+            conditions.push(`reservedparking."createdAt" >= '${startStr}'`);
         } catch {
             throw new Error(`Invalid date format in createdAt`);
         }
     }
-    // updatedAt >= date
     if (input.updatedAt) {
         try {
             const parsedDate = parseFlexibleDate(input.updatedAt as string);
             const startStr = formatDateForSQL(parsedDate);
-            conditions.push(`"updatedAt" >= '${startStr}'`);
+            conditions.push(`reservedparking."updatedAt" >= '${startStr}'`);
         } catch {
             throw new Error(`Invalid date format in updatedAt`);
         }
@@ -209,6 +217,7 @@ function convertQueryToReservedParkingInput(query: any): ReservedParkingSearchIn
             }
         }
     }
+    if (query.email) input.email = query.email as string;
     if (query.freeSearch) input.freeSearch = query.freeSearch as string;
     if (query.createdAt) {
         const parsedDate = parseFlexibleDate(query.createdAt as string);
@@ -226,14 +235,20 @@ function convertQueryToReservedParkingInput(query: any): ReservedParkingSearchIn
 }
 
 // Handler for filtered reserved parking search
+// ...existing code...
+
 export async function handleReservedParkingFilter(req: any, res: any) {
     try {
         const input: ReservedParkingSearchInput = convertQueryToReservedParkingInput(req.query);
         const whereClause = buildWhereClauseFromReservedParkingInput(input);
-        const results = await sequelize.query(
-            `SELECT * FROM reservedparking WHERE ${whereClause}`,
-            { type: QueryTypes.SELECT }
-        );
+
+        // שים לב: ה־JOIN צריך להיות על baseuser_id ולא על id
+        const query = `SELECT reservedparking.*, baseuser.email 
+               FROM reservedparking 
+               JOIN baseuser ON reservedparking.baseuser_id = baseuser.id 
+               WHERE ${whereClause}`;
+        const results = await sequelize.query(query, { type: QueryTypes.SELECT });
+
         res.json({
             whereClause,
             results
@@ -243,8 +258,4 @@ export async function handleReservedParkingFilter(req: any, res: any) {
     }
 }
 
-
-
-
-
-
+// ...existing code...

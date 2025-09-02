@@ -18,30 +18,30 @@ export interface User extends BaseUser {
   approvedAt?: Date;
 }
 
-export const mockUsers: Partial<User>[] = [
+// export const mockUsers: Partial<User>[] = [
 
-    {
-    id: 1,
-    firstName: 'John',
-    lastName: 'Doe',
-    email: 'john.doe@example.com',
-    employeeId: '123',
-    status: 'approved',
-    maxCarsAllowedParking: 2,
-    createdBy: 'admin',
-    createdAt: new Date(),
+//     {
+//     id: 1,
+//     firstName: 'John',
+//     lastName: 'Doe',
+//     email: 'john.doe@example.com',
+//     employeeId: '123',
+//     status: 'approved',
+//     maxCarsAllowedParking: 2,
+//     createdBy: 'admin',
+//     createdAt: new Date(),
 
-  },
-  {
-    id: 2,
-    firstName: 'Jane',
-    lastName: 'Smith',
-    email: 'jane.smith@example.com',
-    employeeId: '124',
-    status: 'pending',
-    maxCarsAllowedParking: 1,
-    createdBy: 'admin',
-    createdAt: new Date(),
-  },
-]
+//   },
+//   {
+//     id: 2,
+//     firstName: 'Jane',
+//     lastName: 'Smith',
+//     email: 'jane.smith@example.com',
+//     employeeId: '124',
+//     status: 'pending',
+//     maxCarsAllowedParking: 1,
+//     createdBy: 'admin',
+//     createdAt: new Date(),
+//   },
+// ]
 
