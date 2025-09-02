@@ -7,8 +7,6 @@ import {
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
 import './table.css';
 import { useNavigate } from 'react-router-dom';
 import DeleteConfirmDialog from '../DeleteConfirmDialog/DeleteConfirmDialog';
@@ -17,6 +15,7 @@ type DataTableProps = {
   data: { columns: any[]; rows: any[] };
   onRowClick?: (row: any) => void; // optional callback when clicking a row
   enablePagination?: boolean; // default false -> show all rows + scrollbar
+            deletePath: string; // path to send delete requests to
   showActions?: boolean; // default false -> hide actions column/buttons
   maxHeight?: number; // max height for table container (px)
   dense?: boolean; // if true, use smaller row height
@@ -188,12 +187,7 @@ const DataTable: React.FC<DataTableProps> = ({
                 ))}
                 {showActions && (
                   <TableCell className="actions">
-                    <IconButton onClick={() => onRowClick && onRowClick(row)} aria-label="Edit" size="small">
-                      <EditIcon fontSize="small" />
-                    </IconButton>
-                    <IconButton onClick={() => handleDelete(row)} aria-label="Delete" size="small">
-                      <DeleteIcon fontSize="small" />
-                    </IconButton>
+                    {/* אם רוצים אקשנים אפשר להכניס כאן */}
                   </TableCell>
                 )}
               </TableRow>
