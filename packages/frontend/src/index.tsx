@@ -16,9 +16,7 @@ import AdminRoutes from './admin/AdminRoutes';
 
 const user = JSON.parse(localStorage.getItem("user") || "{}");
 
-const handleLogout = () => {
-  localStorage.removeItem(user);
-};
+
 
 const routers = createBrowserRouter([
   {
