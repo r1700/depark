@@ -2,9 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Container, Paper, Typography, Box, Button } from "@mui/material";
 import DataTable from "../components/table/table";
 import { useNavigate } from "react-router-dom";
-
 interface ParkingsPageProps {}
-
 const ParkingsPage: React.FC<ParkingsPageProps> = () => {
   const navigate = useNavigate();
   const [tableData, setTableData] = useState<{
@@ -17,30 +15,52 @@ const ParkingsPage: React.FC<ParkingsPageProps> = () => {
     ],
     rows: []
   });
-
-    useEffect(() => {
-      // Fetch parking lots data from backend
-      fetch('/api/admin/')
-        .then((res) => res.json())
-        .then((data) => {
-          // data.parkingConfigs is the array of parking lots
-          setTableData((prev) => ({
-            ...prev,
-            rows: data.parkingConfigs || []
-          }));
-        })
-        .catch((err) => {
-          console.error('Failed to fetch parking lots:', err);
-        });
-    }, []);
-
+  // Fetch parking lots data
+  const getAllParkingLots = async () => {
+    try {
+      console.log(':arrows_counterclockwise: FETCH_LOTS: Starting to fetch parking lots');
+      const response = await fetch('/api/admin/', {
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
+      });
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const result = await response.json();
+      console.log(':arrows_counterclockwise: FETCH_LOTS: Raw server response:', JSON.stringify(result, null, 2));
+      if (result.success) {
+        const formattedData = result.parkingConfigs.map((config: any) => ({
+          id: config.id || '',
+          facilityName: config.facilityName || 'No Name'
+        }));
+        console.log(':arrows_counterclockwise: FETCH_LOTS: Formatted data for table:', JSON.stringify(formattedData, null, 2));
+        return formattedData;
+      } else {
+        console.error('API returned error:', result.error);
+        return [];
+      }
+    } catch (error) {
+      console.error('Error fetching parking lots:', error);
+      return [];
+    }
+  };
+  // Load data on component mount
+  useEffect(() => {
+    const loadData = async () => {
+      const parkingLots = await getAllParkingLots();
+      setTableData(prev => ({ ...prev, rows: parkingLots || [] }));
+    };
+    loadData();
+  }, []);
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
       <Paper elevation={3} sx={{ p: 4, borderRadius: 3 }}>
         {/* Header */}
         <Box textAlign="center" mb={4}>
-          <Typography variant="h3" component="h1" gutterBottom sx={{ 
-            fontWeight: 400, 
+          <Typography variant="h3" component="h1" gutterBottom sx={{
+            fontWeight: 400,
             color: 'primary.main',
             borderBottom: '2px solid',
             borderColor: 'primary.main',
@@ -50,23 +70,16 @@ const ParkingsPage: React.FC<ParkingsPageProps> = () => {
             Parking Lots Management
           </Typography>
         </Box>
-
         {/* Data Table */}
-        <DataTable 
-          data={tableData} 
+        <DataTable
+          data={tableData}
+          editPath="/admin-config"
           deletePath="/api/admin"
-          showActions={true}
-          onRowClick={(row) => {
-            if (row.lotId || row.id) {
-              // Prefer lotId if exists, else fallback to id
-              navigate(`/admin-config/${row.lotId || row.id}`);
-            }
-          }}
         />
         <Box sx={{ textAlign: 'center', mb: 6 }}>
             <Button
               onClick={() => {
-                console.log('🔄 Add New Lot clicked');
+                console.log(':arrows_counterclockwise: Add New Lot clicked');
                 navigate('/admin-config');
               }}
               sx={{ minWidth: 500,
@@ -97,5 +110,4 @@ const ParkingsPage: React.FC<ParkingsPageProps> = () => {
     </Container>
   );
 }
-
 export default ParkingsPage;

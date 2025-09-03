@@ -8,7 +8,7 @@ const sequelize = new Sequelize(
   appDbConfig.password,
   {
     host: appDbConfig.host,
-    dialect: appDbConfig.dialect,
+    dialect: process.env.STATUS === 'development' ? appDbConfig.dialect : undefined,
     logging: process.env.STATUS === 'development' ? console.log : false,
   }
 );

@@ -2,7 +2,14 @@ import { FieldConfig, GenericForm } from '../../../../components/forms/Form';
 import { useAppDispatch } from '../../../store';
 import { addUser, updateUser } from '../userThunks';
 
-const userFields: FieldConfig[] = [
+interface UserFormData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  maxCarsAllowedParking: number;
+}
+
+const userFields: FieldConfig<UserFormData>[] = [
   { name: 'firstName', label: 'First Name', required: true },
   { name: 'lastName', label: 'Last Name', required: true },
   { name: 'email', label: 'Email', type: 'email', required: true },

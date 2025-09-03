@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   Container,
@@ -21,7 +21,6 @@ import {
   Divider,
   ThemeProvider,
   createTheme,
-  Checkbox,
   Radio,
   RadioGroup
 } from '@mui/material';
@@ -42,7 +41,7 @@ import { styled } from '@mui/material/styles';
 // Types
 interface ParkingConfig {
   facilityName: string;
-  lotId: string; 
+  lotId: string;
   timezone: string;
   surfaceSpotIds: string[];
   totalSpots: number;
@@ -55,7 +54,7 @@ interface ParkingConfig {
   };
   maxQueueSize: number;
   avgRetrievalTimeMinutes: number;
-  maxParallelRetrievals: number; 
+  maxParallelRetrievals: number;
   maintenanceMode: boolean;
   showAdminAnalytics: boolean;
   updatedAt?: Date;
@@ -132,12 +131,23 @@ const timezones = [
 
 const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-interface AdminConfigPageProps {}
+interface AdminConfigPageProps { }
 
-export default function AdminConfigPage({}: AdminConfigPageProps) {
+// eslint-disable-next-line no-empty-pattern
+export default function AdminConfigPage({ }: AdminConfigPageProps) {
   const navigate = useNavigate();
   const { lotId } = useParams<{ lotId?: string }>();
-  
+  interface TableRow {
+    id: string;
+    facilityName: string;
+  }
+  const [tableData, setTableData] = useState<{
+    rows: TableRow[];
+    columns: any[];
+  }>({
+    rows: [],  // רשימת השורות (נתונים)
+    columns: [] // רשימת העמודות (אם יש לך מידע על העמודות)
+  });
   // Helper function to get headers with authorization
   const getAuthHeaders = () => {
     return {
@@ -168,7 +178,7 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
     const user = getCurrentUser();
     return `${user.firstName} ${user.lastName}`;
   };
-  
+
   // Initial config - memoized to prevent re-creation on every render
   const initialConfig: ParkingConfig = useMemo(() => ({
     facilityName: '',
@@ -187,7 +197,7 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
     },
     maxQueueSize: 0,
     avgRetrievalTimeMinutes: 0,
-    maxParallelRetrievals:0, 
+    maxParallelRetrievals: 0,
     maintenanceMode: false,
     showAdminAnalytics: false
   }), []);
@@ -203,11 +213,13 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
   const [showErrorPopup, setShowErrorPopup] = useState(false);
   const [currentError, setCurrentError] = useState<string | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [spotToDelete, setSpotToDelete] = useState<{index: number, name: string} | null>(null);
+  const [spotToDelete, setSpotToDelete] = useState<{ index: number, name: string } | null>(null);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
-  const [updateLotId, setUpdateLotId] = useState('');
-  const [loadingUpdate, setLoadingUpdate] = useState(false);
-  const [addingNewLot, setAddingNewLot] = useState(false);
+  // const [updateLotId, setUpdateLotId] = useState('');
+  // const [loadingUpdate, setLoadingUpdate] = useState(false);
+  // const [addingNewLot, setAddingNewLot] = useState(false);
+  const [, setAddingNewLot] = useState(false);
+
   const [deleteConfirmDialog, setDeleteConfirmDialog] = useState<{
     open: boolean;
     lotData: any;
@@ -216,7 +228,7 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
   // Load existing parking config if lotId is provided
   useEffect(() => {
     console.log('🔄 useEffect triggered with lotId:', lotId);
-    
+
     const loadExistingConfig = async () => {
       if (lotId) {
         setLoading(true);
@@ -225,14 +237,14 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
           const response = await fetch(`/api/admin/${lotId}`, {
             headers: getAuthHeaders()
           });
-          
+
           if (response.ok) {
             const result = await response.json();
             console.log('✅ Loaded existing config:', result);
-            
+
             if (result.success && result.parkingConfig) {
               const config = result.parkingConfig;
-              
+
               // Convert the loaded config to match our format
               const defaultDailyHours = {
                 Sunday: { isActive: false, openingHour: '00:00', closingHour: '00:00' },
@@ -243,7 +255,7 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
                 Friday: { isActive: false, openingHour: '00:00', closingHour: '00:00' },
                 Saturday: { isActive: false, openingHour: '00:00', closingHour: '00:00' }
               };
-              
+
               const loadedConfig: ParkingConfig = {
                 facilityName: config.facilityName || '',
                 lotId: config.id || '',
@@ -259,7 +271,7 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
                 updatedAt: config.updatedAt ? new Date(config.updatedAt) : undefined,
                 updatedBy: config.updatedBy || 'admin'
               };
-              
+
               setParkingConfig(loadedConfig);
               setLastSavedConfig(loadedConfig);
               console.log('✅ Config loaded and set:', loadedConfig);
@@ -283,9 +295,9 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
         setLastSavedConfig(initialConfig);
       }
     };
-    
+
     loadExistingConfig();
-  }, [lotId]); // Remove initialConfig dependency
+  }, [initialConfig, lotId]); // Remove initialConfig dependency
 
   // Auto-hide error popup after 3 seconds
   useEffect(() => {
@@ -336,7 +348,7 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
       }
     }));
   };
-  const getAllParkingLots = async () => {
+  const getAllParkingLots = useCallback(async () => {
     try {
       console.log('🔄 FETCH_LOTS: Starting to fetch parking lots');
       const response = await fetch('/api/admin/', {
@@ -347,14 +359,14 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
       }
       const result = await response.json();
       console.log('🔄 FETCH_LOTS: Raw server response:', JSON.stringify(result, null, 2));
-      
+
       if (result.success) {
         // Formats the data for the table with default values
         const formattedData = result.parkingConfigs.map((config: any) => ({
           id: config.id || '',
           facilityName: config.facilityName || 'No Name'
         }));
-        
+
         console.log('🔄 FETCH_LOTS: Formatted data for table:', JSON.stringify(formattedData, null, 2));
         return formattedData;
       } else {
@@ -365,25 +377,16 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
       console.error('Error fetching parking lots:', error);
       return [];
     }
-  };
+  }, []);
 
   // Function to refresh the table
-  const refreshTable = async () => {
-    const parkingLots = await getAllParkingLots();
-    setTableData(prev => ({ ...prev, rows: parkingLots || [] }));
-  };
+  // const refreshTable = async () => {
+  //   const parkingLots = await getAllParkingLots();
+  //   setTableData(prev => ({ ...prev, rows: parkingLots || [] }));
+  // };
 
   // Example of how to prepare data for the table
-  const [tableData, setTableData] = useState<{
-    columns: Array<{ id: string; label: string }>;
-    rows: Array<any>;
-  }>({
-    columns: [
-      { id: 'id', label: 'ID' },
-      { id: 'facilityName', label: 'Facility Name' }
-    ],
-    rows: []
-  });
+  // const [tableData, setTableData] = useState<{
 
   // Load table data only once
   useEffect(() => {
@@ -392,19 +395,19 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
       setTableData(prev => ({ ...prev, rows: parkingLots || [] }));
     };
     loadData();
-  }, []); // Empty - will load only once
+  }, [getAllParkingLots]); // Empty - will load only once
 
   // Function to load a specific lot for editing
-  
+
   const confirmDeleteLot = async () => {
     if (!deleteConfirmDialog.lotData) return;
-    
+
     try {
       const response = await fetch(`/api/admin/${deleteConfirmDialog.lotData.id}`, {
         method: 'DELETE',
         headers: getAuthHeaders()
       });
-      
+
       if (response.ok) {
         // Update the table immediately instead of reloading
         setTableData(prev => ({
@@ -559,7 +562,7 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
   };
   const hasChanges = () => {
     // Direct comparison of important fields (without dates)
-    const changes = 
+    const changes =
       parkingConfig.facilityName !== lastSavedConfig.facilityName ||
       parkingConfig.lotId !== lastSavedConfig.lotId ||
       parkingConfig.timezone !== lastSavedConfig.timezone ||
@@ -576,7 +579,7 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
       facilityName: parkingConfig.facilityName + ' vs ' + lastSavedConfig.facilityName,
       equal: parkingConfig.facilityName === lastSavedConfig.facilityName
     });
-    
+
     return changes;
   };
 
@@ -663,7 +666,7 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
           : '✅ Configuration saved successfully!'
       });
       setAddingNewLot(false);
-      
+
       // Always update the table after saving
       console.log('🔄 CRITICAL_TABLE_UPDATE: Refreshing table after save');
       const updatedLots = await getAllParkingLots();
@@ -697,7 +700,7 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
       },
       maxQueueSize: 0,
       avgRetrievalTimeMinutes: 0,
-      maxParallelRetrievals: 0, 
+      maxParallelRetrievals: 0,
       maintenanceMode: false,
       showAdminAnalytics: false,
       updatedAt: new Date(),
@@ -710,7 +713,7 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
   };
 
 
- 
+
   return (
     <ThemeProvider theme={theme}>
       <Container maxWidth="xl" sx={{ py: 4 }}>
@@ -722,21 +725,21 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
               <Button
                 variant="outlined"
                 onClick={() => navigate('/admin/layout/parkings')}
-                sx={{ 
+                sx={{
                   color: 'primary.main',
                   borderColor: 'primary.main',
                   '&:hover': {
                     backgroundColor: 'primary.main',
                     color: 'white'
                   }
-                  }}
-                >
-                  ← Back to Parking Lots
-                </Button>
-              </Box>
-            
-            <Typography variant="h3" component="h1" gutterBottom sx={{ 
-              fontWeight: 400, 
+                }}
+              >
+                ← Back to Parking Lots
+              </Button>
+            </Box>
+
+            <Typography variant="h3" component="h1" gutterBottom sx={{
+              fontWeight: 400,
               color: 'primary.main',
               borderBottom: '2px solid',
               borderColor: 'primary.main',
@@ -814,16 +817,16 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
             />
           )}
 
-         
-          
+
+
           {/* Main Cards - 2x2 Layout */}
-          <Box sx={{ 
-            display: 'grid', 
-            gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, 
-            gap: 4, 
-            mb: 4 
+          <Box sx={{
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
+            gap: 4,
+            mb: 4
           }}>
-            
+
             {/* Card 1 - Facility Information */}
             <StyledCard>
               <CardHeader
@@ -850,8 +853,8 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
                       facilityName: e.target.value
                     }))}
                   />
-                  
-                  
+
+
                   <FormControl fullWidth>
                     <InputLabel>Timezone</InputLabel>
                     <Select
@@ -886,20 +889,20 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
                 }
               />
               <CardContent sx={{ pt: 0 }}>
-                 <TextField
-                    fullWidth
-                    label="Total Surface Spots Capacity"
-                    type="number"
-                    value={parkingConfig.totalSpots || 0}
-                    onChange={(e) => setParkingConfig(prev => ({
-                      ...prev,
-                      totalSpots: parseInt(e.target.value) || 0
-                    }))}
-                  />
+                <TextField
+                  fullWidth
+                  label="Total Surface Spots Capacity"
+                  type="number"
+                  value={parkingConfig.totalSpots || 0}
+                  onChange={(e) => setParkingConfig(prev => ({
+                    ...prev,
+                    totalSpots: parseInt(e.target.value) || 0
+                  }))}
+                />
                 <Typography variant="subtitle2" gutterBottom>
                   Surface Spots Configuration:
                 </Typography>
-                
+
                 {/* Add Spot Button */}
                 <Button
                   variant="contained"
@@ -937,43 +940,43 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
                   <ParkingIcon fontSize="small" />
                   Existing Spots ({parkingConfig.surfaceSpotIds.length} total):
                 </Typography>
-<Paper variant="outlined" sx={{ 
-  height: 150, // Fixed height
-  overflow: 'auto', 
-  p: 1 
-}}>
-  {parkingConfig.surfaceSpotIds.length > 0 ? (
-    <Stack spacing={1}>
-      {parkingConfig.surfaceSpotIds.map((spot, index) => (
-        <StyledChip
-          key={`spot-${index}-${spot}-${parkingConfig.surfaceSpotIds.length}`}
-          label={spot}
-          onDelete={() => removeSpot(index)}
-          deleteIcon={<DeleteIcon />}
-          color="primary"
-          variant="outlined"
-          sx={{ 
-            justifyContent: 'space-between', 
-            width: '100%',
-            height: 40, // Fixed height
-            '&:hover': {
-              backgroundColor: 'rgba(25, 118, 210, 0.08)' // Only color change, not size
-            }
-          }}
-        />
-      ))}
-    </Stack>
-  ) : (
-    <Box sx={{ textAlign: 'center', py: 3, color: 'text.secondary' }}>
-      <Typography variant="h4" component="div" sx={{ opacity: 0.3, mb: 1 }}>
-        🚗
-      </Typography>
-      <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
-        No parking spots added yet
-      </Typography>
-    </Box>
-  )}
-</Paper>
+                <Paper variant="outlined" sx={{
+                  height: 150, // Fixed height
+                  overflow: 'auto',
+                  p: 1
+                }}>
+                  {parkingConfig.surfaceSpotIds.length > 0 ? (
+                    <Stack spacing={1}>
+                      {parkingConfig.surfaceSpotIds.map((spot, index) => (
+                        <StyledChip
+                          key={`spot-${index}-${spot}-${parkingConfig.surfaceSpotIds.length}`}
+                          label={spot}
+                          onDelete={() => removeSpot(index)}
+                          deleteIcon={<DeleteIcon />}
+                          color="primary"
+                          variant="outlined"
+                          sx={{
+                            justifyContent: 'space-between',
+                            width: '100%',
+                            height: 40, // Fixed height
+                            '&:hover': {
+                              backgroundColor: 'rgba(25, 118, 210, 0.08)' // Only color change, not size
+                            }
+                          }}
+                        />
+                      ))}
+                    </Stack>
+                  ) : (
+                    <Box sx={{ textAlign: 'center', py: 3, color: 'text.secondary' }}>
+                      <Typography variant="h4" component="div" sx={{ opacity: 0.3, mb: 1 }}>
+                        🚗
+                      </Typography>
+                      <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
+                        No parking spots added yet
+                      </Typography>
+                    </Box>
+                  )}
+                </Paper>
               </CardContent>
             </StyledCard>
 
@@ -995,16 +998,16 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
                 <Typography variant="subtitle2" gutterBottom sx={{ mb: 3 }}>
                   Set active days and operating hours:
                 </Typography>
-                
+
                 {/* Days with Hours in Same Row */}
                 <Stack spacing={1.5}>
                   {days.map((day, index) => {
                     const dayData = parkingConfig.operatingHours?.[day]; // Add safe access
                     if (!dayData) return null; // Skip if no data
                     return (
-                      <Box 
+                      <Box
                         key={`day-hours-${index}-${day}`}
-                        sx={{ 
+                        sx={{
                           display: 'grid',
                           gridTemplateColumns: '120px 1fr 1fr', // checkbox | opening | closing
                           gap: 2,
@@ -1036,7 +1039,7 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
                             }
                           }}
                         />
-                        
+
                         {/* Opening Hour - Always Visible */}
                         <TextField
                           size="small"
@@ -1055,7 +1058,7 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
                             }
                           }}
                         />
-                        
+
                         {/* Closing Hour - Always Visible */}
                         <TextField
                           size="small"
@@ -1107,7 +1110,7 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
                       maxQueueSize: parseInt(e.target.value) || 0
                     }))}
                   />
-                  
+
                   <TextField
                     fullWidth
                     label="Average Retrieval Time (minutes)"
@@ -1118,7 +1121,7 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
                       avgRetrievalTimeMinutes: parseInt(e.target.value) || 0
                     }))}
                   />
-                  
+
                   <TextField
                     fullWidth
                     label="Max Parallel Retrievals"
@@ -1129,17 +1132,17 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
                       maxParallelRetrievals: parseInt(e.target.value) || 0
                     }))}
                   />
-                  
-                 
+
+
                 </Stack>
               </CardContent>
             </StyledCard>
           </Box>
-          <Box sx={{ 
-            display: 'grid', 
-            gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, 
-            gap: 4, 
-            mb: 4 
+          <Box sx={{
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
+            gap: 4,
+            mb: 4
           }}>
             <StyledCard>
               <CardHeader
@@ -1183,33 +1186,33 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
                       />
                     </RadioGroup>
                   </Box>
-<Box>
-  <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
-    Show Admin Analytics
-  </Typography>
-  <RadioGroup
-    row
-    value={parkingConfig.showAdminAnalytics ? 'on' : 'off'}
-    onChange={(e) =>
-      setParkingConfig(prev => ({
-        ...prev,
-        showAdminAnalytics: e.target.value === 'on'
-      }))
-    }
-  >
-    <FormControlLabel
-      value="on"
-      control={<Radio color="primary" />}
-      label={<Typography color="primary">Active</Typography>}
-    />
-    <FormControlLabel
-      value="off"
-      control={<Radio color="primary" />}
-      label={<Typography color="primary">Off</Typography>}
-    />
-  </RadioGroup>
-  
-</Box>
+                  <Box>
+                    <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
+                      Show Admin Analytics
+                    </Typography>
+                    <RadioGroup
+                      row
+                      value={parkingConfig.showAdminAnalytics ? 'on' : 'off'}
+                      onChange={(e) =>
+                        setParkingConfig(prev => ({
+                          ...prev,
+                          showAdminAnalytics: e.target.value === 'on'
+                        }))
+                      }
+                    >
+                      <FormControlLabel
+                        value="on"
+                        control={<Radio color="primary" />}
+                        label={<Typography color="primary">Active</Typography>}
+                      />
+                      <FormControlLabel
+                        value="off"
+                        control={<Radio color="primary" />}
+                        label={<Typography color="primary">Off</Typography>}
+                      />
+                    </RadioGroup>
+
+                  </Box>
 
                 </Stack>
               </CardContent>
@@ -1226,7 +1229,8 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
                 onClick={saveConfig}
                 disabled={saving || !!message || showErrorPopup || !hasChanges()}
                 startIcon={saving ? <TimeIcon /> : undefined}
-                sx={{ minWidth: 200,
+                sx={{
+                  minWidth: 200,
                   bgcolor: hasChanges() ? 'primary.main' : 'grey.400',
                   color: 'white',
                   boxShadow: hasChanges() ? '0 4px 16px rgba(25, 118, 210, 0.10)' : 'none',
@@ -1249,8 +1253,8 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
               >
                 {saving
                   ? 'Saving Settings...'
-                  : hasChanges() 
-                    ? '💾 Save Settings' 
+                  : hasChanges()
+                    ? '💾 Save Settings'
                     : '✅ No Changes to Save'
                 }
               </Button>
@@ -1298,7 +1302,7 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
               </Typography>
             )}
           </Box>
-          
+
           {/* Load for Update Section */}
           {showDeleteConfirm && spotToDelete && (
             <Box
@@ -1325,7 +1329,7 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
                   boxShadow: '0 8px 32px rgba(0,0,0,0.3)'
                 }}
               >
-                <Typography variant="h6" gutterBottom sx={{ 
+                <Typography variant="h6" gutterBottom sx={{
                   fontWeight: 600,
                   color: '#d32f2f',
                   display: 'flex',
@@ -1334,7 +1338,7 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
                 }}>
                   ⚠️ Delete Confirmation
                 </Typography>
-                
+
                 <Typography variant="body1" sx={{ mb: 3, lineHeight: 1.6 }}>
                   Are you sure you want to delete parking spot{' '}
                   <Box component="span" sx={{ fontWeight: 600, color: 'primary.main' }}>
@@ -1342,11 +1346,11 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
                   </Box>
                   ?
                 </Typography>
-                
+
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
                   This action cannot be undone.
                 </Typography>
-                
+
                 <Stack direction="row" spacing={2} justifyContent="flex-end">
                   <Button
                     variant="outlined"
@@ -1355,12 +1359,12 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
                   >
                     Cancel
                   </Button>
-                  
+
                   <Button
                     variant="contained"
                     color="error"
                     onClick={confirmDelete}
-                    sx={{ 
+                    sx={{
                       minWidth: 100,
                       bgcolor: '#d32f2f',
                       '&:hover': {
@@ -1450,58 +1454,58 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
             </Box>
           )}
           {deleteConfirmDialog.open && (
-  <Box
-    sx={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      bgcolor: 'rgba(0, 0, 0, 0.5)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 1600
-    }}
-  >
-    <Box
-      sx={{
-        bgcolor: 'white',
-        borderRadius: 2,
-        p: 3,
-        maxWidth: 400,
-        width: '90%',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.3)'
-      }}
-    >
-      <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: '#d32f2f' }}>
-        ⚠️ Delete Parking Lot
-      </Typography>
-      <Typography variant="body1" sx={{ mb: 3 }}>
-        Are you sure you want to delete parking lot{' '}
-        <Box component="span" sx={{ fontWeight: 600, color: 'primary.main' }}>
-          "{deleteConfirmDialog.lotData?.facilityName || deleteConfirmDialog.lotData?.id}"
-        </Box>
-        ?
-      </Typography>
-      <Stack direction="row" spacing={2} justifyContent="flex-end">
-        <Button
-          variant="outlined"
-          onClick={() => setDeleteConfirmDialog({ open: false, lotData: null })}
-        >
-          Cancel
-        </Button>
-        <Button
-          variant="contained"
-          color="error"
-          onClick={confirmDeleteLot}
-        >
-          Delete
-        </Button>
-      </Stack>
-    </Box>
-  </Box>
-)}
+            <Box
+              sx={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                bgcolor: 'rgba(0, 0, 0, 0.5)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: 1600
+              }}
+            >
+              <Box
+                sx={{
+                  bgcolor: 'white',
+                  borderRadius: 2,
+                  p: 3,
+                  maxWidth: 400,
+                  width: '90%',
+                  boxShadow: '0 8px 32px rgba(0,0,0,0.3)'
+                }}
+              >
+                <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: '#d32f2f' }}>
+                  ⚠️ Delete Parking Lot
+                </Typography>
+                <Typography variant="body1" sx={{ mb: 3 }}>
+                  Are you sure you want to delete parking lot{' '}
+                  <Box component="span" sx={{ fontWeight: 600, color: 'primary.main' }}>
+                    "{deleteConfirmDialog.lotData?.facilityName || deleteConfirmDialog.lotData?.id}"
+                  </Box>
+                  ?
+                </Typography>
+                <Stack direction="row" spacing={2} justifyContent="flex-end">
+                  <Button
+                    variant="outlined"
+                    onClick={() => setDeleteConfirmDialog({ open: false, lotData: null })}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="error"
+                    onClick={confirmDeleteLot}
+                  >
+                    Delete
+                  </Button>
+                </Stack>
+              </Box>
+            </Box>
+          )}
 
         </Paper>
       </Container>

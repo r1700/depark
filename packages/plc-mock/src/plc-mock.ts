@@ -1,6 +1,5 @@
 import { OPCUAServer, Variant, DataType, StatusCodes ,VariantArrayType} from "node-opcua";
 // Start an OPC-UA server simulating a PLC
-
 export async function createPlcOpcServer() {
   const server = new OPCUAServer({
     port: 4080,
@@ -12,7 +11,6 @@ export async function createPlcOpcServer() {
     },
   });
   await server.initialize();
-
   const addressSpace = server.engine.addressSpace!;
   const namespace = addressSpace.getOwnNamespace();
   console.log("Adding PLC object under:", addressSpace.rootFolder.objects.nodeId.toString());
@@ -20,7 +18,6 @@ export async function createPlcOpcServer() {
     organizedBy: addressSpace.rootFolder.objects,
     browseName: "PLC",
   });
-  
   console.log("objectsFolder:", addressSpace.rootFolder.objects.nodeId.toString());
   // Internal variables to simulate state
   // Each has its own nodeId
@@ -54,7 +51,7 @@ export async function createPlcOpcServer() {
     minimumSamplingInterval: 1000,
     value: {
       get: () => new Variant({ dataType: DataType.String, value: licensePlateExit }),
-      set: (variant: Variant) => {        
+      set: (variant: Variant) => {
         licensePlateExit = variant.value;
         return StatusCodes.Good;
       },
@@ -74,7 +71,6 @@ export async function createPlcOpcServer() {
       },
     },
   });
-
   namespace.addVariable({
     componentOf: device,
     browseName: "VehicleExitRequest",
@@ -101,7 +97,6 @@ export async function createPlcOpcServer() {
       },
     },
   });
-  
   namespace.addVariable({
     componentOf: device,
     browseName: "licensePlateEntry = `ABC-${Math.floor(Math.random() * 1000)}`",
@@ -128,9 +123,6 @@ export async function createPlcOpcServer() {
       },
     },
   });
-  
-  
-
   // Function to update values periodically using setInterval
   setInterval(async () => {
     // Trigger value updates for monitored items in OPC-UA server
@@ -143,7 +135,6 @@ export async function createPlcOpcServer() {
       `${Math.floor(Math.random() * 5)}:${Math.floor(Math.random() * 5)}` // assignedPickupSpot
     ];
   }, 2000); // Every 2 seconds
-
   await server.start();
   console.log(":white_check_mark: OPC-UA server running at:", server.endpoints[0].endpointDescriptions()[0].endpointUrl);
 }

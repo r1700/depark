@@ -15,12 +15,9 @@ import {
 } from 'node-opcua';
 import { sendDataToBackend } from "./backendService";
 import dotenv from 'dotenv';
-
 dotenv.config();
-
 const { TARGET_URL, PLC_USERNAME, PLC_PASSWORD, TARGET_URL_MOCK } = process.env;
 const endpointUrl: string = TARGET_URL || `opc.tcp://${TARGET_URL_MOCK}/UA/PLC`;
-
 let opcClient: OPCUAClient | null = null;
 let opcSession: ClientSession | null = null;
 let subscription: ClientSubscription | null = null;
@@ -30,17 +27,14 @@ const nodesToMonitor = [
   "ns=1;s=licensePlateExit",
   "ns=1;s=licensePlateEntry",
 ];
-
 // Function to check if the session is valid
 function isChannelValid(session: ClientSession | null): boolean {
   return session ? session.sessionId !== null : false;
 }
-
 // Function to check if the client is connected
 function isConnected(client: OPCUAClient | null): boolean {
   return client ? client.connectionStrategy.maxRetry === 0 : false;
 }
-
 // Create or reuse an OPC UA client
 async function getOpcClient(): Promise<OPCUAClient> {
   if (!opcClient || !isConnected(opcClient)) {
@@ -63,7 +57,6 @@ async function getOpcClient(): Promise<OPCUAClient> {
   }
   return opcClient;
 }
-
 // Ensure a valid session
 export async function ensureSession(): Promise<ClientSession> {
   try {
@@ -91,7 +84,6 @@ export async function ensureSession(): Promise<ClientSession> {
     throw err;
   }
 }
-
 // Close the OPC UA connection
 async function closeOpcConnection(): Promise<void> {
   if (opcSession) {
@@ -105,7 +97,6 @@ async function closeOpcConnection(): Promise<void> {
     opcClient = null;
   }
 }
-
 // Detect the data type of a value
 function detectDataType(value: any): { dataType: DataType; arrayType?: VariantArrayType } {
   if (Array.isArray(value)) {
@@ -121,7 +112,6 @@ function detectDataType(value: any): { dataType: DataType; arrayType?: VariantAr
         throw new Error(`Unsupported array element type: ${elementType}`);
     }
   }
-
   switch (typeof value) {
     case "boolean":
       return { dataType: DataType.Boolean };
@@ -138,20 +128,17 @@ function detectDataType(value: any): { dataType: DataType; arrayType?: VariantAr
       throw new Error(`Unsupported data type: ${typeof value}`);
   }
 }
-
 // Interface for write items
 export interface WriteItem {
   nodeId: string;
   value: any;
 }
-
 // Write values to OPC UA nodes
 export async function writeNodeValues(writeItems: WriteItem[]): Promise<void> {
   await ensureSession();
   if (!opcSession) {
     throw new Error("OPC session is not initialized");
   }
-
   const nodesToWrite = writeItems.map((item) => {
     const dataType: any = detectDataType(item.value);
     return {
@@ -165,7 +152,6 @@ export async function writeNodeValues(writeItems: WriteItem[]): Promise<void> {
       }
     };
   });
-
   try {
     console.log("Writing nodes:", JSON.stringify(nodesToWrite, null, 2));
     await opcSession.write(nodesToWrite);
@@ -175,25 +161,22 @@ export async function writeNodeValues(writeItems: WriteItem[]): Promise<void> {
     throw err;
   }
 }
-
 // Create a subscription
 export async function createSubscription(): Promise<ClientSubscription> {
   if (subscription) {
     try {
       await subscription.terminate();
-      console.log("✅ Previous subscription terminated");
+      console.log(":white_check_mark: Previous subscription terminated");
     } catch (e) {
-      console.warn("⚠️ Warning terminating subscription:", e);
+      console.warn(":warning: Warning terminating subscription:", e);
     }
     subscription = null;
   }
-
   await ensureSession(); // Ensure the session exists
   console.log("Creating OPC UA subscription...");
   if (!opcSession) {
     throw new Error("OPC session is not initialized");
   }
-
   subscription = ClientSubscription.create(opcSession, {
     requestedPublishingInterval: 500,
     requestedLifetimeCount: 100,
@@ -202,37 +185,30 @@ export async function createSubscription(): Promise<ClientSubscription> {
     publishingEnabled: true,
     priority: 10,
   });
-
   subscription.on("started", () => {
     console.log(`Subscription started (ID=${subscription!.subscriptionId})`);
   });
-
   subscription.on("terminated", () => {
     console.log("Subscription terminated");
   });
-
   subscription.on("keepalive", () => {
-    console.log("🔄 Subscription keepalive: Connection is active");
+    console.log(":arrows_counterclockwise: Subscription keepalive: Connection is active");
   });
-
   subscription.on("status_changed", (status) => {
-    console.log("⚠️ Subscription status changed:", status.toString());
+    console.log(":warning: Subscription status changed:", status.toString());
   });
-
   return subscription;
 }
-
 export async function createMonitoredItems(subscription: ClientSubscription): Promise<void> {
   // Cleanup previous monitored items
   for (const item of monitoredItems) {
     try {
       await item.terminate();
     } catch (e) {
-      console.warn("⚠️ Warning terminating monitored item:", e);
+      console.warn(":warning: Warning terminating monitored item:", e);
     }
   }
   monitoredItems = [];
-
   nodesToMonitor.forEach((nodeId) => {
     const monitoredItem = ClientMonitoredItem.create(
       subscription,
@@ -247,7 +223,6 @@ export async function createMonitoredItems(subscription: ClientSubscription): Pr
       },
       TimestampsToReturn.Both
     );
-
     monitoredItem.on("changed", async (dataValue: DataValue) => {
       const val = dataValue.value?.value;
       let event: string = '';
@@ -258,18 +233,15 @@ export async function createMonitoredItems(subscription: ClientSubscription): Pr
       } else if (nodeId === "ns=1;s=parkingSpot") {
         event = 'parkingSpot';
       }
-      console.log(`🔄 Node ${nodeId} changed:`, val);
+      console.log(`:arrows_counterclockwise: Node ${nodeId} changed:`, val);
       await sendDataToBackend(event, val);
     });
-
     monitoredItem.on("err", (err) => {
-      console.error(`❌ Monitored item error at ${nodeId}:`, err);
+      console.error(`:x: Monitored item error at ${nodeId}:`, err);
     });
-
     monitoredItems.push(monitoredItem);
   });
 }
-
 export async function waitForNodeChange(
   nodeId: string,
   options: {
@@ -279,7 +251,6 @@ export async function waitForNodeChange(
   } = {}
 ): Promise<any> {
   const { samplingInterval = 100, timeout = 10000, predicate } = options;
-
   return new Promise((resolve, reject) => {
     const monitoredItem = ClientMonitoredItem.create(
       subscription!,
@@ -287,12 +258,10 @@ export async function waitForNodeChange(
       { samplingInterval, discardOldest: true, queueSize: 1 },
       TimestampsToReturn.Both
     );
-
     const timer = setTimeout(() => {
       monitoredItem.terminate().catch(() => { });
       reject(new Error("Timeout waiting for node change"));
     }, timeout);
-
     monitoredItem.on("changed", (dataValue: DataValue) => {
       const val = dataValue.value?.value;
       const ok = typeof predicate === "function" ? predicate(val, dataValue) : true;
@@ -302,7 +271,6 @@ export async function waitForNodeChange(
         resolve(val);
       }
     });
-
     monitoredItem.on("err", (err: any) => {
       clearTimeout(timer);
       monitoredItem.terminate().catch(() => { });
@@ -310,10 +278,8 @@ export async function waitForNodeChange(
     });
   });
 }
-
 process.on("SIGINT", async () => {
   console.log("Closing OPC UA connection...");
   await closeOpcConnection();
   process.exit(0);
 });
-
