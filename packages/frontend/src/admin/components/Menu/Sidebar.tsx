@@ -24,6 +24,7 @@ import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
+import { LogoDev } from '@mui/icons-material';
 const drawerWidth = 240;
 type RoleName = 'admin' | 'hr' | 'guest';
 interface User {
@@ -54,37 +55,35 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
     }, [open]);
     const userRole = normalizeRole(user?.role);
     const getUserInitials = (): string => {
-        if (!user) return '';
-        const first = user.firstName ? user.firstName[0] : '';
-        const last = user.lastName ? user.lastName[0] : '';
-        return `${first}${last}`.toUpperCase();
+        if (!user || !user.firstName || !user.lastName) return '?';
+        return `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
     };
-    // menu items now include optional `allowed` array with roles that can see the item
+
+    // menu items synced with AdminRoutes
     const menuItems: Array<{
         text: string;
         icon?: React.ReactNode;
         path?: string;
-        allowed?: RoleName[];
-        subMenu?: Array<{ text: string; path: string; allowed?: RoleName[] }>;
+        subMenu?: Array<{ text: string; path: string }>;
     }> = [
-    { text: 'Users', icon: <PeopleIcon />, path: '/admin/layout/users' },
-    { text: 'Vehicles', icon: <DirectionsCarIcon />, path: '/admin/layout/vehicles' },
+        { text: 'Admin Dashboard', icon: <PeopleIcon />, path: '/admin/layout/admin' },
+        { text: 'HR Dashboard', icon: <DirectionsCarIcon />, path: '/admin/layout/hr-dashboard' },
+        // { text: 'Admin Config', icon: <AssessmentIcon />, path: '/admin/layout/admin-config' },
+        { text: 'Parkings', icon: <LocalParkingIcon />, path: '/admin/layout/parkings' },
+        { text: 'Logo Management', icon: <LogoDev />, path: '/admin/layout/logo-management' },
         {
             text: 'Reports',
             icon: <AssessmentIcon />,
-            path: '',
             subMenu: [
                 { text: 'Parking Stats', path: '/admin/layout/reports/parking-stats' },
                 { text: 'Surface Stats', path: '/admin/layout/reports/surface-stats' },
             ],
         },
-    { text: 'Parking Config', icon: <LocalParkingIcon />, path: '/admin/layout/parkings' },
-    { text: 'Logo Management', icon: <PhotoIcon />, path: '/admin/layout/logos' },
-       
-        ];
-    // helper: check if current user role allowed to see item
-    // כל אחד יכול לראות הכל
+    ];
+
+    // All menu items are always visible
     const isAllowed = () => true;
+
     return (
         <Drawer
             variant="permanent"
@@ -130,10 +129,9 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
             )}
             <List>
                 {menuItems.map((item) => {
-                    // skip item if not allowed for this user
-                    if (!isAllowed()) return null;
-                    // determine visible subMenu after filtering by allowed
-                    const visibleSubMenu = item.subMenu?.filter(() => isAllowed()) ?? [];
+                    // all items are allowed
+                    const visibleSubMenu = item.subMenu ?? [];
+
                     return (
                         <React.Fragment key={item.text}>
                             <ListItemButton
@@ -190,7 +188,7 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
                     <Avatar sx={{ bgcolor: '#1565C0', mr: 2, width: 40, height: 40 }}>{getUserInitials()}</Avatar>
                     {open && (
                         <Typography noWrap>
-                            {user.firstName} {user.lastName}
+                            {user && user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : 'Guest'}
                         </Typography>
                     )}
                 </Box>

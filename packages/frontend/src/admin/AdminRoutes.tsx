@@ -2,7 +2,7 @@ import UsersPage from './Pages/UsersPage';
 import VehiclePage from './Pages/VehiclePage';
 // src/admin/AdminRoutes.tsx
 import React, { useCallback } from "react";
-import { Route, Navigate, useNavigate } from "react-router-dom";
+import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { Provider } from "react-redux";
 import { store } from "./app/store"; 
 
@@ -37,17 +37,19 @@ const AdminRoutes: React.FC = () => {
   }, [navigate]);
 
   return (
-    <>
+    <Routes>
       <Route path="login" element={<LoginScreen />} />
       <Route
         path=""
         element={
-          !user ? (
-            <Navigate to="login" replace />
-          ) : String(user.role) === "2" ? (
+          String(user?.role) === "2" ? (
             <Navigate to="layout/admin" replace />
-          ) : (
+          ) : String(user?.role) === "1" ? (
             <Navigate to="layout/hr-dashboard" replace />
+          ) : (
+            <Provider store={store}>
+              <Layout user={user} onLogout={handleLogout} />
+            </Provider>
           )
         }
       />
@@ -68,23 +70,24 @@ const AdminRoutes: React.FC = () => {
         <Route path="admin-config" element={<AdminConfigPage />} />
         <Route path="admin-config/:lotId" element={<AdminConfigPage />} />
         <Route path="parkings" element={<ParkingsPage />} />
-        <Route path="logos" element={<AdminLogoManagement />} />
-        <Route path="users" element={<UsersPage />} />
-        <Route path="vehicles" element={<VehiclePage />} />
+        <Route path="logo-management" element={<AdminLogoManagement />} />
         <Route path="reports">
           <Route path="parking-stats" element={<ParkingStatsPage />} />
           <Route path="surface-stats" element={<SurfaceStatsPage />} />
         </Route>
-        <Route index element={
-          String(user?.role) === "2" ? (
-            <Navigate to="admin" replace />
-          ) : (
-            <Navigate to="hr-dashboard" replace />
-          )
-        } />
+        <Route
+          index
+          element={
+            String(user?.role) === "2" ? (
+              <Navigate to="admin" replace />
+            ) : (
+              <Navigate to="hr-dashboard" replace />
+            )
+          }
+        />
       </Route>
       <Route path="*" element={<Navigate to="/admin" replace />} />
-    </>
+    </Routes>
   );
 };
 
