@@ -1,7 +1,6 @@
 import { Model, DataTypes, Optional } from 'sequelize';
 import sequelize from '../config/database';
 
-// ממשק טיפוס המאפיינים של BaseUser
 export interface BaseUserAttributes {
   id: number;
   email: string;
@@ -55,8 +54,8 @@ BaseUser.init(
   {
     sequelize,
     tableName: 'baseuser', // שם הטבלה ב-DB
-    timestamps: false, // כי יש שדות זמן בטבלה
-    underscored: true, // שמות שדות ב-snake_case
+    timestamps: false, 
+    underscored: true, 
   }
 );
 

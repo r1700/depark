@@ -1,7 +1,6 @@
 import { Model, DataTypes, Optional } from 'sequelize';
 import sequelize from '../config/database';
 
-// ממשק טיפוס המאפיינים של AdminUser
 export interface AdminUserAttributes {
   id: number;
   baseuser_id: number;
@@ -11,10 +10,8 @@ export interface AdminUserAttributes {
   last_login_at?: Date | null;
 }
 
-// בשביל יצירת רשומה חדשה, חלק מהשדות אופציונליים (למשל id)
 export interface AdminUserCreationAttributes extends Optional<AdminUserAttributes, 'id' | 'last_login_at'> {}
 
-// מחלקת המודל עצמה עם הטיפוסים שצוינו
 export class AdminUser extends Model<AdminUserAttributes, AdminUserCreationAttributes>
   implements AdminUserAttributes {
   public id!: number;
@@ -27,7 +24,6 @@ export class AdminUser extends Model<AdminUserAttributes, AdminUserCreationAttri
   public updated_at!: Date;
 }
 
-// הגדרת המודל עם השדות והתכונות
 AdminUser.init(
   {
     id: {
@@ -58,9 +54,9 @@ AdminUser.init(
   },
   {
     sequelize,
-    tableName: 'adminusers', // שם הטבלה ב-DB
-    timestamps: false, // כי יש שדות זמן בטבלה
-    underscored: true, // שמות שדות ב-snake_case
+    tableName: 'adminusers', 
+    timestamps: false, 
+    underscored: true, 
   }
 );
 

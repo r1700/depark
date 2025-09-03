@@ -1,11 +1,14 @@
-import { error } from "console";
-import { pool } from '../db/db';
+import { error, log } from "console";
 const otpGenerator = require('otp-generator');
+import { baseuser, usersessions } from '../model/database-models/user.model'; // ודא שיש לך מודלים כאלה
+import { Op } from 'sequelize';
+import sequelize from "../model/database-models/user.model";
 
 interface OtpEntry {
   otp: string;
   expiresAt: number;
 }
+
 
 // Generate a 6-character OTP (digits + letters, no special characters)
 export async function createOtp(contact: string): Promise<string> {
@@ -16,15 +19,12 @@ export async function createOtp(contact: string): Promise<string> {
     specialChars: false,
   });
 
-  const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString(); // 5 minutes expiry
+  const expiresAt = Date.now() + 5 * 60 * 1000; // 5 minutes expiry (מספר, לא ISO)
   const userId = await userIdByContact(contact);
 
-  await pool.query(
-    `UPDATE "UserSessions"
-     SET "tempToken" = $1,
-         "expiresAt" = $2
-     WHERE "userId" = $3`,
-    [otp, expiresAt, userId]
+  await usersessions.update(
+    { temp_token: otp, expires_at: expiresAt },
+    { where: { baseuser_id: userId } }
   );
 
   return otp;
@@ -34,19 +34,15 @@ export async function createOtp(contact: string): Promise<string> {
 export async function getOtpEntry(contact: string): Promise<OtpEntry | undefined> {
   const userId = await userIdByContact(contact);
 
-  const result = await pool.query(
-    `SELECT "tempToken", "expiresAt"
-     FROM "UserSessions"
-     WHERE "userId" = $1`,
-    [userId]
-  );
+  const session = await usersessions.findOne({
+    where: { baseuser_id: userId }
+  });
 
-  if (result.rows.length === 0) return undefined;
+  if (!session) return undefined;
 
-  const row = result.rows[0];
   return {
-    otp: row.tempToken,
-    expiresAt: Number(row.expiresAt),
+    otp: session.temp_token,
+    expiresAt: Number(session.expires_at),
   };
 }
 
@@ -54,11 +50,9 @@ export async function getOtpEntry(contact: string): Promise<OtpEntry | undefined
 export async function removeOtp(contact: string): Promise<void> {
   const userId = await userIdByContact(contact);
 
-  await pool.query(
-    `UPDATE "UserSessions"
-     SET "tempToken" = NULL
-     WHERE "userId" = $1`,
-    [userId]
+  await usersessions.update(
+    { temp_token: null },
+    { where: { baseuser_id: userId } }
   );
 }
 
@@ -76,29 +70,36 @@ export async function verifyOtp(contact: string, inputOtp: string): Promise<bool
 // Check if the user exists and has a session
 export async function existUser(contact: string): Promise<boolean> {
   try {
-    const userId = await userIdByContact(contact);
-    const result = await pool.query(
-      `SELECT * FROM "UserSessions"
-       WHERE "userId" = $1`,
-      [userId]
-    );
-    return result.rows.length > 0;
-  } catch {
+    
+    const userId:string = await userIdByContact(contact);
+    if (userId) {
+      const session = await usersessions.findOne({ where: { baseuser_id: userId } });
+      return !!session;
+    }
+    else {
+      return false;
+    }
+  } catch (error) {
+    console.log("Error checking user existence:", error);
     return false;
   }
 }
 
 // Get user ID by email or phone
-export async function userIdByContact(contact: string): Promise<number> {
-  const result = await pool.query(
-    `SELECT id FROM "Users"
-     WHERE "email" = $1 OR "phone" = $1`,
-    [contact]
-  );
+export async function userIdByContact(contact: string): Promise<string> {
 
-  if (result.rows.length > 0) {
-    return result.rows[0].id;
+  const user = await baseuser.findOne({
+    where: {
+      [Op.or]: [
+        { email: contact },
+        { phone: contact }
+      ]
+    }
+  });
+
+  if (user) {
+    return user.id.toString(); // Ensure the ID is a string
   } else {
-    throw error("User not found");
+    throw new Error("User not found");
   }
-}
+} 

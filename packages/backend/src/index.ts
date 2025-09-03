@@ -1,78 +1,125 @@
-import express from 'express';
+import 'reflect-metadata';
 import dotenv from 'dotenv';
+dotenv.config();
+import './models/index'
+import express from 'express';
 import cors from 'cors';
-
-// Routes
-import adminUsersRouter from './routes/admin/adminUsers';
 import loggerRoutes from './middlewares/locallLoggerMiddleware';
 import healthRoutes from './routes/health';
 import passwordRoutes from './routes/user.routes';
 import vehicleRoutes from './routes/vehicle';
 import exportToCSV from './routes/exportToCSV';
-// import googleAuth from './routes/google-auth';
-import adminConfigRouter from './routes/admin-config';
-import sequelize from './config/database';   // אתחול חיבור DB
-import { setupAssociations } from './models/assocations';  // פונקציה שמגדירה קשרים בין המודלים
-
-dotenv.config();
-
+import authRoutes from './routes/auth';
+import adminUsers from './routes/admin/adminUsers';
+import userGoogleAuthRoutes from './routes/userGoogle-auth';
+import Exit from './routes/opc/exit'; // Import the exit route
+import session from 'express-session';
+import adminConfigRouter from './routes/adminConfig';
+import userRoutes from './routes/user.routes';
+// import feedbackQuestions from './routes/feedbackQuestions';
+import logoRouter from './routes/logos';
+import screenTypeRouter from './routes/screenType';
+// import './cronJob'; // Import the cron job to ensure it runs on server start
+import vehicle from './routes/vehicleRoute';
+import GoogleAuth from './routes/google-auth';
+import parkingReport from './routes/parkingStat';
+import surfaceReport from './routes/surfaceStat';
+// import feedbackAnswers from './routes/feedbackAnswers';
+import path from 'path';
 const app = express();
-
 const PORT = process.env.PORT || 3001;
-const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:3000';
-setupAssociations();
-
+// Serve static logos
+app.use('/logos', express.static(path.join(process.cwd(), 'public/logos')));
+app.use(session({
+    secret: process.env.SESSION_SECRET || 'keyboard cat',
+    resave: false,
+    saveUninitialized: false,
+    cookie: { secure: process.env.NODE_ENV === 'production' }
+}) as unknown as express.RequestHandler);
 // Middleware
+const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:3000';
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 app.use(cors({
-  origin: CORS_ORIGIN,
-  credentials: true,
+    origin: CORS_ORIGIN,
+    credentials: true,
 }));
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
+if (!GOOGLE_CLIENT_ID) {
+    throw new Error('Missing GOOGLE_CLIENT_ID');
+}
+app.use(cors({ origin: CORS_ORIGIN, credentials: true }));
+app.use(express.json());
 app.use(loggerRoutes);
-
-// Routes
-app.use('/admin', adminUsersRouter);
-app.use('/api/admin', adminConfigRouter);
+app.use('/admin',adminUsers)
 app.use('/api/health', healthRoutes);
 app.use('/api/password', passwordRoutes);
 app.use('/api/vehicle', vehicleRoutes);
 app.use('/api/exportToCSV', exportToCSV);
-// app.use('/OAuth', googleAuth);
-
-// basic routes
+app.use('/api', userRoutes);
+// app.use('/api/users', userFilter);
+app.use('/api/auth', authRoutes);
+app.use('/api/auth', userGoogleAuthRoutes);
+app.use('/api/vehicles', vehicle)
+app.use('/api/admin', adminConfigRouter);
+app.use('/api/Auth', GoogleAuth);
+app.use('/api/admin', adminConfigRouter);
+app.use('/api/parking-stats', parkingReport);
+app.use('/api/surface-stats', surfaceReport);
+// app.use('/api/feedbackQuestions', feedbackQuestions);
+// app.use('/api/feedbackAnswers', feedbackAnswers);
+app.use('/api/logos', logoRouter);
+app.use('/api/screentypes', screenTypeRouter);
+app.use('/logos', express.static(path.join(process.cwd(), 'public/logos')));
+app.use((req, res, next) => {
+    console.log(`[${req.method}] ${req.path}`, req.body);
+    next();
+});
+app.use('/api/opc', Exit);
+// Start server - בסוף!
 app.get('/', (req, res) => {
-  res.json({ message: 'DePark Backend is running!' });
+    res.json({ message: 'DePark Backend is running!' });
 });
-
 app.get('/health', (req, res) => {
-  res.json({
-    status: 'OK',
-    timestamp: new Date().toISOString(),
-  });
+    res.json({
+        status: 'OK',
+        timestamp: new Date().toISOString(),
+    });
 });
-
-// 404 handler
-app.use('*', (req, res) => {
-  res.status(404).json({ message: 'Route not found' });
-});
-
-// Error handler
-app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  console.error('Error:', err);
-  res.status(500).json({ message: 'Internal server error' });
-});
-
-// Checking environment variables (for example supabase)
 if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
-  console.log('🗄️ Initializing database...');
+    console.log(':file_cabinet: Initializing database...');
 } else {
-  console.log('📝 Using mock data - Supabase not configured');
+    console.log(':memo: Using mock data - Supabase not configured');
 }
-
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`🌐 CORS enabled for: ${CORS_ORIGIN}`);
+    console.log(`:rocket: Server running on port ${PORT}`);
+    console.log(`:memo: Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`:globe_with_meridians: CORS enabled for: ${CORS_ORIGIN}`);
+    console.log(':white_check_mark: APIs ready!');
+    console.log(':link: Available routes:');
+    console.log('   GET  /');
+    console.log('   GET  /health');
+    console.log('   GET  /api/health');
+    console.log('   POST /api/password/reset');
+    console.log('   GET  /api/vehicle');
+    console.log('   GET  /api/exportToCSV');
+    if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
+        console.log(':file_cabinet: Database: Supabase configured');
+    } else {
+        console.log(':memo: Database: Using mock data');
+    }
+    console.log(':white_check_mark: Password reset API ready!');
+    console.log(':link: Available routes:');
+    console.log('   GET  /');
+    console.log('   GET  /health');
+    console.log('   GET  /api/auth/users');
+    console.log('   POST /api/auth/register');
+    console.log('   POST /api/auth/login');
+    console.log('   GET  /api/admin/config');
+    console.log('   PUT  /api/admin/config');
+    console.log('   POST /api/logos');
+    if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
+        console.log(':file_cabinet: Initializing database...');
+    } else {
+        console.log(':memo: Using mock data - Supabase not configured');
+    }
 });

@@ -1,138 +1,140 @@
-// src/routes/admin-config.ts
 import { Router } from 'express';
+import { ParkingConfigurationModel } from '../model/systemConfiguration/parkingConfiguration';
+import ParkingConfiguration from '../models/ParkingConfiguration';
+import authenticateToken from '../middlewares/authMiddleware'; // Back to original auth
 
 const router = Router();
+router.post('/', authenticateToken, async (req, res) => {
+  const { parkingConfig } = req.body;
+  if (!parkingConfig) {
+    return res.status(400).json({ success: false, error: 'Missing parkingConfig' });
+  }
 
-// טיפוסים זמניים (עד שתיצרי את קובץ הטיפוסים)
-interface ParkingConfiguration {
-  id: string;
-  facilityName: string;
-  timezone: string;
-  totalSurfaceSpots: number;
-  surfaceSpotIds: string[];
-  operatingHours: {
-    start: string;
-    end: string;
-  };
-  activeDays?: string[];
-  maxQueueSize: number;
-  avgRetrievalTimeMinutes: number;
-  maxParallelRetrievals?: number;
-  updatedAt: Date;
-  updatedBy: string;
-}
-
-interface SystemSettings {
-  maintenance_mode: boolean;
-  show_admin_analytics: boolean;
-  updatedAt: Date;
-  updatedBy: string;
-}
-
-// Mock data
-let mockParkingConfig: ParkingConfiguration = {
-  id: 'main-lot',
-  facilityName: 'Main Parking Facility',
-  timezone: 'Asia/Jerusalem',
-  totalSurfaceSpots: 50,
-  surfaceSpotIds: ['S1', 'S2', 'S3', 'S4', 'S5'],
-  operatingHours: {
-    start: '07:00',
-    end: '22:00'
-  },
-  activeDays: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday'],
-  maxQueueSize: 10,
-  avgRetrievalTimeMinutes: 2.5,
-  maxParallelRetrievals: 3,
-  updatedAt: new Date(),
-  updatedBy: 'admin'
-};
-
-let mockSystemSettings: SystemSettings = {
-  maintenance_mode: false,
-  show_admin_analytics: true,
-  updatedAt: new Date(),
-  updatedBy: 'admin'
-};
-
-// GET /api/admin/config
-router.get('/config', async (req, res) => {
   try {
-    res.json({
-      success: true,
-      data: {
-        parkingConfig: mockParkingConfig,
-        systemSettings: mockSystemSettings
+    console.log('🔍 Raw parkingConfig data:', JSON.stringify(parkingConfig, null, 2));
+      
+      const configForValidation = { ...parkingConfig };
+      delete configForValidation.id;
+      delete configForValidation.lotId;
+      
+      console.log('🔄 Config after removing IDs for validation:', JSON.stringify(configForValidation, null, 2));
+      
+      const { error, value: validatedConfig } = ParkingConfigurationModel.schema.validate(configForValidation);
+      if (error) {
+        console.log('❌ Validation failed:', error);
+        console.log('❌ Error details:', error.details);
+        return res.status(400).json({ success: false, error: 'Validation failed: ' + error.message });
       }
-    });
+      console.log('✅ Validation passed with your model:', validatedConfig);
+
+      const configForDatabase = { ...parkingConfig }; 
+      delete configForDatabase.id;
+      delete configForDatabase.lotId;
+      
+      // Add updated timestamp and user from authentication
+      configForDatabase.updatedAt = new Date();
+      const currentUser = (req as any).user;
+      configForDatabase.updatedBy = currentUser.email || `user_${currentUser.id}`;
+      
+      console.log('🔄 Config for database insertion:', JSON.stringify(configForDatabase, null, 2));
+
+      console.log('⏳ About to create record in database...');
+      // Create new record in database - הID יווצר אוטומטית
+      const newRecord = await ParkingConfiguration.create(configForDatabase);
+
+      res.json({ success: true, id: newRecord.id });
   } catch (error) {
-    console.error('Error fetching admin config:', error);
+    console.error('Error saving parking config:', error);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });
 
-// PUT /api/admin/config
-router.put('/config', async (req, res) => {
+router.put('/:id', authenticateToken, async (req, res) => {
   try {
-    const { parkingConfig, systemSettings } = req.body;
-
-    // ולידציות בסיסיות
-    if (!validateParkingConfig(parkingConfig)) {
-      return res.status(400).json({ success: false, error: 'Invalid parking configuration' });
+    const { id } = req.params;
+    const { parkingConfig } = req.body;
+    if (!parkingConfig) {
+      return res.status(400).json({ success: false, error: 'Missing parkingConfig' });
     }
 
-    const now = new Date();
-    console.log('🔄 Updating config at:', now.toISOString()); // לוג!
+    const configForValidation = { ...parkingConfig };
+    delete configForValidation.id;
+    delete configForValidation.lotId;
+    
+    const { error, value: validatedConfig } = ParkingConfigurationModel.schema.validate(configForValidation);
+    if (error) {
+      console.log('❌ Validation failed:', error);
+      return res.status(400).json({ success: false, error: 'Validation failed: ' + error.message });
+    }
+    console.log('✅ Validation passed with your model:', validatedConfig);
 
-    // עדכון המידע
-    mockParkingConfig = {
-      ...parkingConfig,
-      updatedAt: now, // ודא שזה מתעדכן!
-      updatedBy: 'admin'
-    };
+    const exists = await ParkingConfiguration.findByPk(id);
+    if (!exists) {
+      return res.status(404).json({ success: false, error: 'ID not found' });
+    }
 
-    mockSystemSettings = {
-      ...systemSettings,
-      updatedAt: now, // גם כאן!
-      updatedBy: 'admin'
-    };
+    // Use the validated config for updating, which includes auto-generated fields
+    const configForDatabase = { ...parkingConfig };
+    delete configForDatabase.id;
+    delete configForDatabase.lotId;
+    
+    // Add updated timestamp and user from authentication
+    configForDatabase.updatedAt = new Date();
+    const currentUser = (req as any).user;
+    configForDatabase.updatedBy = currentUser.email || `user_${currentUser.id}`;
 
-    console.log('✅ Config updated:', {
-      parkingUpdated: mockParkingConfig.updatedAt,
-      systemUpdated: mockSystemSettings.updatedAt
-    });
+    await exists.update(configForDatabase);
 
-    res.json({
-      success: true,
-      data: {
-        parkingConfig: mockParkingConfig,
-        systemSettings: mockSystemSettings
-      }
-    });
-  } catch (error) {
-    console.error('Error updating admin config:', error);
+    res.json({ success: true });
+  } catch (error: any) {
+    console.error('Error updating parking config:', error);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });
 
-// פונקציית ולידציה
-function validateParkingConfig(config: any): boolean {
-  if (!config) return false;
-  
-  // בדיקת פורמט זמן HH:mm
-  const timeRegex = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/;
-  
-  if (!timeRegex.test(config.operatingHours?.start) || 
-      !timeRegex.test(config.operatingHours?.end)) {
-    return false;
+router.get('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const parkingConfig = await ParkingConfiguration.findByPk(id);
+    
+    if (!parkingConfig) {
+      return res.status(404).json({ success: false, error: 'ID not found' });
+    }
+    
+    res.json({ success: true, parkingConfig: parkingConfig.toJSON() });
+  } catch (error) {
+    console.error('Error fetching parking config:', error);
+    res.status(500).json({ success: false, error: 'Internal server error' });
   }
+});
 
-  // בדיקות נוספות
-  if (config.totalSurfaceSpots < 0 || config.maxQueueSize < 0) {
-    return false;
+router.get('/', async (req, res) => { 
+  try {
+    const parkingConfigs = await ParkingConfiguration.findAll();
+    
+    const configsData = parkingConfigs.map(config => config.toJSON());
+    res.json({ success: true, parkingConfigs: configsData });
+  } catch (error) {
+    console.error('Error fetching parking configs:', error);
+    res.status(500).json({ success: false, error: 'Internal server error' });
   }
+});
 
-  return true;
-}
+router.delete('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const parkingConfig = await ParkingConfiguration.findByPk(id);
+    
+    if (!parkingConfig) {
+      return res.status(404).json({ success: false, error: 'Lot ID not found' });
+    }
+    
+    await parkingConfig.destroy();
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error deleting parking config:', error); 
+    res.status(500).json({ success: false, error: 'Internal server error' });
+  }
+});
 
 export default router;
