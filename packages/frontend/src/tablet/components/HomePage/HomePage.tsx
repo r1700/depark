@@ -9,7 +9,7 @@ export default function HomeScreen({ onSave }: { onSave?: () => void }) {
   const handleSave = () => {
     if (!floor) return;
     localStorage.setItem("floorNumber", floor);
-    navigate("/", { replace: true });
+    navigate("/tablet", { replace: true });
   };
 
   return (
