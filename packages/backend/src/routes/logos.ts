@@ -1,4 +1,5 @@
 
+import { Request } from 'express';
 import multer from 'multer';
 import path from 'path';
 import {Logo} from '../model/database-models/logo.model';
@@ -7,10 +8,10 @@ const router = Router();
 
 // Multer setup for file uploads
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
+  destination: function (req: Request, file: Express.Multer.File, cb: (error: Error | null, destination: string) => void) {
     cb(null, path.join(__dirname, '../../public/logos'));
   },
-  filename: function (req, file, cb) {
+  filename: function (req: Request, file: Express.Multer.File, cb: (error: Error | null, filename: string) => void) {
     cb(null, Date.now() + '-' + file.originalname);
   }
 });
@@ -23,17 +24,17 @@ router.post('/upload', upload.single('logo'), async (req, res) => {
   console.log('DEBUG: req.file:', req.file);
   console.log('DEBUG: updatedBy:', req.body.updatedBy);
   try {
-    if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
-    if(req.file.mimetype.startsWith('image/') === false) {
+  if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
+  if(req.file.mimetype.startsWith('image/') === false) {
       return res.status(400).json({ error: 'File must be an image' });
     }
     const allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp'];
-    const ext = path.extname(req.file.originalname).toLowerCase();
+  const ext = path.extname(req.file.originalname).toLowerCase();
     if (!allowedExtensions.includes(ext)) {
       return res.status(400).json({ error: 'File extension must be an image type (jpg, png, etc.)' });
     }
     const { updatedBy } = req.body;
-    const logoUrl = `/logos/${req.file.filename}`;
+  const logoUrl = `/logos/${req.file.filename}`;
     // עדכון או יצירה בטבלה
     const [logo, created] = await Logo.upsert({
       logoUrl,
