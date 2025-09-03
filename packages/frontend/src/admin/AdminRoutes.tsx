@@ -1,6 +1,6 @@
 // src/admin/AdminRoutes.tsx
 import React, { useCallback } from "react";
-import { Route, Navigate, useNavigate } from "react-router-dom";
+import { Route, Navigate, useNavigate, Routes } from "react-router-dom";
 import { Provider } from "react-redux";
 import { store } from "./app/store"; 
 
@@ -13,7 +13,8 @@ import AdminConfigPage from "./components/AdminConfigPage";
 import ParkingsPage from "./Pages/ParkingsPage";
 import ParkingStatsPage from "./app/pages/parkingStats/parkingStats";
 import SurfaceStatsPage from "./app/pages/surfaceStats/surfaceStats";
-
+import ReservedParking from "./Pages/ReservedParking";
+import AdmainConfigReservedparking from "../admin/components/AdmainConfigReservedparking";
 function getUserFromStorage() {
   try {
     const raw = localStorage.getItem("user");
@@ -36,6 +37,8 @@ const AdminRoutes: React.FC = () => {
 
   return (
     <>
+      <Provider store={store}>
+    <Routes>
       <Route path="login" element={<LoginScreen />} />
       <Route
         path=""
@@ -55,12 +58,10 @@ const AdminRoutes: React.FC = () => {
           !user ? (
             <Navigate to="/admin/login" replace />
           ) : (
-            <Provider store={store}>
               <Layout user={user} onLogout={handleLogout} />
-            </Provider>
-          )
-        }
-      >
+            )
+          }
+          >
         <Route path="admin" element={<AdminDashboard />} />
         <Route path="hr-dashboard" element={<HrDashboard />} />
         <Route path="admin-config" element={<AdminConfigPage />} />
@@ -71,6 +72,8 @@ const AdminRoutes: React.FC = () => {
           <Route path="parking-stats" element={<ParkingStatsPage />} />
           <Route path="surface-stats" element={<SurfaceStatsPage />} />
         </Route>
+        <Route path="reserved-parking" element={<ReservedParking />} />
+        <Route path="admin-config-reservedparking" element={<AdmainConfigReservedparking />} />
         <Route index element={
           String(user?.role) === "2" ? (
             <Navigate to="admin" replace />
@@ -80,6 +83,8 @@ const AdminRoutes: React.FC = () => {
         } />
       </Route>
       <Route path="*" element={<Navigate to="/admin" replace />} />
+      </Routes>
+        </Provider>
     </>
   );
 };

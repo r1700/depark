@@ -17,6 +17,7 @@ import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import MenuIcon from '@mui/icons-material/Menu';
 import LogoutIcon from '@mui/icons-material/Logout';
 import PeopleIcon from '@mui/icons-material/People';
+import ParkingIcon from '@mui/icons-material/LocalParking';
 import SettingsIcon from '@mui/icons-material/Settings';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import AssessmentIcon from '@mui/icons-material/Assessment';
@@ -77,6 +78,7 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
             ],
         },
         { text: 'Parking Config', icon: <SettingsIcon />, path: '/admin/layout/parkings' },
+        { text: 'Reserved Parking', icon: <ParkingIcon />, path: '/admin/layout/reserved-parking' },
         { text: 'Logo Management', icon: <SettingsIcon />, path: '/admin/layout/logos' },
         { text: 'Settings', icon: <SettingsIcon />, path: '/layout/users' },
             { text: 'Settings', icon: <SettingsIcon />, path: '/layout/users' },

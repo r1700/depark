@@ -2,6 +2,7 @@ import { useAppDispatch} from '../../../store';
 import { FieldConfig, GenericForm } from '../../../../components/forms/Form';
 import { addVehicle, updateVehicle } from '../vehicleThunks';
 
+
 interface VehicleFormData {
   licensePlate: string;
   user: string;

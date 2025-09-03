@@ -74,7 +74,7 @@ const ParkingsPage: React.FC<ParkingsPageProps> = () => {
         </Box>
 
         {/* Data Table */}
-        <DataTable
+        {/* <DataTable
           data={tableData}
           deletePath="/api/admin"
           showActions={true}
@@ -83,7 +83,7 @@ const ParkingsPage: React.FC<ParkingsPageProps> = () => {
               navigate(`/admin-config/${row.lotId || row.id}`);
             }
           }}
-        />
+        /> */}
 
         <Box sx={{ textAlign: "center", mb: 6 }}>
           <Button

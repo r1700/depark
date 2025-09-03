@@ -275,14 +275,14 @@ const GenericStatsChart: React.FC<GenericStatsChartProps> = ({
             <>
               {view === 'table' && (
                 <div className="table-wrapper">
-                  <DataTable
+                  {/* <DataTable
                     data={dataTablePayload}
                     onRowClick={onTableRowClick}
                     enablePagination={false}
                     showActions={false}
                     maxHeight={420}
                     dense={true}
-                  />
+                  /> */}
                 </div>
               )}
 
