@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { Container, Paper, Typography, Box, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import DataTable from "../components/table/table";
+// ...existing code...
 
-interface ParkingsPageProps {}
+interface ParkingsPageProps { }
 
 const ParkingsPage: React.FC<ParkingsPageProps> = () => {
   const navigate = useNavigate();
-  const [, setTableData] = useState<{
+  // ...existing code...
+  const [tableData, setTableData] = useState<{
     columns: Array<{ id: string; label: string }>;
     rows: Array<any>;
   }>({
@@ -16,6 +19,7 @@ const ParkingsPage: React.FC<ParkingsPageProps> = () => {
     ],
     rows: [],
   });
+  // ...existing code...
 
   useEffect(() => {
     const token = localStorage.getItem("token");

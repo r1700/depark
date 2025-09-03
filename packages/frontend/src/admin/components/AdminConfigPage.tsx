@@ -137,10 +137,10 @@ interface AdminConfigPageProps {}
 export default function AdminConfigPage({}: AdminConfigPageProps) {
   const navigate = useNavigate();
   const { lotId } = useParams<{ lotId?: string }>();
-  const [tableData, setTableData] = useState({
-    rows: [],  // רשימת השורות (נתונים)
-    columns: [] // רשימת העמודות (אם יש לך מידע על העמודות)
-  });
+  // const [tableData, setTableData] = useState({
+  //   rows: [],  // רשימת השורות (נתונים)
+  //   columns: [] // רשימת העמודות (אם יש לך מידע על העמודות)
+  // });
   // Helper function to get headers with authorization
   const getAuthHeaders = () => {
     return {
