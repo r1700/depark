@@ -65,8 +65,9 @@ export default function ReservedParkingConfigPage() {
   const location = useLocation();
   const dispatch = useAppDispatch();
   const users = useAppSelector((state) => state.users.users);
-  console.log("Users:", users);
-  
+useEffect(() => {
+  console.log("Users updated:", users);
+}, [users]);  
   // Detect if editing an existing record
   const [editId, setEditId] = useState<number | null>(null);
 
