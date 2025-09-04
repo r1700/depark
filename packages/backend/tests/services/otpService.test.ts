@@ -1,8 +1,6 @@
-import { sequelize, User, UserSession } from '../model/database-models/user.model';
-import {
-  createOtp, getOtpEntry, removeOtp,
-  verifyOtp, existUser, userIdByContact
-} from '../services/otp.service';
+import { baseuser, usersessions } from '../../src/model/database-models/user.model';
+import sequelize from '../../src/model/database-models/user.model';
+import { createOtp, getOtpEntry, removeOtp, verifyOtp, existUser, userIdByContact } from '../../src/services/otp.service';
 import { Op } from 'sequelize';
 
 describe('OTP Service', () => {
@@ -12,43 +10,35 @@ describe('OTP Service', () => {
   });
 
   const createUserAndSession = async (contact: string) => {
-  const id = `test_user_${Date.now()}`; // יצירת מזהה ייחודי ידני
+    const id = `test_user_${Date.now()}`; // יצירת מזהה ייחודי ידני
 
-  const user = await User.create({
-    id,
-    email: contact.includes('@') ? contact : '',
-    phone: contact.includes('@') ? '' : contact,
-    firstName: 'Test',
-    lastName: 'User',
-    department: 'TestDept',
-    employeeId: 'EMP123',
-    googleId: 'GOOG123',
-    status: 'active',
-    maxCarsAllowedParking: 1,
-    createdBy: 'tester',
-    approvedBy: 'approver',
-    approvedAt: new Date(),
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  });
+    const user = await baseuser.create({
+      id,
+      email: contact.includes('@') ? contact : '',
+      phone: contact.includes('@') ? '' : contact,
+      first_name: 'test',
+      last_name: 'test',
+      created_at: new Date(),
+      updated_at: new Date(),
+    });
 
-  await UserSession.create({
-    id: `test_session_${Date.now()}`,
-    userId: id,
-    userType: 'test',
-    token: 'token123',
-    refreshToken: 'refresh123',
-    expiresAt: new Date(Date.now() + 60 * 60 * 1000),
-    isActive: true,
-    ipAddress: '127.0.0.1',
-    userAgent: 'jest',
-    createdAt: new Date(),
-    lastActivity: new Date(),
-    tempToken: null,
-  });
+    await usersessions.create({
+      id: `test_session_${Date.now()}`,
+      baseuser_id: id,
+      user_type: 'test',
+      token: 'testtoken',
+      refresh_token: 'testrefresh',
+      expires_at: new Date(Date.now() + 60 * 60 * 1000),
+      is_active: true,
+      ip_address: '127.0.0.1',
+      user_agent: 'jest',
+      created_at: new Date(),
+      last_activity: new Date(),
+      temp_token: null,
+    });
 
-  return user;
-};
+    return user;
+  };
 
   test('createOtp should generate and store OTP', async () => {
     const contact = 'test@example.com';
@@ -57,9 +47,9 @@ describe('OTP Service', () => {
     const otp = await createOtp(contact);
     expect(otp).toHaveLength(6);
 
-    const session = await UserSession.findOne({ where: { userId: user.id } });
-    expect(session?.tempToken).toBe(otp);
-    expect(Number(session?.expiresAt)).toBeGreaterThan(Date.now());
+    const session = await usersessions.findOne({ where: { baseuser_id: user.id } });
+    expect(session?.temp_token).toBe(otp);
+    expect(Number(session?.expires_at)).toBeGreaterThan(Date.now());
   });
 
   test('getOtpEntry should return OTP entry', async () => {
@@ -78,8 +68,8 @@ describe('OTP Service', () => {
     await createOtp(contact);
     await removeOtp(contact);
 
-    const session = await UserSession.findOne({ where: { userId: user.id } });
-    expect(session?.tempToken).toBeNull();
+    const session = await usersessions.findOne({ where: { baseuser_id: user.id } });
+    expect(session?.temp_token).toBeNull();
   });
 
   test('verifyOtp should return true for valid OTP', async () => {
@@ -113,17 +103,19 @@ describe('OTP Service', () => {
   });
 
   afterAll(async () => {
-    await User.destroy({
+    await baseuser.destroy({
       where: {
         id: { [Op.like]: '%test%' }
       }
     });
-    await UserSession.destroy({
-       where: {
-         id: { [Op.like]: '%test%' }
-       }
+    await usersessions.destroy({
+      where: {
+        id: { [Op.like]: '%test%' }
+      }
     });
     await sequelize.close();
   });
-
+  
 });
+
+

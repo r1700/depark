@@ -8,7 +8,7 @@ import {
   fetchParkingStats,
   fetchParkingDayDetails,
   clearParkingDayDetails,
-} from '../../pages/parkingStats/parkingStatsSlice';
+} from './parkingStatsSlice';
 
 interface ParkingStatItem {
   day: string;
@@ -27,18 +27,16 @@ const ParkingStatsPage: React.FC = () => {
     error,
     dayData: rawDayData,
     dayLoading,
-    dayError,
     selectedDay,
   } = useAppSelector((state) => state.parkingStats);
 
   // AbortControllers
   const mainAbortRef = useRef<AbortController | null>(null);
-  const dayAbortRef = useRef<AbortController | null>(null);
+  // const dayAbortRef = useRef<AbortController | null>(null);
 
   // UI state
   const [selectedRow, setSelectedRow] = useState<string | null>(null);
   const [retryMain, setRetryMain] = useState(0);
-  const [retryDay, setRetryDay] = useState(0);
 
   // Main fetch with abort
   useEffect(() => {
@@ -177,10 +175,10 @@ const ParkingStatsPage: React.FC = () => {
     </div>
   );
 
-  // Highlight selected row
-  const getRowProps = useCallback((row: any) => ({
-    style: selectedRow && row.period === selectedRow ? { background: '#e3f2fd' } : undefined
-  }), [selectedRow]);
+  // // Highlight selected row
+  // const getRowProps = useCallback((row: any) => ({
+  //   style: selectedRow && row.period === selectedRow ? { background: '#e3f2fd' } : undefined
+  // }), [selectedRow]);
 
   // Main render
   if (loading) return renderLoading();
@@ -231,7 +229,7 @@ const ParkingStatsPage: React.FC = () => {
             tableRows={selectedDayData}
           />
           {dayLoading && renderLoading(18)}
-          {dayError && renderError(`Error loading day details: ${String(dayError)}`, () => setRetryDay(r => r + 1))}
+          
         </div>
       ) : (
         <GenericStatsChart
