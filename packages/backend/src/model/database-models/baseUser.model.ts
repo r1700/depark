@@ -1,7 +1,7 @@
 
 import { DataTypes, Model, InferAttributes, InferCreationAttributes, CreationOptional } from 'sequelize';
 import sequelize from '../../config/sequelize';
-
+import { UserStatusEnum } from '../../enums/baseuser';
 export class BaseUser extends Model<
   InferAttributes<BaseUser>,
   InferCreationAttributes<BaseUser>
@@ -13,6 +13,8 @@ export class BaseUser extends Model<
   declare created_at: Date;
   declare updated_at: Date;
   declare phone: string | null;
+  declare status?: UserStatusEnum | null;
+  declare approved_at?: Date | null;
 }
 
 BaseUser.init({
@@ -47,6 +49,15 @@ id: {
   updated_at: {
     type: DataTypes.DATE,
     allowNull: false
+  },
+  status: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    defaultValue: UserStatusEnum.Pending
+  },
+  approved_at: {
+    type: DataTypes.DATE,
+    allowNull: true
   }
 }, {
   sequelize,
