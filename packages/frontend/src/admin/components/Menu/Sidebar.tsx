@@ -23,6 +23,7 @@ import AssessmentIcon from '@mui/icons-material/Assessment';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import LocalParkingIcon from '@mui/icons-material/LocalParking';
+import ParkingIcon from '@mui/icons-material/LocalParking';
 import { LogoDev } from '@mui/icons-material';
 const drawerWidth = 240;
 interface User {
@@ -59,20 +60,21 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
         path?: string;
         subMenu?: Array<{ text: string; path: string }>;
     }> = [
-        { text: 'Admin Dashboard', icon: <PeopleIcon />, path: '/admin/layout/admin' },
-        { text: 'HR Dashboard', icon: <DirectionsCarIcon />, path: '/admin/layout/hr-dashboard' },
-        // { text: 'Admin Config', icon: <AssessmentIcon />, path: '/admin/layout/admin-config' },
-        { text: 'Parkings', icon: <LocalParkingIcon />, path: '/admin/layout/parkings' },
-        { text: 'Logo Management', icon: <LogoDev />, path: '/admin/layout/logo-management' },
-        {
-            text: 'Reports',
-            icon: <AssessmentIcon />,
-            subMenu: [
-                { text: 'Parking Stats', path: '/admin/layout/reports/parking-stats' },
-                { text: 'Surface Stats', path: '/admin/layout/reports/surface-stats' },
-            ],
-        },
-    ];
+            { text: 'Admin Dashboard', icon: <PeopleIcon />, path: '/admin/layout/admin' },
+            { text: 'HR Dashboard', icon: <DirectionsCarIcon />, path: '/admin/layout/hr-dashboard' },
+            // { text: 'Admin Config', icon: <AssessmentIcon />, path: '/admin/layout/admin-config' },
+            { text: 'Parkings', icon: <LocalParkingIcon />, path: '/admin/layout/parkings' },
+            { text: 'Reserved Parking', icon: <ParkingIcon />, path: '/admin/layout/reserved-parking' },
+            { text: 'Logo Management', icon: <LogoDev />, path: '/admin/layout/logo-management' },
+            {
+                text: 'Reports',
+                icon: <AssessmentIcon />,
+                subMenu: [
+                    { text: 'Parking Stats', path: '/admin/layout/reports/parking-stats' },
+                    { text: 'Surface Stats', path: '/admin/layout/reports/surface-stats' },
+                ],
+            },
+        ];
 
 
     return (
