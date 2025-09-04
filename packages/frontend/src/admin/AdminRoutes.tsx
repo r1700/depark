@@ -1,8 +1,7 @@
-// src/admin/AdminRoutes.tsx
 import React, { useCallback } from "react";
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { Provider } from "react-redux";
-import { store } from "./app/store"; 
+import { store } from "./app/store";
 
 import LoginScreen from "./components/screen-login/LoginScreen";
 import Layout from "./components/layout/layout";
@@ -11,7 +10,9 @@ import HrDashboard from "./components/hrDashboard/HrDashboard";
 import AdminConfigPage from "./components/AdminConfigPage";
 import ParkingsPage from "./Pages/ParkingsPage";
 import ParkingStatsPage from "./app/pages/parkingStats/parkingStats";
-import SurfaceStatsPage from "./app/pages/surfaceStats/surfaceStats";
+import UnknownVehicles from "./components/vehicleModel/vehicleModel";
+import ResolvePage from "./components/vehicleModel/ResolvePage";
+// import SurfaceStatsPage from "./app/pages/surfaceStats/surfaceStats";
 
 function getUserFromStorage() {
   try {
@@ -68,11 +69,16 @@ const AdminRoutes: React.FC = () => {
         <Route path="hr-dashboard" element={<HrDashboard />} />
         <Route path="admin-config" element={<AdminConfigPage />} />
         <Route path="parkings" element={<ParkingsPage />} />
+        <Route path="unknown-vehicles" element={<UnknownVehicles />} />
+
+        {/* Resolve modal routes inside layout so it opens over Layout */}
+        <Route path="resolve" element={<ResolvePage />} />
+        <Route path="resolve/:id" element={<ResolvePage />} />
 
         {/* Reports as children of layout */}
         <Route path="reports">
           <Route path="parking-stats" element={<ParkingStatsPage />} />
-          <Route path="surface-stats" element={<SurfaceStatsPage />} />
+          {/* <Route path="surface-stats" element={<SurfaceStatsPage />} /> */}
         </Route>
 
         <Route

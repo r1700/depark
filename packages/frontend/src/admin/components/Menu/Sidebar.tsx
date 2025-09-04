@@ -71,12 +71,12 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
         subMenu?: Array<{ text: string; path: string; allowed?: RoleName[] }>;
     }> = [
             { text: 'Users', icon: <PeopleIcon />, path: '/layout/users', allowed: ['admin'] }, // רק מנהל
-            { text: 'Vehicles', icon: <DirectionsCarIcon />, path: '/layout/vehicles', allowed: ['admin', 'hr'] }, // שניהם
+            { text: 'Vehicles', icon: <DirectionsCarIcon />, path: '/admin/layout/unknown-vehicles', allowed: ['hr'] }, // שניהם
             {
                 text: 'Reports',
                 icon: <AssessmentIcon />,
                 path: '',
-                allowed: ['admin', 'hr'], // שניהם רואים Reports
+                allowed: ['admin', 'hr'], 
                 subMenu: [
                     { text: 'Parking Stats', path: '/admin/layout/reports/parking-stats', allowed: ['admin'] },
                     { text: 'Surface Stats', path: '/admin/layout/reports/surface-stats', allowed: ['admin', 'hr'] },
