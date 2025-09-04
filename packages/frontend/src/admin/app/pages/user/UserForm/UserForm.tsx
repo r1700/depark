@@ -9,7 +9,7 @@ interface UserFormData {
   maxCarsAllowedParking: number;
 }
 
-const userFields: FieldConfig<UserFormData>[] = [
+const userFields: FieldConfig[] = [
   { name: 'firstName', label: 'First Name', required: true },
   { name: 'lastName', label: 'Last Name', required: true },
   { name: 'email', label: 'Email', type: 'email', required: true },

@@ -25,8 +25,6 @@ import LocalParkingIcon from '@mui/icons-material/LocalParking';
 import { LogoDev } from '@mui/icons-material';
 const drawerWidth = 240;
 
-type RoleName = 'admin' | 'hr' | 'guest';
-
 interface User {
     firstName: string;
     lastName: string;
@@ -38,14 +36,6 @@ interface SidebarProps {
     onLogout: () => void;
 }
 
-/** normalize role from various representations to 'admin'|'hr'|'guest' */
-function normalizeRole(role: number | string | undefined): RoleName {
-    if (role === undefined || role === null) return 'guest';
-    const r = String(role).toLowerCase();
-    if (r === '2' || r === 'admin' || r.includes('admin')) return 'admin';
-    if (r === '1' || r === 'hr' || r.includes('hr') || r.includes('human')) return 'hr';
-    return 'guest';
-}
 
 const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
     const [open, setOpen] = useState<boolean>(true);
@@ -58,7 +48,6 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
         }
     }, [open]);
 
-    const userRole = normalizeRole(user?.role);
 
     const getUserInitials = (): string => {
         if (!user || !user.firstName || !user.lastName) return '?';
@@ -87,8 +76,6 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
         },
     ];
 
-    // All menu items are always visible
-    const isAllowed = () => true;
 
     return (
         <Drawer
