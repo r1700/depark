@@ -725,7 +725,7 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
             <Box sx={{ textAlign: 'left', mb: 2 }}>
               <Button
                 variant="outlined"
-                onClick={() => navigate('/parkings')}
+                onClick={() => navigate('/admin/layout/parkings')}
                 sx={{ 
                   color: 'primary.main',
                   borderColor: 'primary.main',

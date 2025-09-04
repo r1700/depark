@@ -82,11 +82,11 @@ const ParkingsPage: React.FC<ParkingsPageProps> = () => {
           ]}
           onRowClick={(row) => {
             if (row.lotId || row.id) {
-              navigate(`/admin-config/${row.lotId || row.id}`);
+              navigate(`/admin/layout/admin-config/${row.lotId || row.id}`);
             }
           }}
           onEdit={(row) => {
-            navigate(`/admin-config/${row.lotId || row.id}`);
+            navigate(`/admin/layout/admin-config/${row.lotId || row.id}`);
           }}
           onSubmit={async (updated) => {
             const token = localStorage.getItem("token");
@@ -117,7 +117,7 @@ const ParkingsPage: React.FC<ParkingsPageProps> = () => {
           <Button
             onClick={() => {
               console.log("Add New Lot clicked");
-              navigate("/admin-config");
+              navigate("/admin/layout/admin-config");
             }}
             sx={{
               minWidth: 500,
