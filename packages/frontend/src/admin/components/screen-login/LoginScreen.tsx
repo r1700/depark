@@ -6,6 +6,7 @@ import * as yup from "yup";
 import {useNavigate} from "react-router-dom";
 import GoogleAuth from "../google-auth/GoogleAuth";
 
+const API_BASE = process.env.REACT_APP_API_URL ;
 
 interface IFormInputs {
     email: string;
@@ -32,9 +33,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({onLogin}) => {
 
     useEffect(() => {
         if (login) {
-            const role = JSON.parse(localStorage.getItem("user") || "{}").role;
-            if (role === 1) navigate("/layout/hr-dashboard");
-            else if (role === 2) navigate("/layout/admin-dashboard");
+            navigate("/admin", {replace: true});
         }
     }, [login, navigate]);
 
@@ -49,7 +48,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({onLogin}) => {
         setLoading(true);
 
         try {
-            const response = await fetch("http://localhost:3001/auth/login", {
+            const response = await fetch(`${API_BASE}/auth/login`, {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify(data),
@@ -78,6 +77,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({onLogin}) => {
         } catch (error) {
             setLoading(false);
             setServerError("Network error: " + (error as Error).message);
+            console.log("Login error:", error);
         }
     };
 

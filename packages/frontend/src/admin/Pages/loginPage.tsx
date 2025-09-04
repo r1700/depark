@@ -1,6 +1,4 @@
-
-import React, { useState, useCallback } from "react";
-import LoginScreen from "../components/screen-login/LoginScreen";
+import React, { useCallback, useState } from "react";
 import { Box, Button, Container, Typography } from "@mui/material";
 
 const LoginPage: React.FC = () => {
@@ -40,7 +38,6 @@ const LoginPage: React.FC = () => {
           </Button>
         </Box>
       ) : (
-        // כאן אנחנו מוסיפים את LoginScreen עם פרופס onLogin
         <LoginScreen onLogin={handleLogin} />
       )}
     </Container>

@@ -22,8 +22,11 @@ import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
+import LocalParkingIcon from '@mui/icons-material/LocalParking';
+import { LogoDev } from '@mui/icons-material';
 const drawerWidth = 240;
 type RoleName = 'admin' | 'hr' | 'guest';
+
 interface User {
     firstName: string;
     lastName: string;
@@ -41,6 +44,8 @@ function normalizeRole(role: number | string | undefined): RoleName {
     if (r === '1' || r === 'hr' || r.includes('hr') || r.includes('human')) return 'hr';
     return 'guest';
 }
+
+
 const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
     const [open, setOpen] = useState<boolean>(true);
     const [reportsOpen, setReportsOpen] = useState<boolean>(false);
@@ -62,28 +67,24 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
         text: string;
         icon?: React.ReactNode;
         path?: string;
-        allowed?: RoleName[];
-        subMenu?: Array<{ text: string; path: string; allowed?: RoleName[] }>;
+        subMenu?: Array<{ text: string; path: string }>;
     }> = [
-        { text: 'Users', icon: <PeopleIcon />, path: '/layout/users' },
-        { text: 'Vehicles', icon: <DirectionsCarIcon />, path: '/layout/vehicles' },
+        { text: 'Admin Dashboard', icon: <PeopleIcon />, path: '/admin/layout/admin' },
+        { text: 'HR Dashboard', icon: <DirectionsCarIcon />, path: '/admin/layout/hr-dashboard' },
+        // { text: 'Admin Config', icon: <AssessmentIcon />, path: '/admin/layout/admin-config' },
+        { text: 'Parkings', icon: <LocalParkingIcon />, path: '/admin/layout/parkings' },
+        { text: 'Logo Management', icon: <LogoDev />, path: '/admin/layout/logo-management' },
         {
             text: 'Reports',
             icon: <AssessmentIcon />,
-            path: '',
             subMenu: [
-                { text: 'Parking Stats', path: '/layout/reports/parking-stats' },
-                { text: 'Surface Stats', path: '/layout/reports/surface-stats' },
+                { text: 'Parking Stats', path: '/admin/layout/reports/parking-stats' },
+                { text: 'Surface Stats', path: '/admin/layout/reports/surface-stats' },
             ],
         },
-        { text: 'Parking Config', icon: <SettingsIcon />, path: '/admin/layout/parkings' },
-        { text: 'Logo Management', icon: <SettingsIcon />, path: '/admin/layout/logos' },
-        { text: 'Settings', icon: <SettingsIcon />, path: '/layout/users' },
-            { text: 'Settings', icon: <SettingsIcon />, path: '/layout/users' },
-        ];
-    // helper: check if current user role allowed to see item
-    // כל אחד יכול לראות הכל
-    const isAllowed = () => true;
+    ];
+
+
     return (
         <Drawer
             variant="permanent"
@@ -129,10 +130,9 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
             )}
             <List>
                 {menuItems.map((item) => {
-                    // skip item if not allowed for this user
-                    if (!isAllowed()) return null;
-                    // determine visible subMenu after filtering by allowed
-                    const visibleSubMenu = item.subMenu?.filter(() => isAllowed()) ?? [];
+                    // all items are allowed
+                    const visibleSubMenu = item.subMenu ?? [];
+
                     return (
                         <React.Fragment key={item.text}>
                             <ListItemButton
@@ -189,7 +189,7 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
                     <Avatar sx={{ bgcolor: '#1565C0', mr: 2, width: 40, height: 40 }}>{getUserInitials()}</Avatar>
                     {open && (
                         <Typography noWrap>
-                            {user.firstName} {user.lastName}
+                            {user && user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : 'Guest'}
                         </Typography>
                     )}
                 </Box>

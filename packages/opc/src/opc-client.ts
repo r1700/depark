@@ -26,6 +26,8 @@ const nodesToMonitor = [
   "ns=1;s=parkingSpot",
   "ns=1;s=licensePlateExit",
   "ns=1;s=licensePlateEntry",
+  "ns=1;s=ActiveFaultList", // רשימת תקלות
+  "ns=1;s=Queue",
 ];
 // Function to check if the session is valid
 function isChannelValid(session: ClientSession | null): boolean {
@@ -283,3 +285,4 @@ process.on("SIGINT", async () => {
   await closeOpcConnection();
   process.exit(0);
 });
+
