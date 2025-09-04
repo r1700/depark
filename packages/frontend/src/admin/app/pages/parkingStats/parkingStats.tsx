@@ -38,8 +38,7 @@ const ParkingStatsPage: React.FC = () => {
   // UI state
   const [selectedRow, setSelectedRow] = useState<string | null>(null);
   const [retryMain, setRetryMain] = useState(0);
- // const [, setRetryDay] = useState(0);
-
+  const [, setRetryDay] = useState(0);
 
   // Main fetch with abort
   useEffect(() => {
