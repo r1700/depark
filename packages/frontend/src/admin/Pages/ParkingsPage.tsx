@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { Container, Paper, Typography, Box, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import DataTable from "../components/table/table";
 
 interface ParkingsPageProps {}
 
 const ParkingsPage: React.FC<ParkingsPageProps> = () => {
   const navigate = useNavigate();
-  const [, setTableData] = useState<{
+  const [tableData, setTableData] = useState<{
     columns: Array<{ id: string; label: string }>;
     rows: Array<any>;
   }>({
@@ -96,14 +97,49 @@ const ParkingsPage: React.FC<ParkingsPageProps> = () => {
           data={tableData}
 >>>>>>> 3d4988bc02d78e861fc434903feb67debaf754c0
           deletePath="/api/admin"
-          showActions={true}
+          showEdit={true}
+          showDelete={true}
+          fields={[
+            { name: "facilityName", label: "Facility Name", type: "text", required: true },
+            // ניתן להוסיף כאן שדות נוספים לפי הצורך
+          ]}
           onRowClick={(row) => {
             if (row.lotId || row.id) {
+<<<<<<< HEAD
 <<<<<<< HEAD
               // Prefer lotId if exists, else fallback to id
 =======
 >>>>>>> 3d4988bc02d78e861fc434903feb67debaf754c0
               navigate(`/admin-config/${row.lotId || row.id}`);
+=======
+              navigate(`/admin/layout/admin-config/${row.lotId || row.id}`);
+            }
+          }}
+          onEdit={(row) => {
+            navigate(`/admin/layout/admin-config/${row.lotId || row.id}`);
+          }}
+          onSubmit={async (updated) => {
+            const token = localStorage.getItem("token");
+            try {
+              const response = await fetch(`/api/admin/${updated.id}`, {
+                method: "PUT",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: token ? `Bearer ${token}` : "",
+                },
+                body: JSON.stringify({ parkingConfig: updated }),
+              });
+              if (response.ok) {
+                setTableData((prev) => ({
+                  ...prev,
+                  rows: prev.rows.map((row) => row.id === updated.id ? updated : row),
+                }));
+              } else {
+                alert("Failed to update parking lot");
+              }
+            } catch (err) {
+              alert("Error updating parking lot");
+>>>>>>> 49e060f5f2082d7869737e034486b1b08d713422
             }
           }}
         />
@@ -144,7 +180,7 @@ const ParkingsPage: React.FC<ParkingsPageProps> = () => {
           <Button
             onClick={() => {
               console.log("Add New Lot clicked");
-              navigate("/admin-config");
+              navigate("/admin/layout/admin-config");
             }}
             sx={{
               minWidth: 500,

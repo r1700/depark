@@ -26,7 +26,11 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import { LogoDev } from '@mui/icons-material';
 const drawerWidth = 240;
+<<<<<<< HEAD
 type RoleName = 'admin' | 'hr' | 'guest';
+=======
+
+>>>>>>> 49e060f5f2082d7869737e034486b1b08d713422
 interface User {
     firstName: string;
     lastName: string;
@@ -36,6 +40,7 @@ interface SidebarProps {
     user: User;
     onLogout: () => void;
 }
+<<<<<<< HEAD
 /** normalize role from various representations to 'admin'|'hr'|'guest' */
 function normalizeRole(role: number | string | undefined): RoleName {
     if (role === undefined || role === null) return 'guest';
@@ -44,6 +49,10 @@ function normalizeRole(role: number | string | undefined): RoleName {
     if (r === '1' || r === 'hr' || r.includes('hr') || r.includes('human')) return 'hr';
     return 'guest';
 }
+=======
+
+
+>>>>>>> 49e060f5f2082d7869737e034486b1b08d713422
 const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
     const [open, setOpen] = useState<boolean>(true);
     const [reportsOpen, setReportsOpen] = useState<boolean>(false);
@@ -53,7 +62,12 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
             setReportsOpen(false);
         }
     }, [open]);
+<<<<<<< HEAD
     const userRole = normalizeRole(user?.role);
+=======
+
+
+>>>>>>> 49e060f5f2082d7869737e034486b1b08d713422
     const getUserInitials = (): string => {
         if (!user || !user.firstName || !user.lastName) return '?';
         return `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
@@ -81,8 +95,6 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
         },
     ];
 
-    // All menu items are always visible
-    const isAllowed = () => true;
 
     return (
         <Drawer

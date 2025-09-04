@@ -1,4 +1,3 @@
-// config/config.ts
 import path from 'path';
 import dbConfig from './env';
 

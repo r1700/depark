@@ -1,4 +1,3 @@
-// config/sequelize.config.ts
 import path from 'path';
 import { appDbConfig } from './config';
 
@@ -19,5 +18,4 @@ export default {
     },
   },
 };
-
 

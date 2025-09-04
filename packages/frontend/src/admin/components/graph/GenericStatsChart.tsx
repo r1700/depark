@@ -279,7 +279,8 @@ const GenericStatsChart: React.FC<GenericStatsChartProps> = ({
                     data={dataTablePayload}
                     onRowClick={onTableRowClick}
                     enablePagination={false}
-                    showActions={false}
+                   showDelete={false}
+                   showEdit={false}
                     maxHeight={420}
                     dense={true}
                   />

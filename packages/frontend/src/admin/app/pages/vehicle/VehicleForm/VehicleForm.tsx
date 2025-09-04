@@ -22,7 +22,7 @@ const AddOrEditVehicleForm = ({ onClose, vehicleToEdit = null }
   const dispatch = useAppDispatch();
   const users: any[] =  []
 
-  const VehicleFields: FieldConfig<VehicleFormData>[] = [
+  const VehicleFields: FieldConfig[] = [
     { name: 'licensePlate', label: 'License Plate', required: true, type: 'text' },
     {
       name: 'user', label: 'User', required: true, type: 'select', options: users.map(user => ({
