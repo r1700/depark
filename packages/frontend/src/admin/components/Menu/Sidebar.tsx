@@ -23,6 +23,8 @@ import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
+import LocalParkingIcon from '@mui/icons-material/LocalParking';
+import { LogoDev } from '@mui/icons-material';
 const drawerWidth = 240;
 type RoleName = 'admin' | 'hr' | 'guest';
 interface User {
@@ -59,6 +61,7 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
         return `${first}${last}`.toUpperCase();
     };
     // menu items now include optional `allowed` array with roles that can see the item
+
     const menuItems: Array<{
         text: string;
         icon?: React.ReactNode;
@@ -86,6 +89,7 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
     // helper: check if current user role allowed to see item
     // כל אחד יכול לראות הכל
     const isAllowed = () => true;
+
     return (
         <Drawer
             variant="permanent"
@@ -135,7 +139,7 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
                     if (!isAllowed()) return null;
                     // determine visible subMenu after filtering by allowed
                     const visibleSubMenu = item.subMenu?.filter(() => isAllowed()) ?? [];
-                    return (
+     return (
                         <React.Fragment key={item.text}>
                             <ListItemButton
                                 onClick={() => {
@@ -191,7 +195,7 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
                     <Avatar sx={{ bgcolor: '#1565C0', mr: 2, width: 40, height: 40 }}>{getUserInitials()}</Avatar>
                     {open && (
                         <Typography noWrap>
-                            {user.firstName} {user.lastName}
+                            {user && user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : 'Guest'}
                         </Typography>
                     )}
                 </Box>

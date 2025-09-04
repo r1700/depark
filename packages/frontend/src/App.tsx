@@ -14,6 +14,7 @@ import ResetPassword from './admin/app/pages/resetPassword/ResetPassword';
 import AdminRoutes from "./admin/AdminRoutes";
 
 const user = JSON.parse(localStorage.getItem("user") || '{}');
+
 const App: React.FC = () => {
 
   return (

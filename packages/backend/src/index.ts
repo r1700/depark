@@ -8,9 +8,12 @@ import healthRoutes from './routes/health';
 import passwordRoutes from './routes/user.routes';
 import vehicleRoutes from './routes/vehicle';
 import exportToCSV from './routes/exportToCSV';
-// import authRoutes from './routes/auth';
 import userGoogleAuthRoutes from './routes/userGoogle-auth';
 import Exit from './routes/opc/exit'; // Import the exit route
+import faultsRouter from './routes/opc/faults';
+import techniciansRoutes from "./routes/opc/technicians";
+import http from 'http';
+import { WebSocketServer } from 'ws';
 import session from 'express-session';
 import adminConfigRouter from './routes/adminConfig';
 import ResevedParking from './routes/reservedparkingApi';
@@ -26,6 +29,8 @@ import vehicle from './routes/vehicleRoute';
 import GoogleAuth from './routes/google-auth';
 import parkingReport from './routes/parkingStat';
 import surfaceReport from './routes/surfaceStat';
+import retrieveRoute from './routes/RetrivalQueue';
+import otpRoutes from './routes/otp.server';
 
 import path from 'path';
 const app = express();
@@ -44,7 +49,6 @@ app.use(session({
 const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:3000';
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 
-
 app.use(cors({
   origin: CORS_ORIGIN,
   credentials: true,
@@ -57,6 +61,15 @@ if (!GOOGLE_CLIENT_ID) {
 
 app.use(cors({ origin: CORS_ORIGIN, credentials: true }));
 app.use(express.json());
+
+
+// Global request logger — מדפיס כל בקשה נכנסת
+app.use((req, res, next) => {
+    console.log(`[REQ] ${ new Date().toISOString() } ${ req.method } ${ req.originalUrl } body:`, req.body);
+    next();
+});
+
+
 app.use(loggerRoutes);
 app.use('/api/health', healthRoutes);
 app.use('/api/reservedparking', ResevedParking);
@@ -72,6 +85,8 @@ app.use('/OAuth', GoogleAuth);
 app.use('/api/admin', adminConfigRouter);
 app.use('/api/parking-stats', parkingReport);
 app.use('/api/surface-stats', surfaceReport);
+app.use('/api/tablet', retrieveRoute);
+app.use('/api/otp', otpRoutes);
 
 app.use('/api/logos', logoRouter);
 app.use('/api/screentypes', screenTypeRouter);
@@ -100,37 +115,38 @@ if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
   console.log(':memo: Using mock data - Supabase not configured');
 }
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`🌐 CORS enabled for: ${CORS_ORIGIN}`);
-  console.log('✅ APIs ready!');
 
-  console.log('🔗 Available routes:');
-  console.log('   GET  /');
-  console.log('   GET  /health');
-  console.log('   GET  /api/health');
-  console.log('   POST /api/password/reset');
-  console.log('   GET  /api/vehicle');
-  console.log('   GET  /api/exportToCSV');
+    console.log(`🚀 Server running on port ${ PORT }`);
+    console.log(`📝 Environment: ${ process.env.NODE_ENV || 'development' }`);
+    console.log(`🌐 CORS enabled for: ${ CORS_ORIGIN }`);
+    console.log('✅ APIs ready!');
 
-  if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
-    console.log('🗄️ Database: Supabase configured');
-  } else {
-    console.log('📝 Database: Using mock data');
-  }
-  console.log('✅ Password reset API ready!');
-  console.log('🔗 Available routes:');
-  console.log('   GET  /');
-  console.log('   GET  /health');
-  console.log('   GET  /api/auth/users');
-  console.log('   POST /api/auth/register');
-  console.log('   POST /api/auth/login');
-  console.log('   GET  /api/admin/config');
-  console.log('   PUT  /api/admin/config');
-  console.log('   POST /api/logos');
-  if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
-    console.log(':file_cabinet: Initializing database...');
-  } else {
-    console.log(':memo: Using mock data - Supabase not configured');
-  }
+    console.log('🔗 Available routes:');
+    console.log('   GET  /');
+    console.log('   GET  /health');
+    console.log('   GET  /api/health');
+    console.log('   POST /api/password/reset');
+    console.log('   GET  /api/vehicle');
+    console.log('   GET  /api/exportToCSV');
+
+    if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
+        console.log('🗄️ Database: Supabase configured');
+    } else {
+        console.log('📝 Database: Using mock data');
+    }
+    console.log('✅ Password reset API ready!');
+    console.log('🔗 Available routes:');
+    console.log('   GET  /');
+    console.log('   GET  /health');
+    console.log('   GET  /api/auth/users');
+    console.log('   POST /api/auth/register');
+    console.log('   POST /api/auth/login');
+    console.log('   GET  /api/admin/config');
+    console.log('   PUT  /api/admin/config');
+
+    if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
+        console.log(':file_cabinet: Initializing database...');
+    } else {
+        console.log(':memo: Using mock data - Supabase not configured');
+    }
 });

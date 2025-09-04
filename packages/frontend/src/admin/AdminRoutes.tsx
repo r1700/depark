@@ -15,6 +15,7 @@ import ParkingStatsPage from "./app/pages/parkingStats/parkingStats";
 import SurfaceStatsPage from "./app/pages/surfaceStats/surfaceStats";
 import ReservedParking from "./Pages/ReservedParking";
 import AdmainConfigReservedparking from "../admin/components/AdmainConfigReservedparking";
+
 function getUserFromStorage() {
   try {
     const raw = localStorage.getItem("user");
@@ -38,17 +39,20 @@ const AdminRoutes: React.FC = () => {
   return (
     <>
       <Provider store={store}>
+
     <Routes>
       <Route path="login" element={<LoginScreen />} />
       <Route
         path=""
         element={
-          !user ? (
-            <Navigate to="login" replace />
-          ) : String(user.role) === "2" ? (
+          String(user?.role) === "2" ? (
             <Navigate to="layout/admin" replace />
-          ) : (
+          ) : String(user?.role) === "1" ? (
             <Navigate to="layout/hr-dashboard" replace />
+          ) : (
+            <Provider store={store}>
+              <Layout user={user} onLogout={handleLogout} />
+            </Provider>
           )
         }
       />
@@ -62,12 +66,16 @@ const AdminRoutes: React.FC = () => {
             )
           }
           >
+
+
         <Route path="admin" element={<AdminDashboard />} />
         <Route path="hr-dashboard" element={<HrDashboard />} />
         <Route path="admin-config" element={<AdminConfigPage />} />
         <Route path="admin-config/:lotId" element={<AdminConfigPage />} />
         <Route path="parkings" element={<ParkingsPage />} />
         <Route path="logos" element={<AdminLogoManagement />} />
+        <Route path="logo-management" element={<AdminLogoManagement />} />
+
         <Route path="reports">
           <Route path="parking-stats" element={<ParkingStatsPage />} />
           <Route path="surface-stats" element={<SurfaceStatsPage />} />
@@ -85,6 +93,7 @@ const AdminRoutes: React.FC = () => {
       <Route path="*" element={<Navigate to="/admin" replace />} />
       </Routes>
         </Provider>
+
     </>
   );
 };

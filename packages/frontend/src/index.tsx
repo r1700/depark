@@ -4,10 +4,6 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import HrDashboard from './admin/components/hrDashboard/HrDashboard';
-import AdminDashboard from './admin/components/adminDashboard/AdminDashboard';
-import Layout from './admin/components/layout/layout';
-import UsersPage from './admin/Pages/UsersPage';
 import { VehicleRow } from './mobile/components/mobile-user/VehicleList';
 import Otp from './mobile/components/otp';
 import HomePage from './tablet/pages/HomePage';
@@ -17,12 +13,6 @@ import LoginPage from './admin/Pages/loginPage';
 import ForgotPassword from './admin/app/pages/resetPassword/ForgotPassword';
 import ResetPassword from './admin/app/pages/resetPassword/ResetPassword';
 import AdminRoutes from './admin/AdminRoutes';
-
-const user = JSON.parse(localStorage.getItem("user") || "{}");
-
-const handleLogout = () => {
-  localStorage.removeItem(user);
-};
 
 const routers = createBrowserRouter([
   {
@@ -38,13 +28,6 @@ const routers = createBrowserRouter([
       { path: 'reset-password', element: <ResetPassword /> },
       { path: 'VehicleRow', element: <VehicleRow /> },
       
-      {
-        path: 'layout', element: <Layout user={user} onLogout={handleLogout} />, children: [
-          { path: 'admin-dashboard', element: <AdminDashboard /> },
-          { path: 'hr-dashboard', element: <HrDashboard /> },
-          { path: 'users', element: <UsersPage />},
-        ]
-      },
     ]
   }
 ])
@@ -52,6 +35,7 @@ const routers = createBrowserRouter([
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
+
 root.render(
   <React.StrictMode>
     

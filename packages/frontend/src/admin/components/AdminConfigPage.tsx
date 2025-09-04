@@ -137,10 +137,19 @@ interface AdminConfigPageProps {}
 export default function AdminConfigPage({}: AdminConfigPageProps) {
   const navigate = useNavigate();
   const { lotId } = useParams<{ lotId?: string }>();
-  // const [tableData, setTableData] = useState({
-  //   rows: [],  // רשימת השורות (נתונים)
-  //   columns: [] // רשימת העמודות (אם יש לך מידע על העמודות)
-  // });
+
+  interface TableRow {
+    id: string;
+    facilityName: string;
+  }
+
+  const [tableData, setTableData] = useState<{
+    rows: TableRow[];
+    columns: any[];
+  }>({
+    rows: [],  // רשימת השורות (נתונים)
+    columns: [] // רשימת העמודות (אם יש לך מידע על העמודות)
+  });
   // Helper function to get headers with authorization
   const getAuthHeaders = () => {
     return {
@@ -384,13 +393,13 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
     columns: Array<{ id: string; label: string }>;
     rows: Array<any>;
   }>({
-
     columns: [
       { id: 'id', label: 'ID' },
       { id: 'facilityName', label: 'Facility Name' }
     ],
     rows: []
   });
+
 
   // Load table data only once
   useEffect(() => {
