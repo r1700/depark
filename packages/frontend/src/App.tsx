@@ -18,14 +18,7 @@ const App: React.FC = () => {
         <Route path="/" element={<LoginPage />} />
         <Route path="/admin/*" element={<AdminRoutes />} />
         <Route path="/mobile" element={<Otp />} />
-        <Route
-          path="/tablet"
-          element={
-            localStorage.getItem("floorNumber")
-              ? <UnifiedEntry />
-              : <HomePage />
-          }
-        />
+        <Route path="/tablet" element={localStorage.getItem("floorNumber") ? <UnifiedEntry /> : <HomePage />} />
         <Route path="/parkings" element={<ParkingsPage />} />
         <Route path="/admin-config" element={<AdminConfigPage />} />
         <Route path="/admin-config/:lotId" element={<AdminConfigPage />} />
