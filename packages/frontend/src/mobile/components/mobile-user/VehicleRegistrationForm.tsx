@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import {
   Button,
@@ -10,6 +9,7 @@ import {
   Alert,
   Stack,
   Box,
+  Typography,
 } from "@mui/material";
 import { useForm } from "react-hook-form";
 import axios from "axios";
@@ -78,19 +78,66 @@ export const VehicleRegistrationForm = ({ onSuccess }: VehicleRegistrationFormPr
       <Box textAlign="center" my={2}>
         <Button
           variant="contained"
-          color="primary"
           fullWidth
-          sx={{ textTransform: "capitalize", maxWidth: 300, mx: "auto" }}
+          sx={{
+            textTransform: "none",
+            maxWidth: 300,
+            mx: "auto",
+            borderRadius: 2,
+            fontWeight: 600,
+            background: "linear-gradient(90deg, #1976d2 60%, #64b5f6 100%)",
+            color: "#fff",
+            boxShadow: "0 2px 8px rgba(30,144,255,0.08)",
+            "&:hover": {
+              background: "linear-gradient(90deg, #1565c0 60%, #1976d2 100%)",
+            },
+          }}
           onClick={() => setOpen(true)}
         >
           Add Vehicle
         </Button>
       </Box>
-      <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Register New Vehicle</DialogTitle>
+      <Dialog
+        open={open}
+        onClose={() => setOpen(false)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: {
+            background: "linear-gradient(135deg, #e3f0ff 0%, #f8fbff 100%)",
+            borderRadius: 0,
+            boxShadow: "0 8px 32px rgba(30,144,255,0.10)",
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            textAlign: "center",
+            fontWeight: 700,
+            fontSize: "1.35rem",
+            color: "#1976d2",
+            letterSpacing: 1,
+            pb: 0,
+            background: "#e3f2fd",
+          }}
+        >
+          Register New Vehicle
+        </DialogTitle>
         <DialogContent>
-          <Box component="form" id="vehicle-form" onSubmit={handleSubmit(onSubmit)} noValidate>
-            <Stack spacing={2} mt={1}>
+          <Box
+            component="form"
+            id="vehicle-form"
+            onSubmit={handleSubmit(onSubmit)}
+            noValidate
+            sx={{
+              mt: 1,
+              px: 1,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            <Stack spacing={2} sx={{ width: "100%", maxWidth: 340 }}>
               <TextField
                 label="License Plate"
                 fullWidth
@@ -136,11 +183,45 @@ export const VehicleRegistrationForm = ({ onSuccess }: VehicleRegistrationFormPr
             </Stack>
           </Box>
         </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={() => setOpen(false)} color="secondary">Close</Button>
-          <Button form="vehicle-form" type="submit" variant="contained" color="primary">Save</Button>
+        <DialogActions sx={{ px: 3, pb: 2, background: "#e3f2fd" }}>
+          <Button
+            onClick={() => setOpen(false)}
+            sx={{
+              borderRadius: 2,
+              px: 4,
+              fontWeight: 600,
+              background: "linear-gradient(90deg, #1976d2 60%, #64b5f6 100%)",
+              color: "#fff",
+              boxShadow: "0 2px 8px rgba(30,144,255,0.08)",
+              "&:hover": {
+                background: "linear-gradient(90deg, #1565c0 60%, #1976d2 100%)",
+              },
+            }}
+          >
+            Close
+          </Button>
+          <Button
+            form="vehicle-form"
+            type="submit"
+            variant="contained"
+            sx={{
+              borderRadius: 2,
+              px: 4,
+              fontWeight: 600,
+              background: "linear-gradient(90deg, #1976d2 60%, #64b5f6 100%)",
+              color: "#fff",
+              boxShadow: "0 2px 8px rgba(30,144,255,0.08)",
+              "&:hover": {
+                background: "linear-gradient(90deg, #1565c0 60%, #1976d2 100%)",
+              },
+            }}
+          >
+            Save
+          </Button>
         </DialogActions>
       </Dialog>
     </>
   );
 };
+
+ 
