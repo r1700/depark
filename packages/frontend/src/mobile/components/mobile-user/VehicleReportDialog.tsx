@@ -127,6 +127,7 @@ export const VehicleReportDialog = ({ open, onClose, userId }: Props) => {
     );
   };
 
+  
   return (
     <Dialog
       open={open}

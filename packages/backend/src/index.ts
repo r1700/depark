@@ -120,6 +120,7 @@ app.use((req, res, next) => {
     next();
 });
 
+
 app.use("/api/opc", techniciansRoutes);
 app.use('/api/opc', faultsRouter);
 app.use('/api/opc', Exit);
