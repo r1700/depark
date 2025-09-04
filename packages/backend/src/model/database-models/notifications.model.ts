@@ -10,6 +10,7 @@ export class Notification extends Model {
   public timestamp!: Date;
 }
 
+
 Notification.init(
   {
     id: {

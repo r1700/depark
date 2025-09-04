@@ -11,6 +11,7 @@ router.get('/', async (req, res) => {
     return res.status(400).send('Error: baseuser_id is required');
   }
 
+  
   try {
     const notifications = await Notification.findAll({
       where: { baseuser_id: baseuser_id },
