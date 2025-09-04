@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 
 
+
 // ייבוא הראוטרים
 import adminConfigRouter from './routes/admin-config';
 
