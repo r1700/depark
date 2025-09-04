@@ -2,10 +2,8 @@
 import React, { useCallback } from "react";
 import { Route, Navigate, useNavigate, Routes } from "react-router-dom";
 import { Provider } from "react-redux";
-import { store } from "./app/store"; 
-
+import { store } from "./app/store";
 import LoginScreen from "./components/screen-login/LoginScreen";
-import AdminLogoManagement from "./components/logo";
 import Layout from "./components/layout/layout";
 import AdminDashboard from "./components/adminDashboard/AdminDashboard";
 import HrDashboard from "./components/hrDashboard/HrDashboard";
@@ -26,17 +24,14 @@ function getUserFromStorage() {
     return null;
   }
 }
-
 const AdminRoutes: React.FC = () => {
   const navigate = useNavigate();
   const user = getUserFromStorage();
-
   const handleLogout = useCallback(() => {
     localStorage.removeItem("user");
     localStorage.removeItem("token");
     navigate("/admin/login", { replace: true });
   }, [navigate]);
-
   return (
     <>
     <Routes>
@@ -55,6 +50,7 @@ const AdminRoutes: React.FC = () => {
           )
         }
       />
+      {/* Layout wrapper – all the routes under /admin/layout/* */}
       <Route
         path="layout/*"
         element={
@@ -67,18 +63,16 @@ const AdminRoutes: React.FC = () => {
           )
         }
       >
+        {/* Dashboard / pages */}
         <Route path="admin" element={<AdminDashboard />} />
         <Route path="hr-dashboard" element={<HrDashboard />} />
         <Route path="admin-config" element={<AdminConfigPage />} />
-        <Route path="admin-config/:lotId" element={<AdminConfigPage />} />
         <Route path="parkings" element={<ParkingsPage />} />
-        <Route path="logo-management" element={<AdminLogoManagement />} />
+        {/* Reports as children of layout */}
         <Route path="reports">
           <Route path="parking-stats" element={<ParkingStatsPage />} />
           <Route path="surface-stats" element={<SurfaceStatsPage />} />
         </Route>
-         <Route path="reserved-parking" element={<ReservedParking />} />
-        <Route path="admin-config-reservedparking" element={<AdmainConfigReservedparking />} />
         <Route
           index
           element={
@@ -91,9 +85,8 @@ const AdminRoutes: React.FC = () => {
         />
       </Route>
       <Route path="*" element={<Navigate to="/admin" replace />} />
-    </Routes>
+      </Routes>
     </>
   );
 };
-
 export default AdminRoutes;

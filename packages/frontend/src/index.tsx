@@ -13,14 +13,28 @@ import LoginPage from './admin/Pages/loginPage';
 import ForgotPassword from './admin/app/pages/resetPassword/ForgotPassword';
 import ResetPassword from './admin/app/pages/resetPassword/ResetPassword';
 import AdminRoutes from './admin/AdminRoutes';
+import Login from './mobile/pages/Login';
+import { GoogleOAuthProvider } from '@react-oauth/google';
+import { AuthProvider } from './mobile/auth/AuthContext';
+import UnifiedEntry from './tablet/components/UnifiedEntry/UnifiedEntry';
+
+const user = JSON.parse(localStorage.getItem("user") || "{}");
+
+const handleLogout = () => {
+  localStorage.removeItem(user);
+};
 
 const routers = createBrowserRouter([
   {
     path: '/', element: <App />, children: [
       { path: '', element: <LoginPage /> },
       { path: 'admin/*', element: <AdminRoutes /> },
-      { path: 'mobile', element: <Otp /> },
-      { path: 'tablet', element: <HomePage /> },
+      { path: 'mobile', element: <Login /> },
+      { path: 'otp', element: <Otp /> },
+      { path: 'tablet', element: localStorage.getItem("floorNumber") ? <UnifiedEntry /> : <HomePage /> },
+      { path: 'parkings', element: <ParkingsPage /> },
+      { path: 'admin-config', element: <AdminConfigPage /> },
+      { path: 'admin-config/:lotId', element: <AdminConfigPage /> },
       { path: 'forgot-password', element: <ForgotPassword /> },
       { path: 'reset-password', element: <ResetPassword /> },
       { path: 'VehicleRow', element: <VehicleRow /> },
@@ -35,7 +49,11 @@ const root = ReactDOM.createRoot(
 
 root.render(
   <React.StrictMode>
-    <RouterProvider router={routers}></RouterProvider>
+     <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID!}>
+      <AuthProvider>
+        <RouterProvider router={routers} />
+      </AuthProvider>
+    </GoogleOAuthProvider>
   </React.StrictMode>,
 );
 
