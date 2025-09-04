@@ -30,6 +30,8 @@ import userApi from './routes/userApi';
 import ResevedParking from './routes/reservedparkingApi';
 import retrieveRoute from './routes/RetrivalQueue';
 import otpRoutes from './routes/otp.server';
+import routes from './routes/mobile/mobileUserRoutes';
+import notifications from "./routes/mobile/notificationsRoutes"; 
 
 import path from 'path';
 const app = express();
@@ -109,6 +111,8 @@ app.use('/api/parking-stats', parkingReport);
 app.use('/api/surface-stats', surfaceReport);
 app.use('/api/tablet', retrieveRoute);
 app.use('/api/otp', otpRoutes);
+app.use("/api", routes);
+app.use("/notifications", notifications);
 
 app.use('/api/logos', logoRouter);
 app.use('/api/screentypes', screenTypeRouter);
