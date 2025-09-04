@@ -1,5 +1,6 @@
 // src/index.ts
 import 'reflect-metadata';
+
 import path from 'path';
 
 // טען dotenv מיד בתחילת הריצה
