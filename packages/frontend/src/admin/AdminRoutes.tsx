@@ -13,7 +13,6 @@ import AdminConfigPage from "./components/AdminConfigPage";
 import ParkingsPage from "./Pages/ParkingsPage";
 import ParkingStatsPage from "./app/pages/parkingStats/parkingStats";
 import SurfaceStatsPage from "./app/pages/surfaceStats/surfaceStats";
-import AdminLogoManagement from "./components/logo";
 import ReservedParking from "./Pages/ReservedParking";
 import AdmainConfigReservedparking from "../admin/components/AdmainConfigReservedparking";
 

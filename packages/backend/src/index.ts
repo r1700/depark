@@ -1,14 +1,26 @@
+// src/index.ts
 import 'reflect-metadata';
-import dotenv from 'dotenv';
 
-dotenv.config();
+import path from 'path';
+
+// טען dotenv מיד בתחילת הריצה
+const envPath = path.resolve(process.cwd(), '.env');
+require('dotenv').config({ path: envPath });
+
+console.log('NODE_ENV =', process.env.NODE_ENV || 'development');
+console.log('Loaded .env from:', envPath);
+console.log('JWT_SECRET loaded =', !!process.env.JWT_SECRET);
+
+// ----------------- Imports -----------------
 import express from 'express';
 import cors from 'cors';
+
 import loggerRoutes from './middlewares/locallLoggerMiddleware';
 import healthRoutes from './routes/health';
 import passwordRoutes from './routes/user.routes';
 import vehicleRoutes from './routes/vehicle';
 import exportToCSV from './routes/exportToCSV';
+import authRoutes from './routes/auth';
 import userGoogleAuthRoutes from './routes/userGoogle-auth';
 import Exit from './routes/opc/exit'; // Import the exit route
 import faultsRouter from './routes/opc/faults';
@@ -26,12 +38,8 @@ import vehicle from './routes/vehicleRoute';
 import GoogleAuth from './routes/google-auth';
 import parkingReport from './routes/parkingStat';
 import surfaceReport from './routes/surfaceStat';
-import userApi from './routes/userApi';
-import ResevedParking from './routes/reservedparkingApi';
 import retrieveRoute from './routes/RetrivalQueue';
 import otpRoutes from './routes/otp.server';
-
-import path from 'path';
 const app = express();
 const server = http.createServer(app);
 export const wss = new WebSocketServer({ server })
@@ -59,8 +67,10 @@ app.use((req, res, next) => {
 });
 // --- end DEBUG ---
 const PORT = process.env.PORT || 3001;
+// Serve static logos
+app.use('/logos', express.static(path.join(process.cwd(), 'public/logos')));
 
-// Middleware for session management
+
 app.use(session({
     secret: process.env.SESSION_SECRET || 'keyboard cat',
     resave: false,
@@ -68,37 +78,29 @@ app.use(session({
     cookie: { secure: process.env.NODE_ENV === 'production' }
 }) as unknown as express.RequestHandler);
 
-// CORS configuration
+// Middleware
 const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:3000';
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 
-app.use(cors({
-    origin: CORS_ORIGIN,
-    credentials: true,
-}));
-app.use(express.json());
-
 if (!GOOGLE_CLIENT_ID) {
-    throw new Error('Missing GOOGLE_CLIENT_ID');
+  throw new Error('Missing GOOGLE_CLIENT_ID');
 }
 
-
-// Global request logger — מדפיס כל בקשה נכנסת
-app.use((req, res, next) => {
-    console.log(`[REQ] ${ new Date().toISOString() } ${ req.method } ${ req.originalUrl } body:`, req.body);
-    next();
-});
-
+// ----------------- Middleware -----------------
+app.use(cors({
+  origin: CORS_ORIGIN,
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+}));
+app.use(express.json());
 app.use(loggerRoutes);
-
-// API routes
 app.use('/api/health', healthRoutes);
 app.use('/api/password', passwordRoutes);
 app.use('/api/vehicle', vehicleRoutes);
 app.use('/api/exportToCSV', exportToCSV);
 app.use('/api', userRoutes);
-app.use('/api/users', userApi);
-app.use('/api/reservedparking', ResevedParking);
+// app.use('/api/users', userFilter);
 // app.use('/api/auth', authRoutes);
 app.use('/api/auth', userGoogleAuthRoutes);
 app.use('/api/vehicles', vehicle)
@@ -114,81 +116,55 @@ app.use('/api/logos', logoRouter);
 app.use('/api/screentypes', screenTypeRouter);
 app.use('/logos', express.static(path.join(process.cwd(), 'public/logos')));
 
-// Log all incoming requests
 app.use((req, res, next) => {
-    console.log(`[${ req.method }] ${ req.path }`, req.body);
-    next();
+  console.log(`[${req.method}] ${req.path}`, req.body ? req.body : '');
+  next();
 });
 
-app.use("/api/opc", techniciansRoutes);
-app.use('/api/opc', faultsRouter);
-app.use('/api/opc', Exit);
+// ----------------- Basic endpoints -----------------
+app.get('/', (req, res) => {
+  res.json({ message: 'Depark Backend is running!' });
+});
+app.get('/health', (req, res) => {
+  res.json({
+    status: 'OK',
+    timestamp: new Date().toISOString(),
+  });
+});
 
-// Print registered routes (debug)
-function printRoutes() {
-    console.log("Registered routes:",  app);
-    app._router?.stack?.forEach((middleware: any) => {
-        if (middleware.route) {
-            const methods = Object.keys(middleware.route.methods).join(',').toUpperCase();
-            console.log(`${ methods } ${ middleware.route.path }`);
-        } else if (middleware.name === 'router' && middleware.handle && middleware.handle.stack) {
-            middleware.handle.stack.forEach((handler: any) => {
-                if (handler.route) {
-                    const methods = Object.keys(handler.route.methods).join(',').toUpperCase();
-                    console.log(`${ methods } ${ handler.route.path }`);
-                }
-            });
-        }
-    });
+// ----------------- DB check -----------------
+if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
+  console.log('Initializing database (Supabase) ...');
+} else {
+  console.log('Using mock data - Supabase not configured');
 }
 
-printRoutes();
-
-// Start server - בסוף!
-app.get('/', (req, res) => {
-    res.json({ message: 'DePark Backend is running!' });
+// ----------------- Error handler -----------------
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  console.error('Unhandled error:', err);
+  res.status(err.status || 500).json({ status: 'error', message: err.message || 'Internal server error' });
 });
 
-// Health check route
-app.get('/health', (req, res) => {
-    res.json({
-        status: 'OK',
-        timestamp: new Date().toISOString(),
-    });
+// ----------------- Start server -----------------
+ app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log('CORS enabled for:', CORS_ORIGIN);
+  console.log('Available routes (examples):');
+  console.log('   GET  /');
+  console.log('   GET  /health');
+  console.log('   POST /api/auth/login');
+  console.log('   POST /api/auth/register');
+  console.log('   GET  /api/protected/profile');
 });
 
-app.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${ PORT }`);
-    console.log(`📝 Environment: ${ process.env.NODE_ENV || 'development' }`);
-    console.log(`🌐 CORS enabled for: ${ CORS_ORIGIN }`);
-    console.log('✅ APIs ready!');
-
-    console.log('🔗 Available routes:');
-    console.log('   GET  /');
-    console.log('   GET  /health');
-    console.log('   GET  /api/health');
-    console.log('   POST /api/password/reset');
-    console.log('   GET  /api/vehicle');
-    console.log('   GET  /api/exportToCSV');
-
-    if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
-        console.log('🗄️ Database: Supabase configured');
-    } else {
-        console.log('📝 Database: Using mock data');
-    }
-    console.log('✅ Password reset API ready!');
-    console.log('🔗 Available routes:');
-    console.log('   GET  /');
-    console.log('   GET  /health');
-    console.log('   GET  /api/auth/users');
-    console.log('   POST /api/auth/register');
-    console.log('   POST /api/auth/login');
-    console.log('   GET  /api/admin/config');
-    console.log('   PUT  /api/admin/config');
-
-    if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
-        console.log(':file_cabinet: Initializing database...');
-    } else {
-        console.log(':memo: Using mock data - Supabase not configured');
-    }
-});
+// ----------------- Graceful shutdown -----------------
+const shutdown = () => {
+  console.log('Shutting down server...');
+  server.close(() => {
+    console.log('Server closed.');
+    process.exit(0);
+  });
+};
+process.on('SIGINT', shutdown);
+process.on('SIGTERM', shutdown);
