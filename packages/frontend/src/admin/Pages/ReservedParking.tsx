@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Container, Paper, Typography, Box, Button, Drawer, Switch, FormControlLabel } from "@mui/material";
+import { Container, Paper, Typography, Box, Button, Drawer, Switch, FormControlLabel, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from "@mui/material";
 import FilterListIcon from '@mui/icons-material/FilterList';
 import DataTable from "../components/table/table";
 import FilterPanel, { FieldConfigGeneric } from "../components/filter-panel/FilterPanel";
@@ -18,6 +18,8 @@ const filterFields: FieldConfigGeneric<any>[] = [
   { name: "day_of_week", label: "Day of Week", type: "select", options: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"] },
 ];
 
+
+
 const ReservedParkingPage: React.FC = () => {
   const navigate = useNavigate();
 
@@ -27,6 +29,10 @@ const ReservedParkingPage: React.FC = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [isFilterEnabled, setIsFilterEnabled] = useState(true);
 
+  // --- דיאלוג מחיקה ---
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [rowToDelete, setRowToDelete] = useState<any>(null);
+
   const fetchReservedParking = async () => {
     try {
       const params: any = {};
@@ -35,8 +41,8 @@ const ReservedParkingPage: React.FC = () => {
         if (filters.parking_number) params.parking_number = filters.parking_number;
         if (filters.day_of_week) params.day_of_week = filters.day_of_week;
       }
-      console.log({params});
-      
+      console.log({ params });
+
       const response = await axios.get("/api/reservedparking", { params });
       setReservedParking(response.data.results || response.data);
     } catch (error) {
@@ -94,6 +100,33 @@ const ReservedParkingPage: React.FC = () => {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
+  };
+
+  const handleEdit = (row: any) => {
+    navigate(`/admin/layout/admin-config-reservedparking`, { state: row });
+  };
+
+  // --- שינוי: במקום למחוק ישירות, פותחים דיאלוג ---
+  const handleDelete = (row: any) => {
+    setRowToDelete(row);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!rowToDelete?.id) return;
+    try {
+      await axios.delete(`/api/reservedparking/${rowToDelete.id}`);
+      setReservedParking(prev => prev.filter(r => r.id !== rowToDelete.id));
+    } catch (error) {
+      console.error("Failed to delete reserved parking:", error);
+    }
+    setDeleteDialogOpen(false);
+    setRowToDelete(null);
+  };
+
+  const cancelDelete = () => {
+    setDeleteDialogOpen(false);
+    setRowToDelete(null);
   };
 
   return (
@@ -193,10 +226,10 @@ const ReservedParkingPage: React.FC = () => {
             </Button>
           </Box>
         </Drawer>
+
         <DataTable
           data={tableData}
           title="Reserved Parking"
-          // fields={fields}
           initialState={{
             email: editUserEmail,
             parking_number: "",
@@ -205,7 +238,24 @@ const ReservedParkingPage: React.FC = () => {
           onRowClick={(row) => {
             setEditUserEmail(row.email || "");
           }}
+          onEdit={handleEdit}
+          showEdit={true}
+          onDelete={handleDelete}
+          showDelete={true}
         />
+        {/* דיאלוג אישור מחיקה */}
+        <Dialog open={deleteDialogOpen} onClose={cancelDelete}>
+          <DialogTitle>Confirm Delete</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+             Are you sure you want to delete this parking?
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={cancelDelete} color="primary">Cancel</Button>
+            <Button onClick={confirmDelete} color="error">Delete</Button>
+          </DialogActions>
+        </Dialog>
       </Paper>
     </Container>
   );

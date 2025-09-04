@@ -19,13 +19,14 @@ import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import GenericForm, { FieldConfig, styleModal } from '../forms/Form';
+import GenericForm, { FieldConfig } from '../forms/Form';
+import { styleModal } from '../forms/Form';
 import './table.css';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 type DataTableProps = {
   data: { columns: any[]; rows: any[] };
-
   onRowClick?: (row: any) => void;
+  onEdit?: (row: any) => void;
   enablePagination?: boolean; // כברירת מחדל TRUE
   showEdit?: boolean;
   showDelete?: boolean;
@@ -33,12 +34,13 @@ type DataTableProps = {
   dense?: boolean;
   deletePath?: string;
   title?: string;
-  fields?: FieldConfig[];
+  fields?: FieldConfig<any>[];
   initialState?: any;
   onSubmit?: (data: any) => void | Promise<void>;
   showToolbar?: boolean;
   enableHorizontalScroll?: boolean;
   stickyColumns?: string[];
+  onDelete?: (row: any) => void;
 };
 const DataTable: React.FC<DataTableProps> = ({
   data,
@@ -56,6 +58,8 @@ const DataTable: React.FC<DataTableProps> = ({
   showToolbar = true,
   enableHorizontalScroll = true,
   stickyColumns = [],
+  onEdit,
+  onDelete,
 }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const tableRef = useRef<HTMLTableElement | null>(null);
@@ -112,7 +116,6 @@ const DataTable: React.FC<DataTableProps> = ({
     const sync = () => {
       horiz.scrollLeft = containerRef.current!.scrollLeft;
     };
-    containerRef.current.addEventListener('scroll', sync);
     return () => containerRef.current?.removeEventListener('scroll', sync);
   }, []);
   useEffect(() => {
@@ -153,18 +156,30 @@ const DataTable: React.FC<DataTableProps> = ({
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
-  const handleDelete = (row: any) => {
-    if (deletePath) {
-      setCurrentDeleteItem(row);
-      setDeleteDialogOpen(true);
-    }
-  };
-  const confirmDelete = () => {
-    if (currentDeleteItem) {
-      setTableRows((prev) => prev.filter((r) => r !== currentDeleteItem));
+  const handleDelete = async (row: any) => {
+    if (deletePath && row && row.id) {
+      try {
+        const response = await fetch(`${deletePath}/${row.id}`, {
+          method: 'DELETE',
+        });
+        if (response.ok) {
+          setTableRows((prev) => prev.filter((r) => r.id !== row.id));
+        } else {
+          // Optionally handle error
+          alert('Failed to delete item');
+        }
+      } catch (error) {
+        alert('Error deleting item');
+      }
     }
     setCurrentDeleteItem(null);
     setDeleteDialogOpen(false);
+  }
+  // confirmDelete is now handled by handleDelete
+  const confirmDelete = () => {
+    if (currentDeleteItem) {
+      handleDelete(currentDeleteItem);
+    }
   };
   const cancelDelete = () => {
     setCurrentDeleteItem(null);
@@ -198,8 +213,7 @@ const DataTable: React.FC<DataTableProps> = ({
   }
   const sorted = stableSort(rows, comparator);
   const visibleRows = enablePagination ? sorted.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) : sorted;
-
-return (
+  return (
     <>
       <TableContainer
         sx={{
@@ -283,6 +297,7 @@ return (
                         >
                           Descending
                         </Box>
+                        3:38
                       </Box>
                     )}
                   </Box>
@@ -314,8 +329,12 @@ return (
                         color="success"
                         aria-label="edit"
                         onClick={() => {
-                          setSelectedItem(row);
-                          openModal();
+                          if (onEdit) {
+                            onEdit(row);
+                          } else {
+                            setSelectedItem(row);
+                            openModal();
+                          }
                         }}
                       >
                         <EditIcon />
@@ -326,8 +345,13 @@ return (
                         color="error"
                         aria-label="delete"
                         onClick={() => {
-                          setSelectedItem(row);
-                          setDeleteDialogOpen(true);
+                          if (onDelete) {
+                            onDelete(row);
+                          } else {
+                            setSelectedItem(row);
+                            setCurrentDeleteItem(row);
+                            setDeleteDialogOpen(true);
+                          }
                         }}
                       >
                         <DeleteIcon />
@@ -338,6 +362,7 @@ return (
               </TableRow>
             ))}
           </TableBody>
+
         </Table>
         <div style={{ height: 1, width: 0 }} />
       </TableContainer>
@@ -421,10 +446,7 @@ return (
         <DialogActions>
           <Button onClick={cancelDelete} color="primary">Cancel</Button>
           <Button
-            onClick={() => {
-              handleDelete(selectedItem);
-              setDeleteDialogOpen(false);
-            }}
+            onClick={confirmDelete}
             color="error"
           >
             Delete
@@ -435,6 +457,12 @@ return (
   );
 };
 export default DataTable;
+
+
+
+
+
+
 
 
 
