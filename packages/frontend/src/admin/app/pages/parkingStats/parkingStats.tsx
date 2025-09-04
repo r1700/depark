@@ -231,7 +231,7 @@ const ParkingStatsPage: React.FC = () => {
             tableRows={selectedDayData}
           />
           {dayLoading && renderLoading(18)}
-          {dayError && renderError(`Error loading day details: ${String(dayError)}`, () => setRetryDay(r => r + 1))}
+          
         </div>
       ) : (
         <GenericStatsChart

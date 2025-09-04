@@ -14,7 +14,6 @@ import ForgotPassword from './admin/app/pages/resetPassword/ForgotPassword';
 import ResetPassword from './admin/app/pages/resetPassword/ResetPassword';
 import AdminRoutes from './admin/AdminRoutes';
 
-
 const routers = createBrowserRouter([
   {
     path: '/', element: <App />, children: [
@@ -29,7 +28,6 @@ const routers = createBrowserRouter([
       { path: 'reset-password', element: <ResetPassword /> },
       { path: 'VehicleRow', element: <VehicleRow /> },
       
-      
     ]
   }
 ])
@@ -37,6 +35,7 @@ const routers = createBrowserRouter([
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
+
 root.render(
   <React.StrictMode>
     <RouterProvider router={routers}></RouterProvider>

@@ -78,7 +78,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({onLogin}) => {
             setLoading(false);
             setServerError("Network error: " + (error as Error).message);
             console.log("Login error:", error);
-            
         }
     };
 
