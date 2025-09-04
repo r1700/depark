@@ -3,7 +3,7 @@ import { Container, Paper, Typography, Box, Button, Drawer, Switch, FormControlL
 
 import FilterListIcon from '@mui/icons-material/FilterList';
 import DataTable from "../components/table/table";
-import FilterPanel, { FieldConfigGeneric } from "../../components/filter-panel/FilterPanel";
+import FilterPanel, { FieldConfigGeneric } from "../components/filter-panel/FilterPanel";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
