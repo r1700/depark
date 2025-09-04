@@ -1,5 +1,7 @@
-import { BaseUser } from '../models/baseuser';
-import { User } from '../models/users';
+// import { baseuser } from '../model/database-models/user.model';
+// import {users} from '../model/database-models/user.model';
+import { baseuser } from '../model/database-models/user.model';
+import {users} from '../model/database-models/user.model';
 import { UserStatusEnum } from '../enums/baseuser';
 
 export async function updateUserStatus(
@@ -10,7 +12,7 @@ export async function updateUserStatus(
 ) {
   try {
     
-    const [numberOfAffectedRowsBaseUser, [updatedBaseUser]] = await BaseUser.update(
+    const [numberOfAffectedRowsBaseUser, [updatedBaseUser]] = await baseuser.update(
       {
         status, 
         approved_at: new Date(), 
@@ -27,7 +29,7 @@ export async function updateUserStatus(
 
     console.log('Updated BaseUser:', updatedBaseUser);
 
-    const [numberOfAffectedRowsUser, [updatedUser]] = await User.update(
+    const [numberOfAffectedRowsUser, [updatedUser]] = await users.update(
       {
         approved_by: adminId, 
       },
