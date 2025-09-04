@@ -23,6 +23,7 @@ import ParkingIcon from '@mui/icons-material/LocalParking';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import { LogoDevOutlined } from '@mui/icons-material';
+import NessageIcon from '@mui/icons-material/Message';
 const drawerWidth = 240;
 
 type RoleName = 'admin' | 'hr' | 'guest';
@@ -80,7 +81,7 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
             },
             { text: 'Reserved Parking', icon: <ParkingIcon />, path: '/admin/layout/reserved-parking' },
             { text: 'Logos', icon: <LogoDevOutlined />, path: '/admin/layout/logo-management', allowed: ['admin'] },
-
+            { text: 'Feedback', icon: <NessageIcon />, path: '/admin/layout/feedback', allowed: ['admin', 'hr'] },
             {
                 text: 'Vehicles', icon: <DirectionsCarIcon />, path: '/admin/layout/unknown-vehicles', allowed: ['admin', 'hr'], subMenu: [
                     { text: 'All Vehicles', path: '/admin/layout/vehicles', allowed: ['admin', 'hr'] },
@@ -95,7 +96,9 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
                 subMenu: [
                     { text: 'Parking Stats', path: '/admin/layout/reports/parking-stats', allowed: ['admin', 'hr'] },
                     { text: 'Surface Stats', path: '/admin/layout/reports/surface-stats', allowed: ['admin', 'hr'] },
+                    
                     { text: 'Parkings Occupancy', path: '/admin/layout/reports/parking-occupancy', allowed: ['admin', 'hr'] },
+                { text: 'Feedback', path: '/admin/layout/reports/feedback-answers', allowed: ['admin', 'hr'] },
                 ],
             },
             { text: 'Parking Lots', icon: <DirectionsCarIcon />, path: '/admin/layout/parkings', allowed: ['admin', 'hr'] },

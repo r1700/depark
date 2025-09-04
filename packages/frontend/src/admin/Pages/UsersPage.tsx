@@ -7,6 +7,7 @@ import {
   Button,
   Drawer,
   Switch,
+  Snackbar ,
   FormControlLabel,
 } from "@mui/material";
 import FilterListIcon from "@mui/icons-material/FilterList";
@@ -17,7 +18,9 @@ import FilterPanel, {
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { numberToStatus } from "../../utils/statusMapper";
-
+import { useDispatch } from 'react-redux';
+import type { AppDispatch } from '../app/store';
+import { uploadCsvFile } from '../app/pages/user/userThunks';
 
 const filterFields: FieldConfigGeneric<any>[] = [
 
@@ -48,6 +51,8 @@ const filterFields: FieldConfigGeneric<any>[] = [
 ];
 
 const UsersPage: React.FC = () => {
+  const dispatch = useDispatch<AppDispatch>();
+
   const navigate = useNavigate();
 
   const [users, setUsers] = useState<any[]>([]);
@@ -147,6 +152,29 @@ const UsersPage: React.FC = () => {
     navigate("/admin/layout/add-user", { state: row._original || row });
   };
 
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files.length > 0) {
+      const selectedFile = event.target.files[0];
+      console.log(":open_file_folder: נבחר קובץ:", selectedFile.name);
+      try {
+        // Thunk מחזיר הבטחה – נחכה לתוצאה
+        await dispatch(uploadCsvFile(selectedFile)).unwrap();
+        // setSnackbar({
+        //   open: true,
+        //   message: " הנתונים הועלו בהצלחה",
+        //   severity: 'success',
+        // });
+      } catch (err: any) {
+        // setSnackbar({
+        //   open: true,
+        //   message: " שגיאה בהעלאת הנתונים: " + (err.message || ''),
+        //   severity: 'error',
+        // });
+      }
+    }
+  };
+
+
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
       <Paper elevation={3} sx={{ p: 4, borderRadius: 3 }}>
@@ -217,6 +245,20 @@ const UsersPage: React.FC = () => {
           <Button variant="contained" color="primary" onClick={handleExportToCSV}>
             Export to CSV
           </Button>
+                    <Button
+            variant="contained"
+            color="primary"
+            component="label"
+            sx={{ marginRight: 2 }}
+          >
+             import from CSV
+            <input
+              type="file"
+              accept=".csv"
+              hidden
+              onChange={handleFileChange}
+            />
+         </Button>
           <Button
             variant="contained"
             color="primary"
