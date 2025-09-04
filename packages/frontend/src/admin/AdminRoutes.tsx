@@ -91,7 +91,7 @@ const AdminRoutes: React.FC = () => {
         />
       </Route>
       <Route path="*" element={<Navigate to="/admin" replace />} />
-      </Routes>
+    </Routes>
     </>
   );
 };
