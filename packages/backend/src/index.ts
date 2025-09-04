@@ -89,7 +89,7 @@ app.use('/api/exportToCSV', exportToCSV);
 app.use('/api', userRoutes);
 // app.use('/api/users', userFilter);
 app.use('/api/auth', authRoutes);
-app.use('/api/auth', userGoogleAuthRoutes);
+app.use('/api/auth-google', userGoogleAuthRoutes);
 app.use('/api/vehicles', vehicle)
 app.use('/api/admin', adminConfigRouter);
 app.use('/OAuth', GoogleAuth);

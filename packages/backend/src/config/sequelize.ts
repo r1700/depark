@@ -10,6 +10,7 @@ const sequelize = new Sequelize(
   {
     host: appDbConfig.host,
     dialect: appDbConfig.dialect,
+    dialectOptions: process.env.STATUS === 'production' ? appDbConfig.dialectOptions : undefined,
     logging: process.env.STATUS === 'development' ? console.log : false,
   }
 );

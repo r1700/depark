@@ -9,6 +9,9 @@ export const appDbConfig = {
   host: dbConfig.DB_HOST,
   port: dbConfig.DB_PORT,
   dialect: dbConfig.DB_DIALECT,
+  dialectOptions: {
+    ssl: { require: true, rejectUnauthorized: false }
+  },
   migrationStorageTableName: 'sequelize_meta',
   migrations: {
     path: path.resolve(__dirname, '../../migrations'),
