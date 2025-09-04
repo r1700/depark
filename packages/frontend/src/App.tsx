@@ -1,5 +1,4 @@
 // src/App.tsx
-
 import React from "react";
 import TestToken from "./TestToken";
 import { AuthProvider } from "./context/AuthContext";
@@ -11,5 +10,6 @@ const App: React.FC = () => {
     </AuthProvider>
   );
 };
+
 
 export default App;
