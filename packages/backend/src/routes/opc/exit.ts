@@ -56,7 +56,7 @@ router.get('/Queue/:floorNumber?', (req, res) => {
   }
 
   // שליחת הנתונים לכל הלקוחות ב-WebSocket
-  wss.clients.forEach(client => {
+  wss.clients.forEach((client: import('ws').WebSocket) => {
     if (client.readyState === 1) { // 1 = OPEN
       client.send(JSON.stringify({ type: 'queueGet', data: responseData }));
     }
