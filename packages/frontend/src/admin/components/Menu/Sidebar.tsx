@@ -17,6 +17,7 @@ import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import MenuIcon from '@mui/icons-material/Menu';
 import LogoutIcon from '@mui/icons-material/Logout';
 import PeopleIcon from '@mui/icons-material/People';
+import SettingsIcon from '@mui/icons-material/Settings';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
@@ -24,13 +25,11 @@ import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import LocalParkingIcon from '@mui/icons-material/LocalParking';
 import { LogoDev } from '@mui/icons-material';
 const drawerWidth = 240;
-
 interface User {
     firstName: string;
     lastName: string;
     role?: number | string; // מקור השרת
 }
-
 interface SidebarProps {
     user: User;
     onLogout: () => void;
@@ -41,7 +40,6 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
     const [open, setOpen] = useState<boolean>(true);
     const [reportsOpen, setReportsOpen] = useState<boolean>(false);
     const navigate = useNavigate();
-
     useEffect(() => {
         if (!open) {
             setReportsOpen(false);
@@ -113,7 +111,6 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
                     {open ? <MenuOpenIcon /> : <MenuIcon />}
                 </IconButton>
             </Box>
-
             {open && (
                 <Box sx={{ px: 2, mb: 3, display: 'flex', justifyContent: 'center' }}>
                     <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#fff' }}>
@@ -121,7 +118,6 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
                     </Typography>
                 </Box>
             )}
-
             <List>
                 {menuItems.map((item) => {
                     // all items are allowed
@@ -152,7 +148,6 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
                                     </IconButton>
                                 )}
                             </ListItemButton>
-
                             {item.subMenu && visibleSubMenu.length > 0 && (
                                 <Collapse in={reportsOpen} timeout="auto" unmountOnExit>
                                     <List component="div" disablePadding>
@@ -178,7 +173,6 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
                     );
                 })}
             </List>
-
             <Box sx={{ px: 2 }}>
                 <Divider sx={{ borderColor: 'rgba(255,255,255,0.3)', mb: 2 }} />
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
@@ -211,5 +205,4 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
         </Drawer>
     );
 };
-
 export default Sidebar;

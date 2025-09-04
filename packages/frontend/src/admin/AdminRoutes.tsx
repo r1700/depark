@@ -5,6 +5,7 @@ import { Provider } from "react-redux";
 import { store } from "./app/store"; 
 
 import LoginScreen from "./components/screen-login/LoginScreen";
+import AdminLogoManagement from "./components/logo";
 import Layout from "./components/layout/layout";
 import AdminDashboard from "./components/adminDashboard/AdminDashboard";
 import HrDashboard from "./components/hrDashboard/HrDashboard";
@@ -12,7 +13,6 @@ import AdminConfigPage from "./components/AdminConfigPage";
 import ParkingsPage from "./Pages/ParkingsPage";
 import ParkingStatsPage from "./app/pages/parkingStats/parkingStats";
 import SurfaceStatsPage from "./app/pages/surfaceStats/surfaceStats";
-import AdminLogoManagement from "./components/logo";
 
 function getUserFromStorage() {
   try {

@@ -26,7 +26,6 @@ let opcClient: OPCUAClient | null = null;
 let opcSession: ClientSession | null = null;
 let subscription: ClientSubscription | null = null;
 let monitoredItems: ClientMonitoredItem[] = [];
-
 const nodesToMonitor = [
   "ns=1;s=parkingSpot",
   "ns=1;s=licensePlateExit",
@@ -94,12 +93,12 @@ export async function ensureSession(): Promise<ClientSession> {
 async function closeOpcConnection() {
   if (opcSession) {
     await opcSession.close();
-    console.log("Session closed");
+    console.log("OPC UA session closed");
     opcSession = null;
   }
   if (opcClient) {
     await opcClient.disconnect();
-    console.log("Client disconnected");
+    console.log("OPC UA client disconnected");
     opcClient = null;
   }
 }
@@ -137,6 +136,7 @@ function detectDataType(value: any): { dataType: DataType; arrayType?: VariantAr
   }
 }
 
+// Interface for write items
 export interface WriteItem {
   nodeId: string;
   value: any;
@@ -201,7 +201,7 @@ export async function createMonitoredItems(subscription: ClientSubscription) {
     try {
       await item.terminate();
     } catch (e) {
-      console.warn("Warning terminating monitored item:", e);
+      console.warn("⚠️ Warning terminating monitored item:", e);
     }
   }
   monitoredItems = [];
@@ -214,7 +214,7 @@ export async function createMonitoredItems(subscription: ClientSubscription) {
       TimestampsToReturn.Both
     );
 
-    monitoredItem.on("changed", (dataValue: DataValue) => {
+    monitoredItem.on("changed", async (dataValue: DataValue) => {
       const val = dataValue.value?.value;
       let event: string = '';
       let payload: any = {};
@@ -262,7 +262,7 @@ export async function createMonitoredItems(subscription: ClientSubscription) {
     });
 
     monitoredItem.on("err", (err) => {
-      console.error(`Monitored item error at ${nodeId}:`, err);
+      console.error(`❌ Monitored item error at ${nodeId}:`, err);
     });
 
     monitoredItems.push(monitoredItem);
