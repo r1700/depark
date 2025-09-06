@@ -5,6 +5,7 @@ import { Provider } from "react-redux";
 import { store } from "./app/store"; 
 
 import LoginScreen from "./components/screen-login/LoginScreen";
+import AdminLogoManagement from "./components/logo";
 import Layout from "./components/layout/layout";
 import AdminDashboard from "./components/adminDashboard/AdminDashboard";
 import HrDashboard from "./components/hrDashboard/HrDashboard";
@@ -12,7 +13,8 @@ import AdminConfigPage from "./components/AdminConfigPage";
 import ParkingsPage from "./Pages/ParkingsPage";
 import ParkingStatsPage from "./app/pages/parkingStats/parkingStats";
 import SurfaceStatsPage from "./app/pages/surfaceStats/surfaceStats";
-import AdminLogoManagement from "./components/logo";
+import ReservedParking from "./Pages/ReservedParking";
+import AdmainConfigReservedparking from "../admin/components/AdmainConfigReservedparking";
 import UnknownVehicles from "./components/vehicleModel/vehicleModel";
 import ResolvePage from "./components/vehicleModel/ResolvePage";
 
@@ -72,15 +74,15 @@ const AdminRoutes: React.FC = () => {
         <Route path="admin-config/:lotId" element={<AdminConfigPage />} />
         <Route path="parkings" element={<ParkingsPage />} />
         <Route path="logo-management" element={<AdminLogoManagement />} />
+        <Route path="unknown-vehicles" element={<UnknownVehicles />} />
+        <Route path="resolve" element={<ResolvePage />} />
+        <Route path="resolve/:id" element={<ResolvePage />} />
         <Route path="reports">
           <Route path="parking-stats" element={<ParkingStatsPage />} />
           <Route path="surface-stats" element={<SurfaceStatsPage />} />
-            <Route path="unknown-vehicles" element={<UnknownVehicles />} />
-
-        {/* Resolve modal routes inside layout so it opens over Layout */}
-        <Route path="resolve" element={<ResolvePage />} />
-        <Route path="resolve/:id" element={<ResolvePage />} />
         </Route>
+         <Route path="reserved-parking" element={<ReservedParking />} />
+        <Route path="admin-config-reservedparking" element={<AdmainConfigReservedparking />} />
         <Route
           index
           element={
