@@ -1,8 +1,7 @@
-// src/admin/AdminRoutes.tsx
 import React, { useCallback } from "react";
 import { Route, Navigate, useNavigate, Routes } from "react-router-dom";
 import { Provider } from "react-redux";
-import { store } from "./app/store"; 
+import { store } from "./app/store";
 
 import LoginScreen from "./components/screen-login/LoginScreen";
 import AdminLogoManagement from "./components/logo";
@@ -15,7 +14,6 @@ import ParkingStatsPage from "./app/pages/parkingStats/parkingStats";
 import SurfaceStatsPage from "./app/pages/surfaceStats/surfaceStats";
 import ReservedParking from "./Pages/ReservedParking";
 import AdmainConfigReservedparking from "../admin/components/AdmainConfigReservedparking";
-
 
 function getUserFromStorage() {
   try {
@@ -37,10 +35,17 @@ const AdminRoutes: React.FC = () => {
     navigate("/admin/login", { replace: true });
   }, [navigate]);
 
+  // ✅ פונקציה שתועבר ל-LoginScreen
+  const handleLogin = useCallback((token?: string) => {
+    // ניתן להוסיף לוגיקה אם נדרש
+    navigate("/admin", { replace: true });
+  }, [navigate]);
+
   return (
-    <>
     <Routes>
-      <Route path="login" element={<LoginScreen />} />
+      {/* ✅ הוספת onLogin */}
+      <Route path="login" element={<LoginScreen onLogin={handleLogin} />} />
+      
       <Route
         path=""
         element={
@@ -55,6 +60,7 @@ const AdminRoutes: React.FC = () => {
           )
         }
       />
+
       <Route
         path="layout/*"
         element={
@@ -77,7 +83,7 @@ const AdminRoutes: React.FC = () => {
           <Route path="parking-stats" element={<ParkingStatsPage />} />
           <Route path="surface-stats" element={<SurfaceStatsPage />} />
         </Route>
-         <Route path="reserved-parking" element={<ReservedParking />} />
+        <Route path="reserved-parking" element={<ReservedParking />} />
         <Route path="admin-config-reservedparking" element={<AdmainConfigReservedparking />} />
         <Route
           index
@@ -90,9 +96,9 @@ const AdminRoutes: React.FC = () => {
           }
         />
       </Route>
+
       <Route path="*" element={<Navigate to="/admin" replace />} />
-      </Routes>
-    </>
+    </Routes>
   );
 };
 

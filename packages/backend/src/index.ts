@@ -18,7 +18,7 @@ import { WebSocketServer } from 'ws';
 import session from 'express-session';
 import adminConfigRouter from './routes/adminConfig';
 import userRoutes from './routes/user.routes';
-
+import authRoutes from './routes/auth';
 import logoRouter from './routes/logos';
 import screenTypeRouter from './routes/screenType';
 import './cronJob'; // Import the cron job to ensure it runs on server start
@@ -94,9 +94,11 @@ app.use('/api/health', healthRoutes);
 app.use('/api/password', passwordRoutes);
 app.use('/api/vehicle', vehicleRoutes);
 app.use('/api/exportToCSV', exportToCSV);
-app.use('/api', userRoutes);
+
+ app.use('/api', userRoutes);
+
 // app.use('/api/users', userFilter);
-// app.use('/api/auth', authRoutes);
+app.use('/api/auth', authRoutes);
 app.use('/api/auth', userGoogleAuthRoutes);
 app.use('/api/vehicles', vehicle)
 app.use('/api/admin', adminConfigRouter);
@@ -104,7 +106,9 @@ app.use('/OAuth', GoogleAuth);
 app.use('/api/admin', adminConfigRouter);
 app.use('/api/parking-stats', parkingReport);
 app.use('/api/surface-stats', surfaceReport);
-app.use('/api/tablet', retrieveRoute);
+app.use('/api/auth', authRoutes);
+
+// app.use('/api/tablet', retrieveRoute);
 app.use('/api/otp', otpRoutes);
 
 app.use('/api/logos', logoRouter);
