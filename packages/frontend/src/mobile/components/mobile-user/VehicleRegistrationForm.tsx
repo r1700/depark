@@ -14,6 +14,7 @@ import {
 import { useForm } from "react-hook-form";
 import axios from "axios";
 
+
 interface VehicleFormInputs {
   license_plate: string;
   vehicle_model_id?: string;

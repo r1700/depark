@@ -14,6 +14,7 @@ import MarkEmailReadIcon from '@mui/icons-material/MarkEmailRead';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
+
 interface Notification {
   id: number;
   baseuser_id: number;
