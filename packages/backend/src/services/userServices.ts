@@ -6,24 +6,23 @@ import { QueryTypes } from 'sequelize';
 export async function getAllUsersWithBaseuser() {
     const results = await sequelize.query(
         `
-    SELECT
-      bu.id AS baseuser_id,
-      bu.first_name,
-      bu.last_name,
-      bu.email,
-      bu.phone,
-      u.id AS id,
-      u.status,
-      u.department,
-      u.employee_id,
-      u.google_id,
-      u.max_cars_allowed_parking,
-      u.created_by,
-      u.approved_by,
-      u.approved_at
-    FROM baseuser bu
-    LEFT JOIN users u ON u.baseuser_id = bu.id
-    `,
+        SELECT
+            bu.id AS baseuser_id,
+            bu.first_name,
+            bu.last_name,
+            bu.email,
+            bu.phone,
+            u.status,
+            u.department,
+            u.employee_id,
+            u.google_id,
+            u.max_cars_allowed_parking,
+            u.created_by,
+            u.approved_by,
+            u.approved_at
+        FROM baseuser bu
+        LEFT JOIN users u ON u.baseuser_id = bu.id
+        `,
         { type: QueryTypes.SELECT }
     );
     return results;

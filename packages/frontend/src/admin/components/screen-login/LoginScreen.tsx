@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from "react";
-import { Box, Button, TextField, Typography, Link, Alert, Stack, Container, CircularProgress } from "@mui/material";
-import { useForm, SubmitHandler, Controller } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
+import React, {useState, useEffect} from "react";
+import {Box, Button, TextField, Typography, Link, Alert, Stack, Container, CircularProgress} from "@mui/material";
+import {useForm, SubmitHandler, Controller} from "react-hook-form";
+import {yupResolver} from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { useNavigate } from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import GoogleAuth from "../google-auth/GoogleAuth";
 
-const API_BASE = process.env.REACT_APP_API_URL;
+const API_BASE = process.env.REACT_APP_API_URL ;
 
 interface IFormInputs {
     email: string;
@@ -25,7 +25,7 @@ const schema = yup
     })
     .required();
 
-const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
+const LoginScreen: React.FC<LoginScreenProps> = ({onLogin}) => {
     const [login, setLogin] = useState<boolean>(false);
     const [serverError, setServerError] = useState<string>("");
     const [loading, setLoading] = useState<boolean>(false);
@@ -33,11 +33,11 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
 
     useEffect(() => {
         if (login) {
-            navigate("/admin", { replace: true });
+            navigate("/admin", {replace: true});
         }
     }, [login, navigate]);
 
-    const { control, handleSubmit, formState: { errors, isValid } } = useForm<IFormInputs>({
+    const {control, handleSubmit, formState: {errors, isValid}} = useForm<IFormInputs>({
         resolver: yupResolver(schema),
         mode: "onChange",
         reValidateMode: "onChange",
@@ -50,7 +50,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
         try {
             const response = await fetch(`${API_BASE}/auth/login`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {"Content-Type": "application/json"},
                 body: JSON.stringify(data),
             });
 
@@ -65,7 +65,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
             if (result.success === true) {
                 setLogin(true);
 
-                const { user, token, expiresAt } = result;
+                const {user, token, expiresAt} = result;
                 console.log(user + " logged in successfully");
 
                 localStorage.setItem("token", token);
@@ -94,19 +94,19 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
                     direction: "ltr",
                 }}
             >
-                <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: "bold" }}>
+                <Typography variant="h4" component="h1" gutterBottom sx={{fontWeight: "bold"}}>
                     Welcome !
                 </Typography>
                 <Typography variant="subtitle1" color="text.secondary" gutterBottom>
                     Please login to your account
                 </Typography>
 
-                <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate sx={{ mt: 1 }}>
+                <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate sx={{mt: 1}}>
                     <Controller
                         name="email"
                         control={control}
                         defaultValue=""
-                        render={({ field }) => (
+                        render={({field}) => (
                             <TextField
                                 {...field}
                                 label="Email"
@@ -126,7 +126,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
                         name="password"
                         control={control}
                         defaultValue=""
-                        render={({ field }) => (
+                        render={({field}) => (
                             <TextField
                                 {...field}
                                 label="Password"
@@ -143,7 +143,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
                     />
 
                     {serverError && (
-                        <Alert severity="error" sx={{ mt: 2 }}>
+                        <Alert severity="error" sx={{mt: 2}}>
                             {serverError}
                         </Alert>
                     )}
@@ -154,24 +154,20 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
                         variant="contained"
                         color="primary"
                         disabled={!isValid || loading}
-                        sx={{ mt: 3, mb: 2 }}
+                        sx={{mt: 3, mb: 2}}
                     >
-                        {loading ? <CircularProgress size={24} color="inherit" /> : "Login"}
+                        {loading ? <CircularProgress size={24} color="inherit"/> : "Login"}
                     </Button>
                 </Box>
 
-                <GoogleAuth setLogin={setLogin} />
+                <GoogleAuth setLogin={setLogin}/>
 
-                <Stack direction="row" justifyContent="center" sx={{ mt: 2 }} spacing={2}>
-                    <Link
-                        component="button"
-                        variant="body1" // מגדיל את הטקסט
-                        onClick={() => navigate("/forgot-password")}
-                        dir="ltr"
-                        underline="hover"
-                        sx={{ fontSize: 20 }}  // מגדיל ומדגיש
-                    >
+                <Stack direction="row" justifyContent="space-between" sx={{mt: 2}} spacing={2}>
+                    <Link href="#" underline="hover" variant="body2" dir="ltr">
                         Forgot password?
+                    </Link>
+                    <Link href="#" underline="hover" variant="body2" dir="ltr">
+                        Sign up for a new account
                     </Link>
                 </Stack>
             </Box>

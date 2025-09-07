@@ -29,7 +29,7 @@ if (STATUS === 'production') {
   };
   console.log("dbConfig:", dbConfig);
 } else {
-  dbConfig = {   
+  dbConfig = {
     DB_USER: process.env.LOCAL_DB_USER  as string,
     DB_PASSWORD: process.env.LOCAL_DB_PASSWORD as string,
     DB_HOST: process.env.LOCAL_DB_HOST  as string,

@@ -18,14 +18,14 @@ import MenuIcon from '@mui/icons-material/Menu';
 import LogoutIcon from '@mui/icons-material/Logout';
 import PeopleIcon from '@mui/icons-material/People';
 import SettingsIcon from '@mui/icons-material/Settings';
-import PhotoIcon from '@mui/icons-material/Photo';
-import LocalParkingIcon from '@mui/icons-material/LocalParking';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
+import LocalParkingIcon from '@mui/icons-material/LocalParking';
+import ParkingIcon from '@mui/icons-material/LocalParking';
+import { LogoDev } from '@mui/icons-material';
 const drawerWidth = 240;
-type RoleName = 'admin' | 'hr' | 'guest';
 interface User {
     firstName: string;
     lastName: string;
@@ -35,14 +35,8 @@ interface SidebarProps {
     user: User;
     onLogout: () => void;
 }
-/** normalize role from various representations to 'admin'|'hr'|'guest' */
-function normalizeRole(role: number | string | undefined): RoleName {
-    if (role === undefined || role === null) return 'guest';
-    const r = String(role).toLowerCase();
-    if (r === '2' || r === 'admin' || r.includes('admin')) return 'admin';
-    if (r === '1' || r === 'hr' || r.includes('hr') || r.includes('human')) return 'hr';
-    return 'guest';
-}
+
+
 const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
     const [open, setOpen] = useState<boolean>(true);
     const [reportsOpen, setReportsOpen] = useState<boolean>(false);
@@ -52,39 +46,37 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
             setReportsOpen(false);
         }
     }, [open]);
-    const userRole = normalizeRole(user?.role);
+
+
     const getUserInitials = (): string => {
-        if (!user) return '';
-        const first = user.firstName ? user.firstName[0] : '';
-        const last = user.lastName ? user.lastName[0] : '';
-        return `${first}${last}`.toUpperCase();
+        if (!user || !user.firstName || !user.lastName) return '?';
+        return `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
     };
-    // menu items now include optional `allowed` array with roles that can see the item
+
+    // menu items synced with AdminRoutes
     const menuItems: Array<{
         text: string;
         icon?: React.ReactNode;
         path?: string;
-        allowed?: RoleName[];
-        subMenu?: Array<{ text: string; path: string; allowed?: RoleName[] }>;
+        subMenu?: Array<{ text: string; path: string }>;
     }> = [
-            { text: 'Users', icon: <PeopleIcon />, path: '/layout/users', allowed: ['admin'] }, // רק מנהל
-            { text: 'Admin', icon: <PeopleIcon />, path: '/admin/layout/admin-users', allowed: ['admin'] },
-            { text: 'Vehicles', icon: <DirectionsCarIcon />, path: '/layout/vehicles', allowed: ['admin', 'hr'] }, // שניהם
+            { text: 'Admin Dashboard', icon: <PeopleIcon />, path: '/admin/layout/admin' },
+            { text: 'HR Dashboard', icon: <DirectionsCarIcon />, path: '/admin/layout/hr-dashboard' },
+            // { text: 'Admin Config', icon: <AssessmentIcon />, path: '/admin/layout/admin-config' },
+            { text: 'Parkings', icon: <LocalParkingIcon />, path: '/admin/layout/parkings' },
+            { text: 'Reserved Parking', icon: <ParkingIcon />, path: '/admin/layout/reserved-parking' },
+            { text: 'Logo Management', icon: <LogoDev />, path: '/admin/layout/logo-management' },
             {
                 text: 'Reports',
                 icon: <AssessmentIcon />,
-                path: '',
-                allowed: ['admin', 'hr'], 
                 subMenu: [
-                    { text: 'Parking Stats', path: '/admin/layout/reports/parking-stats', allowed: ['admin'] },
-                    { text: 'Surface Stats', path: '/admin/layout/reports/surface-stats', allowed: ['admin', 'hr'] },
-               { text: 'Parkings Occupancy', path: '/admin/layout/reports/parkings-occupancy', allowed: ['admin', 'hr'] },
+                    { text: 'Parking Stats', path: '/admin/layout/reports/parking-stats' },
+                    { text: 'Surface Stats', path: '/admin/layout/reports/surface-stats' },
                 ],
             },
         ];
-    // helper: check if current user role allowed to see item
-    // כל אחד יכול לראות הכל
-    const isAllowed = () => true;
+
+
     return (
         <Drawer
             variant="permanent"
@@ -130,10 +122,9 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
             )}
             <List>
                 {menuItems.map((item) => {
-                    // skip item if not allowed for this user
-                    if (!isAllowed()) return null;
-                    // determine visible subMenu after filtering by allowed
-                    const visibleSubMenu = item.subMenu?.filter(() => isAllowed()) ?? [];
+                    // all items are allowed
+                    const visibleSubMenu = item.subMenu ?? [];
+
                     return (
                         <React.Fragment key={item.text}>
                             <ListItemButton
@@ -190,7 +181,7 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
                     <Avatar sx={{ bgcolor: '#1565C0', mr: 2, width: 40, height: 40 }}>{getUserInitials()}</Avatar>
                     {open && (
                         <Typography noWrap>
-                            {user.firstName} {user.lastName}
+                            {user && user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : 'Guest'}
                         </Typography>
                     )}
                 </Box>
