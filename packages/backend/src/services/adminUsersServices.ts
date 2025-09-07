@@ -3,7 +3,6 @@ import sequelize from '../config/database';
 import AdminUser from '../models/AdminUser';
 import BaseUser from '../models/BaseUser';
 import bcrypt from 'bcrypt';
-
 import { Permission, PermissionLabels } from '../enums/permissions';
 import { Role, RoleLabels } from '../enums/role';
 
@@ -20,7 +19,6 @@ export function getPermissionDigits(values: string[], labels: Record<number, str
 
   return Array.from(new Set(digits)).sort((a, b) => Number(a) - Number(b));
 }
-
 
 export function encodeGeneric(values: string[], labels: Record<number, string>): number {
   const digits = getPermissionDigits(values, labels);
@@ -44,7 +42,27 @@ export function decodeGeneric(value: number, labels: Record<number, string>): st
   return result;
 }
 
+function mapBaseUser(raw: any): any {
+  if (!raw) return null;
+  return {
+    id: raw.id,
+    email: raw.email ?? null,
+    firstName: raw.first_name ?? null,
+    lastName: raw.last_name ?? null,
+    createdAt: raw.created_at ?? null,
+    updatedAt: raw.updated_at ?? null,
+  };
+}
 
+function mapAdminUser(raw: any): any {
+  return {
+    id: raw.id,
+    role: decodeGeneric(Number(raw.role ?? 0), RoleLabels)[0],
+    permissions: decodeGeneric(Number(raw.permissions ?? 0), PermissionLabels),
+    lastLoginAt: raw.last_login_at ?? null,
+    baseUser: mapBaseUser(raw.baseUser),
+  };
+}
 
 export interface AdminUserFilters {
   searchTerm?: string;
@@ -59,7 +77,6 @@ export interface AdminUserFilters {
   updatedBefore?: Date;
   activeLastNDays?: number;
   sortBy?: string;
-  sortDirection?: 'asc' | 'desc';
   limit?: number;
   offset?: number;
 }
@@ -76,16 +93,13 @@ export function addDateCondition<T>(
   where[field][operator] = value;
 }
 
-
 export async function getFilteredAdminUsers(filters: AdminUserFilters) {
-  //  Ensure filters is defined to avoid runtime errors
   filters = filters ?? {};
 
   const whereAdmin: WhereOptions = {};
   const whereBaseUser: WhereOptions = {};
   const whereParts: any[] = [];
 
-  //  Search term
   if (filters.searchTerm) {
     if (filters.searchTerm.includes('@')) {
       whereBaseUser.email = { [Op.iLike]: `${filters.searchTerm}%` };
@@ -94,13 +108,11 @@ export async function getFilteredAdminUsers(filters: AdminUserFilters) {
     }
   }
 
-  //  Roles filter (preserve existing bitwise behaviour if applicable)
   if (filters.roles && filters.roles.length > 0) {
     const encodedRole = encodeGeneric(filters.roles, RoleLabels);
     whereParts.push(literal(`"AdminUser"."role" & ${encodedRole} = ${encodedRole}`));
   }
 
-  //  Date filters on admin fields
   if (filters.lastLoginAfter) {
     addDateCondition(whereAdmin, 'last_login_at', Op.gte, filters.lastLoginAfter);
   }
@@ -109,7 +121,6 @@ export async function getFilteredAdminUsers(filters: AdminUserFilters) {
   }
 
   const normalizeDate = (val: any, name: string): Date | undefined => {
-    //  Treat undefined/null/empty-string as "not provided"
     if (val === undefined || val === null) return undefined;
     if (typeof val === 'string' && val.trim() === '') return undefined;
 
@@ -153,20 +164,24 @@ export async function getFilteredAdminUsers(filters: AdminUserFilters) {
   if (filters.updatedBefore) {
     addDateCondition(whereBaseUser, 'updated_at', Op.lte, filters.updatedBefore);
   }
-
-  if (filters.activeLastNDays && filters.activeLastNDays > 0) {
+  if (filters.activeLastNDays !== undefined) {
+    if (
+      typeof filters.activeLastNDays !== 'number' ||
+      filters.activeLastNDays <= 0 ||
+      filters.activeLastNDays >= 30
+    ) {
+      throw new Error('activeLastNDays must be a number greater than 0 and less than 30');
+    }
     const fromDate = new Date();
     fromDate.setDate(fromDate.getDate() - filters.activeLastNDays);
     addDateCondition(whereAdmin, 'last_login_at', Op.gte, fromDate);
   }
 
-  //  Permissions filter (ALL semantics): normalize input, map to digits, require each digit
   if (filters.permissionsInclude && (Array.isArray(filters.permissionsInclude) ? filters.permissionsInclude.length > 0 : String(filters.permissionsInclude).trim() !== '')) {
     const rawPerms = Array.isArray(filters.permissionsInclude)
       ? filters.permissionsInclude
       : [String(filters.permissionsInclude)];
 
-    //  Normalize and map case-insensitively
     const normalized = rawPerms.map(p => String(p).trim().toLowerCase());
     const digits = Array.from(new Set(
       normalized
@@ -178,12 +193,9 @@ export async function getFilteredAdminUsers(filters: AdminUserFilters) {
         .filter((d): d is string => !!d)
     )).sort((a, b) => Number(a) - Number(b));
 
-    //  Debug log to help diagnose mapping problems (remove in prod)
-    // eslint-disable-next-line no-console
     console.log('permissions filter', { rawPerms, normalized, digits });
 
     if (digits.length === 0) {
-      //  No valid permission labels found -> no results (ALL semantics)
       whereParts.push(literal('1 = 0'));
     } else {
       const likeConds = digits.map(d => {
@@ -193,16 +205,11 @@ export async function getFilteredAdminUsers(filters: AdminUserFilters) {
       whereParts.push(literal(`(${likeConds.join(' AND ')})`));
     }
   }
-
-  //  include whereAdmin object if populated
   if (Object.keys(whereAdmin).length > 0) {
     whereParts.push(whereAdmin);
   }
 
   const whereFinal: WhereOptions = whereParts.length > 0 ? { [Op.and]: whereParts } : whereAdmin;
-
-  const orderBy = filters.sortBy ? filters.sortBy.replace(/([A-Z])/g, '_$1').toLowerCase() : 'id';
-  const orderDir = filters.sortDirection?.toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
   const limit = filters.limit && filters.limit > 0 ? filters.limit : 100;
   const offset = filters.offset && filters.offset >= 0 ? filters.offset : 0;
 
@@ -221,33 +228,14 @@ export async function getFilteredAdminUsers(filters: AdminUserFilters) {
     ],
     limit,
     offset,
-    order: [[orderBy, orderDir]],
     attributes: ['id', 'role', 'last_login_at', 'permissions'],
   };
 
   const results = await AdminUser.findAll(findOptions);
 
-  return results.map(u => {
-    const raw = u.toJSON() as any;
-    const role = decodeGeneric(Number(raw.role ?? 0), RoleLabels)[0];
-    const permissions = decodeGeneric(Number(raw.permissions ?? 0), PermissionLabels);
-
-    return {
-      id: raw.id,
-      role,
-      permissions,
-      lastLoginAt: raw.last_login_at ?? null,
-      baseUser: raw.baseUser ? {
-        id: raw.baseUser.id,
-        email: raw.baseUser.email ?? null,
-        firstName: raw.baseUser.first_name ?? null,
-        lastName: raw.baseUser.last_name ?? null,
-        createdAt: raw.baseUser.created_at ?? null,
-        updatedAt: raw.baseUser.updated_at ?? null,
-      } : null,
-    };
-  });
+  return results.map(u => mapAdminUser(u.toJSON()));
 }
+
 interface UpdateAdminUserData {
   email?: string;
   firstName?: string;
@@ -283,13 +271,8 @@ export async function getAdminUserById(
   });
   if (!adminUser) throw new Error(`AdminUser with id ${id} not found`);
 
-  const json = adminUser.toJSON() as any;
-  json.permissions = decodeGeneric(json.permissions ?? 0, PermissionLabels);
-  json.role = decodeGeneric(json.role ?? 0, RoleLabels)[0];
-
-  delete json.password_hash;
-
-  return json;
+  const raw = adminUser.toJSON();
+  return mapAdminUser(raw);
 }
 
 export async function updateAdminUser(id: number, data: UpdateAdminUserData): Promise<any> {
@@ -305,14 +288,11 @@ export async function updateAdminUser(id: number, data: UpdateAdminUserData): Pr
     data.email ?? baseUser.email,
     baseUser.id
   );
-
-  // קידוד הרשאות (אם סופקו), אחרת שומר על ההרשאות הקיימות
   const permissionsNumber = data.permissions ? encodeGeneric(data.permissions, PermissionLabels) : adminUser.permissions;
 
-  // קידוד role (אם סופק), אחרת שומר על ה-role הקיים
   const roleNumber = data.role ? encodeGeneric([data.role], RoleLabels) : adminUser.role;
+  console.log('permissions:', data.permissions, 'encoded:', permissionsNumber);
 
-  // ביצוע עדכון טרנזקציוני של שתי הטבלאות
   return sequelize.transaction(async (t) => {
     await baseUser.update(
       {
@@ -337,7 +317,6 @@ export async function updateAdminUser(id: number, data: UpdateAdminUserData): Pr
     return getAdminUserById(adminUser.id);
   });
 }
-
 
 interface BaseUserData {
   email: string;

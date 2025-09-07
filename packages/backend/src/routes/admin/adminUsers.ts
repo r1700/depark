@@ -21,8 +21,6 @@ router.get('/users', async (req: Request, res: Response) => {
       lastActivityAfter,
       lastActivityBefore,
       activeLastNDays,
-      sortBy,
-      sortDirection,
       limit,
       offset,
     } = req.query;
@@ -129,29 +127,18 @@ router.get('/users', async (req: Request, res: Response) => {
       }
       filters.activeLastNDays = parsedDays;
     }
-
-    if (sortBy && typeof sortBy === 'string') {
-      const allowedSortBy = ['permissions', 'lastName', 'createdAt', 'lastLoginAt', 'updatedAt', 'lastActivityTimestamp'];
-      if (!allowedSortBy.includes(sortBy)) {
-        return res.status(400).json({ success: false, error: `sortBy must be one of ${allowedSortBy.join(', ')}` });
-      }
-      filters.sortBy = sortBy;
-    }
-
-    if (sortDirection && typeof sortDirection === 'string') {
-      const dir = sortDirection.toLowerCase();
-      if (dir !== 'asc' && dir !== 'desc') {
-        return res.status(400).json({ success: false, error: 'sortDirection must be "asc" or "desc"' });
-      }
-      filters.sortDirection = dir;
-    }
-
     const users = await adminUsersService.getFilteredAdminUsers(filters);
-
-    res.json({ success: true, data: users });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ success: false, error: 'Internal Server Error' });
+    res.json(users);
+  } catch (error: any) {
+    if (error instanceof Error && (
+      error.message.includes('must be') ||
+      error.message.includes('not a valid') ||
+      error.message.includes('already exists') ||
+      error.message.includes('Missing required')
+    )) {
+      return res.status(400).json({ error: error.message });
+    }
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 router.post('/users', async (req: Request, res: Response) => {
@@ -160,8 +147,10 @@ router.post('/users', async (req: Request, res: Response) => {
     const newUser = await adminUsersService.addAdminUser(userData);
     res.status(201).json({ success: true, data: newUser });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ success: false, message: 'Error creating user' });
+    if (error instanceof Error && error.message.includes('already exists')) {
+      return res.status(400).json({ error: error.message });
+    }
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
@@ -173,31 +162,22 @@ router.put('/users/:id', async (req: Request, res: Response) => {
     }
     const updateData = req.body;
 
-    const updatedUser = await adminUsersService.updateAdminUser(id, updateData);
+    await adminUsersService.updateAdminUser(id, updateData);
 
+    // אחרי עדכון, תביא את המשתמש מחדש כולל baseUser
+    const updatedUser = await adminUsersService.getAdminUserById(id);
     if (!updatedUser) {
       return res.status(404).json({ success: false, message: 'User not found' });
     }
 
     return res.json({ success: true, data: updatedUser });
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
-    res.status(500).json({ success: false, message: 'Internal Server Error' });
+    if (error instanceof Error && error.message.includes('already exists')) {
+      return res.status(400).json({ error: error.message });
+    }
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
-
-// router.delete('/users/:id', async (req: Request, res: Response) => {
-//   try {
-//     const id = Number(req.params.id);
-//     if (isNaN(id)) {
-//       return res.status(400).json({ success: false, message: 'Invalid user id' });
-//     }
-//     await adminUsersService.deleteAdminUser(id);
-//     res.json({ success: true });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ success: false, message: 'Internal Server Error' });
-//   }
-// });
 
 export default router;
