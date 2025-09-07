@@ -50,22 +50,18 @@ const ParkingStatsPage: React.FC = () => {
   const data: ParkingStatItem[] = useMemo(() => {
     if (!Array.isArray(rawData)) return [];
     return rawData.map((item: any) => {
-      if (!item.period) {
-        return {
-          day: '',
-          hour: '',
-          period: '',
-          monthYear: '',
-          entries: Number(item.entries) || 0,
-          exits: Number(item.exits) || 0,
-        };
+      const period = item && typeof item.period === 'string' ? item.period : '';
+      let date;
+      try {
+        date = parseISO(period);
+      } catch {
+        date = new Date('');
       }
-      const date = parseISO(item.period);
       return {
-        day: format(date, 'd'),
-        hour: format(date, 'HH:00'),
-        period: item.period,
-        monthYear: format(date, 'MMM yyyy'),
+        day: isValid(date) ? format(date, 'd') : '',
+        hour: isValid(date) ? format(date, 'HH:00') : '',
+        period: period,
+        monthYear: isValid(date) ? format(date, 'MMM yyyy') : '',
         entries: Number(item.entries) || 0,
         exits: Number(item.exits) || 0,
       };
@@ -75,22 +71,18 @@ const ParkingStatsPage: React.FC = () => {
   const selectedDayData: ParkingStatItem[] | null = useMemo(() => {
     if (!Array.isArray(rawDayData)) return null;
     return rawDayData.map((item: any) => {
-      if (!item.period) {
-        return {
-          day: '',
-          hour: '',
-          period: '',
-          monthYear: '',
-          entries: Number(item.entries) || 0,
-          exits: Number(item.exits) || 0,
-        };
+      const period = item && typeof item.period === 'string' ? item.period : '';
+      let date;
+      try {
+        date = parseISO(period);
+      } catch {
+        date = new Date('');
       }
-      const date = parseISO(item.period);
       return {
-        day: format(date, 'd'),
-        hour: format(date, 'HH:00'),
-        period: item.period,
-        monthYear: format(date, 'MMM yyyy'),
+        day: isValid(date) ? format(date, 'd') : '',
+        hour: isValid(date) ? format(date, 'HH:00') : '',
+        period: period,
+        monthYear: isValid(date) ? format(date, 'MMM yyyy') : '',
         entries: Number(item.entries) || 0,
         exits: Number(item.exits) || 0,
       };
