@@ -130,6 +130,7 @@ function detectDataType(value: any): { dataType: DataType; arrayType?: VariantAr
       throw new Error(`Unsupported data type: ${typeof value}`);
   }
 }
+
 // Interface for write items
 export interface WriteItem {
   nodeId: string;
@@ -207,7 +208,7 @@ export async function createMonitoredItems(subscription: ClientSubscription): Pr
     try {
       await item.terminate();
     } catch (e) {
-      console.warn(":warning: Warning terminating monitored item:", e);
+      console.warn("⚠️ Warning terminating monitored item:", e);
     }
   }
   monitoredItems = [];
@@ -225,6 +226,7 @@ export async function createMonitoredItems(subscription: ClientSubscription): Pr
       },
       TimestampsToReturn.Both
     );
+
     monitoredItem.on("changed", async (dataValue: DataValue) => {
       const val = dataValue.value?.value;
       let event: string = '';
@@ -239,7 +241,7 @@ export async function createMonitoredItems(subscription: ClientSubscription): Pr
       await sendDataToBackend(event, val);
     });
     monitoredItem.on("err", (err) => {
-      console.error(`:x: Monitored item error at ${nodeId}:`, err);
+      console.error(`❌ Monitored item error at ${nodeId}:`, err);
     });
     monitoredItems.push(monitoredItem);
   });

@@ -22,7 +22,7 @@ console.log('parsedData.json saved!');
   return res.json(data);
 });
 
-router.get('/Queue/:floorNumber?', (req, res) => {
+router.get('/Queue/:floorNumber', (req, res) => {
   let data: any[] = [];
   try {
     const file = fs.readFileSync(__dirname + '/parsedData.json', 'utf-8');

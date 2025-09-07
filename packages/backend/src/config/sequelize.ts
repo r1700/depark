@@ -1,5 +1,6 @@
 import { Sequelize } from 'sequelize';
 import { appDbConfig } from './config';
+
 const sequelize = new Sequelize(
   appDbConfig.database,
   appDbConfig.username,
