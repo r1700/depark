@@ -41,15 +41,10 @@ export default function AdminLogoManagement() {
   const [logoDialogOpen, setLogoDialogOpen] = useState(false);
   const [selectedScreenType, setSelectedScreenType] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-<<<<<<< HEAD
   // מערך לוגואים שממתינים להעלאה
   // State for pending logos
-  const [pendingLogos, setPendingLogos] = useState<File[]>([]);
-  const [, setPendingLogosVersion] = useState(0);
-
   // Remove prevSelectedLogos update on every logos/selectedLogos change
   // Instead, update prevSelectedLogos only after successful save
-=======
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [errorVisible, setErrorVisible] = useState(false);
   const [pendingLogos, setPendingLogos] = useState<File[]>([]);
@@ -79,7 +74,6 @@ export default function AdminLogoManagement() {
     };
     fetchScreenTypeLogos();
   }, []);
->>>>>>> b9d0e8f7 (fix the all conflictim (#211))
 
   useEffect(() => {
     fetch(`${API_BASE}/api/logos`)
@@ -176,16 +170,13 @@ export default function AdminLogoManagement() {
       if (response.ok) {
         setOverlayMessage(`Logos saved successfully for ${screenType}!`);
         setOverlayType('success');
-<<<<<<< HEAD
         // Update prevSelectedLogos only after successful save
         setPrevSelectedLogos(prev => ({ ...prev, [screenType]: [...logoIds] }));
-=======
         // עדכן את prevSelectedLogos לערך החדש
         setPrevSelectedLogos(prev => ({
           ...prev,
           [screenType]: [...logoIds]
         }));
->>>>>>> b9d0e8f7 (fix the all conflictim (#211))
       } else {
         const errorData = await response.json();
         if (errorData && errorData.missingIds) {
