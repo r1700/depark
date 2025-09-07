@@ -1,28 +1,40 @@
-import axios from "axios";
-import * as dotenv from "dotenv";
+import axios from 'axios';
+import * as dotenv from 'dotenv';
+
 dotenv.config();
 
 const { SOURCE_URL } = process.env;
-const backendBase = `http://${SOURCE_URL || "localhost:3001"}/api`;
+
+// Construct the backend URL
+const backendUrl = `http://${SOURCE_URL || 'localhost:3001'}/api/opc`;
 
 /**
- * שלח payload ל‑backend.
- * endpoint — חלק אחרי /api/ (למשל: 'opc/fault' או 'opc/fault/resolve')
+ * Function to send data to the backend
+ * @param event - The event name or endpoint to send the data to
+ * @param value - The value to send to the backend
  */
-async function sendDataToBackend(endpoint: string, payload: any) {
-  const url = `${backendBase}/opc/${endpoint}`;
+async function sendDataToBackend(event: string, value: any): Promise<void> {
+  const url = `${backendUrl}/${event}`; // Construct the full URL
   try {
-    const response = await axios.post(url, payload, {
-      timeout: 5000,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    console.log(`Backend response [${endpoint}]:`, response.data);
-    return response.data;
+    console.log(`Sending data to backend at ${url} with value:`, value);
+
+    const response = await axios.post(url, { value });
+    console.log('Backend response:', response.data);
   } catch (error: any) {
-    console.error(`Error sending data to backend [${endpoint}]:`, error?.response?.data ?? error.message ?? error);
-    throw error;
+    if (error.response) {
+      // Server responded with a status code outside the 2xx range
+      console.error('Error response from backend:', {
+        status: error.response.status,
+        data: error.response.data,
+      });
+    } else if (error.request) {
+      // Request was made but no response was received
+      console.error('No response received from backend:', error.request);
+    } else {
+      // Something else happened while setting up the request
+      console.error('Error sending data to backend:', error.message);
+    }
+    throw new Error(`Failed to send data to backend at ${url}`);
   }
 }
 
