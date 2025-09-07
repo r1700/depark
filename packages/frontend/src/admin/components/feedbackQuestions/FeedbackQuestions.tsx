@@ -7,20 +7,9 @@ import DataTable from '../table/table';
 import './FeedbackQuestions.css';
 import GenericForm from '../forms/Form';
 import { Modal, Backdrop, Fade, Box } from '@mui/material';
-
+import { styleModal } from '../forms/Form';
 
 const FeedbackQuestions: React.FC = () => {
-
-  const styleModal = {
-    position: 'absolute' as 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    borderRadius: 2,
-    p: 4,
-    width: { xs: '90%', sm: 400 },
-    align: 'center',
-  };
 
   const [data, setData] = useState<any>({});
   const [showAddModal, setShowAddModal] = useState(false);
@@ -44,8 +33,6 @@ const FeedbackQuestions: React.FC = () => {
 
     dispatch(fetchFeedbackQuestions());
 
-    
-
     let columns: object[] = [];
 
     for (const k in questions[0]) {
@@ -65,7 +52,6 @@ const FeedbackQuestions: React.FC = () => {
       <div id="options-bar">
         <button onClick={openAddUserModal}>Add question</button>
       </div>
-
 
       <DataTable
         data={data}
