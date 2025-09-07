@@ -1,11 +1,5 @@
-import { Sequelize } from "sequelize";
 
-const sequelize = new Sequelize('depark', 'postgres', 'Chalafta13', {
-  host: "localhost",
-  dialect: "postgres",
-});
-
-//import sequelize from "../config/sequelize";
+import sequelize from "../config/sequelize";
 
 async function seedVehicles() {
   console.log("Starting insert of 500,000 records...");
@@ -47,7 +41,7 @@ FROM generate_series(1, 500000);`;
   await sequelize.close();
 }
 
-// seedVehicles().catch(err => console.error(err));
+seedVehicles().catch(err => console.error(err));
 
 
 
