@@ -29,6 +29,8 @@ import surfaceReport from './routes/surfaceStat';
 import retrieveRoute from './routes/RetrivalQueue';
 import otpRoutes from './routes/otp.server';
 import protectedRoutes from './routes/protected';
+import routes from './routes/mobile/mobileUserRoutes';
+import notifications from "./routes/mobile/notificationsRoutes"; 
 
 import path from 'path';
 const app = express();
@@ -112,6 +114,8 @@ app.use('/api/protected', protectedRoutes);
 
 // app.use('/api/tablet', retrieveRoute);
 app.use('/api/otp', otpRoutes);
+app.use("/api", routes);
+app.use("/notifications", notifications);
 
 app.use('/api/logos', logoRouter);
 app.use('/api/screentypes', screenTypeRouter);
@@ -121,6 +125,7 @@ app.use((req, res, next) => {
     console.log(`[${ req.method }] ${ req.path }`, req.body);
     next();
 });
+
 
 app.use("/api/opc", techniciansRoutes);
 app.use('/api/opc', faultsRouter);

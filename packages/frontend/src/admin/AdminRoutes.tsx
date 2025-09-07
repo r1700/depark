@@ -78,10 +78,12 @@ const AdminRoutes: React.FC = () => {
         <Route path="admin-config" element={<AdminConfigPage />} />
         <Route path="admin-config/:lotId" element={<AdminConfigPage />} />
         <Route path="parkings" element={<ParkingsPage />} />
+
         <Route path="logo-management" element={<AdminLogoManagement />} />
         <Route path="reports">
           <Route path="parking-stats" element={<ParkingStatsPage />} />
           <Route path="surface-stats" element={<SurfaceStatsPage />} />
+
         </Route>
         <Route path="reserved-parking" element={<ReservedParking />} />
         <Route path="admin-config-reservedparking" element={<AdmainConfigReservedparking />} />
@@ -95,6 +97,7 @@ const AdminRoutes: React.FC = () => {
             )
           }
         />
+
       </Route>
 
       <Route path="*" element={<Navigate to="/admin" replace />} />
