@@ -33,7 +33,7 @@ import Exit from './routes/opc/exit'; // Import the exit route
 // import session from 'express-session';
 import adminConfigRouter from './routes/adminConfig';
 import './cronJob'; // Import the cron job to ensure it runs on server start
-import Retrieval from './routes/RetrivalQueue';
+import Employee from './routes/employee-vehicles';
 
 const app = express();
 const server = http.createServer(app);
@@ -95,18 +95,9 @@ app.use('/api/users', userApi);
 app.use('/api/reservedparking', ResevedParking);
 // app.use('/api/auth', authRoutes);
 app.use('/api/auth', userGoogleAuthRoutes);
-app.use('/api/vehicles', vehicle)
-app.use('/api/admin', adminConfigRouter);
-app.use('/OAuth', GoogleAuth);
-app.use('/api/admin', adminConfigRouter);
-app.use('/api/parking-stats', parkingReport);
-app.use('/api/surface-stats', surfaceReport);
-app.use('/api/tablet', retrieveRoute);
-app.use('/api/otp', otpRoutes);
-app.use('/api/logos', logoRouter);
-app.use('/api/screentypes', screenTypeRouter);
-app.use('/logos', express.static(path.join(process.cwd(), 'public/logos')));
-
+app.use('/api/tablet', Retrival);
+app.use('/api/tablet', Employee);
+app.use('/api/opc', Exit);
 // Log all incoming requests
 app.use('/api/admin', adminConfigRouter);
 app.use((req, res, next) => {

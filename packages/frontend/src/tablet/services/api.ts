@@ -56,7 +56,7 @@ export async function sendElevatorQueue(floorNumber: number, elevatorNumber: num
 }
 
 export async function sendEmployeeVehicles(employeeId: string) {
-    const url = 'https://localhost:3001/api/tablet/employee-vehicles';
+    const url = 'https://localhost:3001/api/tablet/Employee';
     try {
         const response = await axios.post(url, { employeeId });
         return response.data;
