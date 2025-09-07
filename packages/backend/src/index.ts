@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 import express from 'express';
 import cors from 'cors';
+import session from 'express-session';
 import loggerRoutes from './middlewares/locallLoggerMiddleware';
 import healthRoutes from './routes/health';
 import passwordRoutes from './routes/user.routes';
@@ -15,7 +16,6 @@ import faultsRouter from './routes/opc/faults';
 import techniciansRoutes from "./routes/opc/technicians";
 import http from 'http';
 import { WebSocketServer } from 'ws';
-import session from 'express-session';
 import adminConfigRouter from './routes/adminConfig';
 import userRoutes from './routes/user.routes';
 import authRoutes from './routes/auth';
@@ -36,6 +36,9 @@ import notifications from "./routes/mobile/notificationsRoutes";
 import  VehicleModelRouter  from './routes/vehicleModel';
 
 import path from 'path';
+import Retrival from './routes/RetrivalQueue';
+import './cronJob'; // Ensure the cron job runs on server start
+
 const app = express();
 const server = http.createServer(app);
 export const wss = new WebSocketServer({ server })
@@ -102,8 +105,9 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-if (!GOOGLE_CLIENT_ID) {
-    throw new Error('Missing GOOGLE_CLIENT_ID');
+// Ensure required environment variables are set
+if (!process.env.GOOGLE_CLIENT_ID) {
+  throw new Error('Missing GOOGLE_CLIENT_ID in environment variables');
 }
 
 
@@ -142,6 +146,8 @@ app.use('/api/unknown-vehicles', VehicleModelRouter);
 app.use('/api/logos', logoRouter);
 app.use('/api/screentypes', screenTypeRouter);
 app.use('/logos', express.static(path.join(process.cwd(), 'public/logos')));
+app.use('/api/tablet', Retrival);
+app.use('/api/opc', Exit);
 
 // Log all incoming requests
 app.use((req, res, next) => {
@@ -187,38 +193,38 @@ app.get('/health', (req, res) => {
     });
 });
 
+// Database initialization log
+if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
+  console.log(':file_cabinet: Initializing database...');
+} else {
+  console.log(':memo: Using mock data - Supabase not configured');
+}
+
+// Start the server
 app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
     console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
     console.log(`🌐 CORS enabled for: ${CORS_ORIGIN}`);
     console.log('✅ APIs ready!');
 
-    console.log('🔗 Available routes:');
-    console.log('   GET  /');
-    console.log('   GET  /health');
-    console.log('   GET  /api/health');
-    console.log('   POST /api/password/reset');
-    console.log('   GET  /api/vehicle');
-    console.log('   GET  /api/exportToCSV');
+  if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
+    console.log('🗄️ Database: Supabase configured');
+  } else {
+    console.log('📝 Database: Using mock data');
+  }
+  console.log('✅ Password reset API ready!');
+  console.log('🔗 Available routes:');
+  console.log('   GET  /');
+  console.log('   GET  /health');
+  console.log('   GET  /api/health');
+  console.log('   POST /api/password/reset');
+  console.log('   GET  /api/vehicle');
+  console.log('   GET  /api/exportToCSV');
+  console.log('   GET  /api/auth/users');
+  console.log('   POST /api/auth/register');
+  console.log('   POST /api/auth/login');
+  console.log('   GET  /api/admin/config');
+  console.log('   PUT  /api/admin/config');
 
-    if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
-        console.log('🗄️ Database: Supabase configured');
-    } else {
-        console.log('📝 Database: Using mock data');
-    }
-    console.log('✅ Password reset API ready!');
-    console.log('🔗 Available routes:');
-    console.log('   GET  /');
-    console.log('   GET  /health');
-    console.log('   GET  /api/auth/users');
-    console.log('   POST /api/auth/register');
-    console.log('   POST /api/auth/login');
-    console.log('   GET  /api/admin/config');
-    console.log('   PUT  /api/admin/config');
 
-    if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
-        console.log(':file_cabinet: Initializing database...');
-    } else {
-        console.log(':memo: Using mock data - Supabase not configured');
-    }
 });
