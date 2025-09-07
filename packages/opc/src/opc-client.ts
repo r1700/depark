@@ -9,15 +9,13 @@ import {
   TimestampsToReturn,
   Variant,
   VariantArrayType,
-  MessageSecurityMode,
-  SecurityPolicy,
   UserTokenType,
   MessageSecurityMode,
   SecurityPolicy
 } from "node-opcua";
 import dotenv from "dotenv";
 import { sendDataToBackend } from "./backendService";
-import dotenv from 'dotenv';
+
 
 dotenv.config();
 

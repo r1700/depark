@@ -4,7 +4,6 @@ import dotenv from 'dotenv';
 dotenv.config();
 import express from 'express';
 import cors from 'cors';
-import session from 'express-session';
 import loggerRoutes from './middlewares/locallLoggerMiddleware';
 import healthRoutes from './routes/health';
 import passwordRoutes from './routes/user.routes';
@@ -16,10 +15,9 @@ import faultsRouter from './routes/opc/faults';
 import techniciansRoutes from "./routes/opc/technicians";
 import http from 'http';
 import { WebSocketServer } from 'ws';
+import session from 'express-session';
 import adminConfigRouter from './routes/adminConfig';
 import userRoutes from './routes/user.routes';
-import authRoutes from './routes/auth';
-import importFromCsv from './routes/importFromCsv';
 import logoRouter from './routes/logos';
 import screenTypeRouter from './routes/screenType';
 import './cronJob'; // Import the cron job to ensure it runs on server start
@@ -31,14 +29,8 @@ import userApi from './routes/userApi';
 import ResevedParking from './routes/reservedparkingApi';
 import retrieveRoute from './routes/RetrivalQueue';
 import otpRoutes from './routes/otp.server';
-import routes from './routes/mobile/mobileUserRoutes';
-import notifications from "./routes/mobile/notificationsRoutes"; 
-import  VehicleModelRouter  from './routes/vehicleModel';
 
 import path from 'path';
-import Retrival from './routes/RetrivalQueue';
-import './cronJob'; // Ensure the cron job runs on server start
-
 const app = express();
 const server = http.createServer(app);
 export const wss = new WebSocketServer({ server })
@@ -126,9 +118,9 @@ app.use('/api/auth', passwordRoutes);
 app.use('/api/vehicle', vehicleRoutes);
 app.use('/api/exportToCSV', exportToCSV);
 app.use('/api', userRoutes);
-app.use('/api/auth', authRoutes);
 app.use('/api/users', userApi);
 app.use('/api/reservedparking', ResevedParking);
+// app.use('/api/auth', authRoutes);
 app.use('/api/auth', userGoogleAuthRoutes);
 app.use('/api/vehicles', vehicle)
 app.use('/api/admin', adminConfigRouter);
@@ -138,16 +130,10 @@ app.use('/api/parking-stats', parkingReport);
 app.use('/api/surface-stats', surfaceReport);
 app.use('/api/tablet', retrieveRoute);
 app.use('/api/otp', otpRoutes);
-app.use("/api", routes);
-app.use("/notifications", notifications);
-app.use('/api/importFromCsv', importFromCsv);
-app.use('/api/unknown-vehicles', VehicleModelRouter);
 
 app.use('/api/logos', logoRouter);
 app.use('/api/screentypes', screenTypeRouter);
 app.use('/logos', express.static(path.join(process.cwd(), 'public/logos')));
-app.use('/api/tablet', Retrival);
-app.use('/api/opc', Exit);
 
 // Log all incoming requests
 app.use((req, res, next) => {
@@ -155,23 +141,22 @@ app.use((req, res, next) => {
     next();
 });
 
-
 app.use("/api/opc", techniciansRoutes);
 app.use('/api/opc', faultsRouter);
 app.use('/api/opc', Exit);
 
 // Print registered routes (debug)
 function printRoutes() {
-    console.log("Registered routes:", app);
+    console.log("Registered routes:",  app);
     app._router?.stack?.forEach((middleware: any) => {
         if (middleware.route) {
             const methods = Object.keys(middleware.route.methods).join(',').toUpperCase();
-            console.log(`${methods} ${middleware.route.path}`);
+            console.log(`${ methods } ${ middleware.route.path }`);
         } else if (middleware.name === 'router' && middleware.handle && middleware.handle.stack) {
             middleware.handle.stack.forEach((handler: any) => {
                 if (handler.route) {
                     const methods = Object.keys(handler.route.methods).join(',').toUpperCase();
-                    console.log(`${methods} ${handler.route.path}`);
+                    console.log(`${ methods } ${ handler.route.path }`);
                 }
             });
         }
@@ -193,38 +178,38 @@ app.get('/health', (req, res) => {
     });
 });
 
-// Database initialization log
-if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
-  console.log(':file_cabinet: Initializing database...');
-} else {
-  console.log(':memo: Using mock data - Supabase not configured');
-}
-
-// Start the server
 app.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
-    console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
-    console.log(`🌐 CORS enabled for: ${CORS_ORIGIN}`);
+    console.log(`🚀 Server running on port ${ PORT }`);
+    console.log(`📝 Environment: ${ process.env.NODE_ENV || 'development' }`);
+    console.log(`🌐 CORS enabled for: ${ CORS_ORIGIN }`);
     console.log('✅ APIs ready!');
 
-  if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
-    console.log('🗄️ Database: Supabase configured');
-  } else {
-    console.log('📝 Database: Using mock data');
-  }
-  console.log('✅ Password reset API ready!');
-  console.log('🔗 Available routes:');
-  console.log('   GET  /');
-  console.log('   GET  /health');
-  console.log('   GET  /api/health');
-  console.log('   POST /api/password/reset');
-  console.log('   GET  /api/vehicle');
-  console.log('   GET  /api/exportToCSV');
-  console.log('   GET  /api/auth/users');
-  console.log('   POST /api/auth/register');
-  console.log('   POST /api/auth/login');
-  console.log('   GET  /api/admin/config');
-  console.log('   PUT  /api/admin/config');
+    console.log('🔗 Available routes:');
+    console.log('   GET  /');
+    console.log('   GET  /health');
+    console.log('   GET  /api/health');
+    console.log('   POST /api/password/reset');
+    console.log('   GET  /api/vehicle');
+    console.log('   GET  /api/exportToCSV');
 
+    if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
+        console.log('🗄️ Database: Supabase configured');
+    } else {
+        console.log('📝 Database: Using mock data');
+    }
+    console.log('✅ Password reset API ready!');
+    console.log('🔗 Available routes:');
+    console.log('   GET  /');
+    console.log('   GET  /health');
+    console.log('   GET  /api/auth/users');
+    console.log('   POST /api/auth/register');
+    console.log('   POST /api/auth/login');
+    console.log('   GET  /api/admin/config');
+    console.log('   PUT  /api/admin/config');
 
+    if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
+        console.log(':file_cabinet: Initializing database...');
+    } else {
+        console.log(':memo: Using mock data - Supabase not configured');
+    }
 });
