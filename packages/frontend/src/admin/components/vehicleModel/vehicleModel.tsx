@@ -4,7 +4,7 @@ import { Box, Typography, IconButton, Snackbar, Alert } from '@mui/material';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import { useNavigate, useLocation } from 'react-router-dom';
 
-const API_BASE = 'http://localhost:3001';
+const API_BASE = process.env.CORS_ORIGIN ;
 
 const UnknownVehicles: React.FC = () => {
   const [data, setData] = React.useState<{ columns: any[]; rows: any[] }>({ columns: [], rows: [] });
