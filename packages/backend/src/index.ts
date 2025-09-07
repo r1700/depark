@@ -60,19 +60,19 @@ const PORT = process.env.PORT || 3001;
 // Serve static logos
 app.use('/logos', express.static(path.join(process.cwd(), 'public/logos')));
 
-if (process.env.NODE_ENV === 'production') {
-    app.set('trust proxy', 1);
-}
+const isProd = process.env.NODE_ENV === 'production';
+
+if (isProd) app.set('trust proxy', 1);
 
 app.use(session({
-    secret: process.env.SESSION_SECRET || 'keyboard cat',
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-        httpOnly: true
-    }
+  secret: process.env.SESSION_SECRET || 'keyboard cat',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    httpOnly: true,
+    secure: true,         // חובה כשSameSite=None
+    sameSite: 'none'      // כדי שיעבור בין דומיינים (pages.dev → onrender.com)
+  }
 }) as unknown as express.RequestHandler);
 
 // Middleware
