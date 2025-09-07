@@ -95,7 +95,7 @@ const corsOptions: cors.CorsOptions = {
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
 };
 app.use(cors(corsOptions));
-app.options('*', cors(corsOptions)); // preflight
+app.options('/*', cors(corsOptions)); // preflight
 
 if (!GOOGLE_CLIENT_ID) {
     throw new Error('Missing GOOGLE_CLIENT_ID');
