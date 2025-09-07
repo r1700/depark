@@ -2,7 +2,7 @@
 import React, { useCallback } from "react";
 import { Route, Navigate, useNavigate, Routes } from "react-router-dom";
 import { Provider } from "react-redux";
-import { store } from "./app/store"; 
+import { store } from "./app/store";
 
 import LoginScreen from "./components/screen-login/LoginScreen";
 import AdminLogoManagement from "./components/logo";
@@ -16,6 +16,7 @@ import SurfaceStatsPage from "./app/pages/surfaceStats/surfaceStats";
 import ReservedParking from "./Pages/ReservedParking";
 import AdmainConfigReservedparking from "../admin/components/AdmainConfigReservedparking";
 
+import OpcNodesPage from './Pages/OpcNodesPage';
 
 function getUserFromStorage() {
   try {
@@ -73,6 +74,8 @@ const AdminRoutes: React.FC = () => {
         <Route path="admin-config/:lotId" element={<AdminConfigPage />} />
         <Route path="parkings" element={<ParkingsPage />} />
         <Route path="logo-management" element={<AdminLogoManagement />} />
+        <Route path="opc-nodes" element={<OpcNodesPage />} />
+        {/* Reports as children of layout */}
         <Route path="reports">
           <Route path="parking-stats" element={<ParkingStatsPage />} />
           <Route path="surface-stats" element={<SurfaceStatsPage />} />

@@ -9,16 +9,31 @@ import {
 const router = Router();
 
 // Endpoint for logging faults
-router.post("/fault", async (req, res) => {
+router.post("/", async (req, res) => {
   try {
-    const { parkingId, faultDescription, severity, assigneeId } = req.body;
-    if (!parkingId) return res.status(400).json({ error: "parkingId required" });
+    const rawValue = req.body.value;
+    let faultObj;
+    if (typeof rawValue === "string") {
+      try {
+        faultObj = JSON.parse(rawValue);
+      } catch (e) {
+        return res.status(400).json({ error: "Invalid fault JSON" });
+      }
+    } else if (typeof rawValue === "object") {
+      faultObj = rawValue;
+    } else {
+      return res.status(400).json({ error: "Fault value missing or invalid" });
+    }
 
+    // ולידציה בסיסית
+    if (!faultObj.parkingId) return res.status(400).json({ error: "parkingId required" });
+
+    // קריאה לשירות שמטפל בתקלה
     const fault = await logFault({
-      parkingId: Number(parkingId),
-      faultDescription: faultDescription || "",
-      severity: severity || "medium",
-      assigneeId: assigneeId ? Number(assigneeId) : null,
+      parkingId: Number(faultObj.parkingId),
+      faultDescription: faultObj.faultDescription || "",
+      severity: faultObj.severity || "medium",
+      assigneeId: faultObj.assigneeId ? Number(faultObj.assigneeId) : null,
     });
 
     res.status(201).json(fault);
@@ -29,7 +44,7 @@ router.post("/fault", async (req, res) => {
 });
 
 // Endpoint for resolving faults
-router.post("/fault/resolve", async (req, res) => {
+router.post("/resolve", async (req, res) => {
   try {
     const { parkingId, faultDescription } = req.body;
     if (!parkingId || !faultDescription)
@@ -45,7 +60,7 @@ router.post("/fault/resolve", async (req, res) => {
 });
 
 // Endpoint for updating fault status
-router.post("/faults/:id/status", async (req, res) => {
+router.post("/:id/status", async (req, res) => {
   try {
     const id = Number(req.params.id);
     const { status } = req.body;
@@ -60,7 +75,7 @@ router.post("/faults/:id/status", async (req, res) => {
 });
 
 // Endpoint for fetching fault history
-router.get("/faults/history", async (req, res) => {
+router.get("/history", async (req, res) => {
   try {
     const parkingId = req.query.parkingId ? Number(req.query.parkingId) : undefined;
     const status = req.query.status as "open" | "in_progress" | "resolved" | undefined;

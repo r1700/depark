@@ -25,6 +25,7 @@ import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import LocalParkingIcon from '@mui/icons-material/LocalParking';
 import ParkingIcon from '@mui/icons-material/LocalParking';
 import { LogoDev } from '@mui/icons-material';
+import MemoryIcon from '@mui/icons-material/Memory';
 const drawerWidth = 240;
 interface User {
     firstName: string;
@@ -74,6 +75,7 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
                     { text: 'Surface Stats', path: '/admin/layout/reports/surface-stats' },
                 ],
             },
+            { text: 'OPC Nodes', icon: <MemoryIcon />, path: '/admin/layout/opc-nodes' },
         ];
 
 
