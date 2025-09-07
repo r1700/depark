@@ -76,10 +76,10 @@ app.use(cors({
     origin: CORS_ORIGIN,
     credentials: true,
 }));
-app.options("*", cors({
-    origin: CORS_ORIGIN,
-    credentials: true,
-}));
+// app.options("*", cors({
+//     origin: CORS_ORIGIN,
+//     credentials: true,
+// }));
 
 app.use(express.json());
 
