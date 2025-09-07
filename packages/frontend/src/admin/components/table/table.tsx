@@ -22,7 +22,6 @@ import DeleteIcon from '@mui/icons-material/Delete';
 
 import GenericForm, { FieldConfig } from '../forms/Form';
 import { styleModal } from '../forms/Form';
-
 import './table.css';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 type DataTableProps = {
