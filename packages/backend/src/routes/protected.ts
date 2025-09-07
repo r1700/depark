@@ -1,7 +1,7 @@
 import express, { Response } from 'express';
 import authenticateToken from '../middlewares/authMiddleware';
 
-const router = express.Router();
+const router: express.Router = express.Router();
 
 router.get('/profile', authenticateToken, (req: any, res: Response) => {
     console.log('Request user:', req.user);

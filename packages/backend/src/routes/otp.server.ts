@@ -1,7 +1,7 @@
 import express from 'express';
 import { handleCreateOtp, handleVerifyOtp } from '../controllers/otp.controller';
 
-const router = express.Router();
+const router: express.Router = express.Router();
 
 // create OTP
 router.post('/create', handleCreateOtp);

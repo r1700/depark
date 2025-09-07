@@ -26,6 +26,8 @@ import vehicle from './routes/vehicleRoute';
 import GoogleAuth from './routes/google-auth';
 import parkingReport from './routes/parkingStat';
 import surfaceReport from './routes/surfaceStat';
+import userApi from './routes/userApi';
+import ResevedParking from './routes/reservedparkingApi';
 import retrieveRoute from './routes/RetrivalQueue';
 import otpRoutes from './routes/otp.server';
 
@@ -57,10 +59,8 @@ app.use((req, res, next) => {
 });
 // --- end DEBUG ---
 const PORT = process.env.PORT || 3001;
-// Serve static logos
-app.use('/logos', express.static(path.join(process.cwd(), 'public/logos')));
 
-
+// Middleware for session management
 app.use(session({
     secret: process.env.SESSION_SECRET || 'keyboard cat',
     resave: false,
@@ -68,7 +68,7 @@ app.use(session({
     cookie: { secure: process.env.NODE_ENV === 'production' }
 }) as unknown as express.RequestHandler);
 
-// Middleware
+// CORS configuration
 const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:3000';
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 
@@ -90,12 +90,15 @@ app.use((req, res, next) => {
 });
 
 app.use(loggerRoutes);
+
+// API routes
 app.use('/api/health', healthRoutes);
 app.use('/api/password', passwordRoutes);
 app.use('/api/vehicle', vehicleRoutes);
 app.use('/api/exportToCSV', exportToCSV);
 app.use('/api', userRoutes);
-// app.use('/api/users', userFilter);
+app.use('/api/users', userApi);
+app.use('/api/reservedparking', ResevedParking);
 // app.use('/api/auth', authRoutes);
 app.use('/api/auth', userGoogleAuthRoutes);
 app.use('/api/vehicles', vehicle)
@@ -111,6 +114,7 @@ app.use('/api/logos', logoRouter);
 app.use('/api/screentypes', screenTypeRouter);
 app.use('/logos', express.static(path.join(process.cwd(), 'public/logos')));
 
+// Log all incoming requests
 app.use((req, res, next) => {
     console.log(`[${ req.method }] ${ req.path }`, req.body);
     next();
@@ -144,6 +148,8 @@ printRoutes();
 app.get('/', (req, res) => {
     res.json({ message: 'DePark Backend is running!' });
 });
+
+// Health check route
 app.get('/health', (req, res) => {
     res.json({
         status: 'OK',
