@@ -11,6 +11,9 @@ import LoginPage from './admin/Pages/loginPage';
 import ForgotPassword from './admin/app/pages/resetPassword/ForgotPassword';
 import ResetPassword from './admin/app/pages/resetPassword/ResetPassword';
 import AdminRoutes from './admin/AdminRoutes';
+import Notifications from './mobile/components/mobile-user/Notifications';
+
+
 
 const routers = createBrowserRouter([
   {
@@ -22,6 +25,7 @@ const routers = createBrowserRouter([
       { path: 'forgot-password', element: <ForgotPassword /> },
       { path: 'reset-password', element: <ResetPassword /> },
       { path: 'VehicleRow', element: <VehicleRow /> },
+      { path: 'Notifications',element:<Notifications/>},
       
     ]
   }
