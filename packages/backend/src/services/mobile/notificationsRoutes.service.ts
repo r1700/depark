@@ -10,14 +10,14 @@ const app = express();
 const server = http.createServer(app);
 const io = new socketIo(server, {
   cors: {
-    origin: 'http://localhost:3001', 
+    origin:process.env.CORS_ORIGIN,
     methods: ['GET', 'POST'],
     allowedHeaders: ['Content-Type'],
   },
 });
 
 app.use(cors({
-  origin: 'http://localhost:3001',
+  origin: process.env.CORS_ORIGIN,
   methods: ['GET', 'POST'],
   allowedHeaders: ['Content-Type'],
 }));
