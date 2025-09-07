@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import dayjs from "dayjs"; 
+import React, { useEffect, useState, useCallback } from "react";
+import dayjs from "dayjs";
 import {
   Card,
   Typography,
@@ -41,14 +41,13 @@ interface Vehicle {
 
 export const VehicleRow = () => {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
-  const [queuePosition, setQueuePosition] = useState<Record<string, number>>({});
+  const [queuePosition] = useState<Record<string, number>>({});
   const [currentIndex, setCurrentIndex] = useState(0);
   const [reportOpen, setReportOpen] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const [showFeedbackIcon, setShowFeedbackIcon] = useState(false);
 
   const navigate = useNavigate();
-
   const [unreadCount, setUnreadCount] = useState<number>(0);
 
   const [pickupInfo, setPickupInfo] = useState<{
@@ -59,6 +58,7 @@ export const VehicleRow = () => {
   } | null>(null);
   const [pickupDialogOpen, setPickupDialogOpen] = useState(false);
 
+  // --- Feedback icon logic ---
   useEffect(() => {
     const lastFeedback = localStorage.getItem("lastFeedbackSent");
     if (!lastFeedback) {
@@ -70,11 +70,8 @@ export const VehicleRow = () => {
       setShowFeedbackIcon(true);
     }
   }, []);
-    const handleFeedbackSent = () => {
-    localStorage.setItem("lastFeedbackSent", dayjs().toISOString());
-    setShowFeedbackIcon(false);
-  };
 
+  // --- Notifications ---
   useEffect(() => {
     if (!userId) return;
 
@@ -91,11 +88,11 @@ export const VehicleRow = () => {
     };
 
     fetchNotifications();
-
     const interval = setInterval(fetchNotifications, 10000);
     return () => clearInterval(interval);
   }, [userId]);
 
+  // --- Get userId from localStorage ---
   useEffect(() => {
     const userStr = localStorage.getItem("user");
     if (userStr !== null) {
@@ -110,11 +107,8 @@ export const VehicleRow = () => {
     }
   }, []);
 
-  useEffect(() => {
-    if (userId) fetchVehicles();
-  }, [userId]);
-
-  const fetchVehicles = async () => {
+  // --- Fetch vehicles ---
+  const fetchVehicles = useCallback(async () => {
     if (!userId) {
       console.warn("No userId — skipping fetch");
       return;
@@ -131,11 +125,16 @@ export const VehicleRow = () => {
     } catch (err) {
       console.error("Fetch error:", err);
     }
-  };
+  }, [userId]);
 
+  useEffect(() => {
+    if (userId) fetchVehicles();
+  }, [userId, fetchVehicles]);
+
+  // --- Helpers ---
   const getVehicleCategory = (v: Vehicle) => {
     const dims = v.dimension_overrides;
-    if (!dims || !dims.length || !dims.weight) return "unknown";
+    if (!dims?.length || !dims.weight) return "unknown";
     const length = parseInt(dims.length);
     const weight = parseInt(dims.weight);
     if (length <= 4500 && weight <= 1300) return "private";
@@ -158,10 +157,6 @@ export const VehicleRow = () => {
     }
   };
 
-  const vehicle = vehicles[currentIndex];
-  const category = vehicle ? getVehicleCategory(vehicle) : "unknown";
-  const icon = iconForCategory(category);
-
   const getWaitTime = (estimated_time: string) => {
     const now = new Date();
     const est = new Date(estimated_time);
@@ -170,47 +165,48 @@ export const VehicleRow = () => {
     return diffMin;
   };
 
-  
-  
-  
+  // --- Request pickup ---
   const handleRequestPickup = async () => {
-  if (!vehicle || !userId) return;
-  try {
-    const res = await fetch("/api/tablet/retrieve", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        baseuser_id: userId,
-        license_plate: vehicle.license_plate,
-      }),
-    });
+    const vehicle = vehicles[currentIndex];
+    if (!vehicle || !userId) return;
+    try {
+      const res = await fetch("/api/tablet/retrieve", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          baseuser_id: userId,
+          license_plate: vehicle.license_plate,
+        }),
+      });
 
-    if (!res.ok) {
-      const text = await res.text();
-      throw new Error(text || "Server Error");
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(text || "Server Error");
+      }
+
+      const data = await res.json();
+
+      setPickupInfo({
+        licensePlate: vehicle.license_plate,
+        position: data.position,
+        assigned_pickup_spot: data.assigned_pickup_spot,
+        estimated_time: data.estimated_time,
+      });
+
+      setPickupDialogOpen(true);
+    } catch (err) {
+      console.error("Request pickup error:", err);
+      alert("שגיאה בשליחת בקשת הרכב");
     }
+  };
 
-    const data = await res.json();
-
-   
-    setPickupInfo({
-      licensePlate: vehicle.license_plate,
-      position: data.position,
-      assigned_pickup_spot: data.assigned_pickup_spot,
-      estimated_time: data.estimated_time,
-    });
-
-    setPickupDialogOpen(true);
-  } catch (err) {
-    console.error("Request pickup error:", err);
-    alert("שגיאה בשליחת בקשת הרכב");
-  }
-};
+  // --- Render ---
+  const vehicle = vehicles[currentIndex];
+  const category = vehicle ? getVehicleCategory(vehicle) : "unknown";
+  const icon = iconForCategory(category);
 
   return (
-     <Box
+    <Box
       p={3}
       minHeight="100vh"
       display="flex"
@@ -224,6 +220,7 @@ export const VehicleRow = () => {
         mx: "auto",
       }}
     >
+      {/* Header */}
       <Box
         display="flex"
         justifyContent="space-between"
@@ -233,11 +230,7 @@ export const VehicleRow = () => {
       >
         <Typography
           variant="h4"
-          sx={{
-            color: "#1976d2",
-            fontWeight: 700,
-            letterSpacing: 1,
-          }}
+          sx={{ color: "#1976d2", fontWeight: 700, letterSpacing: 1 }}
         >
           User vehicles
         </Typography>
@@ -269,27 +262,26 @@ export const VehicleRow = () => {
               </Avatar>
             </Badge>
           </IconButton>
-{showFeedbackIcon && (
-  <IconButton
-    onClick={() => {
-      navigate("/FeedbackForm");
-    }}
-    sx={{ position: "relative", p: 0 }}
-  >
-    <Avatar
-      sx={{
-        bgcolor: "#1976d2",
-        width: 48,
-        height: 48,
-      }}
-    >
-      <FeedbackIcon sx={{ fontSize: 28, color: "#fff" }} />
-    </Avatar>
-  </IconButton>
-)}
-
+          {showFeedbackIcon && (
+            <IconButton
+              onClick={() => navigate("/FeedbackForm")}
+              sx={{ position: "relative", p: 0 }}
+            >
+              <Avatar
+                sx={{
+                  bgcolor: "#1976d2",
+                  width: 48,
+                  height: 48,
+                }}
+              >
+                <FeedbackIcon sx={{ fontSize: 28, color: "#fff" }} />
+              </Avatar>
+            </IconButton>
+          )}
         </Box>
       </Box>
+
+      {/* Vehicle card */}
       {vehicle && (
         <Card
           sx={{
@@ -307,12 +299,7 @@ export const VehicleRow = () => {
             mb: 2,
           }}
         >
-          <Stack
-            spacing={2}
-            alignItems="center"
-            justifyContent="center"
-            sx={{ width: "100%" }}
-          >
+          <Stack spacing={2} alignItems="center" sx={{ width: "100%" }}>
             {icon}
             <Typography fontWeight="bold" sx={{ color: "#1976d2", fontSize: "1.2rem" }}>
               {vehicle.model}
@@ -339,7 +326,6 @@ export const VehicleRow = () => {
                 variant="contained"
                 onClick={handleRequestPickup}
               >
-                
                 Request
               </Button>
             </Box>
@@ -361,7 +347,7 @@ export const VehicleRow = () => {
         </Card>
       )}
 
-      {/* Stylish English popup for pickup info */}
+      {/* Pickup dialog */}
       <Dialog
         open={pickupDialogOpen}
         onClose={() => setPickupDialogOpen(false)}
@@ -399,15 +385,7 @@ export const VehicleRow = () => {
                 mt: 1,
               }}
             >
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 1,
-                  fontSize: "1.1rem",
-                  color: "#333",
-                }}
-              >
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1, fontSize: "1.1rem" }}>
                 <DirectionsCarIcon sx={{ color: "#1976d2", fontSize: 32 }} />
                 <span>
                   <strong>License Plate:</strong> {pickupInfo.licensePlate}
@@ -458,7 +436,8 @@ export const VehicleRow = () => {
                   textAlign: "center",
                 }}
               >
-                <strong>Estimated Wait:</strong> {getWaitTime(pickupInfo.estimated_time)} min
+                <strong>Estimated Wait:</strong>{" "}
+                {getWaitTime(pickupInfo.estimated_time)} min
               </Box>
             </Box>
           )}
@@ -479,6 +458,7 @@ export const VehicleRow = () => {
         </DialogActions>
       </Dialog>
 
+      {/* Vehicles dots */}
       <Box display="flex" justifyContent="center" gap={1} mt={2}>
         {vehicles.map((_, idx) => (
           <IconButton key={idx} onClick={() => setCurrentIndex(idx)}>
@@ -490,6 +470,7 @@ export const VehicleRow = () => {
         ))}
       </Box>
 
+      {/* Bottom actions */}
       <Box mt={3} width="100%" maxWidth={320}>
         <Stack spacing={2}>
           <Button
@@ -514,6 +495,7 @@ export const VehicleRow = () => {
         </Stack>
       </Box>
 
+      {/* Report dialog */}
       <VehicleReportDialog
         open={reportOpen}
         onClose={() => setReportOpen(false)}
@@ -522,5 +504,3 @@ export const VehicleRow = () => {
     </Box>
   );
 };
-
- 
