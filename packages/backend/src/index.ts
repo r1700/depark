@@ -28,6 +28,7 @@ import parkingReport from './routes/parkingStat';
 import surfaceReport from './routes/surfaceStat';
 import retrieveRoute from './routes/RetrivalQueue';
 import otpRoutes from './routes/otp.server';
+import protectedRoutes from './routes/protected';
 
 import path from 'path';
 const app = express();
@@ -107,6 +108,7 @@ app.use('/api/admin', adminConfigRouter);
 app.use('/api/parking-stats', parkingReport);
 app.use('/api/surface-stats', surfaceReport);
 app.use('/api/auth', authRoutes);
+app.use('/api/protected', protectedRoutes);
 
 // app.use('/api/tablet', retrieveRoute);
 app.use('/api/otp', otpRoutes);
