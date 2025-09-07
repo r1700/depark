@@ -27,6 +27,8 @@ import vehicle from './routes/vehicleRoute';
 import GoogleAuth from './routes/google-auth';
 import parkingReport from './routes/parkingStat';
 import surfaceReport from './routes/surfaceStat';
+import userApi from './routes/userApi';
+import ResevedParking from './routes/reservedparkingApi';
 import retrieveRoute from './routes/RetrivalQueue';
 import otpRoutes from './routes/otp.server';
 
@@ -99,7 +101,8 @@ app.use('/api/auth', userGoogleAuthRoutes);
 app.use('/api/tablet', Retrival);
 app.use('/api/opc', Exit);
 app.use('/api', userRoutes);
-// app.use('/api/users', userFilter);
+app.use('/api/users', userApi);
+app.use('/api/reservedparking', ResevedParking);
 // app.use('/api/auth', authRoutes);
 app.use('/api/auth', userGoogleAuthRoutes);
 app.use('/api/vehicles', vehicle)
