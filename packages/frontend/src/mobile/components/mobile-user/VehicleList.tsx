@@ -15,7 +15,6 @@ import {
   DialogContent,
   DialogActions,
 } from "@mui/material";
-
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
 import LocalTaxiIcon from "@mui/icons-material/LocalTaxi";
 import AirportShuttleIcon from "@mui/icons-material/AirportShuttle";
@@ -59,7 +58,7 @@ export const VehicleRow = () => {
   } | null>(null);
   const [pickupDialogOpen, setPickupDialogOpen] = useState(false);
 
-  // --- Feedback icon logic ---
+  
   useEffect(() => {
     const lastFeedback = localStorage.getItem("lastFeedbackSent");
     if (!lastFeedback) {
@@ -72,7 +71,7 @@ export const VehicleRow = () => {
     }
   }, []);
 
-  // --- Notifications ---
+  
   useEffect(() => {
     if (!userId) return;
 
@@ -93,7 +92,7 @@ export const VehicleRow = () => {
     return () => clearInterval(interval);
   }, [userId]);
 
-  // --- Get userId from localStorage ---
+  
   useEffect(() => {
     const userStr = localStorage.getItem("user");
     if (userStr !== null) {
@@ -108,7 +107,7 @@ export const VehicleRow = () => {
     }
   }, []);
 
-  // --- Fetch vehicles ---
+
   const fetchVehicles = useCallback(async () => {
     if (!userId) {
       console.warn("No userId — skipping fetch");
@@ -132,7 +131,7 @@ export const VehicleRow = () => {
     if (userId) fetchVehicles();
   }, [userId, fetchVehicles]);
 
-  // --- Helpers ---
+
   const getVehicleCategory = (v: Vehicle) => {
     const dims = v.dimension_overrides;
     if (!dims?.length || !dims.weight) return "unknown";
@@ -166,7 +165,7 @@ export const VehicleRow = () => {
     return diffMin;
   };
 
-  // --- Request pickup ---
+
   const handleRequestPickup = async () => {
     const vehicle = vehicles[currentIndex];
     if (!vehicle || !userId) return;

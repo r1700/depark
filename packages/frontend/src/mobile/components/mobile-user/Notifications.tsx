@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import {
   Box,
   Card,
-
   IconButton,
   Typography,
   Button,
@@ -13,7 +12,6 @@ import MailOutlineIcon from '@mui/icons-material/MailOutline';
 import MarkEmailReadIcon from '@mui/icons-material/MarkEmailRead';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-
 
 interface Notification {
   id: number;
