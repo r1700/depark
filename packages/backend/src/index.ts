@@ -20,9 +20,10 @@ import adminConfigRouter from './routes/adminConfig';
 import userRoutes from './routes/user.routes';
 import authRoutes from './routes/auth';
 import importFromCsv from './routes/importFromCsv';
+import feedbackQuestions from './routes/feedbackQuestions';
 import logoRouter from './routes/logos';
 import screenTypeRouter from './routes/screenType';
-import './cronJob'; // Import the cron job to ensure it runs on server start
+// import './cronJob'; // Import the cron job to ensure it runs on server start
 import vehicle from './routes/vehicleRoute';
 import GoogleAuth from './routes/google-auth';
 import parkingReport from './routes/parkingStat';
@@ -33,6 +34,7 @@ import retrieveRoute from './routes/RetrivalQueue';
 import otpRoutes from './routes/otp.server';
 import routes from './routes/mobile/mobileUserRoutes';
 import notifications from "./routes/mobile/notificationsRoutes"; 
+import feedbackAnswers from './routes/feedbackAnswers';
 
 import path from 'path';
 const app = express();
@@ -126,7 +128,7 @@ app.use('/api/reservedparking', ResevedParking);
 app.use('/api/auth', userGoogleAuthRoutes);
 app.use('/api/vehicles', vehicle)
 app.use('/api/admin', adminConfigRouter);
-app.use('/OAuth', GoogleAuth);
+app.use('/api/Auth', GoogleAuth);
 app.use('/api/admin', adminConfigRouter);
 app.use('/api/parking-stats', parkingReport);
 app.use('/api/surface-stats', surfaceReport);
@@ -136,6 +138,8 @@ app.use("/api", routes);
 app.use("/notifications", notifications);
 app.use('/api/importFromCsv', importFromCsv);
 
+app.use('/api/feedbackQuestions', feedbackQuestions);
+app.use('/api/feedbackAnswers', feedbackAnswers);
 app.use('/api/logos', logoRouter);
 app.use('/api/screentypes', screenTypeRouter);
 app.use('/logos', express.static(path.join(process.cwd(), 'public/logos')));

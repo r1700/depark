@@ -1,7 +1,6 @@
 import { OAuth2Client } from 'google-auth-library';
 import { getRoleById } from '../services/adminUsers';
 import { getUserByEmail } from '../services/baseUser';
-import { Err } from 'joi';
 
 const clientId = process.env.CLIENT_ID;
 
@@ -42,11 +41,10 @@ const auth = async (idToken: string): Promise<any> => {
         if (!role) {
             throw new Error('you dont have permission to access this system');
         }
-
+        
         return {user, role};
 
     } catch (error: Error|any) {
-        
             throw new Error(error.message);
     }
 }

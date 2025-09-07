@@ -21,6 +21,10 @@ import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
+import LocalParkingIcon from '@mui/icons-material/LocalParking';
+import ParkingIcon from '@mui/icons-material/LocalParking';
+import { LogoDev } from '@mui/icons-material';
+import { Message } from '@mui/icons-material';
 const drawerWidth = 240;
 
 type RoleName = 'admin' | 'hr' | 'guest';
@@ -73,14 +77,24 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
             { text: 'Users', icon: <PeopleIcon />, path: '/layout/users', allowed: ['admin'] }, // רק מנהל
             { text: 'Admin', icon: <PeopleIcon />, path: '/admin/layout/admin-users', allowed: ['admin'] },
             { text: 'Vehicles', icon: <DirectionsCarIcon />, path: '/layout/vehicles', allowed: ['admin', 'hr'] }, // שניהם
+            { text: 'Admin Dashboard', icon: <PeopleIcon />, path: '/admin/layout/admin' },
+            { text: 'HR Dashboard', icon: <DirectionsCarIcon />, path: '/admin/layout/hr-dashboard' },
+            // { text: 'Admin Config', icon: <AssessmentIcon />, path: '/admin/layout/admin-config' },
+            { text: 'Parkings', icon: <LocalParkingIcon />, path: '/admin/layout/parkings' },
+            { text: 'Reserved Parking', icon: <ParkingIcon />, path: '/admin/layout/reserved-parking' },
+            { text: 'Logo Management', icon: <LogoDev />, path: '/admin/layout/logo-management' },
+            { text: 'Users', icon: <PeopleIcon />, path: '/layout/users'}, // רק מנהל
+            { text: 'Vehicles', icon: <DirectionsCarIcon />, path: '/layout/vehicles'}, // שניהם
+            { text: 'Feedback', icon: <Message />, path: '/admin/layout/feedback' },
             {
                 text: 'Reports',
                 icon: <AssessmentIcon />,
                 path: '',
                 allowed: ['admin', 'hr'], 
                 subMenu: [
-                    { text: 'Parking Stats', path: '/admin/layout/reports/parking-stats', allowed: ['admin'] },
-                    { text: 'Surface Stats', path: '/admin/layout/reports/surface-stats', allowed: ['admin', 'hr'] },
+                    { text: 'Parking Stats', path: '/admin/layout/reports/parking-stats' },
+                    { text: 'Surface Stats', path: '/admin/layout/reports/surface-stats' },
+                    { text: 'Feedback Answers', path: '/admin/layout/reports/feedback-answers'}
                 ],
             },
         ];

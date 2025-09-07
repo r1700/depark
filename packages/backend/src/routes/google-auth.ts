@@ -13,13 +13,19 @@ router.post('/verify-google-token', async (req: Request, res: Response) => {
       throw new Error('No token provided');
     }
 
-    const {user, role}= await auth(idToken);
-    
-    const {id, email, first_name, last_name} = user;
+    const { user, role } = await auth(idToken);
+
+    const { id, email, first_name, last_name } = user;
 
     res.send({
       success: true,
-      user: { id: id, email:email, firstName:first_name, lastName:last_name, role: role },
+      user: {
+        id: id,
+        email: email,
+        firstName: first_name,
+        lastName: last_name,
+        role: role
+      },
       idToken: idToken,
 
     });

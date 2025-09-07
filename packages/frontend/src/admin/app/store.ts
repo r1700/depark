@@ -6,6 +6,9 @@ import userReducer from './pages/user/usersSlice';
 import parkingStatsReducer from './pages/parkingStats/parkingStatsSlice';
 import surfaceStatsReducer from './pages/surfaceStats/surfaceStatsSlice';
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
+import authReducer from '../components/google-auth/GoogleAuthSlice';
+import feedbackQuestionsReducer from '../components/feedbackQuestions/FeedbackQuestionsSlice'
+import feedbackAnswersReducer from '../components/FeedbackAnswersReports/FeedbackAnswersSlice'
 
 export const store = configureStore({
   reducer: {
@@ -15,6 +18,9 @@ export const store = configureStore({
     users: userReducer,
     parkingStats: parkingStatsReducer,
     surfaceStats: surfaceStatsReducer,
+    auth: authReducer,
+    feedbackQuestions: feedbackQuestionsReducer,
+    feedbackAnswers: feedbackAnswersReducer
   },
 });
 
