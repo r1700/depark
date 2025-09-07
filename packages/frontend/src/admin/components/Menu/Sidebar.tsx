@@ -18,29 +18,15 @@ import MenuIcon from '@mui/icons-material/Menu';
 import LogoutIcon from '@mui/icons-material/Logout';
 import PeopleIcon from '@mui/icons-material/People';
 import SettingsIcon from '@mui/icons-material/Settings';
-<<<<<<< HEAD
-import PhotoIcon from '@mui/icons-material/Photo';
-import LocalParkingIcon from '@mui/icons-material/LocalParking';
-=======
->>>>>>> 1aa8592334d2867644dfc837fbb8c469270296e2
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
-<<<<<<< HEAD
-import { LogoDev } from '@mui/icons-material';
-const drawerWidth = 240;
-<<<<<<< HEAD
-type RoleName = 'admin' | 'hr' | 'guest';
-=======
-
->>>>>>> 49e060f5f2082d7869737e034486b1b08d713422
-=======
 import LocalParkingIcon from '@mui/icons-material/LocalParking';
 import ParkingIcon from '@mui/icons-material/LocalParking';
 import { LogoDev } from '@mui/icons-material';
 const drawerWidth = 240;
->>>>>>> 1aa8592334d2867644dfc837fbb8c469270296e2
+
 interface User {
     firstName: string;
     lastName: string;
@@ -50,19 +36,8 @@ interface SidebarProps {
     user: User;
     onLogout: () => void;
 }
-<<<<<<< HEAD
-/** normalize role from various representations to 'admin'|'hr'|'guest' */
-function normalizeRole(role: number | string | undefined): RoleName {
-    if (role === undefined || role === null) return 'guest';
-    const r = String(role).toLowerCase();
-    if (r === '2' || r === 'admin' || r.includes('admin')) return 'admin';
-    if (r === '1' || r === 'hr' || r.includes('hr') || r.includes('human')) return 'hr';
-    return 'guest';
-}
-=======
 
 
->>>>>>> 49e060f5f2082d7869737e034486b1b08d713422
 const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
     const [open, setOpen] = useState<boolean>(true);
     const [reportsOpen, setReportsOpen] = useState<boolean>(false);
@@ -72,12 +47,8 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
             setReportsOpen(false);
         }
     }, [open]);
-<<<<<<< HEAD
-    const userRole = normalizeRole(user?.role);
-=======
 
 
->>>>>>> 49e060f5f2082d7869737e034486b1b08d713422
     const getUserInitials = (): string => {
         if (!user || !user.firstName || !user.lastName) return '?';
         return `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();

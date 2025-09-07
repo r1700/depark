@@ -19,11 +19,8 @@ import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-<<<<<<< HEAD
-=======
 import GenericForm, { FieldConfig } from '../forms/Form';
 import { styleModal } from '../forms/Form';
->>>>>>> 49e060f5f2082d7869737e034486b1b08d713422
 import './table.css';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 type DataTableProps = {
@@ -316,14 +313,6 @@ const DataTable: React.FC<DataTableProps> = ({
                 ))}
                 {(showEdit || showDelete) && (
                   <TableCell className="actions">
-<<<<<<< HEAD
-                    <IconButton onClick={() => onRowClick && onRowClick(row)} aria-label="Edit" size="small">
-                      <EditIcon fontSize="small" />
-                    </IconButton>
-                    <IconButton onClick={() => handleDelete(row)} aria-label="Delete" size="small">
-                      <DeleteIcon fontSize="small" />
-                    </IconButton>
-=======
                     {showEdit && (
                       <IconButton
                         color="success"
@@ -353,7 +342,6 @@ const DataTable: React.FC<DataTableProps> = ({
                         <DeleteIcon />
                       </IconButton>
                     )}
->>>>>>> 49e060f5f2082d7869737e034486b1b08d713422
                   </TableCell>
                 )}
               </TableRow>
