@@ -61,15 +61,15 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
 
-// אופציה: מענה ל־preflight לכולם
-app.options('*', cors({
-  origin: (origin, callback) => {
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) return callback(null, true);
-    return callback(new Error('Not allowed by CORS'));
-  },
-  credentials: true
-}));
+// // אופציה: מענה ל־preflight לכולם
+// app.options('/*', cors({
+//   origin: (origin, callback) => {
+//     if (!origin) return callback(null, true);
+//     if (allowedOrigins.includes(origin)) return callback(null, true);
+//     return callback(new Error('Not allowed by CORS'));
+//   },
+//   credentials: true
+// }));
 
 // --- Session: אחרי CORS (כדי שהעוגיה תשלח ותתקבל נכון) ---
 app.use(session({
