@@ -1,5 +1,6 @@
 import { DataTypes, Model, InferAttributes, InferCreationAttributes, CreationOptional } from 'sequelize';
 import sequelize from '../../config/sequelize';
+import { BaseUser } from './baseUser.model';
 
 export class adminUsers extends Model<
   InferAttributes<adminUsers>,
@@ -15,13 +16,15 @@ export class adminUsers extends Model<
 
 adminUsers.init({
   id: {
-    type: DataTypes.INTEGER,
-    autoIncrement: true,
-    primaryKey: true
-  },
+  type: DataTypes.INTEGER,
+  primaryKey: true,
+  autoIncrement: true
+
+},
+
   baseuser_id: {
     type: DataTypes.INTEGER,
-    allowNull: false
+    allowNull: false,
   },
   password_hash: {
     type: DataTypes.STRING,
@@ -44,3 +47,6 @@ adminUsers.init({
   tableName: 'adminusers', 
   timestamps: false
 });
+
+
+

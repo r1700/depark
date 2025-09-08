@@ -20,7 +20,7 @@ import { WebSocketServer } from 'ws';
 import session from 'express-session';
 import adminConfigRouter from './routes/adminConfig';
 import userRoutes from './routes/user.routes';
-
+import importFromCsv from './routes/importFromCsv';
 import logoRouter from './routes/logos';
 import screenTypeRouter from './routes/screenType';
 import vehicle from './routes/vehicleRoute';
@@ -31,6 +31,8 @@ import userApi from './routes/userApi';
 import ResevedParking from './routes/reservedparkingApi';
 import retrieveRoute from './routes/RetrivalQueue';
 import otpRoutes from './routes/otp.server';
+import routes from './routes/mobile/mobileUserRoutes';
+import notifications from "./routes/mobile/notificationsRoutes"; 
 
 import path from 'path';
 const app = express();
@@ -113,6 +115,9 @@ app.use('/api/parking-stats', parkingReport);
 app.use('/api/surface-stats', surfaceReport);
 app.use('/api/tablet', retrieveRoute);
 app.use('/api/otp', otpRoutes);
+app.use("/api", routes);
+app.use("/notifications", notifications);
+app.use('/api/importFromCsv', importFromCsv);
 
 app.use('/api/logos', logoRouter);
 app.use('/api/screentypes', screenTypeRouter);
@@ -123,6 +128,7 @@ app.use((req, res, next) => {
     console.log(`[${ req.method }] ${ req.path }`, req.body);
     next();
 });
+
 
 app.use("/api/opc", techniciansRoutes);
 app.use('/api/opc', faultsRouter);
