@@ -23,29 +23,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(null);
   }, []);
 
-  const login = useCallback(
-    async (newToken: string) => {
-      localStorage.setItem('token', newToken);
-      setToken(newToken);
+  const login = useCallback(async (newToken: string) => {
+    localStorage.setItem('token', newToken);
+    setToken(newToken);
 
-      try {
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}/auth/me`, {
-          headers: { Authorization: `Bearer ${newToken}` },
-        });
-        setUser(res.data.user);
-      } catch {
-        logout();
-      }
-    },
-    [logout]
-  );
+    try {
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/auth/me`, {
+        headers: { Authorization: `Bearer ${newToken}` },
+      });
+      setUser(res.data.user);
+    } catch {
+      logout();
+    }
+  }, [logout]);
 
   useEffect(() => {
     const savedToken = localStorage.getItem('token');
     if (savedToken) {
       login(savedToken);
     }
-  }, [login]); // עכשיו זה בטוח לשים login פה
+  }, [login]);
 
   const isAuthenticated = !!token;
 
