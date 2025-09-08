@@ -1,17 +1,12 @@
 import axios from 'axios';
 
 export async function sendVehicleData(value: { licensePlate: string; floor: string }) {
-    console.log("sendVehicleData called with:", value);
-
     const url = 'http://localhost:3001/api/tablet/retrieve';
     try {
-        console.log('sending vehicle data:', value);
-
         const response = await axios.post(url, {
             licensePlate: value.licensePlate,
             floor: value.floor
         });
-        console.log('Response from sendVehicleData:', response.data);
 
          return { ...response.data, status: response.status };
     } catch (error) {
@@ -28,7 +23,7 @@ export async function sendVehicleData(value: { licensePlate: string; floor: stri
 }
 
 export async function sendFloorQueues(floorNumber: number) {
-    const url = 'https://localhost:3001/api/tablet/queues';
+    const url = 'http://localhost:3001/api/tablet/queues';
     try {
         const response = await axios.post(url, { floor: floorNumber });
         return response.data;
@@ -51,7 +46,7 @@ export async function sendFloorQueues(floorNumber: number) {
 }
 
 export async function sendElevatorQueue(floorNumber: number, elevatorNumber: number) {
-    const url = 'https://localhost:3001/api/tablet/elevator-queue';
+    const url = 'http://localhost:3001/api/tablet/elevator-queue';
     try {
         const response = await axios.post(url, { floor: floorNumber, elevator: elevatorNumber });
         return response.data;
@@ -67,23 +62,26 @@ export async function sendElevatorQueue(floorNumber: number, elevatorNumber: num
 }
 
 export async function sendEmployeeVehicles(employeeId: string) {
-    const url = 'https://localhost:3001/api/tablet/Employee';
+    const url = 'http://localhost:3001/api/tablet/employee';
     try {
         const response = await axios.post(url, { employeeId });
+        
         return response.data;
     } catch (error) {
-        if (employeeId === '123456789') {
-            return [
-                { licensePlate: '12-345-67' },
-                { licensePlate: '456-78-901' }
-            ];
-        } if (employeeId === '999999999') {
-            return [
-                { licensePlate: '56-789-01' },
-                { licensePlate: '678-90-123' }
-            ];
-        } else {
-            return [];
-        }
+        console.log('Error fetching employee vehicles:', error);
+        
+        // if (employeeId === '123456789') {
+        //     return [
+        //         { licensePlate: '12-345-67' },
+        //         { licensePlate: '456-78-901' }
+        //     ];
+        // } if (employeeId === '999999999') {
+        //     return [
+        //         { licensePlate: '56-789-01' },
+        //         { licensePlate: '678-90-123' }
+        //     ];
+        // } else {
+        //     return [];
+        // }
     }
 }
