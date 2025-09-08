@@ -6,7 +6,7 @@ import reportWebVitals from './reportWebVitals';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { VehicleRow } from './mobile/components/mobile-user/VehicleList';
 import Otp from './mobile/components/otp';
-import HomePage from './tablet/pages/HomePage';
+import HomePage from './tablet/components/HomePage/HomePage';
 import LoginPage from './admin/Pages/loginPage';
 import ForgotPassword from './admin/app/pages/resetPassword/ForgotPassword';
 import ResetPassword from './admin/app/pages/resetPassword/ResetPassword';
