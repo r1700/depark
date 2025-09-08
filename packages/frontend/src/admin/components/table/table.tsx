@@ -346,6 +346,12 @@ const DataTable: React.FC<DataTableProps> = ({
                       </IconButton>
                     )}
 
+                    <IconButton onClick={() => onRowClick && onRowClick(row)} aria-label="Edit" size="small">
+                      <EditIcon fontSize="small" />
+                    </IconButton>
+                    <IconButton onClick={() => handleDelete(row)} aria-label="Delete" size="small">
+                      <DeleteIcon fontSize="small" />
+                    </IconButton>
                   </TableCell>
                 )}
               </TableRow>
