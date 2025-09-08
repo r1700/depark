@@ -1,5 +1,5 @@
 
-import { Request, Response } from 'express';
+import { Request, Response, RequestHandler } from 'express';
 import fs from 'fs';
 import path from 'path';
 import csv from 'csv-parser';
@@ -66,7 +66,8 @@ async function insertWithInheritance(modelName: string, row: any) {
     childData[foreignKey] = parentInstance.getDataValue("id");
     return Model.create(childData);
 }
-export const uploadGenericCsv = [
+
+export const uploadGenericCsv: RequestHandler[] = [
     upload.single('file'),
     async (req: Request, res: Response) => {
         console.log("📌 Models loaded:", Object.keys(sequelize.models));
