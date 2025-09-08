@@ -13,7 +13,7 @@ import ParkingsPage from "./Pages/ParkingsPage";
 import AdminUsersPage from "./Pages/adminUser/AdminUsersPage";
 import ParkingStatsPage from "./app/pages/parkingStats/parkingStats";
 import SurfaceStatsPage from "./app/pages/surfaceStats/surfaceStats";
-
+import LogoManagementPage from "./components/logo";
 function getUserFromStorage() {
   try {
     const raw = localStorage.getItem("user");
@@ -70,7 +70,7 @@ const AdminRoutes: React.FC = () => {
         <Route path="admin-config" element={<AdminConfigPage />} />
         <Route path="parkings" element={<ParkingsPage />} />
         <Route path="admin-users" element={<AdminUsersPage />} />
-
+        <Route path="logo-management" element={<LogoManagementPage />} />
         {/* Reports as children of layout */}
         <Route path="reports">
           <Route path="parking-stats" element={<ParkingStatsPage />} />
