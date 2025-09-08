@@ -1,0 +1,3 @@
+email,first_name,last_name,phone,created_at,updated_at,baseuserId,passwordHash,role,permissions,lastLoginAt
+user66@xample.com,zzzzzzzzzfiuo,DoeSssss,0501234567,2023-01-01 12:00:00,2023-01-01 12:00:00,1,$2b$10$abcdefgHashedPassHere,1,"['read','write']",2023-08-26 15:30
+user33@example.com,dvoraa,gurr,0509876543,2023-01-02 12:00:00,2023-01-02 12:00:00,2,$2b$10$xyzAnotherHashedPass,2,"['read','write']",2023-08-27 10:15
