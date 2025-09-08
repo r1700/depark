@@ -1,5 +1,4 @@
 import { OPCUAServer, Variant, DataType, StatusCodes ,VariantArrayType} from "node-opcua";
-import { OPCUAServer, Variant, DataType, StatusCodes } from "node-opcua";
 //----------------------------
 import express from "express";
 //----------------------------

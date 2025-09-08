@@ -1,15 +1,6 @@
-import { Sequelize } from "sequelize";
-
-const sequelize = new Sequelize('depark', 'postgres', 'Chalafta13', {
-  host: "localhost",
-  dialect: "postgres",
-});
-
-//import sequelize from "../config/sequelize";
-
+import sequelize from "../config/sequelize";
 async function seedVehicles() {
   console.log("Starting insert of 500,000 records...");
-
   const sql = `INSERT INTO vehicles (
 baseuser_id, license_plate, vehicle_model_id, color,
 is_active, is_currently_parked, created_at, updated_at,
@@ -33,23 +24,11 @@ jsonb_build_object(
 ),
 (floor(random() * 3)::int) + 1
 FROM generate_series(1, 500000);`;
-
-
-  
   const start = Date.now();
   await sequelize.query(sql);
   const end = Date.now();
-
   console.log('start       ' ,start,'   end  ' ,end);
-  
   console.log(`Inserted 500,000 records in ${(end - start) / 1000} seconds`);
-
   await sequelize.close();
 }
-
-// seedVehicles().catch(err => console.error(err));
-
-
-
-
-
+seedVehicles().catch(err => console.error(err));

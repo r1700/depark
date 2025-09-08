@@ -18,7 +18,8 @@ import { WebSocketServer } from 'ws';
 import session from 'express-session';
 import adminConfigRouter from './routes/adminConfig';
 import userRoutes from './routes/user.routes';
-
+import authRoutes from './routes/auth';
+import importFromCsv from './routes/importFromCsv';
 import logoRouter from './routes/logos';
 import screenTypeRouter from './routes/screenType';
 import './cronJob'; // Import the cron job to ensure it runs on server start
@@ -41,18 +42,18 @@ app.use(express.json());
 
 // --- DEBUG: log incoming requests and who sends responses ---
 app.use((req, res, next) => {
-    console.log(`[REQ] ${ new Date().toISOString() } ${ req.method } ${ req.originalUrl } body:`, req.body);
+    console.log(`[REQ] ${new Date().toISOString()} ${req.method} ${req.originalUrl} body:`, req.body);
     const origJson = res.json.bind(res);
     const origSend = res.send.bind(res);
 
     res.json = function (body) {
-        console.log(`[DEBUG] res.json called for ${ req.method } ${ req.originalUrl } with body:`, body);
+        console.log(`[DEBUG] res.json called for ${req.method} ${req.originalUrl} with body:`, body);
         console.trace();
         return origJson(body);
     };
 
     res.send = function (body) {
-        console.log(`[DEBUG] res.send called for ${ req.method } ${ req.originalUrl } with body:`, body);
+        console.log(`[DEBUG] res.send called for ${req.method} ${req.originalUrl} with body:`, body);
         console.trace();
         return origSend(body);
     };
@@ -62,23 +63,43 @@ app.use((req, res, next) => {
 // --- end DEBUG ---
 const PORT = process.env.PORT || 3001;
 
+if (process.env.NODE_ENV === 'production') {
+    app.set('trust proxy', 1);
+}
 // Middleware for session management
 app.use(session({
     secret: process.env.SESSION_SECRET || 'keyboard cat',
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: process.env.NODE_ENV === 'production' }
+    cookie: {
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        httpOnly: true
+    }
 }) as unknown as express.RequestHandler);
 
 // CORS configuration
 const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:3000';
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 
-app.use(cors({
+const corsOptions = {
     origin: CORS_ORIGIN,
     credentials: true,
-}));
-app.use(express.json());
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+    allowedHeaders: [
+        'Origin',
+        'X-Requested-With',
+        'Content-Type',
+        'Accept',
+        'Authorization',
+        'Cache-Control',
+        'X-Requested-With'
+    ],
+    exposedHeaders: ['set-cookie'],
+    optionsSuccessStatus: 200 // For legacy browser support
+};
+
+app.use(cors(corsOptions));
 
 if (!GOOGLE_CLIENT_ID) {
     throw new Error('Missing GOOGLE_CLIENT_ID');
@@ -87,7 +108,7 @@ if (!GOOGLE_CLIENT_ID) {
 
 // Global request logger — מדפיס כל בקשה נכנסת
 app.use((req, res, next) => {
-    console.log(`[REQ] ${ new Date().toISOString() } ${ req.method } ${ req.originalUrl } body:`, req.body);
+    console.log(`[REQ] ${new Date().toISOString()} ${req.method} ${req.originalUrl} body:`, req.body);
     next();
 });
 
@@ -99,9 +120,9 @@ app.use('/api/password', passwordRoutes);
 app.use('/api/vehicle', vehicleRoutes);
 app.use('/api/exportToCSV', exportToCSV);
 app.use('/api', userRoutes);
+app.use('/api/auth', authRoutes);
 app.use('/api/users', userApi);
 app.use('/api/reservedparking', ResevedParking);
-// app.use('/api/auth', authRoutes);
 app.use('/api/auth', userGoogleAuthRoutes);
 app.use('/api/vehicles', vehicle)
 app.use('/api/admin', adminConfigRouter);
@@ -113,6 +134,7 @@ app.use('/api/tablet', retrieveRoute);
 app.use('/api/otp', otpRoutes);
 app.use("/api", routes);
 app.use("/notifications", notifications);
+app.use('/api/importFromCsv', importFromCsv);
 
 app.use('/api/logos', logoRouter);
 app.use('/api/screentypes', screenTypeRouter);
@@ -120,7 +142,7 @@ app.use('/logos', express.static(path.join(process.cwd(), 'public/logos')));
 
 // Log all incoming requests
 app.use((req, res, next) => {
-    console.log(`[${ req.method }] ${ req.path }`, req.body);
+    console.log(`[${req.method}] ${req.path}`, req.body);
     next();
 });
 
@@ -131,16 +153,16 @@ app.use('/api/opc', Exit);
 
 // Print registered routes (debug)
 function printRoutes() {
-    console.log("Registered routes:",  app);
+    console.log("Registered routes:", app);
     app._router?.stack?.forEach((middleware: any) => {
         if (middleware.route) {
             const methods = Object.keys(middleware.route.methods).join(',').toUpperCase();
-            console.log(`${ methods } ${ middleware.route.path }`);
+            console.log(`${methods} ${middleware.route.path}`);
         } else if (middleware.name === 'router' && middleware.handle && middleware.handle.stack) {
             middleware.handle.stack.forEach((handler: any) => {
                 if (handler.route) {
                     const methods = Object.keys(handler.route.methods).join(',').toUpperCase();
-                    console.log(`${ methods } ${ handler.route.path }`);
+                    console.log(`${methods} ${handler.route.path}`);
                 }
             });
         }
@@ -163,9 +185,9 @@ app.get('/health', (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${ PORT }`);
-    console.log(`📝 Environment: ${ process.env.NODE_ENV || 'development' }`);
-    console.log(`🌐 CORS enabled for: ${ CORS_ORIGIN }`);
+    console.log(`🚀 Server running on port ${PORT}`);
+    console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`🌐 CORS enabled for: ${CORS_ORIGIN}`);
     console.log('✅ APIs ready!');
 
     console.log('🔗 Available routes:');
@@ -197,4 +219,3 @@ app.listen(PORT, () => {
         console.log(':memo: Using mock data - Supabase not configured');
     }
 });
-

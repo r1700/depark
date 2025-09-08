@@ -101,7 +101,7 @@ export default function Login() {
           showPopup('Email not registered in the system', 'error');
           return;
         }
-        navigate('/dashboard');
+        navigate('/VehicleRow');
       } catch {
         showPopup('Login failed', 'error');
       }

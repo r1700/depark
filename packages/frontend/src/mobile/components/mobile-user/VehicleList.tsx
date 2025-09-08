@@ -174,8 +174,9 @@ export const VehicleRow = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          baseuser_id: userId,
-          license_plate: vehicle.license_plate,
+          
+          licensePlate: vehicle.license_plate,
+          floor:'mobile'
         }),
       });
 
