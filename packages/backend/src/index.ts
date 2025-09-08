@@ -18,20 +18,19 @@ import { WebSocketServer } from 'ws';
 import session from 'express-session';
 import adminConfigRouter from './routes/adminConfig';
 import userRoutes from './routes/user.routes';
-import authRoutes from './routes/auth';
 import importFromCsv from './routes/importFromCsv';
+import authRoutes from './routes/auth';
 import logoRouter from './routes/logos';
 import screenTypeRouter from './routes/screenType';
 import './cronJob'; // Import the cron job to ensure it runs on server start
 import vehicle from './routes/vehicleRoute';
 import GoogleAuth from './routes/google-auth';
 import parkingReport from './routes/parkingStat';
+// import notifications from './routes/notifications';
 import surfaceReport from './routes/surfaceStat';
 import retrieveRoute from './routes/RetrivalQueue';
 import otpRoutes from './routes/otp.server';
 import protectedRoutes from './routes/protected';
-import routes from './routes/mobile/mobileUserRoutes';
-import notifications from "./routes/mobile/notificationsRoutes"; 
 
 import path from 'path';
 const app = express();
@@ -41,18 +40,18 @@ app.use(express.json());
 
 // --- DEBUG: log incoming requests and who sends responses ---
 app.use((req, res, next) => {
-    console.log(`[REQ] ${ new Date().toISOString() } ${ req.method } ${ req.originalUrl } body:`, req.body);
+    console.log(`[REQ] ${new Date().toISOString()} ${req.method} ${req.originalUrl} body:`, req.body);
     const origJson = res.json.bind(res);
     const origSend = res.send.bind(res);
 
     res.json = function (body) {
-        console.log(`[DEBUG] res.json called for ${ req.method } ${ req.originalUrl } with body:`, body);
+        console.log(`[DEBUG] res.json called for ${req.method} ${req.originalUrl} with body:`, body);
         console.trace();
         return origJson(body);
     };
 
     res.send = function (body) {
-        console.log(`[DEBUG] res.send called for ${ req.method } ${ req.originalUrl } with body:`, body);
+        console.log(`[DEBUG] res.send called for ${req.method} ${req.originalUrl} with body:`, body);
         console.trace();
         return origSend(body);
     };
@@ -69,7 +68,11 @@ app.use(session({
     secret: process.env.SESSION_SECRET || 'keyboard cat',
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: process.env.NODE_ENV === 'production' }
+    cookie: {
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        httpOnly: true
+    }
 }) as unknown as express.RequestHandler);
 
 // Middleware
@@ -115,8 +118,8 @@ app.use('/api/protected', protectedRoutes);
 
 // app.use('/api/tablet', retrieveRoute);
 app.use('/api/otp', otpRoutes);
-app.use("/api", routes);
-app.use("/notifications", notifications);
+// app.use("/api", routes);
+// app.use("/notifications", notifications);
 app.use('/api/importFromCsv', importFromCsv);
 
 app.use('/api/logos', logoRouter);
@@ -127,7 +130,6 @@ app.use((req, res, next) => {
     console.log(`[${ req.method }] ${ req.path }`, req.body);
     next();
 });
-
 
 app.use("/api/opc", techniciansRoutes);
 app.use('/api/opc', faultsRouter);

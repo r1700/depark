@@ -100,6 +100,7 @@ temp/*.json
 !package-lock.json
 !tsconfig.json
 !*.config.json
+package.json
 connection/
 knexfile.js
 # migrations/
@@ -119,3 +120,4 @@ packages/backend/src/routes/opc/parsedData.json
 
 
 
+[package.json](http://_vscodecontentref_/0)

@@ -19,6 +19,7 @@ export type FieldConfigGeneric<T> = {
   type: 'free' | 'select' | 'multiSelect' | 'date' | 'dateRange' | 'number';
   options?: string[];
   valueAsArray?: boolean;
+  multi?: boolean; // הוספתי את המאפיין הזה
   fromKey?: Extract<keyof T, string>;
   toKey?: Extract<keyof T, string>;
 };
@@ -44,7 +45,7 @@ const FilterPanel = <T extends Record<string, any>>({
     if (!val) return '';
     const d = new Date(val);
     if (isNaN(d.getTime())) return '';
-    return d.toISOString().slice(0, 10); 
+    return d.toISOString().slice(0, 10);
   };
 
   return (
@@ -67,27 +68,33 @@ const FilterPanel = <T extends Record<string, any>>({
             );
 
           case 'select': {
-            const valueAsArray = !!field.valueAsArray;
+            const multiple = !!field.valueAsArray || !!field.multi;
             const raw = (filters as Record<string, any>)[name];
-            const currentValue = valueAsArray
-              ? (Array.isArray(raw) ? raw[0] ?? '' : '')
+            const currentValue = multiple
+              ? (Array.isArray(raw) ? raw : [])
               : (raw ?? '');
+
             return (
               <FormControl size="small" key={name}>
                 <InputLabel>{label}</InputLabel>
                 <Select
                   label={label}
+                  multiple={multiple}
                   value={currentValue}
                   onChange={(e) => {
-                    const val = e.target.value as string;
-                    if (valueAsArray) {
-                      update(name, val ? [val] : []);
+                    const val = e.target.value as string | string[];
+                    if (multiple) {
+                      const arr = Array.isArray(val) ? val : (val ? [val] : []);
+                      update(name, arr.length ? arr : undefined);
                     } else {
-                      update(name, val || undefined);
+                      update(name, (val as string) || undefined);
                     }
                   }}
+                  renderValue={(selected) =>
+                    Array.isArray(selected) ? (selected as string[]).join(', ') : (selected as string)
+                  }
                 >
-                  <MenuItem value="">None</MenuItem>
+                  {!multiple && <MenuItem value="">None</MenuItem>}
                   {(field.options ?? []).map((opt) => (
                     <MenuItem key={opt} value={opt}>
                       {opt}
@@ -111,7 +118,10 @@ const FilterPanel = <T extends Record<string, any>>({
                   update(name, newValue && newValue.length ? [...newValue] : undefined);
                 }}
                 renderTags={(value: readonly string[], getTagProps) =>
-                  value.map((option, index) => <Chip label={option} {...getTagProps({ index })} />)
+                  value.map((option, index) => (
+                    // חשוב: לא להוסיף `key={...}` כאן — getTagProps מספקת את ה-key
+                    <Chip {...getTagProps({ index })} label={option} />
+                  ))
                 }
                 renderInput={(params) => (
                   <TextField {...params} label={label} placeholder={field.placeholder} size="small" />
