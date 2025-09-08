@@ -21,13 +21,11 @@ describe('vehiclesService Tests', () => {
       await sequelize.authenticate();
       console.log('✅ Connected to test database');
 
-      // ✅ נקה נתונים קיימים לפני הטסטים
       await sequelize.query('DELETE FROM vehicles WHERE license_plate IN ($1, $2)', {
         bind: ['ZXC123', 'XYZ789'],
         type: QueryTypes.DELETE
       });
 
-      // ✅ תיקון: השתמש בטבלה הנכונה
       await sequelize.query('DELETE FROM users WHERE baseuser_id IN ($1, $2)', {
         bind: [123, 456],
         type: QueryTypes.DELETE
@@ -39,13 +37,12 @@ describe('vehiclesService Tests', () => {
     }
   });
 
-  describe('האם הלוחית רישוי קיים', () => {
+  describe('if vehicle license plate exists', () => {
     let testVehicles: any[] = [];
 
     beforeEach(async () => {
-      console.log('🚀 Setting up test data for: האם הלוחית רישוי קיים');
+      console.log('🚀 Setting up test data for: if vehicle license plate exists');
       try {
-        // ✅ נקה לוחיות רישוי לפני יצירה
         await sequelize.query('DELETE FROM vehicles WHERE license_plate IN ($1, $2)', {
           bind: ['ZXC123', 'XYZ789'],
           type: QueryTypes.DELETE
@@ -123,31 +120,29 @@ describe('vehiclesService Tests', () => {
       }
     });
 
-    test('לוחית רישוי לא קיים', async () => {
+    test('if vehicle license plate does not exist', async () => {
       const exists = await isLicensePlateExists('GTD234');
       expect(exists.found).toBe(false);
     });
 
-    test('לוחית רישוי קיים', async () => {
+    test('if vehicle license plate exists', async () => {
       const exists = await isLicensePlateExists('ZXC123');
       expect(exists.found).toBe(true);
     });
   });
 
-  describe('האם המשתמש יכול להכניס עוד רכב', () => {
+  describe('if user can add another vehicle', () => {
     console.log('🚀 Testing if user can add another vehicle');
-    test('אין מקום לעוד רכבים', async () => {
+    test('if no space for another vehicle', async () => {
       let userCreated: any = null;
       let sessionCreated: any = null;
 
       try {
-        // ✅ נקה משתמש קיים לפני יצירה
         await sequelize.query('DELETE FROM users WHERE baseuser_id = $1', {
           bind: [123],
           type: QueryTypes.DELETE
         });
 
-        // ✅ תיקון: השתמש בטבלה הנכונה וצור המשתמש עם addUserData
         const newUser = await createFullUser(
           12345,
           "john@example.com",     // email
@@ -198,17 +193,15 @@ describe('vehiclesService Tests', () => {
       }
     });
 
-    test('יש מקום לעוד רכב', async () => {
+    test('if user can add another vehicle', async () => {
       let userCreated: any = null;
 
       try {
-        // ✅ נקה משתמש קיים לפני יצירה
         await sequelize.query('DELETE FROM users WHERE baseuser_id = $1', {
           bind: [456],
           type: QueryTypes.DELETE
         });
 
-        // ✅ תיקון: השתמש ב-createFullUser
         const newUser2 = await createFullUser(
           12346,
           "sarah.wilson@company.com",   // email
@@ -228,7 +221,6 @@ describe('vehiclesService Tests', () => {
         userCreated = newUser2;
         console.log('✅ User created:', userCreated);
 
-        // ✅ בדיקת הפונקציה
         const userPark = await canUserPark(Number(userCreated.user.dataValues.baseuser_id));
         expect(userPark).toBe(true);
 
@@ -236,7 +228,7 @@ describe('vehiclesService Tests', () => {
         console.error('Test failed:', error);
         throw error;
       } finally {
-        // ✅ ניקוי מובטח
+        // ✅ Cleanup guaranteed
         try {
           if (userCreated && userCreated.id) {
             await sequelize.query('DELETE FROM users WHERE id = $1', {
@@ -250,7 +242,7 @@ describe('vehiclesService Tests', () => {
       }
     });
   });
-  describe('האם החניון פעיל', () => {
+  describe('if parking lot is active', () => {
     let newParkingConfig1: any;
     let newParkingConfig2: any;
 
@@ -292,7 +284,7 @@ describe('vehiclesService Tests', () => {
         updated_by: "tester"
       });
     });
-    test('החניון לא פעיל', async () => {
+    test('if parking lot is not active', async () => {
       const now = new Date();
       const isParkingActive = await isParkingLotActive(now, newParkingConfig1.id);
       console.log('Is parking active!!!!!!!!!11111111:', isParkingActive.message);
@@ -301,7 +293,7 @@ describe('vehiclesService Tests', () => {
 
       expect(isParkingActive.active).toBe(false);
     });
-    test('החניון פעיל', async () => {
+    test('if parking lot is active', async () => {
       const now = new Date();
       const isParkingActive = await isParkingLotActive(now, newParkingConfig2.id);
       console.log('Is parking active!!!!!!!!!2:', isParkingActive.message);
@@ -312,7 +304,6 @@ describe('vehiclesService Tests', () => {
     });
 
     afterAll(async () => {
-      // מחיקת הקונפיגורציה שנוצרה
       if (newParkingConfig1 && newParkingConfig1.id) {
         await sequelize.query('DELETE FROM parkingconfigurations WHERE id = $1', {
           bind: [newParkingConfig1.id],
@@ -336,7 +327,6 @@ describe('vehiclesService Tests', () => {
     let vehicle1Results2: any;
 
     beforeAll(async () => {
-      // הכנסת רכב ראשון
 
 
       const newVehicle = await addVehicleData(
@@ -355,7 +345,6 @@ describe('vehiclesService Tests', () => {
 
       const reserved = await createReservedParking(5, 101, 'Monday');
       console.log('Reserved parking created:', reserved);
-      // הכנסת רכב שני (למשתמש אחר)
       const newVehicle2 = await addVehicleData(
         6,                        // baseuser_id
         `yuru46_${Date.now()}`,                 // license_plate
@@ -382,14 +371,12 @@ describe('vehiclesService Tests', () => {
     });
 
     afterAll(async () => {
-      // מחיקת חניה שמורה
       if (reservedParkingResults && reservedParkingResults.id) {
         await sequelize.query('DELETE FROM reservedparking WHERE id = $1', {
           bind: [reservedParkingResults.id],
           type: QueryTypes.DELETE
         });
       }
-      // מחיקת רכבים
       if (vehicle1Results1 && vehicle1Results1.id) {
         await sequelize.query('DELETE FROM vehicles WHERE id = $1', {
           bind: [vehicle1Results1.id],
@@ -408,7 +395,6 @@ describe('vehiclesService Tests', () => {
     let newVehicleModelId: number;
     let newVehicle: any;
     beforeAll(async () => {
-      // הוספת מודל רכב חדש
       const exampleModel = await addVehicleModelData(
         'Toyota',
         'Corolla',
@@ -422,7 +408,6 @@ describe('vehiclesService Tests', () => {
       }
       newVehicleModelId = exampleModel.id;
 
-      // הוספת רכב חדש עם id=3
       newVehicle = await addVehicleData(
         8,                        // baseuser_id
         `yuru46_${Date.now()}`,                 // license_plate
@@ -460,12 +445,10 @@ describe('vehiclesService Tests', () => {
     });
 
     afterAll(async () => {
-      // מחיקת הרכב
       await sequelize.query('DELETE FROM vehicles WHERE id = $1', {
         bind: [3],
         type: QueryTypes.DELETE
       });
-      // מחיקת מודל הרכב
       await sequelize.query('DELETE FROM vehiclemodels WHERE id = $1', {
         bind: [newVehicleModelId],
         type: QueryTypes.DELETE
@@ -475,15 +458,14 @@ describe('vehiclesService Tests', () => {
   describe('Global Cleanup', () => {
   });
   afterAll(async () => {
-    console.log('🧹 Global cleanup - סגירת חיבור ל-DB');
+    console.log('🧹 Global cleanup - Closing DB connection');
     try {
-      // ✅ ניקוי סופי
+      // ✅ Final cleanup
       await sequelize.query('DELETE FROM vehicles WHERE license_plate IN ($1, $2)', {
         bind: ['ZXC123', 'XYZ789'],
         type: QueryTypes.DELETE
       });
 
-      // ✅ תיקון: השתמש בטבלה הנכונה
       await sequelize.query('DELETE FROM users WHERE baseuser_id IN ($1, $2)', {
         bind: [123, 456],
         type: QueryTypes.DELETE

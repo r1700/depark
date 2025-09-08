@@ -17,9 +17,7 @@ async function createFullUser(
   approved_at?: Date,
   phone?: string
 ) {
-  // 1. שמור baseuser
   const baseUser = await baseuser.create({
-    // id: id,
     email: email,
     first_name: first_name,
     last_name: last_name,
@@ -27,10 +25,8 @@ async function createFullUser(
     updated_at: new Date(),
   });
 
-  // 2. שמור User עם קישור ל-baseuser
   const user = await User.create({
-    // שדה הקישור - תלוי במודל שלך, לרוב baseuser_id או id
-    baseuser_id: baseUser.id, // אם id של User הוא אותו id של baseuser
+    baseuser_id: baseUser.id,
     department: department,
     employee_id: employee_id,
     google_id: google_id,
@@ -120,7 +116,6 @@ async function addParkingSessionData(
   }
 }
 
-// הוספת ParkingConfiguration
 async function addParkingConfigurationData(
   params: {
   facility_name: string;
@@ -151,10 +146,8 @@ async function addParkingConfigurationData(
   }
 }
 
-// פונקציה לחיפוש רכב לפי ID
 
 
-// ייצוא כל הפונקציות
 
  async function findVehicleById(vehicleId: number) {
   try {
