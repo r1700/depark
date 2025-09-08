@@ -13,8 +13,8 @@ import {
   TableRow,
   TableCell,
   TableBody,
+  Box,
 } from "@mui/material";
-
 import { Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -127,6 +127,7 @@ export const VehicleReportDialog = ({ open, onClose, userId }: Props) => {
     );
   };
 
+  
   return (
     <Dialog
       open={open}
@@ -137,16 +138,33 @@ export const VehicleReportDialog = ({ open, onClose, userId }: Props) => {
           display: "flex",
           flexDirection: "column",
           height: "100%",
+          background: "linear-gradient(135deg, #e3f0ff 0%, #f8fbff 100%)",
+          borderRadius: 0,
         },
       }}
     >
-      <DialogTitle>Vehicle Report</DialogTitle>
+      <DialogTitle
+        sx={{
+          textAlign: "center",
+          fontWeight: 700,
+          fontSize: "1.35rem",
+          color: "#1976d2",
+          letterSpacing: 1,
+          pb: 0,
+          background: "#e3f2fd",
+        }}
+      >
+        Vehicle Report
+      </DialogTitle>
 
       <DialogContent
         sx={{
           flex: 1,
           overflowY: "auto",
           px: 1,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
         }}
       >
         {loading ? (
@@ -155,41 +173,71 @@ export const VehicleReportDialog = ({ open, onClose, userId }: Props) => {
           <Alert severity="error">{error}</Alert>
         ) : report?.vehicles?.length ? (
           <>
-            <Table size="small" sx={{ width: "100%" }}>
-             <TableHead>
-  <TableRow>
-    <TableCell sx={{ backgroundColor: "#b9b5b5ff", color: "#333" }}>License</TableCell>
-    <TableCell sx={{ backgroundColor: "#b9b5b5ff", color: "#333" }}>Total</TableCell>
-    <TableCell sx={{ backgroundColor:"#b9b5b5ff", color: "#333" }}>Avg Park</TableCell>
-    <TableCell sx={{ backgroundColor: "#b9b5b5ff", color: "#333" }}>Avg Wait</TableCell>
-    <TableCell sx={{ backgroundColor: "#b9b5b5ff", color: "#333" }}>Records</TableCell>
-  </TableRow>
-</TableHead>
-              <TableBody>
-                {report.vehicles.map((v, idx) => (
-                  <TableRow key={idx}>
-                    <TableCell>{v.license_plate}</TableCell>
-                    <TableCell>{formatDuration(v.totalTime)}</TableCell>
-                    <TableCell>{formatDuration(v.averageTime)}</TableCell>
-                    <TableCell>{formatDuration(v.averageWaitTime)}</TableCell>
-                    <TableCell>{v.records.length}</TableCell>
+            <Box
+              sx={{
+                width: "100%",
+                maxWidth: 340,
+                background: "#e3f2fd",
+                borderRadius: 2,
+                boxShadow: "0 2px 8px rgba(30,144,255,0.08)",
+                mb: 2,
+                p: 2,
+              }}
+            >
+              <Table size="small" sx={{ width: "100%" }}>
+                <TableHead>
+                  <TableRow>
+                    <TableCell sx={{ backgroundColor: "#e3f2fd", color: "#1976d2", fontWeight: 700 }}>License</TableCell>
+                    <TableCell sx={{ backgroundColor: "#e3f2fd", color: "#1976d2", fontWeight: 700 }}>Total</TableCell>
+                    <TableCell sx={{ backgroundColor: "#e3f2fd", color: "#1976d2", fontWeight: 700 }}>Avg Park</TableCell>
+                    <TableCell sx={{ backgroundColor: "#e3f2fd", color: "#1976d2", fontWeight: 700 }}>Avg Wait</TableCell>
+                    <TableCell sx={{ backgroundColor: "#e3f2fd", color: "#1976d2", fontWeight: 700 }}>Records</TableCell>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-
-            {getTotalTimeGraph()}
+                </TableHead>
+                <TableBody>
+                  {report.vehicles.map((v, idx) => (
+                    <TableRow key={idx}>
+                      <TableCell>{v.license_plate}</TableCell>
+                      <TableCell>{formatDuration(v.totalTime)}</TableCell>
+                      <TableCell>{formatDuration(v.averageTime)}</TableCell>
+                      <TableCell>{formatDuration(v.averageWaitTime)}</TableCell>
+                      <TableCell>{v.records.length}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </Box>
+            <Box sx={{ width: "100%", maxWidth: 340 }}>
+              {getTotalTimeGraph()}
+            </Box>
           </>
         ) : (
           <Typography>No data to display.</Typography>
         )}
       </DialogContent>
 
-      <DialogActions sx={{ p: 1 }}>
-        <Button fullWidth onClick={onClose}>
+      <DialogActions sx={{ p: 1, background: "#e3f2fd" }}>
+        <Button
+          fullWidth
+          onClick={onClose}
+          variant="contained"
+          sx={{
+            borderRadius: 2,
+            px: 4,
+            fontWeight: 600,
+            background: "linear-gradient(90deg, #1976d2 60%, #64b5f6 100%)",
+            color: "#fff",
+            boxShadow: "0 2px 8px rgba(30,144,255,0.08)",
+            "&:hover": {
+              background: "linear-gradient(90deg, #1565c0 60%, #1976d2 100%)",
+            },
+          }}
+        >
           Close
         </Button>
       </DialogActions>
     </Dialog>
   );
 };
+
+ 

@@ -26,6 +26,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         headers: { Authorization: `Bearer ${newToken}` },
       });
       setUser(res.data.user);
+      localStorage.setItem('user', JSON.stringify({ userId: res.data.user?.id, contact: res.data.user?.email }));
     } catch {
       logout();
     }
