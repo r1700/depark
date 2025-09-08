@@ -37,7 +37,6 @@ router.post('/retrieve', async (req, res) => {
         if (!vehicle) {
             return res.status(404).json({ error: 'Vehicle not found' });
         }
-
         // Fetch active session for the vehicle
         const session = await ParkingSession.findOne({
             where: {
@@ -66,7 +65,7 @@ router.post('/retrieve', async (req, res) => {
 
         let value;
         try {
-            value = await callWaitForNodeChangeApi();
+            value = await callWaitForNodeChangeApi('ExitRequestApproval');
         } catch (opcError) {
             console.error('Error waiting for node change from OPC server:', opcError);
             return res.status(500).json({ error: 'Failed to communicate with OPC server' });
