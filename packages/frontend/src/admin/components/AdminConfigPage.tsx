@@ -136,7 +136,8 @@ interface AdminConfigPageProps {}
 // eslint-disable-next-line no-empty-pattern
 export default function AdminConfigPage({}: AdminConfigPageProps) {
   const navigate = useNavigate();
-  const { lotId } = useParams<{ lotId?: string }>();
+  // Use 'id' param for editing, as defined in AdminRoutes
+  const { id } = useParams<{ id?: string }>();
 
   // Helper function to get headers with authorization
   const getAuthHeaders = () => {
@@ -187,7 +188,7 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
     },
     maxQueueSize: 0,
     avgRetrievalTimeMinutes: 0,
-    maxParallelRetrievals:0, 
+    maxParallelRetrievals: 0,
     maintenanceMode: false,
     showAdminAnalytics: false
   }), []);
@@ -205,37 +206,28 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [spotToDelete, setSpotToDelete] = useState<{index: number, name: string} | null>(null);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
-  // const [updateLotId, setUpdateLotId] = useState('');
-  // const [loadingUpdate, setLoadingUpdate] = useState(false);
-  // const [addingNewLot, setAddingNewLot] = useState(false);
   const [, setAddingNewLot] = useState(false);
-
   const [deleteConfirmDialog, setDeleteConfirmDialog] = useState<{
     open: boolean;
     lotData: any;
   }>({ open: false, lotData: null });
 
-  // Load existing parking config if lotId is provided
+  // Load existing parking config if id is provided
   useEffect(() => {
-    console.log('🔄 useEffect triggered with lotId:', lotId);
-    
+    console.log('🔄 useEffect triggered with id:', id);
     const loadExistingConfig = async () => {
-      if (lotId) {
+      if (id) {
         setLoading(true);
         try {
-          console.log('🔄 Loading existing config for lotId:', lotId);
-          const response = await fetch(`/api/admin/${lotId}`, {
+          console.log('🔄 Loading existing config for id:', id);
+          const response = await fetch(`/api/admin/${id}`, {
             headers: getAuthHeaders()
           });
-          
           if (response.ok) {
             const result = await response.json();
             console.log('✅ Loaded existing config:', result);
-            
             if (result.success && result.parkingConfig) {
               const config = result.parkingConfig;
-              
-              // Convert the loaded config to match our format
               const defaultDailyHours = {
                 Sunday: { isActive: false, openingHour: '00:00', closingHour: '00:00' },
                 Monday: { isActive: false, openingHour: '00:00', closingHour: '00:00' },
@@ -245,7 +237,6 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
                 Friday: { isActive: false, openingHour: '00:00', closingHour: '00:00' },
                 Saturday: { isActive: false, openingHour: '00:00', closingHour: '00:00' }
               };
-              
               const loadedConfig: ParkingConfig = {
                 facilityName: config.facilityName || '',
                 lotId: config.id || '',
@@ -261,7 +252,6 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
                 updatedAt: config.updatedAt ? new Date(config.updatedAt) : undefined,
                 updatedBy: config.updatedBy || 'admin'
               };
-              
               setParkingConfig(loadedConfig);
               setLastSavedConfig(loadedConfig);
               console.log('✅ Config loaded and set:', loadedConfig);
@@ -279,15 +269,13 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
           setLoading(false);
         }
       } else {
-        console.log('💭 No lotId provided, staying with initial config');
-        // Reset to initial config when no lotId (new lot)
+        console.log('💭 No id provided, staying with initial config');
         setParkingConfig(initialConfig);
         setLastSavedConfig(initialConfig);
       }
     };
-    
     loadExistingConfig();
-  }, [initialConfig, lotId]); // Remove initialConfig dependency
+  }, [initialConfig, id]);
 
   // Auto-hide error popup after 3 seconds
   useEffect(() => {
@@ -597,16 +585,16 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
     try {
       const now = new Date();
       // Check if this is a new lot - use React Router lotId instead of URL params
-      const isNewLot = !lotId; // If no lotId from useParams, it's a new lot
+      const isNewLot = !id; // If no id from useParams, it's a new lot
       console.log('🔄 CRITICAL_SAVE_DEBUG: Starting save process');
       console.log('🔄 Current parkingConfig:', JSON.stringify(parkingConfig, null, 2));
-      console.log('🔄 lotId from useParams:', lotId);
+      console.log('🔄 id from useParams:', id);
       console.log('🔄 isNewLot:', isNewLot);
       console.log('🔄 Sending timestamp:', now.toISOString());
 
       const url = isNewLot
         ? '/api/admin'
-        : `/api/admin/${lotId}`; // Use lotId from useParams
+        : `/api/admin/${id}`; // Use id from useParams
 
       const method = isNewLot ? 'POST' : 'PUT';
 
@@ -747,7 +735,7 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
               pb: 2,
               mb: 4
             }}>
-              {lotId ? `Edit Parking Lot: ${parkingConfig.facilityName || lotId}` : 'New Parking System Configuration'}
+              {id ? `Edit Parking Lot: ${parkingConfig.facilityName || id}` : 'New Parking System Configuration'}
             </Typography>
           </Box>
 
@@ -1291,14 +1279,14 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
                 🔄 Reset to Default Settings
               </Button>
             </Stack>
-            {(parkingConfig.updatedAt || lotId) && (
+            {(parkingConfig.updatedAt || id) && (
               <Typography variant="caption" color="text.secondary" sx={{ mt: 2, display: 'block' }}>
                 {parkingConfig.updatedAt ? (() => {
                   const d = new Date(parkingConfig.updatedAt);
                   const dateStr = d.toLocaleDateString('en-GB');
                   const timeStr = d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
                   return `Last updated: ${dateStr} at ${timeStr}${parkingConfig.updatedBy ? ` by ${parkingConfig.updatedBy}` : ''}`;
-                })() : lotId ? `Configuration loaded for lot: ${lotId}` : 'New configuration'}
+                })() : id ? `Configuration loaded for lot: ${id}` : 'New configuration'}
               </Typography>
             )}
           </Box>

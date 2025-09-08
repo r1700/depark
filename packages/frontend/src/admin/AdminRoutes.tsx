@@ -68,6 +68,7 @@ const AdminRoutes: React.FC = () => {
         <Route path="admin" element={<AdminDashboard />} />
         <Route path="hr-dashboard" element={<HrDashboard />} />
         <Route path="admin-config" element={<AdminConfigPage />} />
+        <Route path="admin-config/:id" element={<AdminConfigPage />} />
         <Route path="parkings" element={<ParkingsPage />} />
         <Route path="admin-users" element={<AdminUsersPage />} />
         <Route path="logo-management" element={<LogoManagementPage />} />
