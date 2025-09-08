@@ -109,6 +109,7 @@ knexfile.js
 package-lock.json
 .env
 
+
 packages/backend/src/routes/opc/parsedData.json
 
 
@@ -117,3 +118,5 @@ packages/backend/src/routes/opc/parsedData.json
 
 
 
+
+[package.json](http://_vscodecontentref_/0)

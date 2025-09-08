@@ -1,3 +1,4 @@
+
 import { DataTypes, Model, InferAttributes, InferCreationAttributes, CreationOptional } from 'sequelize';
 import sequelize from '../../config/sequelize';
 
@@ -11,14 +12,17 @@ export class BaseUser extends Model<
   declare last_name: string;
   declare created_at: Date;
   declare updated_at: Date;
+  declare phone: string | null;
 }
 
 BaseUser.init({
-  id: {
-    type: DataTypes.INTEGER,
-    autoIncrement: true,
-    primaryKey: true
-  },
+id: {
+  type: DataTypes.INTEGER,
+  primaryKey: true,
+  autoIncrement: true,
+  allowNull: false,
+},
+
   email: {
     type: DataTypes.STRING,
     allowNull: false
@@ -31,6 +35,11 @@ BaseUser.init({
     type: DataTypes.STRING,
     allowNull: false
   },
+  phone: {
+  type: DataTypes.STRING,
+  allowNull: true, // או false בהתאם לסכימה
+},
+
   created_at: {
     type: DataTypes.DATE,
     allowNull: false
