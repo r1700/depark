@@ -187,6 +187,7 @@ export const VehicleRow = () => {
 
       const data = await res.json();
 
+      
       setPickupInfo({
         licensePlate: vehicle.license_plate,
         position: data.position,
