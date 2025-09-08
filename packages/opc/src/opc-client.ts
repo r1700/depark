@@ -26,8 +26,7 @@ const nodesToMonitor = [
   "ns=1;s=parkingSpot",
   "ns=1;s=licensePlateExit",
   "ns=1;s=licensePlateEntry",
-  "ns=1;s=ActiveFaultList", // רשימת תקלות
-  "ns=1;s=Queue",
+  // "ns=1;s=ExitRequestApproval"
 ];
 // Function to check if the session is valid
 function isChannelValid(session: ClientSession | null): boolean {
@@ -130,7 +129,6 @@ function detectDataType(value: any): { dataType: DataType; arrayType?: VariantAr
       throw new Error(`Unsupported data type: ${typeof value}`);
   }
 }
-
 // Interface for write items
 export interface WriteItem {
   nodeId: string;
@@ -195,7 +193,7 @@ export async function createSubscription(): Promise<ClientSubscription> {
     console.log("Subscription terminated");
   });
   subscription.on("keepalive", () => {
-    console.log(":arrows_counterclockwise: Subscription keepalive: Connection is active");
+    // console.log(":arrows_counterclockwise: Subscription keepalive: Connection is active");
   });
   subscription.on("status_changed", (status) => {
     console.log(":warning: Subscription status changed:", status.toString());
@@ -208,7 +206,7 @@ export async function createMonitoredItems(subscription: ClientSubscription): Pr
     try {
       await item.terminate();
     } catch (e) {
-      console.warn("⚠️ Warning terminating monitored item:", e);
+      console.warn(":warning: Warning terminating monitored item:", e);
     }
   }
   monitoredItems = [];
@@ -226,7 +224,6 @@ export async function createMonitoredItems(subscription: ClientSubscription): Pr
       },
       TimestampsToReturn.Both
     );
-
     monitoredItem.on("changed", async (dataValue: DataValue) => {
       const val = dataValue.value?.value;
       let event: string = '';
@@ -237,11 +234,14 @@ export async function createMonitoredItems(subscription: ClientSubscription): Pr
       } else if (nodeId === "ns=1;s=parkingSpot") {
         event = 'parkingSpot';
       }
+      // else if (nodeId === "ns=1;s=ExitRequestApproval") {
+      //   event = 'exitRequestApproval';
+      // }
       console.log(`:arrows_counterclockwise: Node ${nodeId} changed:`, val);
       await sendDataToBackend(event, val);
     });
     monitoredItem.on("err", (err) => {
-      console.error(`❌ Monitored item error at ${nodeId}:`, err);
+      console.error(`:x: Monitored item error at ${nodeId}:`, err);
     });
     monitoredItems.push(monitoredItem);
   });
@@ -287,4 +287,3 @@ process.on("SIGINT", async () => {
   await closeOpcConnection();
   process.exit(0);
 });
-

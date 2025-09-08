@@ -243,8 +243,8 @@ const PopupMessage = ({ message, color }: { message: string; color: 'error' | 's
 );
 
 export default function UnifiedEntry() {
-    const [pickupFloor, setPickupFloor] = useState<number | null>(null);
-    const [pickupElevator, setPickupElevator] = useState<number | null>(null);
+    const [, setPickupFloor] = useState<number | null>(null);
+    const [, setPickupElevator] = useState<number | null>(null);
     const handleVehicleSelect = (plate: string) => {
         setSelectedVehicle(plate);
         setLicensePlate(plate);
@@ -271,9 +271,9 @@ export default function UnifiedEntry() {
             d.length === 8 ? d.replace(/^(\d{3})(\d{2})(\d{3})$/, '$1-$2-$3') : d;
     };
     const [employeeVehicles, setEmployeeVehicles] = useState<{ licensePlate: string }[]>([]);
-    const [selectedVehicle, setSelectedVehicle] = useState('');
-    const [queues, setQueues] = useState<any[]>([]);
-    const [userVehicle, setUserVehicle] = useState('');
+    const [, setSelectedVehicle] = useState('');
+    const [, setQueues] = useState<any[]>([]);
+    const [, setUserVehicle] = useState('');
     const [popup, setPopup] = useState<{ message: string; color: 'error' | 'success' } | null>(null);
     const [loading, setLoading] = useState(false);
     const [showQueuesLoading, setShowQueuesLoading] = useState(false);
@@ -296,10 +296,12 @@ export default function UnifiedEntry() {
                 setLoading(false);
                 return showPopup('License plate must be 7 or 8 digits', 'error');
             }
-            const floorNumber = Number(localStorage.getItem('floorNumber'));
-            const response = await sendVehicleData({ licensePlate: value, floor: floorNumber });
+            const floorNumber = String(localStorage.getItem('floorNumber'));
+            const response = await sendVehicleData({ licensePlate: "ABC789", floor: floorNumber });
+            console.log("API response:", response);
+
             setLoading(false);
-            if (!response.success) {
+            if (response.status !== 201) {
                 showPopup(response.message || 'Vehicle not found in the system', 'error');
             } else {
                 const [floor, elevator] = response.assigned_pickup_spot.split(':');
@@ -327,8 +329,8 @@ export default function UnifiedEntry() {
         }
     }
 
-    const [allVehicles, setAllVehicles] = useState<string[]>([]);
-    const [allEmployees, setAllEmployees] = useState<string[]>([]);
+    const [, setAllVehicles] = useState<string[]>([]);
+    const [, setAllEmployees] = useState<string[]>([]);
 
     useEffect(() => {
         async function fetchVehicles() {

@@ -5,9 +5,7 @@ import fs from 'fs';
 import { number } from 'joi';
 const router : Router = Router();
 
-// router.post('/:param', (req, res) => {       
-//     res.json({  value: req.body.value });
-// });
+
 router.post('/Queue', (req, res) => {
   
   console.log('POST /Queue called');
@@ -63,5 +61,9 @@ router.get('/Queue/:floorNumber', (req, res) => {
   });
 
   return res.json(responseData);
+});
+
+router.post('/:param', (req, res) => {       
+    res.json({  value: req.body.value });
 });
 export default router;

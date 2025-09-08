@@ -1,19 +1,28 @@
 import axios from 'axios';
 
-export async function sendVehicleData(value: { licensePlate: string; floor: number }) {
-    const url = 'https://localhost:3001/api/tablet/retrieve';
+export async function sendVehicleData(value: { licensePlate: string; floor: string }) {
+    console.log("sendVehicleData called with:", value);
+
+    const url = 'http://localhost:3001/api/tablet/retrieve';
     try {
+        console.log('sending vehicle data:', value);
+
         const response = await axios.post(url, {
             licensePlate: value.licensePlate,
             floor: value.floor
         });
-        return response.data;
+        console.log('Response from sendVehicleData:', response.data);
+
+         return { ...response.data, status: response.status };
     } catch (error) {
+        console.log('Error from sendVehicleData:', error);
+
         return {
-            success: true,
+            success: false,
+            message: 'Network error or server unavailable',
             licensePlate: value.licensePlate,
-            position: Math.floor(Math.random() * 10) + 1,
-            assigned_pickup_spot: `${value.floor}:${Math.floor(Math.random() * 4) + 1}`
+            position: null,
+            assigned_pickup_spot: null
         };
     }
 }
@@ -24,18 +33,20 @@ export async function sendFloorQueues(floorNumber: number) {
         const response = await axios.post(url, { floor: floorNumber });
         return response.data;
     } catch (error) {
-        return [
-            {
-                elevatorNumber: 1,
-                firstVehicle: { licensePlate: '12-345-67', estimatedWait: 0 },
-                remainingCount: 2,
-            },
-            {
-                elevatorNumber: 2,
-                firstVehicle: { licensePlate: '234-56-789', estimatedWait: 5 },
-                remainingCount: 1,
-            }
-        ];
+        console.log('Error fetching floor queues:', error);
+        
+        // return [
+        //     {
+        //         elevatorNumber: 1,
+        //         firstVehicle: { licensePlate: '12-345-67', estimatedWait: 0 },
+        //         remainingCount: 2,
+        //     },
+        //     {
+        //         elevatorNumber: 2,
+        //         firstVehicle: { licensePlate: '234-56-789', estimatedWait: 5 },
+        //         remainingCount: 1,
+        //     }
+        // ];
     }
 }
 
@@ -76,4 +87,3 @@ export async function sendEmployeeVehicles(employeeId: string) {
         }
     }
 }
- 

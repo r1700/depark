@@ -37,13 +37,7 @@ interface SidebarProps {
     onLogout: () => void;
 }
 /** normalize role from various representations to 'admin'|'hr'|'guest' */
-function normalizeRole(role: number | string | undefined): RoleName {
-    if (role === undefined || role === null) return 'guest';
-    const r = String(role).toLowerCase();
-    if (r === '2' || r === 'admin' || r.includes('admin')) return 'admin';
-    if (r === '1' || r === 'hr' || r.includes('hr') || r.includes('human')) return 'hr';
-    return 'guest';
-}
+
 
 
 const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
@@ -55,7 +49,6 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
             setReportsOpen(false);
         }
     }, [open]);
-    const userRole = normalizeRole(user?.role);
     const getUserInitials = (): string => {
         if (!user) return '';
         const first = user.firstName ? user.firstName[0] : '';

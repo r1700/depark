@@ -8,6 +8,7 @@ const router: express.Router = express.Router();
 // POST endpoint for retrieval request
 router.post('/retrieve', async (req, res) => {
     const { licensePlate, floor } = req.body;
+console.log('License Plate:', licensePlate, 'Floor:', floor);
 
     // Input validation
     if (!licensePlate) {

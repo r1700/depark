@@ -6,10 +6,13 @@
     "packages/*"
   ],
   "scripts": {
+    "prod-db:migrate": "npx sequelize-cli db:migrate --migrations-path ./packages/migrations --config ./sequelize.config.js --env production",
     "db:migrate": "npx sequelize-cli db:migrate --migrations-path ./packages/migrations --config ./sequelize.config.js",
+    "db:migrate:undo:all": "npx sequelize-cli db:migrate:undo:all --migrations-path ./packages/migrations --config ./sequelize.config.js",
     "db:migrate:undo": "npx sequelize-cli db:migrate:undo --migrations-path ./packages/migrations --config ./sequelize.config.js",
     "migration:generate": "npx sequelize-cli migration:generate --migrations-path ./packages/migrations --config ./sequelize.config.js",
     "build": "tsc",
+
     "test": "jest",
     "install:all": "npm install --workspaces",
     "start:frontend": "npm start --workspace packages/frontend",
@@ -17,39 +20,64 @@
     "dev:opc": "npm run dev --workspace=packages/opc",
     "dev:backend": "npm run dev --workspace=packages/backend",
     "dev:frontend": "npm run start --workspace=packages/frontend",
-    "dev:plc": "npm run dev --workspace=packages/plc-mock"
+    "dev:plc": "npm run dev --workspace=packages/plc-mock",
+    "build:backend": "npm run build --workspace=packages/backend",
+    "build:frontend": "npm run build --workspace=packages/frontend"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",
+    "@mui/lab": "^7.0.0-beta.16",
     "@react-oauth/google": "^0.12.2",
     "@reduxjs/toolkit": "^2.8.2",
     "@types/react": "^19.1.9",
     "@types/react-redux": "^7.1.34",
+    "chart.js": "^4.5.0",
+    "csv-parser": "^3.2.0",
     "axios": "^1.11.0",
+    "cors": "^2.8.5",
     "dotenv": "^17.2.1",
     "express": "^4.21.2",
     "express-session": "^1.18.2",
     "google-auth-library": "^10.2.1",
     "jsonwebtoken": "^9.0.2",
     "mime-db": "^1.54.0",
+
+    "multer": "^2.0.2",
     "node-cron": "^4.2.1",
     "node-opcua": "^2.156.0",
+    "otp-generator": "^4.0.1",
+    "path-to-regexp": "^8.3.0",
     "pg": "^8.16.3",
     "react": "^19.1.1",
+    "react-chartjs-2": "^5.3.0",
     "react-dom": "^19.1.1",
+    "react-icons": "^5.5.0",
     "react-redux": "^9.2.0",
     "sequelize": "^6.37.7",
-    "sequelize-cli": "^6.6.3",
     "sequelize-typescript": "^2.1.6",
+    "string-similarity": "^4.0.4",
+
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "typeorm": "^0.3.25",
+    "typescript": "^5.9.2",
     "yup": "^1.6.1"
   },
   "devDependencies": {
     "@types/express": "^4.17.23",
     "@types/express-session": "^1.18.2",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/multer": "^2.0.0",
+
+    "@types/jest": "^30.0.0",
+    "@types/otp-generator": "^4.0.2",
     "@types/pg": "^8.15.5",
+    "@types/string-similarity": "^4.0.2",
+    "@types/uuid": "^10.0.0",
+
+    "@types/socket.io": "^3.0.1",
     "babel-loader": "^8.2.3",
     "eslint": "^8.57.1",
     "eslint-config-react-app": "^7.0.1",
@@ -57,7 +85,11 @@
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.2.0",
+    "jest": "^30.0.5",
     "postcss-preset-env": "^10.2.4",
+
+    "sequelize-cli": "^6.6.3",
+    "ts-jest": "^29.4.1",
     "webpack": "^5.64.4"
   }
 }

@@ -54,7 +54,7 @@ export async function createPlcOpcServer() {
     minimumSamplingInterval: 1000,
     value: {
       get: () => new Variant({ dataType: DataType.String, value: licensePlateExit }),
-      set: (variant: Variant) => {        
+      set: (variant: Variant) => {
         licensePlateExit = variant.value;
         return StatusCodes.Good;
       },
