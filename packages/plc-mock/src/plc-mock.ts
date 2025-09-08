@@ -38,9 +38,7 @@ export async function createPlcOpcServer() {
   let licensePlateExit = "";
   let parkingSpot = "";
   let vehicleExitRequest = ["", "", ""];
-  //{ licensePlate: "", undergroundSpot: "", CustomerLocation: "" };
   let exitRequestApproval = ["", "", ""];
-  //{ licensePlate: "", position: "", assignedPickupSpot: "" };
   // Add Outputs variables
 
   namespace.addVariable({

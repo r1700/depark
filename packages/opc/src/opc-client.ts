@@ -32,6 +32,7 @@ const nodesToMonitor = [
   "ns=1;s=licensePlateEntry",
   "ns=1;s=ActiveFaultList", // רשימת תקלות
   "ns=1;s=Queue",
+  "ns=1;s=ExitRequestApproval"
 ];
 
 // ----------------------------
@@ -232,7 +233,7 @@ export async function createSubscription(): Promise<ClientSubscription> {
   });
 
   subscription.on("keepalive", () => {
-    console.log("🔄 Subscription keepalive: Connection is active");
+    // console.log("🔄 Subscription keepalive: Connection is active");
   });
 
   subscription.on("status_changed", (status) => {
@@ -277,6 +278,9 @@ export async function createMonitoredItems(subscription: ClientSubscription): Pr
       }
       else if (nodeId === "ns=1;s=ActiveFaultList") {
         event = 'fault';
+      }
+      else if (nodeId === "ns=1;s=ExitRequestApproval") {
+        event = 'exitRequestApproval';
       }
       console.log(`🔄 Node ${nodeId} changed:`, val);
       await sendDataToBackend(event, val);
