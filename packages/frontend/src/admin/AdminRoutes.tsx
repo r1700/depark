@@ -2,7 +2,7 @@ import UsersPage from './Pages/UsersPage';
 import VehiclePage from './Pages/VehiclePage';
 // src/admin/AdminRoutes.tsx
 import React, { useCallback } from "react";
-import { Route, Navigate, useNavigate, Routes } from "react-router-dom";
+import { Route, Navigate, useNavigate } from "react-router-dom";
 import { Provider } from "react-redux";
 import { store } from "./app/store"; 
 
@@ -12,13 +12,9 @@ import AdminDashboard from "./components/adminDashboard/AdminDashboard";
 import HrDashboard from "./components/hrDashboard/HrDashboard";
 import AdminConfigPage from "./components/AdminConfigPage";
 import ParkingsPage from "./Pages/ParkingsPage";
-import ReservedParkingPage from "./Pages/ReservedParking";
-import AdmainConfigResevedparhing from "./components/AdmainConfigReservedparking";
+import AdminUsersPage from "./Pages/adminUser/AdminUsersPage";
 import ParkingStatsPage from "./app/pages/parkingStats/parkingStats";
 import SurfaceStatsPage from "./app/pages/surfaceStats/surfaceStats";
-import AdminLogoManagement from "./components/logo";
-import Users from "./Pages/UsersPage";
-import AdmainConfigUsers from "./components/AdmainConfigUsers"; 
 
 function getUserFromStorage() {
   try {
@@ -42,22 +38,22 @@ const AdminRoutes: React.FC = () => {
 
   return (
     <>
-    <Routes>
       <Route path="login" element={<LoginScreen />} />
+
       <Route
         path=""
         element={
-          String(user?.role) === "2" ? (
+          !user ? (
+            <Navigate to="login" replace />
+          ) : String(user.role) === "2" ? (
             <Navigate to="layout/admin" replace />
-          ) : String(user?.role) === "1" ? (
-            <Navigate to="layout/hr-dashboard" replace />
           ) : (
-            <Provider store={store}>
-              <Layout user={user} onLogout={handleLogout} />
-            </Provider>
+            <Navigate to="layout/hr-dashboard" replace />
           )
         }
       />
+
+      {/* Layout wrapper – all the routes under /admin/layout/* */}
       <Route
         path="layout/*"
         element={
@@ -70,22 +66,19 @@ const AdminRoutes: React.FC = () => {
           )
         }
       >
+        {/* Dashboard / pages */}
         <Route path="admin" element={<AdminDashboard />} />
         <Route path="hr-dashboard" element={<HrDashboard />} />
         <Route path="admin-config" element={<AdminConfigPage />} />
-        <Route path="admin-config/:lotId" element={<AdminConfigPage />} />
         <Route path="parkings" element={<ParkingsPage />} />
-        <Route path="reserved-parking" element={<ReservedParkingPage />} />
-        <Route path="admin-config-reservedparking" element={<AdmainConfigResevedparhing />} />
-        <Route path="users" element={<Users />} />
-        <Route path="add-user" element={<AdmainConfigUsers />} />
-        <Route path="edit-user/:userId" element={<AdmainConfigUsers />} />
-        <Route path="logo-management" element={<AdminLogoManagement />} />
+        <Route path="admin-users" element={<AdminUsersPage />} />
+
+        {/* Reports as children of layout */}
         <Route path="reports">
           <Route path="parking-stats" element={<ParkingStatsPage />} />
           <Route path="surface-stats" element={<SurfaceStatsPage />} />
-
         </Route>
+
         <Route
           index
           element={
@@ -96,10 +89,9 @@ const AdminRoutes: React.FC = () => {
             )
           }
         />
-
       </Route>
+
       <Route path="*" element={<Navigate to="/admin" replace />} />
-      </Routes>
     </>
   );
 };
