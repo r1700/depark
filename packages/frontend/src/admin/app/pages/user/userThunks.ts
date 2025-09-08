@@ -58,10 +58,10 @@ export const uploadCsvFile = createAsyncThunk(
       return response.data;
     } catch (error: any) {
       return thunkAPI.rejectWithValue(error.response?.data || error.message);
+
     }
   }
 );
-
 
 // ✅ שליפת משתמשים
 export const fetchUsers = createAsyncThunk(
