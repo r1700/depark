@@ -1,7 +1,7 @@
 import { Op, WhereOptions, FindOptions, literal, Transaction } from 'sequelize';
-import sequelize from '../config/database';
-import AdminUser from '../models/AdminUser';
-import BaseUser from '../models/BaseUser';
+import sequelize from '../config/sequelize';
+import AdminUser from '../model/database-models/AdminUser';
+import BaseUser from '../model/database-models/BaseUser';
 import bcrypt from 'bcrypt';
 import { Permission, PermissionLabels } from '../enums/permissions';
 import { Role, RoleLabels } from '../enums/role';
