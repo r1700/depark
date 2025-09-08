@@ -5,17 +5,18 @@ import { Provider } from "react-redux";
 import { store } from "./app/store"; 
 
 import LoginScreen from "./components/screen-login/LoginScreen";
-import AdminLogoManagement from "./components/logo";
 import Layout from "./components/layout/layout";
 import AdminDashboard from "./components/adminDashboard/AdminDashboard";
 import HrDashboard from "./components/hrDashboard/HrDashboard";
 import AdminConfigPage from "./components/AdminConfigPage";
 import ParkingsPage from "./Pages/ParkingsPage";
+import ReservedParkingPage from "./Pages/ReservedParking";
+import AdmainConfigResevedparhing from "./components/AdmainConfigReservedparking";
 import ParkingStatsPage from "./app/pages/parkingStats/parkingStats";
 import SurfaceStatsPage from "./app/pages/surfaceStats/surfaceStats";
-import ReservedParking from "./Pages/ReservedParking";
-import AdmainConfigReservedparking from "../admin/components/AdmainConfigReservedparking";
-
+import AdminLogoManagement from "./components/logo";
+import Users from "./Pages/UsersPage";
+import AdmainConfigUsers from "./components/AdmainConfigUsers"; 
 
 function getUserFromStorage() {
   try {
@@ -72,15 +73,17 @@ const AdminRoutes: React.FC = () => {
         <Route path="admin-config" element={<AdminConfigPage />} />
         <Route path="admin-config/:lotId" element={<AdminConfigPage />} />
         <Route path="parkings" element={<ParkingsPage />} />
-
+        <Route path="reserved-parking" element={<ReservedParkingPage />} />
+        <Route path="admin-config-reservedparking" element={<AdmainConfigResevedparhing />} />
+        <Route path="users" element={<Users />} />
+        <Route path="add-user" element={<AdmainConfigUsers />} />
+        <Route path="edit-user/:userId" element={<AdmainConfigUsers />} />
         <Route path="logo-management" element={<AdminLogoManagement />} />
         <Route path="reports">
           <Route path="parking-stats" element={<ParkingStatsPage />} />
           <Route path="surface-stats" element={<SurfaceStatsPage />} />
 
         </Route>
-         <Route path="reserved-parking" element={<ReservedParking />} />
-        <Route path="admin-config-reservedparking" element={<AdmainConfigReservedparking />} />
         <Route
           index
           element={
