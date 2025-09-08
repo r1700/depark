@@ -2,15 +2,19 @@ import 'reflect-metadata';
 import dotenv from 'dotenv';
 
 dotenv.config();
+
 import express from 'express';
 import cors from 'cors';
+import path from 'path';
+import fs from 'fs';
+
 import loggerRoutes from './middlewares/locallLoggerMiddleware';
 import healthRoutes from './routes/health';
 import passwordRoutes from './routes/user.routes';
 import vehicleRoutes from './routes/vehicle';
 import exportToCSV from './routes/exportToCSV';
 import userGoogleAuthRoutes from './routes/userGoogle-auth';
-import Exit from './routes/opc/exit'; // Import the exit route
+import Exit from './routes/opc/exit';
 import faultsRouter from './routes/opc/faults';
 import techniciansRoutes from "./routes/opc/technicians";
 import http from 'http';
@@ -18,10 +22,9 @@ import { WebSocketServer } from 'ws';
 import session from 'express-session';
 import adminConfigRouter from './routes/adminConfig';
 import userRoutes from './routes/user.routes';
-
 import logoRouter from './routes/logos';
 import screenTypeRouter from './routes/screenType';
-import './cronJob'; // Import the cron job to ensure it runs on server start
+import './cronJob';
 import vehicle from './routes/vehicleRoute';
 import GoogleAuth from './routes/google-auth';
 import parkingReport from './routes/parkingStat';
@@ -30,8 +33,8 @@ import userApi from './routes/userApi';
 import ResevedParking from './routes/reservedparkingApi';
 import retrieveRoute from './routes/RetrivalQueue';
 import otpRoutes from './routes/otp.server';
-
-import path from 'path';
+import  VehicleModelRouter  from './routes/vehicleModel';
+import authRoutes from './routes/auth';
 const app = express();
 const server = http.createServer(app);
 export const wss = new WebSocketServer({ server })
@@ -99,16 +102,18 @@ app.use('/api/exportToCSV', exportToCSV);
 app.use('/api', userRoutes);
 app.use('/api/users', userApi);
 app.use('/api/reservedparking', ResevedParking);
-// app.use('/api/auth', authRoutes);
+app.use('/api/auth', authRoutes);
 app.use('/api/auth', userGoogleAuthRoutes);
+app.use('/api/vehicles', vehicle);
 app.use('/api/vehicles', vehicle)
 app.use('/api/admin', adminConfigRouter);
 app.use('/OAuth', GoogleAuth);
-app.use('/api/admin', adminConfigRouter);
 app.use('/api/parking-stats', parkingReport);
 app.use('/api/surface-stats', surfaceReport);
 app.use('/api/tablet', retrieveRoute);
 app.use('/api/otp', otpRoutes);
+
+app.use('/api/unknown-vehicles', VehicleModelRouter);
 
 app.use('/api/logos', logoRouter);
 app.use('/api/screentypes', screenTypeRouter);
@@ -144,7 +149,6 @@ function printRoutes() {
 
 printRoutes();
 
-// Start server - בסוף!
 app.get('/', (req, res) => {
     res.json({ message: 'DePark Backend is running!' });
 });
