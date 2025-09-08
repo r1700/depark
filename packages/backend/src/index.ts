@@ -18,7 +18,7 @@ import { WebSocketServer } from 'ws';
 import session from 'express-session';
 import adminConfigRouter from './routes/adminConfig';
 import userRoutes from './routes/user.routes';
-
+import importFromCsv from './routes/importFromCsv';
 import logoRouter from './routes/logos';
 import screenTypeRouter from './routes/screenType';
 import './cronJob'; // Import the cron job to ensure it runs on server start
@@ -113,6 +113,7 @@ app.use('/api/tablet', retrieveRoute);
 app.use('/api/otp', otpRoutes);
 app.use("/api", routes);
 app.use("/notifications", notifications);
+app.use('/api/importFromCsv', importFromCsv);
 
 app.use('/api/logos', logoRouter);
 app.use('/api/screentypes', screenTypeRouter);
@@ -197,4 +198,3 @@ app.listen(PORT, () => {
         console.log(':memo: Using mock data - Supabase not configured');
     }
 });
-

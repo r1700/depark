@@ -4,7 +4,7 @@ import { Vehicle } from "../../model/database-models/vehicle.model";
 import { ParkingSession } from "../../model/database-models/parkingstssion.model";
 import { Op } from "sequelize";
 
-const router = express.Router();
+const router: express.Router = express.Router();
 
 // GET - vehicles
 router.get("/vehicles/:userId", async (req, res) => {
