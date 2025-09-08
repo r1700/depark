@@ -51,11 +51,8 @@ const LoginScreen: React.FC<LoginScreenProps> = ({onLogin}) => {
             const response = await fetch(`${API_BASE}/auth/login`, {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
-                credentials: 'include', 
                 body: JSON.stringify(data),
             });
-
-            
 
             const result = await response.json();
             setLoading(false);

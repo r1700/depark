@@ -60,42 +60,43 @@ const PORT = process.env.PORT || 3001;
 // Serve static logos
 app.use('/logos', express.static(path.join(process.cwd(), 'public/logos')));
 
-const isProd = process.env.NODE_ENV === 'production';
-
-if (isProd) app.set('trust proxy', 1);
+if (process.env.NODE_ENV === 'production') {
+    app.set('trust proxy', 1);
+}
 
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'keyboard cat',
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    httpOnly: true,
-    secure: true,         // חובה כשSameSite=None
-    sameSite: 'none'      // כדי שיעבור בין דומיינים (pages.dev → onrender.com)
-  }
+    secret: process.env.SESSION_SECRET || 'keyboard cat',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        httpOnly: true
+    }
 }) as unknown as express.RequestHandler);
 
 // Middleware
 const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:3000';
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 
-const ORIGINS = (process.env.CORS_ORIGIN || '').split(',').map(s => s.trim()).filter(Boolean);
-const corsOptions: cors.CorsOptions = {
-    origin(origin, cb) {
-        // מאפשר גם בקשות בלי Origin (curl/health)
-        if (!origin) return cb(null, true);
-        const ok = ORIGINS.some(o =>
-            o.includes('*')
-                ? new RegExp('^' + o.replace('*.', '([a-z0-9-]+\\.)?').replace('.', '\\.') + '$').test(origin)
-                : origin === o
-        );
-        cb(ok ? null : new Error('Not allowed by CORS'), ok);
-    },
+const corsOptions = {
+    origin: CORS_ORIGIN,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+    allowedHeaders: [
+        'Origin',
+        'X-Requested-With',
+        'Content-Type',
+        'Accept',
+        'Authorization',
+        'Cache-Control',
+        'X-Requested-With'
+    ],
+    exposedHeaders: ['set-cookie'],
+    optionsSuccessStatus: 200 // For legacy browser support
 };
+
 app.use(cors(corsOptions));
-app.options('/*', cors(corsOptions)); // preflight
 
 if (!GOOGLE_CLIENT_ID) {
     throw new Error('Missing GOOGLE_CLIENT_ID');
