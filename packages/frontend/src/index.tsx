@@ -12,6 +12,9 @@ import ForgotPassword from './admin/app/pages/resetPassword/ForgotPassword';
 import ResetPassword from './admin/app/pages/resetPassword/ResetPassword';
 import AdminRoutes from './admin/AdminRoutes';
 import Notifications from './mobile/components/mobile-user/Notifications';
+import Login from './mobile/pages/Login';
+import { AuthProvider } from './mobile/auth/AuthContext';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 
 
@@ -20,13 +23,14 @@ const routers = createBrowserRouter([
     path: '/', element: <App />, children: [
       { path: '', element: <LoginPage /> },
       { path: 'admin/*', element: <AdminRoutes /> },
-      { path: 'mobile', element: <Otp /> },
+      { path: 'mobile', element: <Login /> },
+      { path: 'otp', element: <Otp /> },
       { path: 'tablet', element: <HomePage /> },
       { path: 'forgot-password', element: <ForgotPassword /> },
       { path: 'reset-password', element: <ResetPassword /> },
       { path: 'VehicleRow', element: <VehicleRow /> },
-      { path: 'Notifications',element:<Notifications/>},
-      
+      { path: 'Notifications', element: <Notifications /> },
+
     ]
   }
 ])
@@ -37,7 +41,11 @@ const root = ReactDOM.createRoot(
 
 root.render(
   <React.StrictMode>
-    <RouterProvider router={routers}></RouterProvider>
+    <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID!}>
+      <AuthProvider>
+        <RouterProvider router={routers}></RouterProvider>
+      </AuthProvider>
+    </GoogleOAuthProvider>
   </React.StrictMode>,
 );
 
