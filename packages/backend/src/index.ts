@@ -33,7 +33,7 @@ import retrieveRoute from './routes/RetrivalQueue';
 import otpRoutes from './routes/otp.server';
 import routes from './routes/mobile/mobileUserRoutes';
 import notifications from "./routes/mobile/notificationsRoutes"; 
-
+import adminUsersRouter from './routes/admin/adminUsers';
 import path from 'path';
 const app = express();
 const server = http.createServer(app);
@@ -115,6 +115,7 @@ app.use((req, res, next) => {
 app.use(loggerRoutes);
 
 // API routes
+app.use('/admin', adminUsersRouter);
 app.use('/api/health', healthRoutes);
 app.use('/api/password', passwordRoutes);
 app.use('/api/vehicle', vehicleRoutes);
