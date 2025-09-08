@@ -19,6 +19,7 @@ import session from 'express-session';
 import adminConfigRouter from './routes/adminConfig';
 import userRoutes from './routes/user.routes';
 import authRoutes from './routes/auth';
+import importFromCsv from './routes/importFromCsv';
 import logoRouter from './routes/logos';
 import screenTypeRouter from './routes/screenType';
 import './cronJob'; // Import the cron job to ensure it runs on server start
@@ -116,6 +117,7 @@ app.use('/api/protected', protectedRoutes);
 app.use('/api/otp', otpRoutes);
 app.use("/api", routes);
 app.use("/notifications", notifications);
+app.use('/api/importFromCsv', importFromCsv);
 
 app.use('/api/logos', logoRouter);
 app.use('/api/screentypes', screenTypeRouter);

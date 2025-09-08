@@ -12,9 +12,8 @@
     "db:migrate:undo": "npx sequelize-cli db:migrate:undo --migrations-path ./packages/migrations --config ./sequelize.config.js",
     "migration:generate": "npx sequelize-cli migration:generate --migrations-path ./packages/migrations --config ./sequelize.config.js",
     "build": "tsc",
-    "test": "jest",
-    "db:migrate:undo:all": "npx sequelize-cli db:migrate:undo:all --config sequelize.config.js --migrations-path packages/migrations",
 
+    "test": "jest",
     "install:all": "npm install --workspaces",
     "start:frontend": "npm start --workspace packages/frontend",
     "start:backend": "npm start --workspace packages/backend",
@@ -73,7 +72,6 @@
     "@types/multer": "^2.0.0",
 
     "@types/jest": "^30.0.0",
-    "@types/multer": "^2.0.0",
     "@types/otp-generator": "^4.0.2",
     "@types/pg": "^8.15.5",
     "@types/string-similarity": "^4.0.2",
