@@ -10,6 +10,7 @@ export const appDbConfig = {
   dialect: dbConfig.DB_DIALECT,
   migrationStorageTableName: 'sequelize_meta',
   dialectOptions: {
+
     ssl: { require: true, rejectUnauthorized: false }
   },
   migrations: {

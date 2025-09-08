@@ -148,5 +148,6 @@ const ParkingsPage: React.FC<ParkingsPageProps> = () => {
       </Paper>
     </Container>
   );
-}
+};
+
 export default ParkingsPage;
