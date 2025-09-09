@@ -63,7 +63,7 @@ export default function AdminLogoManagement() {
       });
   }, [originalLogos.length]);
 
-  // When selectedLogos is fetched, set prevSelectedLogos to match (only on initial fetch)
+
   useEffect(() => {
 
     if (Object.keys(prevSelectedLogos).length === 0 && Object.keys(selectedLogos).length > 0) {
