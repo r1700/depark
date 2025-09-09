@@ -69,7 +69,7 @@ export default function AdminLogoManagement() {
     if (Object.keys(prevSelectedLogos).length === 0 && Object.keys(selectedLogos).length > 0) {
       setPrevSelectedLogos({ ...selectedLogos });
     }
-    // No update on every change, only first load
+
   }, [selectedLogos, prevSelectedLogos]);
 
   useEffect(() => {
