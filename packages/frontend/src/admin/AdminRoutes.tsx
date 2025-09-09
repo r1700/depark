@@ -1,16 +1,16 @@
 // src/admin/AdminRoutes.tsx
 import React, { useCallback } from "react";
-import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import { Route, Navigate, useNavigate } from "react-router-dom";
 import { Provider } from "react-redux";
 import { store } from "./app/store"; 
 
 import LoginScreen from "./components/screen-login/LoginScreen";
-import AdminLogoManagement from "./components/logo";
 import Layout from "./components/layout/layout";
 import AdminDashboard from "./components/adminDashboard/AdminDashboard";
 import HrDashboard from "./components/hrDashboard/HrDashboard";
 import AdminConfigPage from "./components/AdminConfigPage";
 import ParkingsPage from "./Pages/ParkingsPage";
+import AdminUsersPage from "./Pages/adminUser/AdminUsersPage";
 import ParkingStatsPage from "./app/pages/parkingStats/parkingStats";
 import SurfaceStatsPage from "./app/pages/surfaceStats/surfaceStats";
 
@@ -35,8 +35,9 @@ const AdminRoutes: React.FC = () => {
   }, [navigate]);
 
   return (
-    <Routes>
+    <>
       <Route path="login" element={<LoginScreen />} />
+
       <Route
         path=""
         element={
@@ -49,6 +50,8 @@ const AdminRoutes: React.FC = () => {
           )
         }
       />
+
+      {/* Layout wrapper – all the routes under /admin/layout/* */}
       <Route
         path="layout/*"
         element={
@@ -61,26 +64,33 @@ const AdminRoutes: React.FC = () => {
           )
         }
       >
+        {/* Dashboard / pages */}
         <Route path="admin" element={<AdminDashboard />} />
         <Route path="hr-dashboard" element={<HrDashboard />} />
         <Route path="admin-config" element={<AdminConfigPage />} />
-        <Route path="admin-config/:lotId" element={<AdminConfigPage />} />
         <Route path="parkings" element={<ParkingsPage />} />
-        <Route path="logos" element={<AdminLogoManagement />} />
+        <Route path="admin-users" element={<AdminUsersPage />} />
+
+        {/* Reports as children of layout */}
         <Route path="reports">
           <Route path="parking-stats" element={<ParkingStatsPage />} />
           <Route path="surface-stats" element={<SurfaceStatsPage />} />
         </Route>
-        <Route index element={
-          String(user?.role) === "2" ? (
-            <Navigate to="admin" replace />
-          ) : (
-            <Navigate to="hr-dashboard" replace />
-          )
-        } />
+
+        <Route
+          index
+          element={
+            String(user?.role) === "2" ? (
+              <Navigate to="admin" replace />
+            ) : (
+              <Navigate to="hr-dashboard" replace />
+            )
+          }
+        />
       </Route>
+
       <Route path="*" element={<Navigate to="/admin" replace />} />
-    </Routes>
+    </>
   );
 };
 

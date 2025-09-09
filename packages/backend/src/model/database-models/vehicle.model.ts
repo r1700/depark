@@ -22,6 +22,8 @@ Vehicle.init({
   autoIncrement: true,
   allowNull: false,
 },
+
+
     baseuser_id: { type: DataTypes.STRING, field: 'baseuser_id' },
     license_plate: { type: DataTypes.STRING, field: 'license_plate' },
     vehicle_model_id: { type: DataTypes.STRING, field: 'vehicle_model_id' },

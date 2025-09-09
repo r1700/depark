@@ -110,6 +110,7 @@ package-lock.json
 .env
 
 
+packages/backend/src/routes/opc/parsedData.json
 
 
 
@@ -117,3 +118,5 @@ package-lock.json
 
 
 
+
+[package.json](http://_vscodecontentref_/0)
