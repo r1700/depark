@@ -37,7 +37,7 @@ import notifications from "./routes/mobile/notificationsRoutes";
 import Retrival from './routes/RetrivalQueue';
 import './cronJob'; // Ensure the cron job runs on server start
 import  VehicleModelRouter  from './routes/vehicleModel';
-
+import userApprovalRoutes from './routes/userApprovalRoute';
 import path from 'path';
 const app = express();
 const server = http.createServer(app);
@@ -145,7 +145,7 @@ app.use("/notifications", notifications);
 app.use('/api/importFromCsv', importFromCsv);
 app.use('/api/opc',Opc)
 app.use('/api/unknown-vehicles', VehicleModelRouter);
-
+app.use('/api/users', userApprovalRoutes);
 app.use('/api/logos', logoRouter);
 app.use('/api/screentypes', screenTypeRouter);
 app.use('/logos', express.static(path.join(process.cwd(), 'public/logos')));
