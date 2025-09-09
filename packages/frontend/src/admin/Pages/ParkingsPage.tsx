@@ -60,7 +60,8 @@ const ParkingsPage: React.FC<ParkingsPageProps> = () => {
         <DataTable 
           data={tableData} 
           deletePath="/api/admin"
-          showActions={true}
+          showDelete={true}
+          showEdit={true}
           onRowClick={(row) => {
             if (row.lotId || row.id) {
               // Prefer lotId if exists, else fallback to id
