@@ -28,9 +28,9 @@ async function sendToOPC(api: string, data: any): Promise<any> {
 }
 
 // Function to wait for a node change in the OPC server
-export async function callWaitForNodeChangeApi(): Promise<any> {
+export async function callWaitForNodeChangeApi(nodeid:string): Promise<any> {
   const data = {
-    nodeId: 'ns=1;s=ExitRequestApproval', // NodeId to monitor
+    nodeId: `ns=1;s=${nodeid}`, // NodeId to monitor
     samplingInterval: 200, // Sampling interval in milliseconds
     timeout: 10000, // Maximum wait time in milliseconds
     predicate: 'return value !== null;', // Custom predicate
