@@ -8,10 +8,9 @@ import {
 
 const router : Router = express.Router();
 
-router.post('/password/reset', handlePasswordReset);  
-router.post('/password/forgot', handleForgotPassword);
-router.post('/password/change', handleChangePassword);
-
+router.post('/reset', handlePasswordReset);
+router.post('/forgot', handleForgotPassword);
+router.post('/change', handleChangePassword);
 // Auth routes  
 router.post('/login', handleLogin);  
 

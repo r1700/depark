@@ -118,6 +118,7 @@ app.use(loggerRoutes);
 app.use('/admin', adminUsersRouter);
 app.use('/api/health', healthRoutes);
 app.use('/api/password', passwordRoutes);
+app.use('/api/auth', passwordRoutes);
 app.use('/api/vehicle', vehicleRoutes);
 app.use('/api/exportToCSV', exportToCSV);
 app.use('/api', userRoutes);
