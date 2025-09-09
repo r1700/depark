@@ -1,6 +1,6 @@
-import express, { Request, Response } from 'express';
+import express, { Request, Response, Router } from 'express';
 import * as adminUsersService from '../../services/adminUsersServices';
-const router = express.Router();
+const router:Router = express.Router();
 
 const now = new Date().toISOString();
 

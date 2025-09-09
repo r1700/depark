@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { getVehicleDetailsByDegem } from '../services/vehicleService';
 
-const router = Router();
+const router : Router = Router();
 
 router.get('/get-vehicle', async (req, res) => {  
   const degem = req.query.degem as string;

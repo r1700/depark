@@ -51,7 +51,6 @@ const AdminRoutes: React.FC = () => {
         }
       />
 
-      {/* Layout wrapper – all the routes under /admin/layout/* */}
       <Route
         path="layout/*"
         element={
@@ -64,15 +63,12 @@ const AdminRoutes: React.FC = () => {
           )
         }
       >
-        {/* Dashboard / pages */}
         <Route path="admin" element={<AdminDashboard />} />
         <Route path="hr-dashboard" element={<HrDashboard />} />
         <Route path="admin-config" element={<AdminConfigPage />} />
         <Route path="admin-config/:id" element={<AdminConfigPage />} />
         <Route path="parkings" element={<ParkingsPage />} />
         <Route path="admin-users" element={<AdminUsersPage />} />
-        <Route path="logo-management" element={<LogoManagementPage />} />
-        {/* Reports as children of layout */}
         <Route path="reports">
           <Route path="parking-stats" element={<ParkingStatsPage />} />
           <Route path="surface-stats" element={<SurfaceStatsPage />} />
@@ -87,7 +83,7 @@ const AdminRoutes: React.FC = () => {
               <Navigate to="hr-dashboard" replace />
             )
           }
-        />
+         />
       </Route>
 
       <Route path="*" element={<Navigate to="/admin" replace />} />

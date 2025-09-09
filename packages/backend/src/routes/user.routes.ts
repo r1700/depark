@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Router } from 'express';
 import { 
   handlePasswordReset,
   handleLogin,
@@ -6,12 +6,11 @@ import {
   handleForgotPassword 
 } from '../controllers/user.controller';
 
-const router = express.Router();
+const router : Router = express.Router();
 
-router.post('/password/reset', handlePasswordReset);  
-router.post('/password/forgot', handleForgotPassword);
-router.post('/password/change', handleChangePassword);
-
+router.post('/reset', handlePasswordReset);
+router.post('/forgot', handleForgotPassword);
+router.post('/change', handleChangePassword);
 // Auth routes  
 router.post('/login', handleLogin);  
 

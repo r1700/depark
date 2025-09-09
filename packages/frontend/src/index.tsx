@@ -15,7 +15,7 @@ import Notifications from './mobile/components/mobile-user/Notifications';
 import Login from './mobile/pages/Login';
 import { AuthProvider } from './mobile/auth/AuthContext';
 import { GoogleOAuthProvider } from '@react-oauth/google';
-
+import UnifiedEntry from './tablet/components/UnifiedEntry/UnifiedEntry';
 
 
 const routers = createBrowserRouter([
@@ -25,7 +25,7 @@ const routers = createBrowserRouter([
       { path: 'admin/*', element: <AdminRoutes /> },
       { path: 'mobile', element: <Login /> },
       { path: 'otp', element: <Otp /> },
-      { path: 'tablet', element: <HomePage /> },
+      { path: 'tablet', element: localStorage.getItem("floorNumber") ? <UnifiedEntry /> : <HomePage /> },
       { path: 'forgot-password', element: <ForgotPassword /> },
       { path: 'reset-password', element: <ResetPassword /> },
       { path: 'VehicleRow', element: <VehicleRow /> },
