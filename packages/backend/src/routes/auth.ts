@@ -2,7 +2,7 @@
 import { Router } from 'express';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
-import { validateLoginData } from '../../src/validation/check';
+import { validateLoginData } from '../validation/check';
 import sequelize from '../config/sequelize';
 import { QueryTypes } from 'sequelize';
 const router : Router= Router();
