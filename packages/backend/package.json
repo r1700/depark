@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "nodemon src/index.ts",
-    "build": "tsc",
+    "build": "tsc -p tsconfig.build.json",
     "db:migrate:undo": "npx sequelize-cli db:migrate:undo --config ./sequelize.config.js --migrations-path ../migrations",
     "db:migrate:undo:all": "npx sequelize-cli db:migrate:undo:all --config ./sequelize.config.js --migrations-path ../migrations",
     "prestart": "npm run build",
