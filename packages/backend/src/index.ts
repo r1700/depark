@@ -34,6 +34,7 @@ import retrieveRoute from './routes/RetrivalQueue';
 import otpRoutes from './routes/otp.server';
 import routes from './routes/mobile/mobileUserRoutes';
 import notifications from "./routes/mobile/notificationsRoutes"; 
+import  VehicleModelRouter  from './routes/vehicleModel';
 
 import path from 'path';
 const app = express();
@@ -118,6 +119,7 @@ app.use(loggerRoutes);
 // API routes
 app.use('/api/health', healthRoutes);
 app.use('/api/password', passwordRoutes);
+app.use('/api/auth', passwordRoutes);
 app.use('/api/vehicle', vehicleRoutes);
 app.use('/api/exportToCSV', exportToCSV);
 app.use('/api/auth', userGoogleAuthRoutes);
@@ -139,6 +141,7 @@ app.use('/api/otp', otpRoutes);
 app.use("/api", routes);
 app.use("/notifications", notifications);
 app.use('/api/importFromCsv', importFromCsv);
+app.use('/api/unknown-vehicles', VehicleModelRouter);
 
 app.use('/api/logos', logoRouter);
 app.use('/api/screentypes', screenTypeRouter);
