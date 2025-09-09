@@ -12,7 +12,7 @@ const FeedbackList = () => {
 
     const dispatch = useDispatch<AppDispatch>();
 
-    const { questionStats, loading, error } = useSelector(
+    const { questionStats } = useSelector(
         (state: RootState) => state.feedbackAnswers
     );
 
@@ -45,7 +45,7 @@ const FeedbackList = () => {
         dispatch(fetchAnswersStats());
     }, [dispatch]);
 
-    
+
     return (
         <>{
             !questionClicked ?

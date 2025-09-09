@@ -34,7 +34,6 @@ const schema = yup
   })
   .required();
 const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin = () => { } }) => {
-  const [login, setLogin] = useState<boolean>(false);
   const [serverError, setServerError] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const navigate = useNavigate();
@@ -46,7 +45,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin = () => { } }) => {
       const token = localStorage.getItem('token') || undefined;
       onLogin(token);
     }
-  }, [login, navigate, onLogin]);
+  }, [loggedIn, navigate, onLogin]);
   const {
     control,
     handleSubmit,
@@ -81,7 +80,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin = () => { } }) => {
         setServerError(result.message || 'Login failed');
         return;
       }
-      setLogin(true);
       const { user, token, expiresAt } = result;
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(user));

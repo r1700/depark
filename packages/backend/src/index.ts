@@ -128,7 +128,7 @@ app.use('/api/reservedparking', ResevedParking);
 app.use('/api/auth', userGoogleAuthRoutes);
 app.use('/api/vehicles', vehicle)
 app.use('/api/admin', adminConfigRouter);
-app.use('/api/Auth', GoogleAuth);
+app.use('/api/OAuth', GoogleAuth);
 app.use('/api/admin', adminConfigRouter);
 app.use('/api/parking-stats', parkingReport);
 app.use('/api/surface-stats', surfaceReport);

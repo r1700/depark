@@ -40,3 +40,7 @@ button:active {
   align-items: center;
   margin-bottom: 20px;
 }
+
+.no-data div div:last-child {
+  color: #6b6b6b;
+}

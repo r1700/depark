@@ -8,7 +8,7 @@ export const authenticateUser = createAsyncThunk(
   'auth/authenticateUser',
   async (idToken: string, { rejectWithValue }) => {
     try {
-      const res = await axios.post(`${BASE_URL}/Auth/verify-google-token`, { idToken });
+      const res = await axios.post(`${BASE_URL}/OAuth/verify-google-token`, { idToken });
       const data = res.data;
 
       if (data.success) {
