@@ -35,6 +35,7 @@ import otpRoutes from './routes/otp.server';
 import routes from './routes/mobile/mobileUserRoutes';
 import notifications from "./routes/mobile/notificationsRoutes"; 
 import  VehicleModelRouter  from './routes/vehicleModel';
+import userApprovalRoutes from './routes/userApprovalRoute';
 
 import path from 'path';
 const app = express();
@@ -141,7 +142,7 @@ app.use("/api", routes);
 app.use("/notifications", notifications);
 app.use('/api/importFromCsv', importFromCsv);
 app.use('/api/unknown-vehicles', VehicleModelRouter);
-
+app.use('/api/users', userApprovalRoutes);
 app.use('/api/logos', logoRouter);
 app.use('/api/screentypes', screenTypeRouter);
 app.use('/logos', express.static(path.join(process.cwd(), 'public/logos')));
