@@ -30,7 +30,6 @@ const routers = createBrowserRouter([
       { path: 'reset-password', element: <ResetPassword /> },
       { path: 'VehicleRow', element: <VehicleRow /> },
       { path: 'Notifications', element: <Notifications /> },
-
     ]
   }
 ])
@@ -48,5 +47,4 @@ root.render(
     </GoogleOAuthProvider>
   </React.StrictMode>,
 );
-
 reportWebVitals();
