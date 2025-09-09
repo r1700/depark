@@ -31,8 +31,9 @@ import retrieveRoute from './routes/RetrivalQueue';
 import otpRoutes from './routes/otp.server';
 import routes from './routes/mobile/mobileUserRoutes';
 import notifications from "./routes/mobile/notificationsRoutes"; 
+import adminUsersRouter from './routes/admin/adminUsers';
 import Retrival from './routes/RetrivalQueue';
-import './cronJob'; // Ensure the cron job runs on server start
+import './cronJob'; 
 import  VehicleModelRouter  from './routes/vehicleModel';
 import APIvehicle from './routes/APIvehicle';
 
@@ -117,6 +118,7 @@ app.use((req, res, next) => {
 app.use(loggerRoutes);
 
 // API routes
+app.use('/admin', adminUsersRouter);
 app.use('/api/health', healthRoutes);
 app.use('/api/password', passwordRoutes);
 app.use('/api/auth', passwordRoutes);

@@ -56,6 +56,7 @@ function sanitizeAdminUser(u: any): AdminUser {
     permissions: Array.isArray(u.permissions) ? [...u.permissions] : [],
     lastLoginAt: u.lastLoginAt ?? null,
     baseUser: {
+      id: u.baseUser?.id ?? undefined,
       email: u.baseUser?.email ?? '',
       firstName: u.baseUser?.firstName ?? '',
       lastName: u.baseUser?.lastName ?? '',
