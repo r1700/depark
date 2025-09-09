@@ -103,8 +103,12 @@ temp/*.json
 connection/
 knexfile.js
 # migrations/
+package.json
+packages/backend/package.json
+packages/frontend/src/App.tsx
+packages/frontend/src/index.tsx
 
-
+package.json
 # Miscellaneous
 package-lock.json
 .env
