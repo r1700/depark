@@ -65,11 +65,10 @@ export default function AdminLogoManagement() {
 
   // When selectedLogos is fetched, set prevSelectedLogos to match (only on initial fetch)
   useEffect(() => {
-    // Only set if prevSelectedLogos is empty (first load)
+
     if (Object.keys(prevSelectedLogos).length === 0 && Object.keys(selectedLogos).length > 0) {
       setPrevSelectedLogos({ ...selectedLogos });
     }
-    // No update on every change, only first load
   }, [selectedLogos, prevSelectedLogos]);
 
   useEffect(() => {
