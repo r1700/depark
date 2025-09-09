@@ -5,10 +5,8 @@ import fs from 'fs';
 import { number } from 'joi';
 const router : Router = Router();
 
-// router.post('/:param', (req, res) => {       
-//     res.json({  value: req.body.value });
-// });
-router.post('/Queue', (req, res) => {
+
+router.post('/', (req, res) => {
   
   console.log('POST /Queue called');
   const data = req.body.value || [];
@@ -22,7 +20,7 @@ console.log('parsedData.json saved!');
   return res.json(data);
 });
 
-router.get('/Queue/:floorNumber', (req, res) => {
+router.get('/:floorNumber', (req, res) => {
   let data: any[] = [];
   try {
     const file = fs.readFileSync(__dirname + '/parsedData.json', 'utf-8');

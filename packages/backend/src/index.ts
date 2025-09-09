@@ -10,9 +10,7 @@ import passwordRoutes from './routes/user.routes';
 import vehicleRoutes from './routes/vehicle';
 import exportToCSV from './routes/exportToCSV';
 import userGoogleAuthRoutes from './routes/userGoogle-auth';
-import Exit from './routes/opc/exit'; // Import the exit route
-import faultsRouter from './routes/opc/faults';
-import techniciansRoutes from "./routes/opc/technicians";
+import Opc from './routes/opc/router-opc';
 import http from 'http';
 import { WebSocketServer } from 'ws';
 import session from 'express-session';
@@ -33,6 +31,8 @@ import retrieveRoute from './routes/RetrivalQueue';
 import otpRoutes from './routes/otp.server';
 import routes from './routes/mobile/mobileUserRoutes';
 import notifications from "./routes/mobile/notificationsRoutes"; 
+import Retrival from './routes/RetrivalQueue';
+import './cronJob'; // Ensure the cron job runs on server start
 import  VehicleModelRouter  from './routes/vehicleModel';
 
 import path from 'path';
@@ -137,11 +137,14 @@ app.use('/api/otp', otpRoutes);
 app.use("/api", routes);
 app.use("/notifications", notifications);
 app.use('/api/importFromCsv', importFromCsv);
+app.use('/api/opc',Opc)
 app.use('/api/unknown-vehicles', VehicleModelRouter);
 
 app.use('/api/logos', logoRouter);
 app.use('/api/screentypes', screenTypeRouter);
 app.use('/logos', express.static(path.join(process.cwd(), 'public/logos')));
+
+app.use('/api/tablet', Retrival);
 
 // Log all incoming requests
 app.use((req, res, next) => {
@@ -149,12 +152,6 @@ app.use((req, res, next) => {
     next();
 });
 
-
-app.use("/api/opc", techniciansRoutes);
-app.use('/api/opc', faultsRouter);
-app.use('/api/opc', Exit);
-
-// Print registered routes (debug)
 function printRoutes() {
     console.log("Registered routes:", app);
     app._router?.stack?.forEach((middleware: any) => {
@@ -174,7 +171,7 @@ function printRoutes() {
 
 printRoutes();
 
-// Start server - בסוף!
+// Root route
 app.get('/', (req, res) => {
     res.json({ message: 'DePark Backend is running!' });
 });
