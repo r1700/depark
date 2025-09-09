@@ -31,7 +31,6 @@ import userApi from './routes/userApi';
 import ResevedParking from './routes/reservedparkingApi';
 import retrieveRoute from './routes/RetrivalQueue';
 import otpRoutes from './routes/otp.server';
-
 import path from 'path';
 const app = express();
 const server = http.createServer(app);
