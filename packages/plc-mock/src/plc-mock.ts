@@ -1,6 +1,5 @@
 import { OPCUAServer, Variant, DataType, StatusCodes ,VariantArrayType} from "node-opcua";
-//----------------------------
-import express from "express";
+
 //----------------------------
 // Start an OPC-UA server simulating a PLC
 export async function createPlcOpcServer() {

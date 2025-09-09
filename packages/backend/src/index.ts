@@ -10,8 +10,7 @@ import passwordRoutes from './routes/user.routes';
 import vehicleRoutes from './routes/vehicle';
 import exportToCSV from './routes/exportToCSV';
 import userGoogleAuthRoutes from './routes/userGoogle-auth';
-import faultsRouter from './routes/opc/faults';
-import techniciansRoutes from "./routes/opc/technicians";
+import Opc from './routes/opc/router-opc';
 import http from 'http';
 import { WebSocketServer } from 'ws';
 import session from 'express-session';
@@ -137,13 +136,12 @@ app.use('/api/otp', otpRoutes);
 app.use("/api", routes);
 app.use("/notifications", notifications);
 app.use('/api/importFromCsv', importFromCsv);
-
+app.use('/api/opc',Opc)
 app.use('/api/logos', logoRouter);
 app.use('/api/screentypes', screenTypeRouter);
 app.use('/logos', express.static(path.join(process.cwd(), 'public/logos')));
 
 app.use('/api/tablet', Retrival);
-app.use('/api/opc', Exit);
 
 // Log all incoming requests
 app.use((req, res, next) => {

@@ -9,18 +9,17 @@ import {
   TimestampsToReturn,
   Variant,
   VariantArrayType,
-  UserTokenType,
   MessageSecurityMode,
-  SecurityPolicy
-} from "node-opcua";
-import dotenv from "dotenv";
+  SecurityPolicy,
+  UserTokenType,
+} from 'node-opcua';
 import { sendDataToBackend } from "./backendService";
+import dotenv from 'dotenv';
 
 dotenv.config();
-const { TARGET_URL, PLC_USERNAME, PLC_PASSWORD, TARGET_URL_MOCK } = process.env;
 
-// עדיף לשים את ה־endpoint מה־.env
-const endpointUrl: string = `opc.tcp://${TARGET_URL}/UA/PLC`;
+const { TARGET_URL, PLC_USERNAME, PLC_PASSWORD, TARGET_URL_MOCK } = process.env;
+const endpointUrl: string = TARGET_URL || `opc.tcp://${TARGET_URL_MOCK}/UA/PLC`;
 
 let opcClient: OPCUAClient | null = null;
 let opcSession: ClientSession | null = null;
@@ -30,7 +29,6 @@ const nodesToMonitor = [
   "ns=1;s=parkingSpot",
   "ns=1;s=licensePlateExit",
   "ns=1;s=licensePlateEntry",
-  "ns=1;s=ActiveFaultList", // רשימת תקלות
   "ns=1;s=Queue",
   "ns=1;s=ExitRequestApproval"
 ];
@@ -38,27 +36,31 @@ const nodesToMonitor = [
 // ----------------------------
 // Helpers
 // ----------------------------
+// Function to check if the session is valid
 function isChannelValid(session: ClientSession | null): boolean {
   return session ? session.sessionId !== null : false;
 }
 
+// Function to check if the client is connected
 function isConnected(client: OPCUAClient | null): boolean {
   return client ? client.connectionStrategy.maxRetry === 0 : false;
 }
 
+
 // ----------------------------
 // Client / Session Management
 // ----------------------------
+// Create or reuse an OPC UA client
 async function getOpcClient(): Promise<OPCUAClient> {
-  if (!opcClient) {
+  if (!opcClient || !isConnected(opcClient)) {
     opcClient = OPCUAClient.create({
-      // endpointMustExist: false,
-      // securityMode: MessageSecurityMode.Sign,
-      // securityPolicy: SecurityPolicy.Basic256Sha256,
-      // connectionStrategy: {
-      //   initialDelay: 1000,
-      //   maxRetry: 3,
-      // },
+      endpointMustExist: false,
+      securityMode: MessageSecurityMode.Sign,
+      securityPolicy: SecurityPolicy.Basic256Sha256,
+      connectionStrategy: {
+        initialDelay: 1000,
+        maxRetry: 3,
+      },
     });
     try {
       await opcClient.connect(endpointUrl);
@@ -70,7 +72,6 @@ async function getOpcClient(): Promise<OPCUAClient> {
   }
   return opcClient;
 }
-
 // Ensure a valid session
 export async function ensureSession(): Promise<ClientSession> {
   try {
@@ -81,32 +82,20 @@ export async function ensureSession(): Promise<ClientSession> {
       }
       opcClient = await getOpcClient();
       opcSession = await opcClient.createSession(
-        // {
-        //   type: UserTokenType.UserName,
-        //   userName: PLC_USERNAME || "TestUser",
-        //   password: PLC_PASSWORD || "Interpaz1234!",
-        // }
+        {
+          type: UserTokenType.UserName,
+          userName: PLC_USERNAME || "TestUser",
+          password: PLC_PASSWORD || "Interpaz1234!",
+        }
       );
       console.log("OPC UA session created");
     }
-
-    const client = await getOpcClient();
-    await client.connect(endpointUrl);
-    console.log("✅ Connected to OPC UA server");
-
-    opcSession = await client.createSession({
-      type: UserTokenType.UserName,
-      userName: PLC_USERNAME || "",
-      password: PLC_PASSWORD || "",
-    });
-
-    console.log("✅ Session created");
     return opcSession;
   } catch (err) {
-    console.error("❌ OPC connection failed. Retrying in 5s...", err);
+    console.error("Failed to create OPC UA session:", err);
     opcSession = null;
     opcClient = null;
-    setTimeout(() => ensureSession(), 5000);
+    setTimeout(() => ensureSession(), 5000); // Retry after 5 seconds
     throw err;
   }
 }
@@ -257,15 +246,21 @@ export async function createMonitoredItems(subscription: ClientSubscription): Pr
   nodesToMonitor.forEach((nodeId) => {
     const monitoredItem = ClientMonitoredItem.create(
       subscription,
-      { nodeId, attributeId: AttributeIds.Value },
-      { samplingInterval: 100, discardOldest: true, queueSize: 10 },
+      {
+        nodeId,
+        attributeId: AttributeIds.Value,
+      },
+      {
+        samplingInterval: 100,
+        discardOldest: true,
+        queueSize: 10,
+      },
       TimestampsToReturn.Both
     );
 
     monitoredItem.on("changed", async (dataValue: DataValue) => {
       const val = dataValue.value?.value;
       let event: string = '';
-      let payload: any = {};
       if (nodeId === "ns=1;s=licensePlateExit") {
         event = 'exit';
       } else if (nodeId === "ns=1;s=licensePlateEntry") {
@@ -276,9 +271,9 @@ export async function createMonitoredItems(subscription: ClientSubscription): Pr
       else if (nodeId === "ns=1;s=Queue") {
         event = 'Queue';
       }
-      else if (nodeId === "ns=1;s=ActiveFaultList") {
-        event = 'fault';
-      }
+      // else if (nodeId === "ns=1;s=ActiveFaultList") {
+      //   event = 'fault';
+      // }
       else if (nodeId === "ns=1;s=ExitRequestApproval") {
         event = 'exitRequestApproval';
       }
@@ -340,4 +335,3 @@ process.on("SIGINT", async () => {
   await closeOpcConnection();
   process.exit(0);
 });
-
