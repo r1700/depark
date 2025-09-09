@@ -245,12 +245,12 @@ const PopupMessage = ({ message, color }: { message: string; color: 'error' | 's
 export default function UnifiedEntry() {
     const [, setPickupFloor] = useState<number | null>(null);
     const [, setPickupElevator] = useState<number | null>(null);
-    const handleVehicleSelect = (plate: string) => {
-        setSelectedVehicle(plate);
-        setLicensePlate(plate);
-        setOpenModal(false);
-        handleSearch('plate', plate);
-    };
+    // const handleVehicleSelect = (plate: string) => {
+    //     setSelectedVehicle(plate);
+    //     setLicensePlate(plate);
+    //     setOpenModal(false);
+    //     handleSearch('plate', plate);
+    // };
     const showPopup = (message: string, color: 'error' | 'success') => setPopup({ message, color });
 
     const resetSearch = () => {
@@ -270,7 +270,7 @@ export default function UnifiedEntry() {
         return d.length === 7 ? d.replace(/^(\d{2})(\d{3})(\d{2})$/, '$1-$2-$3') :
             d.length === 8 ? d.replace(/^(\d{3})(\d{2})(\d{3})$/, '$1-$2-$3') : d;
     };
-    const [employeeVehicles, setEmployeeVehicles] = useState<{ licensePlate: string }[]>([]);
+    const [, setEmployeeVehicles] = useState<{ licensePlate: string }[]>([]);
     const [, setSelectedVehicle] = useState('');
     const [, setQueues] = useState<any[]>([]);
     const [, setUserVehicle] = useState('');
