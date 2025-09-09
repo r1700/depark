@@ -51,10 +51,12 @@ const LoginScreen: React.FC<LoginScreenProps> = ({onLogin}) => {
             const response = await fetch(`${API_BASE}/auth/login`, {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
-                body: JSON.stringify(data),
+                body: JSON.stringify(data),                
             });
-
+            
+            
             const result = await response.json();
+            console.log("Login response:", result.user);
             setLoading(false);
 
             if (!response || result.status === "error") {
@@ -71,6 +73,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({onLogin}) => {
                 localStorage.setItem("token", token);
                 localStorage.setItem("user", JSON.stringify(user));
                 localStorage.setItem("expiresAt", expiresAt);
+                console.log(localStorage + " stored in localStorage");
             } else {
                 setServerError("Unexpected server response");
             }

@@ -1,10 +1,10 @@
 
-import { Request, Response } from 'express';
 import fs from 'fs';
 import path from 'path';
 import csv from 'csv-parser';
 import sequelize from '../config/sequelize';
 import multer from 'multer';
+import type { RequestHandler ,Request,Response} from 'express';
 
 // Normalization function
 function normalizeFieldName(fieldName: string) {
@@ -66,7 +66,7 @@ async function insertWithInheritance(modelName: string, row: any) {
     childData[foreignKey] = parentInstance.getDataValue("id");
     return Model.create(childData);
 }
-export const uploadGenericCsv = [
+export const uploadGenericCsv: RequestHandler[] = [
     upload.single('file'),
     async (req: Request, res: Response) => {
         console.log("📌 Models loaded:", Object.keys(sequelize.models));
@@ -185,3 +185,5 @@ export const uploadGenericCsv = [
         }
     }
 ];
+
+
