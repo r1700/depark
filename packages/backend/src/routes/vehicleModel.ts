@@ -1,8 +1,8 @@
-import express, { Request, Response } from 'express';
+import express, { Request, Response, Router } from 'express';
 import sequelize from '../config/sequelize'; 
 import { QueryTypes } from 'sequelize';
 
-const router = express.Router();
+const router: Router = express.Router();
 
 interface ResolveBody {
 vehicle_id?: number | string;

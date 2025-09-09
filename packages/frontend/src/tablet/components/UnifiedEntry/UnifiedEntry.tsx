@@ -270,7 +270,7 @@ export default function UnifiedEntry() {
         return d.length === 7 ? d.replace(/^(\d{2})(\d{3})(\d{2})$/, '$1-$2-$3') :
             d.length === 8 ? d.replace(/^(\d{3})(\d{2})(\d{3})$/, '$1-$2-$3') : d;
     };
-    const [, setEmployeeVehicles] = useState<{ licensePlate: string }[]>([]);
+    const [employeeVehicles, setEmployeeVehicles] = useState<{ licensePlate: string }[]>([]);
     const [, setSelectedVehicle] = useState('');
     const [, setQueues] = useState<any[]>([]);
     const [, setUserVehicle] = useState('');
@@ -328,6 +328,14 @@ export default function UnifiedEntry() {
             setOpenModal(true);
         }
     }
+    
+    const handleVehicleSelect = (plate: string) => {
+        setSelectedVehicle(plate);
+        setLicensePlate(plate);
+        setOpenModal(false);
+        handleSearch('plate', plate);
+    };
+    
 
     return (
         <div style={{
@@ -382,23 +390,23 @@ export default function UnifiedEntry() {
                     style={{ width: '100%', maxWidth: 300, display: 'flex', flexDirection: 'column', gap: 20, alignItems: 'center' }}
                 >
                     {searchMode === 'plate' && (
-                            <TextField
-                                label="License Plate"
-                                variant="outlined"
-                                value={licensePlate}
-                                onChange={e => setLicensePlate(formatLicensePlateInput(e.target.value))}
-                                inputRef={licensePlateRef}
-                                sx={{ maxWidth: 300, width: 300, backgroundColor: 'white', borderRadius: 2, boxShadow: 1, textAlign: 'center' }}
-                                InputProps={{
-                                    endAdornment: (
-                                        <VoiceInput
-                                            inputRef={licensePlateRef}
-                                            onChange={val => setLicensePlate(val)}
-                                            currentValue={licensePlate}
-                                        />
-                                    )
-                                }}
-                            />
+                        <TextField
+                            label="License Plate"
+                            variant="outlined"
+                            value={licensePlate}
+                            onChange={e => setLicensePlate(formatLicensePlateInput(e.target.value))}
+                            inputRef={licensePlateRef}
+                            sx={{ maxWidth: 300, width: 300, backgroundColor: 'white', borderRadius: 2, boxShadow: 1, textAlign: 'center' }}
+                            InputProps={{
+                                endAdornment: (
+                                    <VoiceInput
+                                        inputRef={licensePlateRef}
+                                        onChange={val => setLicensePlate(val)}
+                                        currentValue={licensePlate}
+                                    />
+                                )
+                            }}
+                        />
                     )}
                     {searchMode === 'employee' && (
                         <TextField
