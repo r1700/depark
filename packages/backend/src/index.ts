@@ -18,10 +18,8 @@ import techniciansRoutes from "./routes/opc/technicians";
 import http from 'http';
 import { WebSocketServer } from 'ws';
 import session from 'express-session';
-import adminConfigRouter from './routes/adminConfig';
+// import adminConfigRouter from './routes/adminConfig';
 import userRoutes from './routes/user.routes';
-import authRoutes from './routes/auth';
-import importFromCsv from './routes/importFromCsv';
 import logoRouter from './routes/logos';
 import screenTypeRouter from './routes/screenType';
 import vehicle from './routes/vehicleRoute';
@@ -36,6 +34,7 @@ import routes from './routes/mobile/mobileUserRoutes';
 import notifications from "./routes/mobile/notificationsRoutes"; 
 import  VehicleModelRouter  from './routes/vehicleModel';
 import userApprovalRoutes from './routes/userApprovalRoute';
+import importFromCsv from './routes/importFromCsv';
 
 import path from 'path';
 const app = express();
@@ -104,8 +103,9 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-if (!GOOGLE_CLIENT_ID) {
-    throw new Error('Missing GOOGLE_CLIENT_ID');
+// Ensure required environment variables are set
+if (!process.env.GOOGLE_CLIENT_ID) {
+  throw new Error('Missing GOOGLE_CLIENT_ID in environment variables');
 }
 
 // Global request logger — מדפיס כל בקשה נכנסת
@@ -126,14 +126,13 @@ app.use('/api/auth', userGoogleAuthRoutes);
 app.use('/api/tablet', Retrival);
 app.use('/api/opc', Exit);
 app.use('/api', userRoutes);
-app.use('/api/auth', authRoutes);
 app.use('/api/users', userApi);
 app.use('/api/reservedparking', ResevedParking);
+// app.use('/api/auth', authRoutes);
 app.use('/api/auth', userGoogleAuthRoutes);
 app.use('/api/vehicles', vehicle)
-app.use('/api/admin', adminConfigRouter);
+// app.use('/api/admin', adminConfigRouter);
 app.use('/OAuth', GoogleAuth);
-app.use('/api/admin', adminConfigRouter);
 app.use('/api/parking-stats', parkingReport);
 app.use('/api/surface-stats', surfaceReport);
 app.use('/api/tablet', retrieveRoute);
@@ -159,16 +158,16 @@ app.use('/api/opc', Exit);
 
 // Print registered routes (debug)
 function printRoutes() {
-    console.log("Registered routes:", app);
+    console.log("Registered routes:",  app);
     app._router?.stack?.forEach((middleware: any) => {
         if (middleware.route) {
             const methods = Object.keys(middleware.route.methods).join(',').toUpperCase();
-            console.log(`${methods} ${middleware.route.path}`);
+            console.log(`${ methods } ${ middleware.route.path }`);
         } else if (middleware.name === 'router' && middleware.handle && middleware.handle.stack) {
             middleware.handle.stack.forEach((handler: any) => {
                 if (handler.route) {
                     const methods = Object.keys(handler.route.methods).join(',').toUpperCase();
-                    console.log(`${methods} ${handler.route.path}`);
+                    console.log(`${ methods } ${ handler.route.path }`);
                 }
             });
         }
@@ -191,9 +190,9 @@ app.get('/health', (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
-    console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
-    console.log(`🌐 CORS enabled for: ${CORS_ORIGIN}`);
+    console.log(`🚀 Server running on port ${ PORT }`);
+    console.log(`📝 Environment: ${ process.env.NODE_ENV || 'development' }`);
+    console.log(`🌐 CORS enabled for: ${ CORS_ORIGIN }`);
     console.log('✅ APIs ready!');
 
     console.log('🔗 Available routes:');
