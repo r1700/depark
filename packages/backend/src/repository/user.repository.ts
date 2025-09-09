@@ -2,6 +2,12 @@ import bcrypt from 'bcrypt';
 import { AdminUser, UserSession, BaseUser } from '../model/database-models/resetPassword';
 import { Op } from 'sequelize';
 
+// מיפוי מחרוזת לסוג משתמש מספרי
+const userTypeMap: Record<string, number> = {
+  admin: 1,
+  user: 2
+};
+
 export const findBaseUserByEmail = async (email: string): Promise<BaseUser | null> => {
   try {
     return await BaseUser.findOne({ where: { email } });
@@ -58,7 +64,7 @@ export const updateTempTokenInSession = async (
     } else {
       await UserSession.create({
         baseuser_id: userId,
-        user_type: 'admin',
+        user_type: 1, // תמיד admin במספר
         token: 'temp-token',
         temp_token: tempToken,
         expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000),
@@ -193,9 +199,12 @@ export const createUserSession = async (
       { where: { baseuser_id: userId, is_active: true } }
     );
 
+    // המרה ממחרוזת למספר
+    const dbUserType = userTypeMap[userType] ?? 2; // ברירת מחדל: user
+
     const session = await UserSession.create({
       baseuser_id: userId,
-      user_type: userType,
+      user_type: dbUserType,
       token: token,
       temp_token: tempToken,
       expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000),

@@ -5,7 +5,7 @@ import bcrypt from 'bcrypt';
 import { validateLoginData } from '../../src/validation/check';
 import sequelize from '../config/sequelize';
 import { QueryTypes } from 'sequelize';
-const router = Router();
+const router : Router= Router();
 const JWT_SECRET = process.env.JWT_SECRET;
 if (!JWT_SECRET) throw new Error("JWT_SECRET is not defined in environment variables");
 // פונקציה לשאוב id לפי אימייל

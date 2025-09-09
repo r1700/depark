@@ -321,9 +321,9 @@ export default function UnifiedEntry() {
             }
             const vehicles = await sendEmployeeVehicles(value);
             setLoading(false);
-            // if (!vehicles.length) {
-            //     return showPopup('No vehicles found for this employee.', 'error');
-            // }
+            if (!vehicles.length) {
+                return showPopup('No vehicles found for this employee.', 'error');
+            }
             setEmployeeVehicles(vehicles);
             setOpenModal(true);
         }
@@ -452,7 +452,7 @@ export default function UnifiedEntry() {
                 <Dialog open={openModal} onClose={() => setOpenModal(false)}>
                     <DialogTitle sx={{ fontWeight: 700, color: '#1976d2', textAlign: 'center' }}>Select Vehicle</DialogTitle>
                     <DialogContent sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                        {/* {employeeVehicles.length === 0 ? (
+                        {employeeVehicles.length === 0 ? (
                             <Typography>No vehicles found for this employee.</Typography>
                         ) : (
                             employeeVehicles.map((v, idx) => (
@@ -465,7 +465,7 @@ export default function UnifiedEntry() {
                                     {v.licensePlate}
                                 </Button>
                             ))
-                        )} */}
+                        )}
                     </DialogContent>
                     <DialogActions sx={{ justifyContent: 'center' }}>
                         <Button onClick={() => setOpenModal(false)} sx={{ fontWeight: 600 }}>Close</Button>

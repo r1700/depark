@@ -1,8 +1,8 @@
-import express from "express";
+import express, { Router } from "express";
 import { ScreenType } from "../model/database-models/screentype.model";
 import { Logo } from "../model/database-models/logo.model";
 import ScreenTypeLogo from "../model/database-models/screentypelogo.model";
-const router = express.Router();
+const router : Router = express.Router();
 
 // GET /api/screentypes - get all screen types
 router.get("/", async (req, res) => {

@@ -7,7 +7,7 @@ import {
   handleReservedParkingFilter
 } from '../services/reservedparkingServices';
 
-const router = Router();
+const router : Router = Router();
 
 router.get('/', async (req: Request, res: Response) => {
   const hasFilters = Object.keys(req.query).length > 0;

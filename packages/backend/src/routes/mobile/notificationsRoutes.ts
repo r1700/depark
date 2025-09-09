@@ -1,7 +1,7 @@
-import express from 'express';
+import express, { Router } from 'express';
 import { Notification } from '../../model/database-models/notifications.model'; 
 
-const router = express.Router();
+const router : Router = express.Router();
 
 
 router.get('/', async (req, res) => {
