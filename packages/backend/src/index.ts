@@ -33,7 +33,8 @@ import retrieveRoute from './routes/RetrivalQueue';
 import otpRoutes from './routes/otp.server';
 import routes from './routes/mobile/mobileUserRoutes';
 import notifications from "./routes/mobile/notificationsRoutes"; 
-import adminUsersRouter from './routes/admin/adminUsers';
+import  VehicleModelRouter  from './routes/vehicleModel';
+
 import path from 'path';
 const app = express();
 const server = http.createServer(app);
@@ -115,7 +116,6 @@ app.use((req, res, next) => {
 app.use(loggerRoutes);
 
 // API routes
-app.use('/admin', adminUsersRouter);
 app.use('/api/health', healthRoutes);
 app.use('/api/password', passwordRoutes);
 app.use('/api/auth', passwordRoutes);
@@ -137,6 +137,7 @@ app.use('/api/otp', otpRoutes);
 app.use("/api", routes);
 app.use("/notifications", notifications);
 app.use('/api/importFromCsv', importFromCsv);
+app.use('/api/unknown-vehicles', VehicleModelRouter);
 
 app.use('/api/logos', logoRouter);
 app.use('/api/screentypes', screenTypeRouter);
