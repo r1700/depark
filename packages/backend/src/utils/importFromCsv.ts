@@ -15,19 +15,23 @@ function normalizeFieldName(fieldName: string) {
 }
 // Loading models
 export function loadModels() {
-    const modelsPath = path.resolve(process.cwd(), 'src/model/database-models');
-    if (!fs.existsSync(modelsPath)) {
-        throw new Error(`❌ Models directory not found at path: ${modelsPath}`);
+    // dist: __dirname -> .../packages/backend/dist/src/utils (למשל)
+    const distModelsDir = path.resolve(__dirname, "..", "model", "database-models");
+    const srcModelsDir  = path.resolve(process.cwd(), "src", "model", "database-models");
+    const baseDir = fs.existsSync(distModelsDir) ? distModelsDir : srcModelsDir;
+
+    const allowTs = baseDir === srcModelsDir; // ב-dev אפשר .ts
+    for (const file of fs.readdirSync(baseDir)) {
+        if (file.startsWith("_")) continue;
+        const ext = path.extname(file).toLowerCase();
+        if (ext !== ".js" && !(allowTs && ext === ".ts")) continue;
+
+        const full = path.join(baseDir, file);
+        require(full);
     }
-    fs.readdirSync(modelsPath)
-        .filter(file => (file.endsWith('.ts') || file.endsWith('.js')) && !file.startsWith('_'))
-        .forEach(file => {
-            require(path.join(modelsPath, file));
-        });
 
-    console.log('📦 Models loaded:', Object.keys(sequelize.models));
+    // console.log('📦 Models loaded:', Object.keys(sequelize.models)); // אל תדפיסי סודות
 }
-
 loadModels();
 const upload = multer({ dest: 'uploads/' });
 /**
