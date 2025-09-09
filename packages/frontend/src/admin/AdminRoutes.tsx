@@ -13,6 +13,7 @@ import ParkingsPage from "./Pages/ParkingsPage";
 import AdminUsersPage from "./Pages/adminUser/AdminUsersPage";
 import ParkingStatsPage from "./app/pages/parkingStats/parkingStats";
 import SurfaceStatsPage from "./app/pages/surfaceStats/surfaceStats";
+import ParkingOccupiedCount from "./components/adminDashboard/ParkingStatus";
 
 function getUserFromStorage() {
   try {
@@ -72,6 +73,7 @@ const AdminRoutes: React.FC = () => {
         <Route path="reports">
           <Route path="parking-stats" element={<ParkingStatsPage />} />
           <Route path="surface-stats" element={<SurfaceStatsPage />} />
+       <Route path="parkings-occupancy" element={<ParkingOccupiedCount />} />
         </Route>
 
         <Route

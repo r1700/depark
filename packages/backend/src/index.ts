@@ -36,7 +36,7 @@ import Retrival from './routes/RetrivalQueue';
 import './cronJob'; 
 import  VehicleModelRouter  from './routes/vehicleModel';
 import APIvehicle from './routes/APIvehicle';
-
+import pritectedRoute from './routes/protected';
 import path from 'path';
 const app = express();
 const server = http.createServer(app);
@@ -116,7 +116,15 @@ app.use((req, res, next) => {
 });
 
 app.use(loggerRoutes);
-
+import parkingStatus from './routes/parkingStatus';
+app.use('/api/parkingStatus',parkingStatus);
+// WS
+import { initWebSocket } from './services/WS-server';
+// CURD to table parkingsessions
+import parkingsessionsCURD from './routes/parkingStatusFunc';
+app.use('/api/parkingStatusCURD', parkingsessionsCURD);
+// WebSocket on server restart
+initWebSocket(server);
 // API routes
 app.use('/admin', adminUsersRouter);
 app.use('/api/health', healthRoutes);
@@ -143,7 +151,7 @@ app.use('/api/importFromCsv', importFromCsv);
 app.use('/api/opc',Opc)
 app.use('/api/unknown-vehicles', VehicleModelRouter);
 app.use('/api/vehicles', APIvehicle); // Ensure this route is correctly set up
-
+app.use('/api/protected',pritectedRoute);
 app.use('/api/logos', logoRouter);
 app.use('/api/screentypes', screenTypeRouter);
 app.use('/logos', express.static(path.join(process.cwd(), 'public/logos')));
@@ -223,3 +231,5 @@ app.listen(PORT, () => {
         console.log(':memo: Using mock data - Supabase not configured');
     }
 });
+// export { server };
+// export default app;

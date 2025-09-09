@@ -16,7 +16,8 @@ import Login from './mobile/pages/Login';
 import { AuthProvider } from './mobile/auth/AuthContext';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import UnifiedEntry from './tablet/components/UnifiedEntry/UnifiedEntry';
-
+import { Provider } from 'react-redux';
+import { store } from './admin/app/store';
 
 const routers = createBrowserRouter([
   {
@@ -42,8 +43,10 @@ root.render(
   <React.StrictMode>
     <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID!}>
       <AuthProvider>
-        <RouterProvider router={routers}></RouterProvider>
-      </AuthProvider>
+    <Provider store={store}>
+    <RouterProvider router={routers}></RouterProvider>
+     </Provider>    
+       </AuthProvider>
     </GoogleOAuthProvider>
   </React.StrictMode>,
 );
