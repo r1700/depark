@@ -1,9 +1,9 @@
 
-import { Sequelize, DataTypes, Model } from 'sequelize';
+import { Optional, DataTypes, Model } from 'sequelize';
 import dotenv from 'dotenv';
 dotenv.config();
 import sequelize from '../../config/sequelize';
-
+import { UserStatusEnum } from '../../enums/baseuser';
 
 
 // --- Model baseuser ---
@@ -14,7 +14,9 @@ export class baseuser extends Model {
     public last_name!: string;
     public created_at!: Date;
     public updated_at!: Date;
-    public phone!: string;
+    public status?: UserStatusEnum | null;
+    public approved_at?: Date | null;
+    public phone!: string; 
 }
 
 baseuser.init(
@@ -35,6 +37,15 @@ baseuser.init(
             type: DataTypes.DATE,
             defaultValue: DataTypes.NOW,
         },
+        status: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+            defaultValue: UserStatusEnum.Pending
+        },
+        approved_at: {
+            type: DataTypes.DATE,
+            allowNull: true
+        },
         phone: DataTypes.STRING,
     },
     {
@@ -42,6 +53,36 @@ baseuser.init(
         tableName: 'baseuser',
         timestamps: false,
     }
+);
+
+// --- Model users ---
+export class users extends Model {
+  public id!: number;
+  public baseuser_id!: number;
+  public department?: string | null;
+  public employee_id?: string | null;
+  public google_id?: string | null;
+  public max_cars_allowed_parking?: number | null;
+  public created_by!: string;
+  public approved_by?: string | null;
+}
+
+users.init(
+  {
+    id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+    baseuser_id: { type: DataTypes.INTEGER, allowNull: false, references: { model: 'baseuser', key: 'id' } },
+    department: { type: DataTypes.STRING, allowNull: true },
+    employee_id: { type: DataTypes.STRING, allowNull: true },
+    google_id: { type: DataTypes.STRING, allowNull: true },
+    max_cars_allowed_parking: { type: DataTypes.INTEGER, allowNull: true },
+    created_by: { type: DataTypes.STRING, allowNull: false },
+    approved_by: { type: DataTypes.STRING, allowNull: true },
+  },
+  {
+    sequelize,
+    tableName: 'users',
+    timestamps: false,
+  }
 );
 
 // --- Model usersessions ---
@@ -95,5 +136,6 @@ usersessions.init(
 // קשרים
 baseuser.hasMany(usersessions, { foreignKey: 'baseuser_id' });
 usersessions.belongsTo(baseuser, { foreignKey: 'baseuser_id' });
+users.belongsTo(baseuser, { foreignKey: 'baseuser_id'});
 
 export default sequelize;
