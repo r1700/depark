@@ -1,10 +1,10 @@
 
 // בס"ד
 
-import express from 'express';
+import express, { Router } from 'express';
 import isVehicleAllowed from '../services/vehicle-lookup/vehicleLookup';
 
-const router = express.Router();
+const router : Router= express.Router();
 
 router.post('/lookup', async (req, res) => {
   const { licensePlate, timestamp, opcRequestId, lotId } = req.body;

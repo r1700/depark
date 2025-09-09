@@ -1,7 +1,7 @@
-import express, { Request, Response } from 'express';
+import express, { Request, Response, Router } from 'express';
 import { auth } from '../controllers/google-auth';
 
-const router = express.Router();
+const router :Router= express.Router();
 
 
 router.post('/verify-google-token', async (req: Request, res: Response) => {
