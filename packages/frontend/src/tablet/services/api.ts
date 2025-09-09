@@ -70,18 +70,5 @@ export async function sendEmployeeVehicles(employeeId: string) {
     } catch (error) {
         console.log('Error fetching employee vehicles:', error);
         
-        // if (employeeId === '123456789') {
-        //     return [
-        //         { licensePlate: '12-345-67' },
-        //         { licensePlate: '456-78-901' }
-        //     ];
-        // } if (employeeId === '999999999') {
-        //     return [
-        //         { licensePlate: '56-789-01' },
-        //         { licensePlate: '678-90-123' }
-        //     ];
-        // } else {
-        //     return [];
-        // }
     }
 }
