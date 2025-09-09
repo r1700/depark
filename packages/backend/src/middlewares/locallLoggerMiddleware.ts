@@ -1,7 +1,7 @@
 import winston from 'winston';
 import path from 'path';
 import fs from 'fs';
-import express from 'express';
+import express, { Router } from 'express';
 import moment from 'moment';
 
 const { combine, timestamp, printf } = winston.format;
@@ -39,7 +39,7 @@ const logger = winston.createLogger({
   ],
 });
 
-const router = express.Router();  // Create router
+const router :Router = express.Router();  // Create router
 
 // Manage the middleware that will write the request details and status
 router.use((req, res, next) => {

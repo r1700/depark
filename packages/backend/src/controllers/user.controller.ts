@@ -41,9 +41,9 @@ async function sendResetMailAndRespond(email: string, resetUrl: string, res: Res
         resetUrl: resetUrl
       });
     }
-    return res.status(200).json({ 
-      message: devMsg,
-      success: true
+    return res.status(500).json({ 
+      message: 'Failed to send reset email',
+      success: false
     });
   }
 }
@@ -90,7 +90,7 @@ export const handleLogin = async (req: Request, res: Response) => {
         const userData = { 
           id: Math.floor(Math.random() * 1000) + 1,
           email: email, 
-          role: randomRole, // Now can be 1 or 2 only
+          role: randomRole,
           first_name: email.split('@')[0],
           last_name: 'User'
         };
@@ -125,25 +125,19 @@ export const handlePasswordReset = async (req: Request, res: Response) => {
     if (email && !token) {
       try {
         const result = await requestPasswordReset(email);
-        const resetUrl = `http://localhost:3000/reset-password?token=${result.tempToken}&userId=${result.userId}`;
+        if (!result || !result.userId) {
+          return res.status(200).json({
+            message: 'If this email exists, a reset link will be sent.',
+            success: true
+          });
+        }
+        const resetUrl = `${process.env.FRONTEND_URL }/reset-password?token=${result.tempToken}&userId=${result.userId}`;
         return await sendResetMailAndRespond(email, resetUrl, res, 'Reset email sent successfully! Please check your email.');
       } catch (serviceError: any) {
-        if (serviceError.message.includes('User not found')) {
-          return res.status(404).json({ 
-            error: 'User not found',
-            success: false
-          });
-        }
-        if (serviceError.message.includes('not authorized')) {
-          return res.status(403).json({ 
-            error: 'User not authorized for password reset',
-            success: false
-          });
-        }
-        // fallback mode
-        const resetToken = `fallback-${Date.now()}-${Math.random().toString(36).substring(2)}`;
-        const resetUrl = `http://localhost:3000/reset-password?token=${resetToken}&userId=1`;
-        return await sendResetMailAndRespond(email, resetUrl, res, 'Reset email sent successfully! (Fallback mode)');
+        return res.status(200).json({
+          message: 'If this email exists, a reset link will be sent.',
+          success: true
+        });
       }
     }
 
@@ -257,18 +251,25 @@ export const handleForgotPassword = async (req: Request, res: Response) => {
     
     try {
       const result = await requestPasswordReset(email);
-      const resetUrl = `http://localhost:3000/password-reset/ResetPassword?token=${result.tempToken}&userId=${result.userId}`;
+      if (!result || !result.userId) {
+        return res.status(200).json({
+          message: 'If this email exists in our system, you will receive a reset link shortly.',
+          success: true
+        });
+      }
+      const resetUrl = `${process.env.FRONTEND_URL}/password-reset/ResetPassword?token=${result.tempToken}&userId=${result.userId}`;
       return await sendResetMailAndRespond(email, resetUrl, res, 'If this email exists in our system, you will receive a reset link shortly.');
     } catch (serviceError: any) {
-      // fallback mode
-      const resetToken = `fallback-${Date.now()}-${Math.random().toString(36).substring(2)}`;
-      const resetUrl = `http://localhost:3000/password-reset/ResetPassword?token=${resetToken}&userId=1`;
-      return await sendResetMailAndRespond(email, resetUrl, res, 'If this email exists in our system, you will receive a reset link shortly.');
+      // לא שולח קישור עם userId=1 במצב fallback
+      return res.status(200).json({
+        message: 'If this email exists in our system, you will receive a reset link shortly.',
+        success: true
+      });
     }
   } catch (error: any) {
-    return res.status(200).json({ 
-      message: 'If this email exists in our system, you will receive a reset link shortly.',
-      success: true
+    return res.status(500).json({ 
+      error: 'Internal server error',
+      success: false
     });
   }
 };

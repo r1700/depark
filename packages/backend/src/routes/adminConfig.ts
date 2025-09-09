@@ -1,10 +1,10 @@
-import { Router } from 'express';
+import { Router , Request , Response} from 'express';
 import { ParkingConfigurationModel } from '../model/systemConfiguration/parkingConfiguration';
 import ParkingConfiguration from '../models/ParkingConfiguration';
 import authenticateToken from '../middlewares/authMiddleware'; // Back to original auth
 
-const router = Router();
-router.post('/', authenticateToken, async (req, res) => {
+const router : Router = Router();
+router.post('/', authenticateToken, async (req : Request, res : Response) => {
   const { parkingConfig } = req.body;
   if (!parkingConfig) {
     return res.status(400).json({ success: false, error: 'Missing parkingConfig' });

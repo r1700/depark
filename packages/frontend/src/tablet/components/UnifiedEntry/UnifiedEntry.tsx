@@ -321,13 +321,21 @@ export default function UnifiedEntry() {
             }
             const vehicles = await sendEmployeeVehicles(value);
             setLoading(false);
-            // if (!vehicles.length) {
-            //     return showPopup('No vehicles found for this employee.', 'error');
-            // }
+            if (!vehicles.length) {
+                return showPopup('No vehicles found for this employee.', 'error');
+            }
             setEmployeeVehicles(vehicles);
             setOpenModal(true);
         }
     }
+    
+    const handleVehicleSelect = (plate: string) => {
+        setSelectedVehicle(plate);
+        setLicensePlate(plate);
+        setOpenModal(false);
+        handleSearch('plate', plate);
+    };
+    
 
     return (
         <div style={{
@@ -382,23 +390,23 @@ export default function UnifiedEntry() {
                     style={{ width: '100%', maxWidth: 300, display: 'flex', flexDirection: 'column', gap: 20, alignItems: 'center' }}
                 >
                     {searchMode === 'plate' && (
-                            <TextField
-                                label="License Plate"
-                                variant="outlined"
-                                value={licensePlate}
-                                onChange={e => setLicensePlate(formatLicensePlateInput(e.target.value))}
-                                inputRef={licensePlateRef}
-                                sx={{ maxWidth: 300, width: 300, backgroundColor: 'white', borderRadius: 2, boxShadow: 1, textAlign: 'center' }}
-                                InputProps={{
-                                    endAdornment: (
-                                        <VoiceInput
-                                            inputRef={licensePlateRef}
-                                            onChange={val => setLicensePlate(val)}
-                                            currentValue={licensePlate}
-                                        />
-                                    )
-                                }}
-                            />
+                        <TextField
+                            label="License Plate"
+                            variant="outlined"
+                            value={licensePlate}
+                            onChange={e => setLicensePlate(formatLicensePlateInput(e.target.value))}
+                            inputRef={licensePlateRef}
+                            sx={{ maxWidth: 300, width: 300, backgroundColor: 'white', borderRadius: 2, boxShadow: 1, textAlign: 'center' }}
+                            InputProps={{
+                                endAdornment: (
+                                    <VoiceInput
+                                        inputRef={licensePlateRef}
+                                        onChange={val => setLicensePlate(val)}
+                                        currentValue={licensePlate}
+                                    />
+                                )
+                            }}
+                        />
                     )}
                     {searchMode === 'employee' && (
                         <TextField
@@ -452,7 +460,7 @@ export default function UnifiedEntry() {
                 <Dialog open={openModal} onClose={() => setOpenModal(false)}>
                     <DialogTitle sx={{ fontWeight: 700, color: '#1976d2', textAlign: 'center' }}>Select Vehicle</DialogTitle>
                     <DialogContent sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                        {/* {employeeVehicles.length === 0 ? (
+                        {employeeVehicles.length === 0 ? (
                             <Typography>No vehicles found for this employee.</Typography>
                         ) : (
                             employeeVehicles.map((v, idx) => (
@@ -465,7 +473,7 @@ export default function UnifiedEntry() {
                                     {v.licensePlate}
                                 </Button>
                             ))
-                        )} */}
+                        )}
                     </DialogContent>
                     <DialogActions sx={{ justifyContent: 'center' }}>
                         <Button onClick={() => setOpenModal(false)} sx={{ fontWeight: 600 }}>Close</Button>
