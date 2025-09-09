@@ -21,6 +21,7 @@ import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 const drawerWidth = 240;
 
 type RoleName = 'admin' | 'hr' | 'guest';
@@ -71,7 +72,7 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
         subMenu?: Array<{ text: string; path: string; allowed?: RoleName[] }>;
     }> = [
             { text: 'Users', icon: <PeopleIcon />, path: '/layout/users', allowed: ['admin'] }, // רק מנהל
-            { text: 'Admin', icon: <PeopleIcon />, path: '/admin/layout/admin-users', allowed: ['admin'] },
+            { text: 'Admin', icon: <AdminPanelSettingsIcon />, path: '/admin/layout/admin-users', allowed: ['admin'] },
             { text: 'Vehicles', icon: <DirectionsCarIcon />, path: '/layout/vehicles', allowed: ['admin', 'hr'] }, // שניהם
             {
                 text: 'Reports',
