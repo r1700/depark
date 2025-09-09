@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button, Dialog, DialogTitle, DialogContent, DialogActions, Typography, Card, CardContent, CircularProgress, Box } from '@mui/material';
 import VehicleInQueue from '../VehicleInQueue/VehicleInQueue';
 import { sendElevatorQueue } from '../../services/api';
 import './VehicleQueue.css';
+import OfflineBanner from '../OfflineBanner';
+import { getQueueByFloor } from '../../services/queueService';
 
 export interface Vehicle {
   licensePlate: string;
@@ -13,20 +15,68 @@ export interface Vehicle {
 const VehicleQueue: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const queues = location.state?.queues || [];
+  // const queues = location.state?.queues || [];
   const userVehicle = location.state?.userVehicle || '';
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedQueue, setSelectedQueue] = useState<Vehicle[]>([]);
   const [loadingDialog, setLoadingDialog] = useState(false);
-  const normalizedQueues = Array.isArray(queues) ? queues : [queues];
+  // const normalizedQueues = Array.isArray(queues) ? queues : [queues];
   const floorNumber = location.state?.floorNumber || 1;
 
+  const [isOnline, setIsOnline] = useState<boolean>(navigator.onLine);
+  const [normalizedQueues, setNormalizedQueues] = useState<any[]>([]);
+
   // Debug: Print the queues data to console
-  console.log('VehicleQueue - queues:', queues);
+  // console.log('VehicleQueue - queues:', queues);
   console.log('VehicleQueue - normalizedQueues:', normalizedQueues);
+
+  // מעקב אחרי מצב האינטרנט (online/offline)
+  useEffect(() => {
+    const goOnline = () => setIsOnline(true);
+    const goOffline = () => setIsOnline(false);
+
+    window.addEventListener("online", goOnline);
+    window.addEventListener("offline", goOffline);
+
+    return () => {
+      window.removeEventListener("online", goOnline);
+      window.removeEventListener("offline", goOffline);
+    };
+  }, []);
+
+  useEffect(() => {                                             // 🟢 נוסף – טעינת תורים לפי קומה
+    const load = async () => {
+      try {
+        const { data, from } = await getQueueByFloor(floorNumber);
+        console.log("Queue loaded from", from, data);
+        setNormalizedQueues(data ? formatQueue(data.queue) : []);
+      } catch (err) {
+        console.error("❌ Failed to load queues", err);
+        setNormalizedQueues([]);
+      }
+    };
+    load();
+  }, [floorNumber, isOnline]);
+
+  // פונקציית עזר לשינוי מבנה התור
+  function formatQueue(queue: any[]) {
+    return queue.map((item, index) => {
+      return {
+        elevatorNumber: index + 1, // מספר מעלית לפי הסדר
+        firstVehicle: {
+          licensePlate: item.licensePlate,
+          estimatedWait: 0, // ?? דוגמה - זמן המתנה מחושב
+        },
+        remainingCount: item.carsCount,
+      };
+    });
+  }
 
   return (
     <div className="vehicle-queue-main-wrapper" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', paddingTop: 32 }}>
+
+      <OfflineBanner />
+
       <div className="vehicle-queue-container" style={{ width: '100%', maxWidth: 1200, marginTop: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start' }}>
         <h1 style={{ marginTop: 0, marginBottom: 18, fontWeight: 800, fontSize: '2.3em', color: '#1976d2', textAlign: 'center', letterSpacing: 1 }}>Vehicle Queues</h1>
         <div className="floor-title" style={{
