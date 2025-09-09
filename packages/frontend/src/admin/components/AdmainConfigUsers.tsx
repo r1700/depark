@@ -46,9 +46,10 @@ const theme = createTheme({
         secondary: { main: '#dc004e' }
     }
 });
-const getInitialEmployeeId = () => {
+const getInitialUserId = () => {
     // Change the key here according to how you saved the id in localStorage
-    return localStorage.getItem('employee_id') || '';
+    console.log(localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user") || "{}").id : 'U1000' );
+    return  localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user") || "{}").id : 'U1000';
 };
 
 const initialForm = {
@@ -58,7 +59,7 @@ const initialForm = {
     email: '',
     phone: '',
     department: '',
-    employee_id: getInitialEmployeeId(),
+    employee_id: getInitialUserId(),
     google_id: '',
     status: '',
     max_cars_allowed_parking: '',
@@ -180,7 +181,7 @@ export default function UsersConfigPage() {
             setEditId(null);
             setForm({
                 ...initialForm,
-                employee_id: getInitialEmployeeId()
+                employee_id: getInitialUserId()
             });
             dispatch(fetchUsers());
         } catch {
@@ -194,7 +195,7 @@ export default function UsersConfigPage() {
         setShowResetConfirm(false);
         setForm({
             ...initialForm,
-            employee_id: getInitialEmployeeId()
+            employee_id: getInitialUserId()
         });
         setEditId(null);
         setMessage({ type: 'success', text: 'Form reset!' });
@@ -278,12 +279,12 @@ export default function UsersConfigPage() {
                                         <MenuItem value="HR">HR</MenuItem>
 
                                     </TextField>
-                                    <TextField
+                                    {/* <TextField
                                         label="Employee ID"
                                         value={form.employee_id}
                                         fullWidth
                                         disabled
-                                    />
+                                    /> */}
                                     <TextField
                                         label="Status"
                                         select

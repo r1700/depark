@@ -19,6 +19,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import PeopleIcon from '@mui/icons-material/People';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import AssessmentIcon from '@mui/icons-material/Assessment';
+import ParkingIcon from '@mui/icons-material/LocalParking';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 const drawerWidth = 240;
@@ -67,12 +68,13 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
         text: string;
         icon?: React.ReactNode;
         path?: string;
-        allowed?: RoleName[]; // אם לא קיים -> גלוי לכולם
+        allowed?: RoleName[]; 
         subMenu?: Array<{ text: string; path: string; allowed?: RoleName[] }>;
     }> = [
-            { text: 'Users', icon: <PeopleIcon />, path: '/layout/users', allowed: ['admin'] }, // רק מנהל
+            { text: 'Users', icon: <PeopleIcon />, path: '/admin/layout/users', allowed: ['admin', 'hr'] }, 
             { text: 'Admin', icon: <PeopleIcon />, path: '/admin/layout/admin-users', allowed: ['admin'] },
-            { text: 'Vehicles', icon: <DirectionsCarIcon />, path: '/layout/vehicles', allowed: ['admin', 'hr'] }, // שניהם
+            { text: 'Vehicles', icon: <DirectionsCarIcon />, path: 'admin/layout/vehicles', allowed: ['admin', 'hr'] },
+            { text: 'Reserved Parking', icon: <ParkingIcon />, path: '/admin/layout/reserved-parking', allowed: ['admin', 'hr'] },
             {
                 text: 'Reports',
                 icon: <AssessmentIcon />,
@@ -83,6 +85,8 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
                     { text: 'Surface Stats', path: '/admin/layout/reports/surface-stats', allowed: ['admin', 'hr'] },
                 ],
             },
+            { text: 'Parking Lots', icon: <DirectionsCarIcon />, path: '/admin/layout/parkings', allowed: ['admin', 'hr'] },
+            { text: 'Admin Config', icon: <PeopleIcon />, path: '/admin/layout/admin-config', allowed: ['admin'] },
         ];
 
     // helper: check if current user role allowed to see item
@@ -230,3 +234,4 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
 };
 
 export default Sidebar;
+
