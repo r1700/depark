@@ -68,6 +68,10 @@ export const VehicleReportDialog = ({ open, onClose, userId }: Props) => {
     try {
       const response = await fetch(`${API_BASE}/report/${encodeURIComponent(userId || '')}`);
       if (!response.ok) {
+        if (response.status === 404) {
+        setReport(null);
+        throw new Error("no report found");
+      }
         const errRes = await response.json().catch(() => ({}));
         throw new Error(errRes.message || "Failed to fetch report data");
       }
