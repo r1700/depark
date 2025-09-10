@@ -72,7 +72,6 @@ const UsersPage: React.FC = () => {
           });
         }
         const response = await axios.get("/api/users", { params });
-        console.log("API response:", response.data);
         setUsers(response.data.results || response.data);
       } catch (error) {
         console.error("Failed to fetch users:", error);
@@ -95,7 +94,7 @@ const UsersPage: React.FC = () => {
       { id: "approved_by", label: "Approved By" },
       { id: "approved_at", label: "Approved At" },
     ],
-    rows: Array.isArray(users) ? users.map((user: any): Record<string, any> => ({
+    rows: (users || []).map((user: any): Record<string, any> => ({
       id: user.baseuser_id,
       baseuser_id: user.baseuser_id,
       fullName: `${user.first_name ?? ""} ${user.last_name ?? ""}`.trim(),
