@@ -1,5 +1,5 @@
 
-import { Optional, DataTypes, Model } from 'sequelize';
+import { Sequelize, DataTypes, Model } from 'sequelize';
 import dotenv from 'dotenv';
 dotenv.config();
 import sequelize from '../../config/sequelize';
@@ -14,9 +14,9 @@ export class baseuser extends Model {
     public last_name!: string;
     public created_at!: Date;
     public updated_at!: Date;
+     public phone!: string;
     public status?: UserStatusEnum | null;
     public approved_at?: Date | null;
-    public phone!: string; 
 }
 
 baseuser.init(
