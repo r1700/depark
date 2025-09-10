@@ -1,7 +1,7 @@
 import React from 'react';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import './VehicleInQueue.css';
-
+import Header from '../../../components/Header';
 interface VehicleInQueueProps {
     vehicle: {
         licensePlate: string;
@@ -16,6 +16,9 @@ interface VehicleInQueueProps {
 const VehicleInQueue: React.FC<VehicleInQueueProps> = ({ vehicle, position, userVehicle }) => {
     const isUserVehicle = vehicle.licensePlate === userVehicle;
     return (
+        <>
+             <Header screenType="tablet" />
+
     <div className="vehicle-card">
             <DirectionsCarIcon style={{ fontSize: 50, color: '#007BFF' }} />
             <span className="license-plate">
@@ -30,6 +33,7 @@ const VehicleInQueue: React.FC<VehicleInQueueProps> = ({ vehicle, position, user
                 </span>
             )}
         </div>
+        </>
     );
 };
 

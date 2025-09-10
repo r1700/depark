@@ -44,20 +44,7 @@ export const apiService = {
   },
 };
 
-export const authenticateUser = async (googleToken: string): Promise<{ token: string; user: { id: number; name: string } }> => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      if (googleToken === "valid-google-token") {
-        resolve({
-          token: "mock-jwt-token-123456",
-          user: { id: 1, name: "Google User" },
-        });
-      } else {
-        reject(new Error("Invalid Google token"));
-      }
-    }, 1000);
-  });
-};
+
 
 
 export async function loginWithGoogle(credential: string) {

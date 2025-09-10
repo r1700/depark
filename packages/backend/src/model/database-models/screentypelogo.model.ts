@@ -1,10 +1,10 @@
 
 import { DataTypes, Model } from "sequelize";
 import sequelize from "../../config/sequelize";
-import ScreenType from "./screentype.model";
+import ScreenType from './screentype.model';
 import Logo from "./logo.model";
 
-class ScreenTypeLogo extends Model {
+export class ScreenTypeLogo extends Model {
   public id!: number;
   public screenTypeId!: number;
   public logoId!: number;

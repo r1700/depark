@@ -12,6 +12,8 @@ import MailOutlineIcon from '@mui/icons-material/MailOutline';
 import MarkEmailReadIcon from '@mui/icons-material/MarkEmailRead';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import Header from '../../../components/Header';
+
 
 interface Notification {
   id: number;
@@ -28,6 +30,7 @@ const Notifications: React.FC = () => {
   const [userId, setUserId] = useState<number | null>(null);
   const location = useLocation();
   const navigate = useNavigate();
+
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -101,6 +104,7 @@ const Notifications: React.FC = () => {
         mx: "auto",
       }}
     >
+      <Header screenType="mobile" />
       <Box width="100%" mb={2}>
         <Button
           variant="outlined"

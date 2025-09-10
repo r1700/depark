@@ -7,7 +7,7 @@ import MicOffIcon from '@mui/icons-material/MicOff';
 import { ToggleButton, ToggleButtonGroup } from '@mui/material';
 import './UnifiedEntry.css';
 import { sendVehicleData, sendFloorQueues, sendEmployeeVehicles } from '../../services/api';
-
+import Header from '../../../components/Header';
 // VoiceInput logic
 const DIGITS_HE: Record<string, string> = {
     'אפס': '0', 'אחד': '1', 'אחת': '1', 'שתיים': '2', 'שניים': '2', 'שתים': '2', 'שתי': '2',
@@ -349,6 +349,7 @@ export default function UnifiedEntry() {
             paddingTop: 0,
             overflow: 'hidden',
         }}>
+            <Header screenType="tablet" />
             <div style={{
                 display: 'flex',
                 flexDirection: 'column',

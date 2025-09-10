@@ -1,10 +1,12 @@
-
 import multer from 'multer';
 import path from 'path';
-import {Logo} from '../model/database-models/logo.model';
-import { Router } from 'express';
-const router: Router = Router();
+import { Logo } from '../model/database-models/logo.model';
+import { ScreenType } from '../model/database-models/screentype.model';
+import { ScreenTypeLogo } from '../model/database-models/screentypelogo.model';
+import express, { Router } from 'express';
 
+
+const router = Router();
 // Multer setup for file uploads
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -15,7 +17,6 @@ const storage = multer.diskStorage({
   }
 });
 const upload = multer({ storage });
-
 // Route for uploading logo image
 // Usage: POST /api/logos/upload with form-data: { logo: <file>, updatedBy: <string> }
 router.post('/upload', upload.single('logo'), async (req, res) => {
@@ -24,7 +25,7 @@ router.post('/upload', upload.single('logo'), async (req, res) => {
   console.log('DEBUG: updatedBy:', req.body.updatedBy);
   try {
     if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
-    if(req.file.mimetype.startsWith('image/') === false) {
+    if (req.file.mimetype.startsWith('image/') === false) {
       return res.status(400).json({ error: 'File must be an image' });
     }
     const allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp'];
@@ -45,16 +46,12 @@ router.post('/upload', upload.single('logo'), async (req, res) => {
     res.status(500).json({ error: 'Upload failed', details: err.message });
   }
 });
-
-
 // יצירת/עדכון לוגו
 router.post('/', async (req, res) => {
   const { logoUrl, updatedBy } = req.body;
   if (!logoUrl) {
     return res.status(400).json({ error: 'Missing logoUrl' });
   }
-
-  
   // עדכון אם קיים, יצירה אם לא
   const [logo, created] = await Logo.upsert({
     logoUrl,
@@ -63,18 +60,15 @@ router.post('/', async (req, res) => {
   });
   res.json({ success: true, logo });
 });
-
 // שליפת לוגו לפי id
 router.get('/:id', async (req, res) => {
   const { id } = req.params;
-
   const logo = await Logo.findOne({ where: { id } });
   if (!logo) {
     return res.status(404).json({ error: 'Logo not found' });
   }
   res.json({ success: true, logo });
 });
-
 // שליפת כל הלוגואים
 router.get('/', async (req, res) => {
   const logos = await Logo.findAll();
@@ -99,11 +93,9 @@ router.put('/:id', async (req, res) => {
     res.status(500).json({ error: 'Failed to update logo', details: (err as Error).message || String(err) });
   }
 });
-
 // מחיקת לוגו
 router.delete('/:id', async (req, res) => {
   const { id } = req.params;
-
   const deleted = await Logo.destroy({ where: { id } });
   if (!deleted) {
     return res.status(404).json({ error: 'Logo not found' });
@@ -111,4 +103,24 @@ router.delete('/:id', async (req, res) => {
   res.json({ success: true });
 });
 
+
+// שליפת לוגו לפי screentype (name)
+
+router.get('/by-name/:screentype', async (req, res) => {
+  const { screentype } = req.params;
+  try {
+    // שליפת סוג המסך
+    const screenType = await ScreenType.findOne({ where: { name: screentype } });
+    if (!screenType) {
+      return res.status(404).json({ error: 'ScreenType not found' });
+    }
+    // שליפת כל הלוגואים המשויכים
+    const screenTypeLogos = await ScreenTypeLogo.findAll({ where: { screenTypeId: screenType.id } });
+    const logoIds = screenTypeLogos.map((stl: ScreenTypeLogo) => stl.logoId);
+    const logos = await Logo.findAll({ where: { id: logoIds } });
+    res.json({ success: true, logos });
+  } catch (err: any) {
+    res.status(500).json({ error: 'Failed to fetch logos', details: err.message });
+  }
+});
 export default router;

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { TextField, Button, Box, Typography, Container } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import Header from '../../../components/Header';
 
 export default function HomeScreen({ onSave }: { onSave?: () => void }) {
   const [floor, setFloor] = useState("");
@@ -26,6 +27,8 @@ export default function HomeScreen({ onSave }: { onSave?: () => void }) {
           textAlign: 'center',
         }}
       >
+        <Header screenType="tablet" />
+
         <h1 style={{ marginBottom: 16 }}>Welcome!</h1>
         <Typography variant="h5" sx={{ mb: 2 }}>
           Please enter the floor number

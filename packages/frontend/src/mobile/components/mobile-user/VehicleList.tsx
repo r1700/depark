@@ -1,4 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
+
+
 import dayjs from "dayjs";
 import {
   Card,
@@ -25,6 +27,7 @@ import FeedbackIcon from "@mui/icons-material/Feedback";
 import { useNavigate } from "react-router-dom";
 import { VehicleReportDialog } from "./VehicleReportDialog";
 import { VehicleRegistrationForm } from "./VehicleRegistrationForm";
+import Header from "../../../components/Header";
 
 interface Vehicle {
   id: string;
@@ -58,7 +61,7 @@ export const VehicleRow = () => {
   } | null>(null);
   const [pickupDialogOpen, setPickupDialogOpen] = useState(false);
 
-  
+
   useEffect(() => {
     const lastFeedback = localStorage.getItem("lastFeedbackSent");
     if (!lastFeedback) {
@@ -71,7 +74,7 @@ export const VehicleRow = () => {
     }
   }, []);
 
-  
+
   useEffect(() => {
     if (!userId) return;
 
@@ -92,7 +95,7 @@ export const VehicleRow = () => {
     return () => clearInterval(interval);
   }, [userId]);
 
-  
+
   useEffect(() => {
     const userStr = localStorage.getItem("user");
     if (userStr !== null) {
@@ -174,9 +177,9 @@ export const VehicleRow = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          
+
           licensePlate: vehicle.license_plate,
-          floor:'mobile'
+          floor: 'mobile'
         }),
       });
 
@@ -221,7 +224,7 @@ export const VehicleRow = () => {
         mx: "auto",
       }}
     >
-      {/* Header */}
+      <Header screenType="mobile" />
       <Box
         display="flex"
         justifyContent="space-between"

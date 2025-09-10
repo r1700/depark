@@ -24,6 +24,8 @@ import {
   Title,
   Tooltip,
 } from "chart.js";
+import Header from '../../../components/Header';
+
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip);
 
@@ -143,6 +145,7 @@ export const VehicleReportDialog = ({ open, onClose, userId }: Props) => {
         },
       }}
     >
+      <Header screenType="mobile" />
       <DialogTitle
         sx={{
           textAlign: "center",

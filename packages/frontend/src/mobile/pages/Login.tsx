@@ -1,9 +1,10 @@
 import React from 'react';
+import Header from '../../components/Header';
 import { useAuthGoogle } from '../auth/useGoogleLogin';
 import { useNavigate } from 'react-router-dom';
 import { Box, Typography, Button, Stack, CircularProgress } from '@mui/material';
 import { GoogleLogin } from '@react-oauth/google';
-
+// הרכיב PopupMessage
 const PopupMessage = ({ message, color }: { message: string; color: 'error' | 'success' }) => (
   <Box
     sx={{
@@ -126,6 +127,9 @@ export default function Login() {
         px: 2,
       }}
     >
+      {/* הוספת header עם ה-Logo */}
+      <Header screenType="mobile" />
+      
       <Typography
         variant="h1"
         fontWeight={800}
@@ -135,7 +139,7 @@ export default function Login() {
         sx={{
           fontSize: 'clamp(3rem, 7vw, 7rem)',
           letterSpacing: '-0.02em',
-          textShadow: '2px 2px 6px rgba(0,0,0,0.25)', 
+          textShadow: '2px 2px 6px rgba(0,0,0,0.25)',
         }}
       >
         Wellcome
@@ -175,4 +179,3 @@ export default function Login() {
     </Box>
   );
 }
-
