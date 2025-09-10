@@ -44,6 +44,8 @@ import  VehicleModelRouter  from './routes/vehicleModel';
 // import APIvehicle from './routes/APIvehicle';
 import pritectedRoute from './routes/protected';
 
+import elevatorRouter from './routes/PerElevator';
+
 import path from 'path';
 // import adminConfigRouter from './routes/adminConfig';
 // import retrieveRoute from './routes/RetrivalQueue';
@@ -55,25 +57,25 @@ export const wss = new WebSocketServer({ server })
 app.use(express.json());
 
 // --- DEBUG: log incoming requests and who sends responses ---
-app.use((req, res, next) => {
-    console.log(`[REQ] ${ new Date().toISOString() } ${ req.method } ${ req.originalUrl } body:`, req.body);
-    const origJson = res.json.bind(res);
-    const origSend = res.send.bind(res);
+// app.use((req, res, next) => {
+//     console.log(`[REQ] ${ new Date().toISOString() } ${ req.method } ${ req.originalUrl } body:`, req.body);
+//     const origJson = res.json.bind(res);
+//     const origSend = res.send.bind(res);
 
-    res.json = function (body) {
-        console.log(`[DEBUG] res.json called for ${ req.method } ${ req.originalUrl } with body:`, body);
-        console.trace();
-        return origJson(body);
-    };
+//     res.json = function (body) {
+//         console.log(`[DEBUG] res.json called for ${ req.method } ${ req.originalUrl } with body:`, body);
+//         console.trace();
+//         return origJson(body);
+//     };
 
-    res.send = function (body) {
-        console.log(`[DEBUG] res.send called for ${ req.method } ${ req.originalUrl } with body:`, body);
-        console.trace();
-        return origSend(body);
-    };
+//     res.send = function (body) {
+//         console.log(`[DEBUG] res.send called for ${ req.method } ${ req.originalUrl } with body:`, body);
+//         console.trace();
+//         return origSend(body);
+//     };
 
-    next();
-});
+//     next();
+// });
 // --- end DEBUG ---
 const PORT = process.env.PORT || 3001;
 
@@ -152,7 +154,7 @@ app.use('/api/tablet', retrieveRoute);
 app.use('/api/otp', otpRoutes);
 app.use("/api", routes);
 app.use("/notifications", notifications);
-
+app.use("/elevator-queue",elevatorRouter);
 app.use('/api/logos', logoRouter);
 app.use('/api/screentypes', screenTypeRouter);
 app.use('/logos', express.static(path.join(process.cwd(), 'public/logos')));
@@ -177,6 +179,9 @@ app.use('/api/screentypes', screenTypeRouter);
 app.use('/logos', express.static(path.join(process.cwd(), 'public/logos')));
 
 app.use('/api/tablet', Retrival);
+app.use("/api/opc", techniciansRoutes);
+app.use('/api/opc', faultsRouter);
+app.use('/api/opc', Exit);
 
 // Log all incoming requests
 app.use((req, res, next) => {
@@ -185,9 +190,6 @@ app.use((req, res, next) => {
 });
 
 
-app.use("/api/opc", techniciansRoutes);
-app.use('/api/opc', faultsRouter);
-app.use('/api/opc', Exit);
 
 // Print registered routes (debug)
 function printRoutes() {

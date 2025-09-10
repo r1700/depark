@@ -74,6 +74,66 @@ app.post('/api/wait-for-node-change', async (req: Request, res: Response) => {
   }
 });
 
+
+// start my code-rachel
+/**
+ * API לקבלת תור של מעלית מה־PLC
+ * POST /api/opc/elevatorQueue
+ * body: { elevatorId: string, floor: string, timeoutMs?: number }
+ */
+app.post('/api/opc/elevatorQueue', async (req, res) => {
+  const { elevatorId, floor, timeoutMs = 5000 } = req.body;
+  if (!elevatorId || !floor) {
+    return res.status(400).json({ error: "Missing elevatorId or floor" });
+  }
+  try {
+    // בניית payload ושליחה ל־PLC
+    const payload = `${elevatorId}|${floor}`;
+    await writeNodeValues([{ nodeId: `ns=1;s=ElevatorQueueRequest`, value: payload }]);
+    // המתנה לערך חדש
+    const nodeId = `ns=1;s=ElevatorWaitingList`;
+    console.log('try to read node id:', nodeId);
+
+    const rawValue = await waitForNodeChange(nodeId, { timeout: timeoutMs });
+    // פירוש הערך
+    let queue: any[] = [];
+    if (rawValue === "[]" || rawValue === "" || rawValue == null) {
+      queue = [];
+    } else {
+      queue = String(rawValue)
+        .split(";")
+        .filter(Boolean)
+        .map((item, i) => {
+          const [licensePlate, pos] = item.split(":");
+          return {
+            licensePlate,
+            position: Number(pos || i + 1),
+            estimatedRetrievalTime: (Number(pos || i + 1)) * 5
+          };
+        });
+    }
+
+    res.json({
+      elevatorId,
+      floor,
+      queue,
+      timestamp: new Date().toISOString(),
+      warnings: queue.length === 0 ? ["NO_DATA_FROM_PLC"] : []
+    });
+  } catch (err: any) {
+    if (err.message?.includes("Timeout")) {
+      return res.status(504).json({ error: "PLC_TIMEOUT" });
+    }
+    res.status(500).json({ error: err.message || "Internal Server Error" });
+  }
+});
+
+app.listen(5000, () => {
+  console.log("OPC Bridge API running on port 5000");
+});
+
+// end my code-rachel
+
 // Catch-all route for undefined endpoints
 app.use('/', (req: Request, res: Response) => {
   res.status(404).json({ error: 'Not Found' });

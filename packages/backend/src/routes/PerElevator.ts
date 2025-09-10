@@ -1,14 +1,5 @@
 
-// // בס"ד
-
-// import { Router } from 'express';
-// import { getElevatorQueueController } from '../services/elevatorQueue';
-
-// const router = Router();
-
-// router.post('/queue', getElevatorQueueController)
-
-// export default router;
+// בס"ד
 
 import express, { Request, Response } from 'express';
 import { getElevatorQueue } from '../services/elevatorQueue';
@@ -16,10 +7,9 @@ import { getElevatorQueue } from '../services/elevatorQueue';
 const router = express.Router();
 
 /**
- * API לקבלת תור של מעלית
+api for elevator
  */
-router.post('/queue', async (req: Request, res: Response) => {
-
+router.post('/', async (req: Request, res: Response) => {
   const { elevatorId, floor, timeoutMs = 5000 } = req.body;
 
   if (!elevatorId || !floor) {
@@ -28,13 +18,19 @@ router.post('/queue', async (req: Request, res: Response) => {
 
   try {
     const result = await getElevatorQueue(elevatorId, floor, timeoutMs);
-    res.json(result);
-    console.log("📥 Request received at /queue:", req.body);
+    const vehicles = (result.queue || []).map((item: any, idx: number) => ({
+      licensePlate: item.licensePlate,
+      estimatedWait: (typeof item.estimatedRetrievalTime === 'number')
+        ? item.estimatedRetrievalTime - 5
+        : idx * 5 // ברירת מחדל אם אין estimatedRetrievalTime
+    }));
+    console.log(vehicles);
+    
+    res.json(vehicles);
   } catch (err: any) {
     if (err.message === "PLC_TIMEOUT") {
       return res.status(504).json({ error: "PLC_TIMEOUT" });
     }
-    console.error("Error in /elevator-queue:", err);
     res.status(500).json({ error: err.message || "Internal Server Error" });
   }
 });
