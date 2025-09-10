@@ -9,7 +9,6 @@ import { store } from './admin/app/store'; // נתיב לפי הפרויקט ש�
 
 import { VehicleRow } from './mobile/components/mobile-user/VehicleList';
 import Otp from './mobile/components/otp';
-import HomePage from './tablet/pages/HomePage';
 import LoginPage from './admin/Pages/loginPage';
 import ForgotPassword from './admin/app/pages/resetPassword/ForgotPassword';
 import ResetPassword from './admin/app/pages/resetPassword/ResetPassword';
@@ -34,7 +33,11 @@ import ResolvePage from './admin/components/vehicleModel/ResolvePage';
 import APIvehicle from './admin/components/APIvehicle/APIvehicle';
 import AdminConfigUsers from './admin/components/AdmainConfigUsers';
 import AdminLogoManagement from './admin/components/logo';
+import HomePage from './tablet/components/HomePage/HomePage';
 
+import Notifications from './mobile/components/mobile-user/Notifications';
+import UnifiedEntry from './tablet/components/UnifiedEntry/UnifiedEntry';
+import VehicleQueue from './tablet/components/VehicleQueue/VehicleQueue';
 // helper to read user from localStorage
 function getUserFromStorage() {
   try {
@@ -135,10 +138,11 @@ const routers = createBrowserRouter([
       // mobile / other routes
       { path: 'mobile', element: <Login /> },
       { path: 'otp', element: <Otp /> },
-      { path: 'tablet', element: <HomePage /> },
-      { path: 'forgot-password', element: <ForgotPassword /> },
+      { path: 'tablet', element: localStorage.getItem("floorNumber") ? <UnifiedEntry /> : <HomePage /> }, { path: 'forgot-password', element: <ForgotPassword /> },
       { path: 'reset-password', element: <ResetPassword /> },
       { path: 'VehicleRow', element: <VehicleRow /> },
+      { path: 'Notifications', element: <Notifications /> },
+      { path: 'VehicleQueue', element: <VehicleQueue /> },
     ]
   }
 ]);
