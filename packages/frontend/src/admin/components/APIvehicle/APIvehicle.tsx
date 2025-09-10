@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   TextField,
   Select,
@@ -12,7 +12,7 @@ import {
 import DataTable from '../table/table';
 import { fetchFilteredVehicles } from './fetch';
 
-const APIvehicle = () => {
+const APIvehicle :React.FC= () => {
   const [search, setSearch] = useState('');
   const [isActive, setIsActive] = useState<string>('');
   const [isCurrentlyParked, setIsCurrentlyParked] = useState<string>('');
@@ -23,7 +23,7 @@ const APIvehicle = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const loadData = async () => {
+  const loadData = useCallback (async () => {
     setLoading(true);
     setError('');
 
@@ -43,11 +43,12 @@ const APIvehicle = () => {
     } finally {
       setLoading(false);
     }
-  };
+  
+  }, [search, isActive, isCurrentlyParked, createdAt, updatedAt]); // תלות אמיתיות
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [loadData]);
 
   return (
     <Box sx={{ maxWidth: 1000, mx: 'auto', p: 3 }}>
