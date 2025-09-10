@@ -322,32 +322,16 @@ export default function AdminLogoManagement() {
         {logos.length === 0 && <Typography>No logos found.</Typography>}
         {logos.map((logo) => {
           const originalLogo = originalLogos.find(l => l.id === logo.id);
-          const isNewLogo = !originalLogo;
-          const nameFilled = logo.name && logo.name.trim() !== "";
-          const urlFilled = logo.url && logo.url.trim() !== "";
-          let isChanged: boolean;
-          if (isNewLogo) {
-            // New logo: allow save if either name or url is filled
-            const savedLogo = originalLogos.find(l => l.id === logo.id);
-            if (!savedLogo) {
-              isChanged = !!(nameFilled || urlFilled);
-            } else {
-              // If already saved, enable if either name or url is changed (not both required)
-              const nameChanged = logo.name !== (savedLogo.name || "");
-              const urlChanged = logo.url !== (savedLogo.url || "");
-              isChanged = nameChanged || urlChanged;
-            }
-          } else {
-            const nameChanged = logo.name !== (originalLogo.name || "");
-            const urlChanged = logo.url !== (originalLogo.url || "");
+          let isChanged: boolean = false;
+          if (originalLogo) {
+            // לוגו קיים: שינוי רק אם name או url שונים מהמקור
+            const nameChanged = (logo.name || "") !== (originalLogo.name || "");
+            const urlChanged = (logo.url || "") !== (originalLogo.url || "");
             isChanged = nameChanged || urlChanged;
+          } else {
+            // לוגו חדש: שינוי רק אם אחד מהשדות לא ריק (כלומר, הוזן ערך)
+            isChanged = !!((logo.name && logo.name.trim() !== "") || (logo.url && logo.url.trim() !== ""));
           }
-          if (isNewLogo && !isChanged && (logo.name || logo.url)) {
-            // Mark logo as "active" (i.e., no longer new)
-            // This happens automatically because originalLogos updates after save
-          }
-          // For new logo, save button is enabled only if there is a change in name or url and both are not empty
-          // For existing logo, only if there is a change
           return (
             <Box key={logo.id} sx={{ border: '2px solid #1976d2', p: 1.5, borderRadius: 3, boxShadow: 2, textAlign: 'center', minWidth: 180, bgcolor: '#f5f5f5', display: 'flex', flexDirection: 'column', alignItems: 'center', mr: 2, mb: 2, position: 'relative' }}>
               <LogoDeleteBox logo={logo} onDelete={handleDeleteLogo} />
