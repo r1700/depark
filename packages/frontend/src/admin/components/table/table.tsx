@@ -302,6 +302,9 @@ const DataTable: React.FC<DataTableProps> = ({
               <TableRow
                 key={idx}
                 hover={!!onRowClick}
+                onClick={() => {
+                  if (onRowClick) onRowClick(row);
+                }}
                 sx={{ cursor: 'default' }}
               >
                 {columns.map((column) => (

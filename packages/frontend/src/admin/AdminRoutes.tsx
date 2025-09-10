@@ -13,6 +13,9 @@ import ParkingsPage from "./Pages/ParkingsPage";
 import AdminUsersPage from "./Pages/adminUser/AdminUsersPage";
 import ParkingStatsPage from "./app/pages/parkingStats/parkingStats";
 import SurfaceStatsPage from "./app/pages/surfaceStats/surfaceStats";
+import FeedbackQuestions from "./components/feedbackQuestions/FeedbackQuestions";
+import FeedbackAnswersReports from "./components/FeedbackAnswersReports/FeedbackAnswersReports";
+import Dashboard from "./Pages/hrDashboard/DashboardPage";
 
 function getUserFromStorage() {
   try {
@@ -35,59 +38,61 @@ const AdminRoutes: React.FC = () => {
   }, [navigate]);
 
   return (
-    <Routes>
-      <Route path="login" element={<LoginScreen />} />
-
-      <Route
-        path=""
-        element={
-          !user ? (
-            <Navigate to="login" replace />
-          ) : String(user.role) === "2" ? (
-            <Navigate to="layout/admin" replace />
-          ) : (
-            <Navigate to="layout/hr-dashboard" replace />
-          )
-        }
-      />
-
-      <Route
-        path="layout/*"
-        element={
-          !user ? (
-            <Navigate to="/admin/login" replace />
-          ) : (
-            <Provider store={store}>
-              <Layout user={user} onLogout={handleLogout} />
-            </Provider>
-          )
-        }
-      >
-        <Route path="admin" element={<AdminDashboard />} />
-        <Route path="hr-dashboard" element={<HrDashboard />} />
-        <Route path="admin-config" element={<AdminConfigPage />} />
-        <Route path="parkings" element={<ParkingsPage />} />
-        <Route path="admin-users" element={<AdminUsersPage />} />
-
-        <Route path="reports">
-          <Route path="parking-stats" element={<ParkingStatsPage />} />
-          <Route path="surface-stats" element={<SurfaceStatsPage />} />
-        </Route>
+    <Provider store={store}>
+      <Routes>
+        <Route path="login" element={<LoginScreen />} />
 
         <Route
-          index
+          path=""
           element={
-            String(user?.role) === "2" ? (
-              <Navigate to="admin" replace />
+            !user ? (
+              <Navigate to="login" replace />
+            ) : String(user.role) === "2" ? (
+              <Navigate to="layout/admin" replace />
             ) : (
-              <Navigate to="hr-dashboard" replace />
+              <Navigate to="layout/hr-dashboard" replace />
             )
           }
-         />
-      </Route>
+        />
 
-      <Route path="*" element={<Navigate to="/admin" replace />} />
-    </Routes>
+        <Route
+          path="layout/*"
+          element={
+            !user ? (
+              <Navigate to="/admin/login" replace />
+            ) : (
+              <Layout user={user} onLogout={handleLogout} />
+            )
+          }
+        >
+          <Route path="admin" element={<Dashboard/>} />
+          <Route path="hr-dashboard" element={<Dashboard />} />
+          <Route path="admin-config" element={<AdminConfigPage />} />
+          <Route path="parkings" element={<ParkingsPage />} />
+          <Route path="admin-users" element={<AdminUsersPage />} />
+          <Route path="feedback" element={<FeedbackQuestions />} />
+
+          <Route path="reports">
+            <Route path="parking-stats" element={<ParkingStatsPage />} />
+            <Route path="surface-stats" element={<SurfaceStatsPage />} />
+            <Route path="feedback-answers" element={<FeedbackAnswersReports />} />
+          </Route>
+
+          <Route
+            index
+            element={
+              String(user?.role) === "2" ? (
+                <Navigate to="admin" replace />
+              ) : (
+                <Navigate to="hr-dashboard" replace />
+              )
+            }
+          />
+        </Route>
+
+        <Route path="*" element={<Navigate to="/admin" replace />} />
+      </Routes>
+    </Provider>
   );
 };
 

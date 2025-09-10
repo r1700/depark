@@ -5,6 +5,8 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useNavigate } from "react-router-dom";
 import GoogleAuth from "../google-auth/GoogleAuth";
+import { useSelector } from "react-redux";
+import { RootState } from "../../app/store";
 
 const API_BASE = process.env.REACT_APP_API_URL;
 
@@ -30,12 +32,15 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
     const [serverError, setServerError] = useState<string>("");
     const [loading, setLoading] = useState<boolean>(false);
     const navigate = useNavigate();
+    const loggedIn = useSelector((state: RootState) => state.auth.loggedIn);
+
+
 
     useEffect(() => {
-        if (login) {
+        if (loggedIn || login) {
             navigate("/admin", { replace: true });
         }
-    }, [login, navigate]);
+    }, [loggedIn, navigate, login]);
 
     const { control, handleSubmit, formState: { errors, isValid } } = useForm<IFormInputs>({
         resolver: yupResolver(schema),
@@ -160,16 +165,16 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
                     </Button>
                 </Box>
 
-                <GoogleAuth setLogin={setLogin} />
+                <GoogleAuth />
 
-                <Stack direction="row" justifyContent="center" sx={{ mt: 2 }} spacing={2}>
+                 <Stack direction="row" justifyContent="center" sx={{ mt: 2 }} spacing={2}>
                     <Link
                         component="button"
-                        variant="body1" // מגדיל את הטקסט
+                        variant="body1" 
                         onClick={() => navigate("/forgot-password")}
                         dir="ltr"
                         underline="hover"
-                        sx={{ fontSize: 20 }}  // מגדיל ומדגיש
+                        sx={{ fontSize: 20 }} 
                     >
                         Forgot password?
                     </Link>

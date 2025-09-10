@@ -16,7 +16,9 @@ import Login from './mobile/pages/Login';
 import { AuthProvider } from './mobile/auth/AuthContext';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import UnifiedEntry from './tablet/components/UnifiedEntry/UnifiedEntry';
-
+import Dashboard from '../src/admin/Pages/hrDashboard/DashboardPage'
+import { store } from './admin/app/store'; // ודא שזה הנתיב הנכון
+import { Provider } from 'react-redux';
 
 const routers = createBrowserRouter([
   {
@@ -30,6 +32,8 @@ const routers = createBrowserRouter([
       { path: 'reset-password', element: <ResetPassword /> },
       { path: 'VehicleRow', element: <VehicleRow /> },
       { path: 'Notifications', element: <Notifications /> },
+      { path: 'hr-dashboard', element: <Dashboard /> }
+
 
     ]
   }
@@ -42,11 +46,12 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID!}>
-      <AuthProvider>
-        <RouterProvider router={routers}></RouterProvider>
-      </AuthProvider>
+      <Provider store={store}>
+        <AuthProvider>
+          <RouterProvider router={routers}></RouterProvider>
+        </AuthProvider>
+      </Provider>
     </GoogleOAuthProvider>
   </React.StrictMode>,
 );
-
 reportWebVitals();

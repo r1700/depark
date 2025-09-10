@@ -21,6 +21,8 @@ import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
+import DashboardIcon from '@mui/icons-material/Dashboard'; // אייקון לדשבורד
+import { Message } from '@mui/icons-material';
 const drawerWidth = 240;
 
 type RoleName = 'admin' | 'hr' | 'guest';
@@ -28,7 +30,7 @@ type RoleName = 'admin' | 'hr' | 'guest';
 interface User {
     firstName: string;
     lastName: string;
-    role?: number | string; 
+    role?: number | string;
 }
 
 interface SidebarProps {
@@ -73,14 +75,17 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
             { text: 'Users', icon: <PeopleIcon />, path: '/layout/users', allowed: ['admin'] }, // רק מנהל
             { text: 'Admin', icon: <PeopleIcon />, path: '/admin/layout/admin-users', allowed: ['admin'] },
             { text: 'Vehicles', icon: <DirectionsCarIcon />, path: '/layout/vehicles', allowed: ['admin', 'hr'] }, // שניהם
+            
             {
                 text: 'Reports',
                 icon: <AssessmentIcon />,
                 path: '',
-                allowed: ['admin', 'hr'], 
+                allowed: ['admin', 'hr'],
                 subMenu: [
                     { text: 'Parking Stats', path: '/admin/layout/reports/parking-stats', allowed: ['admin'] },
                     { text: 'Surface Stats', path: '/admin/layout/reports/surface-stats', allowed: ['admin', 'hr'] },
+                    { text: 'Feedback Answers', path: '/admin/layout/reports/feedback-answers' },
+
                 ],
             },
         ];

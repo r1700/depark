@@ -10,7 +10,7 @@ import passwordRoutes from './routes/user.routes';
 import vehicleRoutes from './routes/vehicle';
 import exportToCSV from './routes/exportToCSV';
 import userGoogleAuthRoutes from './routes/userGoogle-auth';
-import Exit from './routes/opc/exit'; // Import the exit route
+import Exit from './routes/opc/exit';
 import faultsRouter from './routes/opc/faults';
 import techniciansRoutes from "./routes/opc/technicians";
 import http from 'http';
@@ -22,9 +22,9 @@ import authRoutes from './routes/auth';
 import importFromCsv from './routes/importFromCsv';
 import logoRouter from './routes/logos';
 import screenTypeRouter from './routes/screenType';
-import './cronJob'; // Import the cron job to ensure it runs on server start
-import vehicle from './routes/vehicleRoute';
+import './cronJob';
 import GoogleAuth from './routes/google-auth';
+import vehicle from './routes/vehicleRoute';
 import parkingReport from './routes/parkingStat';
 import surfaceReport from './routes/surfaceStat';
 import userApi from './routes/userApi';
@@ -32,13 +32,18 @@ import ResevedParking from './routes/reservedparkingApi';
 import retrieveRoute from './routes/RetrivalQueue';
 import otpRoutes from './routes/otp.server';
 import routes from './routes/mobile/mobileUserRoutes';
-import notifications from "./routes/mobile/notificationsRoutes"; 
-import  VehicleModelRouter  from './routes/vehicleModel';
-
+import notifications from "./routes/mobile/notificationsRoutes";
+import VehicleModelRouter from './routes/vehicleModel';
+import dashboardSatistics from './routes/dashboardStatistics.route';
+import { getDashboardSnapshot } from './services/dashboard/dashboardStatistics.service';
 import path from 'path';
+import feedbackQuestions from './routes/feedbackQuestions';
+import feedbackAnswers from './routes/feedbackAnswers';
+
 const app = express();
 const server = http.createServer(app);
-export const wss = new WebSocketServer({ server })
+export const wss = new WebSocketServer({ server });
+
 app.use(express.json());
 
 // --- DEBUG: log incoming requests and who sends responses ---
@@ -62,11 +67,13 @@ app.use((req, res, next) => {
     next();
 });
 // --- end DEBUG ---
+
 const PORT = process.env.PORT || 3001;
 
 if (process.env.NODE_ENV === 'production') {
     app.set('trust proxy', 1);
 }
+
 // Middleware for session management
 app.use(session({
     secret: process.env.SESSION_SECRET || 'keyboard cat',
@@ -97,7 +104,7 @@ const corsOptions = {
         'X-Requested-With'
     ],
     exposedHeaders: ['set-cookie'],
-    optionsSuccessStatus: 200 // For legacy browser support
+    optionsSuccessStatus: 200
 };
 
 app.use(cors(corsOptions));
@@ -106,8 +113,7 @@ if (!GOOGLE_CLIENT_ID) {
     throw new Error('Missing GOOGLE_CLIENT_ID');
 }
 
-
-// Global request logger — מדפיס כל בקשה נכנסת
+// Global request logger
 app.use((req, res, next) => {
     console.log(`[REQ] ${new Date().toISOString()} ${req.method} ${req.originalUrl} body:`, req.body);
     next();
@@ -126,9 +132,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', userApi);
 app.use('/api/reservedparking', ResevedParking);
 app.use('/api/auth', userGoogleAuthRoutes);
-app.use('/api/vehicles', vehicle)
+app.use('/api/vehicles', vehicle);
 app.use('/api/admin', adminConfigRouter);
-app.use('/OAuth', GoogleAuth);
 app.use('/api/admin', adminConfigRouter);
 app.use('/api/parking-stats', parkingReport);
 app.use('/api/surface-stats', surfaceReport);
@@ -138,17 +143,17 @@ app.use("/api", routes);
 app.use("/notifications", notifications);
 app.use('/api/importFromCsv', importFromCsv);
 app.use('/api/unknown-vehicles', VehicleModelRouter);
-
+app.use('/api/HR-statistics', dashboardSatistics);
 app.use('/api/logos', logoRouter);
 app.use('/api/screentypes', screenTypeRouter);
 app.use('/logos', express.static(path.join(process.cwd(), 'public/logos')));
-
-// Log all incoming requests
+app.use('/api/OAuth', GoogleAuth);
+app.use('/api/feedbackQuestions', feedbackQuestions);
+app.use('/api/feedbackAnswers', feedbackAnswers);
 app.use((req, res, next) => {
     console.log(`[${req.method}] ${req.path}`, req.body);
     next();
 });
-
 
 app.use("/api/opc", techniciansRoutes);
 app.use('/api/opc', faultsRouter);
@@ -174,12 +179,11 @@ function printRoutes() {
 
 printRoutes();
 
-// Start server - בסוף!
+// Start server
 app.get('/', (req, res) => {
     res.json({ message: 'DePark Backend is running!' });
 });
 
-// Health check route
 app.get('/health', (req, res) => {
     res.json({
         status: 'OK',
@@ -187,7 +191,7 @@ app.get('/health', (req, res) => {
     });
 });
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
     console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
     console.log(`🌐 CORS enabled for: ${CORS_ORIGIN}`);
@@ -222,3 +226,43 @@ app.listen(PORT, () => {
         console.log(':memo: Using mock data - Supabase not configured');
     }
 });
+
+// WebSocket setup (single instance)
+
+function heartbeat(this: any) {
+    (this as any).isAlive = true;
+}
+
+wss.on('connection', async (ws) => {
+    console.log('WS client connected');
+    (ws as any).isAlive = true;
+    ws.on('pong', heartbeat);
+    try {
+        const snapshot = await getDashboardSnapshot();
+        ws.send(JSON.stringify({ type: 'update', data: snapshot }));
+    } catch (err) {
+        console.error('Error sending initial snapshot:', err);
+    }
+});
+
+setInterval(async () => {
+    try {
+        const snapshot = await getDashboardSnapshot();
+        const message = JSON.stringify({ type: 'update', data: snapshot });
+        wss.clients.forEach((client: any) => {
+            if (client.readyState === 1) {
+                client.send(message);
+            }
+        });
+    } catch (err) {
+        console.error('Error broadcasting snapshot:', err);
+    }
+}, 1000);
+
+setInterval(() => {
+    wss.clients.forEach((ws: any) => {
+        if (ws.isAlive === false) return ws.terminate();
+        ws.isAlive = false;
+        ws.ping();
+    });
+}, 30000);
