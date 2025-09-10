@@ -75,9 +75,8 @@ app.post('/api/wait-for-node-change', async (req: Request, res: Response) => {
 });
 
 
-// start my code-rachel
 /**
- * API לקבלת תור של מעלית מה־PLC
+ * API to get queue for elevator from ־PLC
  * POST /api/opc/elevatorQueue
  * body: { elevatorId: string, floor: string, timeoutMs?: number }
  */
@@ -87,15 +86,15 @@ app.post('/api/opc/elevatorQueue', async (req, res) => {
     return res.status(400).json({ error: "Missing elevatorId or floor" });
   }
   try {
-    // בניית payload ושליחה ל־PLC
+    // build payload send to ־PLC
     const payload = `${elevatorId}|${floor}`;
     await writeNodeValues([{ nodeId: `ns=1;s=ElevatorQueueRequest`, value: payload }]);
-    // המתנה לערך חדש
+    // waiting for a new node
     const nodeId = `ns=1;s=ElevatorWaitingList`;
     console.log('try to read node id:', nodeId);
 
     const rawValue = await waitForNodeChange(nodeId, { timeout: timeoutMs });
-    // פירוש הערך
+    // Interpretation of the result
     let queue: any[] = [];
     if (rawValue === "[]" || rawValue === "" || rawValue == null) {
       queue = [];
@@ -132,7 +131,6 @@ app.listen(5000, () => {
   console.log("OPC Bridge API running on port 5000");
 });
 
-// end my code-rachel
 
 // Catch-all route for undefined endpoints
 app.use('/', (req: Request, res: Response) => {
