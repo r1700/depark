@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 
-const ForgotPassword = () => {
+const ForgotPassword : React.FC = () => {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const res = await fetch(`${process.env.REACT_APP_API_URL}/password/reset`, {
       method: "POST",
