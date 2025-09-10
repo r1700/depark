@@ -1,9 +1,7 @@
 import { OPCUAServer, Variant, DataType, StatusCodes ,VariantArrayType} from "node-opcua";
-
-//----------------------------
 // Start an OPC-UA server simulating a PLC
+
 export async function createPlcOpcServer() {
-  // Added userManager and allowAnonymous to require username and password
   const server = new OPCUAServer({
     port: 4080,
     resourcePath: "/UA/PLC",
@@ -12,15 +10,7 @@ export async function createPlcOpcServer() {
       buildNumber: "1",
       buildDate: new Date(),
     },
-    userManager: {
-      isValidUser: (username: string, password: string): boolean => {
-        // Define allowed username and password here
-        return username === "TestUser" && password === "Interpaz1234!";
-      },
-    },
-    allowAnonymous: false, // Username and password are required
   });
-
   await server.initialize();
 
   const addressSpace = server.engine.addressSpace!;
@@ -30,16 +20,16 @@ export async function createPlcOpcServer() {
     organizedBy: addressSpace.rootFolder.objects,
     browseName: "PLC",
   });
-
+  
   console.log("objectsFolder:", addressSpace.rootFolder.objects.nodeId.toString());
-  // Internal variables to simulate PLC state
+  // Internal variables to simulate state
+  // Each has its own nodeId
   let licensePlateEntry = "";
   let licensePlateExit = "";
   let parkingSpot = "";
   let vehicleExitRequest = ["", "", ""];
   let exitRequestApproval = ["", "", ""];
   // Add Outputs variables
-
   namespace.addVariable({
     componentOf: device,
     browseName: "licensePlateEntry",
@@ -110,6 +100,40 @@ export async function createPlcOpcServer() {
     },
   });
   
+  
+  namespace.addVariable({
+    componentOf: device,
+    browseName: "ElevatorWaitingList",
+    nodeId: "ns=1;s=ElevatorWaitingList",
+    dataType: "String",
+    minimumSamplingInterval: 1000,
+    value: {
+      get: () => new Variant({
+        dataType: DataType.String,
+        value: JSON.stringify([]) // או כל מבנה שאת רוצה
+      }),
+      set: (variant: Variant) => {
+        console.log("ElevatorWaitingList updated:", variant.value);
+        return StatusCodes.Good;
+      }
+    }
+  });
+
+  namespace.addVariable({
+    componentOf: device,
+    browseName: "QueueListRequest",
+    nodeId: "ns=1;s=QueueListRequest",
+    dataType: "String",
+    minimumSamplingInterval: 1000,
+    value: {
+      get: () => new Variant({ dataType: DataType.String, value: "" }),
+      set: (variant: Variant) => {
+        console.log("QueueListRequest updated:", variant.value);
+        return StatusCodes.Good;
+      }
+    }
+  });
+
   namespace.addVariable({
     componentOf: device,
     browseName: "ExitRequestApproval",
@@ -145,14 +169,13 @@ export async function createPlcOpcServer() {
     // licensePlateEntry = `ABC-${Math.floor(Math.random() * 1000)}`;
     // licensePlateExit = `XYZ-${Math.floor(Math.random() * 1000)}`;
     // parkingSpot = `Spot-${Math.floor(Math.random() * 100)}`;
-    exitRequestApproval = [
-      `ABC-${Math.floor(Math.random() * 1000)}`, // licensePlate
-      `${Math.floor(Math.random() * 10)}`, // position
-      `${Math.floor(Math.random() * 5)}:${Math.floor(Math.random() * 5)}` // assignedPickupSpot
-    ];
+    // exitRequestApproval = [
+    //   `ABC-${Math.floor(Math.random() * 1000)}`, // licensePlate
+    //   `${Math.floor(Math.random() * 10)}`, // position
+    //   `${Math.floor(Math.random() * 5)}:${Math.floor(Math.random() * 5)}` // assignedPickupSpot
+    // ];
   }, 2000); // Every 2 seconds
-  
-//----------------------------------
+
   await server.start();
   console.log(":white_check_mark: OPC-UA server running at:", server.endpoints[0].endpointDescriptions()[0].endpointUrl);
 }

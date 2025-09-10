@@ -16,10 +16,12 @@ import {
 import { sendDataToBackend } from "./backendService";
 import dotenv from 'dotenv';
 
-dotenv.config();
+dotenv.config({path:'../.env'});
 
 const { TARGET_URL, PLC_USERNAME, PLC_PASSWORD, TARGET_URL_MOCK } = process.env;
-const endpointUrl: string = TARGET_URL || `opc.tcp://${TARGET_URL_MOCK}/UA/PLC`;
+const endpointUrl: string = `opc.tcp://${TARGET_URL_MOCK}/UA/PLC`;
+// const endpointUrl: string = TARGET_URL || `opc.tcp://${TARGET_URL_MOCK}/UA/PLC`;
+
 
 let opcClient: OPCUAClient | null = null;
 let opcSession: ClientSession | null = null;
@@ -29,13 +31,13 @@ const nodesToMonitor = [
   "ns=1;s=parkingSpot",
   "ns=1;s=licensePlateExit",
   "ns=1;s=licensePlateEntry",
-  "ns=1;s=Queue",
-  "ns=1;s=ExitRequestApproval"
+  // "ns=1;s=ActiveFaultList", // רשימת תקלות
+  // "ns=1;s=Queue",
+  "ns=1;s=ElevatorWaitingList",//queue for specific elevator
+  "ns=1;s=QueueListRequest"//request for elevator queue
 ];
 
-// ----------------------------
-// Helpers
-// ----------------------------
+
 // Function to check if the session is valid
 function isChannelValid(session: ClientSession | null): boolean {
   return session ? session.sessionId !== null : false;
@@ -45,6 +47,7 @@ function isChannelValid(session: ClientSession | null): boolean {
 function isConnected(client: OPCUAClient | null): boolean {
   return client ? client.connectionStrategy.maxRetry === 0 : false;
 }
+console.log('end///////////',endpointUrl);
 
 
 // ----------------------------
@@ -52,17 +55,20 @@ function isConnected(client: OPCUAClient | null): boolean {
 // ----------------------------
 // Create or reuse an OPC UA client
 async function getOpcClient(): Promise<OPCUAClient> {
+
   if (!opcClient || !isConnected(opcClient)) {
     opcClient = OPCUAClient.create({
-      endpointMustExist: false,
-      securityMode: MessageSecurityMode.Sign,
-      securityPolicy: SecurityPolicy.Basic256Sha256,
-      connectionStrategy: {
-        initialDelay: 1000,
-        maxRetry: 3,
-      },
+      // endpointMustExist: false,
+      // securityMode: MessageSecurityMode.Sign,
+      // securityPolicy: SecurityPolicy.Basic256Sha256,
+      // connectionStrategy: {
+      //   initialDelay: 1000,
+      //   maxRetry: 3,
+      // },
     });
+
     try {
+      console.log("in getOpcClient!!!!!!!!!!!!!!!!!!!", endpointUrl);
       await opcClient.connect(endpointUrl);
       console.log(`Connected to OPC UA server at ${endpointUrl}`);
     } catch (err) {
@@ -74,6 +80,7 @@ async function getOpcClient(): Promise<OPCUAClient> {
 }
 // Ensure a valid session
 export async function ensureSession(): Promise<ClientSession> {
+
   try {
     if (!opcSession || !isChannelValid(opcSession)) {
       if (opcClient && isConnected(opcClient)) {
@@ -81,12 +88,16 @@ export async function ensureSession(): Promise<ClientSession> {
         console.log("Disconnected inactive OPC UA client");
       }
       opcClient = await getOpcClient();
+      console.log(`after opc client${opcClient}`);
+
+      console.log("in ensure session!!!!!!!!!!!!!!!!!!!");
+
       opcSession = await opcClient.createSession(
-        {
-          type: UserTokenType.UserName,
-          userName: PLC_USERNAME || "TestUser",
-          password: PLC_PASSWORD || "Interpaz1234!",
-        }
+        // {
+        //   type: UserTokenType.UserName,
+        //   userName: PLC_USERNAME || "TestUser",
+        //   password: PLC_PASSWORD || "Interpaz1234!",
+        // }
       );
       console.log("OPC UA session created");
     }
@@ -114,9 +125,7 @@ async function closeOpcConnection(): Promise<void> {
   }
 }
 
-// ----------------------------
-// Write Support
-// ----------------------------
+// Detect the data type of a value
 function detectDataType(value: any): { dataType: DataType; arrayType?: VariantArrayType } {
   if (Array.isArray(value)) {
     const elementType = typeof value[0];
@@ -157,7 +166,10 @@ export interface WriteItem {
 
 // Write values to OPC UA nodes
 export async function writeNodeValues(writeItems: WriteItem[]): Promise<void> {
+  console.log("in write node values!!!!!!!!!!!!!!!!!")
   await ensureSession();
+  console.log("after ensure session");
+
   if (!opcSession) {
     throw new Error("OPC session is not initialized");
   }
@@ -268,12 +280,12 @@ export async function createMonitoredItems(subscription: ClientSubscription): Pr
       } else if (nodeId === "ns=1;s=parkingSpot") {
         event = 'parkingSpot';
       }
-      else if (nodeId === "ns=1;s=Queue") {
-        event = 'Queue';
+      else if (nodeId === "ns=1;s=QueueListRequest") {
+        event = 'elevatorQueueRequest';
       }
-      // else if (nodeId === "ns=1;s=ActiveFaultList") {
-      //   event = 'fault';
-      // }
+      else if (nodeId === "ns=1;s=ElevatorWaitingList") {
+        event = 'elevatorWaitingList';
+      }
       else if (nodeId === "ns=1;s=ExitRequestApproval") {
         event = 'exitRequestApproval';
       }
@@ -335,4 +347,3 @@ process.on("SIGINT", async () => {
   await closeOpcConnection();
   process.exit(0);
 });
-
