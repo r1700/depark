@@ -46,10 +46,21 @@ const theme = createTheme({
         secondary: { main: '#dc004e' }
     }
 });
-const getInitialEmployeeId = () => {
-    // Change the key here according to how you saved the id in localStorage
-    return localStorage.getItem('employee_id') || '';
+const getInitialToken = () => {
+    return localStorage.getItem("token") || "";
 };
+const getInitialUserId = () => {   
+    return  localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user") || "{}").id : 'U1000';
+};
+   const getInitialrole = () => {
+    if (localStorage.getItem("user")) {
+        const role = JSON.parse(localStorage.getItem("user") || "{}").role;
+        if (role === 1) return "admin";
+        if (role === 2) return "HR";
+    }
+    return "user";
+};
+
 
 const initialForm = {
     baseuser_id: '',
@@ -58,11 +69,11 @@ const initialForm = {
     email: '',
     phone: '',
     department: '',
-    employee_id: getInitialEmployeeId(),
-    google_id: '',
+    employee_id: getInitialUserId(),
+    google_id: getInitialToken(),
     status: '',
     max_cars_allowed_parking: '',
-    created_by: '',
+    created_by: getInitialrole(),
     approved_by: '',
 };
 
@@ -139,6 +150,9 @@ export default function UsersConfigPage() {
         try {
           
             const today = new Date().toISOString();
+
+            const approved_by = form.status === "approved" ? getInitialrole() : "";
+
             const formToSave = {
                 first_name: form.firstName,
                 last_name: form.lastName,
@@ -146,11 +160,11 @@ export default function UsersConfigPage() {
                 phone: form.phone,
                 status: statusToNumber(form.status),
                 department: form.department,
-                employee_id: form.employee_id ? String(form.employee_id) : "0", // לשמור תמיד כטקסט
-                google_id: form.google_id || null,
+                employee_id: getInitialUserId(),
+                google_id: getInitialToken(),
                 max_cars_allowed_parking: Number(form.max_cars_allowed_parking),
-                created_by: form.created_by,
-                approved_by: form.approved_by,
+                created_by: getInitialrole(),
+                approved_by:approved_by,
                 approved_at: today
             };
 
@@ -180,7 +194,9 @@ export default function UsersConfigPage() {
             setEditId(null);
             setForm({
                 ...initialForm,
-                employee_id: getInitialEmployeeId()
+                employee_id: getInitialUserId(),
+                created_by: getInitialrole(),
+                google_id: getInitialToken()
             });
             dispatch(fetchUsers());
         } catch {
@@ -194,7 +210,9 @@ export default function UsersConfigPage() {
         setShowResetConfirm(false);
         setForm({
             ...initialForm,
-            employee_id: getInitialEmployeeId()
+            employee_id: getInitialUserId(),
+            created_by: getInitialrole(),
+            google_id: getInitialToken()
         });
         setEditId(null);
         setMessage({ type: 'success', text: 'Form reset!' });
@@ -278,12 +296,12 @@ export default function UsersConfigPage() {
                                         <MenuItem value="HR">HR</MenuItem>
 
                                     </TextField>
-                                    <TextField
+                                    {/* <TextField
                                         label="Employee ID"
                                         value={form.employee_id}
                                         fullWidth
                                         disabled
-                                    />
+                                    /> */}
                                     <TextField
                                         label="Status"
                                         select
@@ -309,26 +327,6 @@ export default function UsersConfigPage() {
                                         inputProps={{ min: 1, max: 10 }}
                                         fullWidth
                                     />
-                                    <TextField
-                                        label="Created By"
-                                        select
-                                        value={form.created_by}
-                                        onChange={e => setForm(prev => ({ ...prev, created_by: e.target.value }))}
-                                        fullWidth
-                                    >
-                                        <MenuItem value="HR">HR</MenuItem>
-                                        <MenuItem value="admin">admin</MenuItem>
-                                    </TextField>
-                                    <TextField
-                                        label="Approved By"
-                                        select
-                                        value={form.approved_by}
-                                        onChange={e => setForm(prev => ({ ...prev, approved_by: e.target.value }))}
-                                        fullWidth
-                                    >
-                                        <MenuItem value="HR">HR</MenuItem>
-                                        <MenuItem value="admin">admin</MenuItem>
-                                    </TextField>
                                 </Stack>
                             </CardContent>
                         </StyledCard>

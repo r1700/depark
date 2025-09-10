@@ -122,6 +122,8 @@ app.use('/api/parkingStatus',parkingStatus);
 import { initWebSocket } from './services/WS-server';
 // CURD to table parkingsessions
 import parkingsessionsCURD from './routes/parkingStatusFunc';
+import feedbackQuestions from './routes/feedbackQuestions';
+import feedbackAnswers from './routes/feedbackAnswers ';
 app.use('/api/parkingStatusCURD', parkingsessionsCURD);
 // WebSocket on server restart
 initWebSocket(server);
@@ -155,6 +157,8 @@ app.use('/api/protected',pritectedRoute);
 app.use('/api/logos', logoRouter);
 app.use('/api/screentypes', screenTypeRouter);
 app.use('/logos', express.static(path.join(process.cwd(), 'public/logos')));
+app.use('/api/feedbackQuestions', feedbackQuestions);
+app.use('/api/feedbackAnswers', feedbackAnswers);
 
 app.use('/api/tablet', Retrival);
 
@@ -231,5 +235,6 @@ app.listen(PORT, () => {
         console.log(':memo: Using mock data - Supabase not configured');
     }
 });
+
 // export { server };
 // export default app;

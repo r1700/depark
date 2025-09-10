@@ -7,6 +7,8 @@ import parkingStatsReducer from './pages/parkingStats/parkingStatsSlice';
 import surfaceStatsReducer from './pages/surfaceStats/surfaceStatsSlice';
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 import parkingStatusReducer from '../components/adminDashboard/parkingStatusSlice';
+import feedbackQuestionsReducer from '../components/feedbackQuestions/FeedbackQuestionsSlice';
+import feedbackAnswersReducer from '../components/FeedbackAnswersReports/FeedbackAnswersSlice';
 
 export const store = configureStore({
   reducer: {
@@ -17,6 +19,8 @@ export const store = configureStore({
     parkingStats: parkingStatsReducer,
     surfaceStats: surfaceStatsReducer,
     parkingStatus: parkingStatusReducer,
+    feedbackQuestions: feedbackQuestionsReducer,
+    feedbackAnswers: feedbackAnswersReducer,
   },
 });
 

@@ -19,8 +19,11 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import PeopleIcon from '@mui/icons-material/People';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import AssessmentIcon from '@mui/icons-material/Assessment';
+import ParkingIcon from '@mui/icons-material/LocalParking';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
+import { LogoDevOutlined } from '@mui/icons-material';
+import NessageIcon from '@mui/icons-material/Message';
 const drawerWidth = 240;
 
 type RoleName = 'admin' | 'hr' | 'guest';
@@ -28,7 +31,7 @@ type RoleName = 'admin' | 'hr' | 'guest';
 interface User {
     firstName: string;
     lastName: string;
-    role?: number | string; 
+    role?: number | string;
 }
 
 interface SidebarProps {
@@ -47,12 +50,12 @@ function normalizeRole(role: number | string | undefined): RoleName {
 
 const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
     const [open, setOpen] = useState<boolean>(true);
-    const [reportsOpen, setReportsOpen] = useState<boolean>(false);
+    const [openSubMenu, setOpenSubMenu] = useState<string | null>(null);
     const navigate = useNavigate();
 
     useEffect(() => {
         if (!open) {
-            setReportsOpen(false);
+            setOpenSubMenu(null);
         }
     }, [open]);
 
@@ -67,23 +70,38 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
         text: string;
         icon?: React.ReactNode;
         path?: string;
-        allowed?: RoleName[]; // אם לא קיים -> גלוי לכולם
+        allowed?: RoleName[];
         subMenu?: Array<{ text: string; path: string; allowed?: RoleName[] }>;
     }> = [
-            { text: 'Users', icon: <PeopleIcon />, path: '/layout/users', allowed: ['admin'] }, // רק מנהל
-            { text: 'Admin', icon: <PeopleIcon />, path: '/admin/layout/admin-users', allowed: ['admin'] },
-            { text: 'Vehicles', icon: <DirectionsCarIcon />, path: '/layout/vehicles', allowed: ['admin', 'hr'] }, // שניהם
+            {
+                text: 'Users', icon: <PeopleIcon />, path: '/admin/layout/users', allowed: ['admin', 'hr'], subMenu: [
+                    { text: 'All Users', path: '/admin/layout/users', allowed: ['admin', 'hr'] },
+                    { text: 'Admin Users', path: '/admin/layout/admin-users', allowed: ['admin'] },
+                ]
+            },
+            { text: 'Reserved Parking', icon: <ParkingIcon />, path: '/admin/layout/reserved-parking' },
+            { text: 'Logos', icon: <LogoDevOutlined />, path: '/admin/layout/logo-management', allowed: ['admin'] },
+            { text: 'Feedback', icon: <NessageIcon />, path: '/admin/layout/feedback', allowed: ['admin', 'hr'] },
+            {
+                text: 'Vehicles', icon: <DirectionsCarIcon />, path: '/admin/layout/unknown-vehicles', allowed: ['admin', 'hr'], subMenu: [
+                    { text: 'All Vehicles', path: '/admin/layout/vehicles', allowed: ['admin', 'hr'] },
+                    { text: 'Unrecognized Vehicles', path: '/admin/layout/unknown-vehicles', allowed: ['admin', 'hr'] },
+                ]
+            },
             {
                 text: 'Reports',
                 icon: <AssessmentIcon />,
                 path: '',
-                allowed: ['admin', 'hr'], 
+                allowed: ['admin', 'hr'],
                 subMenu: [
-                    { text: 'Parking Stats', path: '/admin/layout/reports/parking-stats', allowed: ['admin'] },
+                    { text: 'Parking Stats', path: '/admin/layout/reports/parking-stats', allowed: ['admin', 'hr'] },
                     { text: 'Surface Stats', path: '/admin/layout/reports/surface-stats', allowed: ['admin', 'hr'] },
-               { text: 'Parkings Occupancy', path: '/admin/layout/reports/parkings-occupancy', allowed: ['admin', 'hr'] },
+                    
+                    { text: 'Parkings Occupancy', path: '/admin/layout/reports/parking-occupancy', allowed: ['admin', 'hr'] },
+                { text: 'Feedback', path: '/admin/layout/reports/feedback-answers', allowed: ['admin', 'hr'] },
                 ],
             },
+            { text: 'Parking Lots', icon: <DirectionsCarIcon />, path: '/admin/layout/parkings', allowed: ['admin', 'hr'] },
         ];
 
     // helper: check if current user role allowed to see item
@@ -130,9 +148,26 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
             </Box>
 
             {open && (
-                <Box sx={{ px: 2, mb: 3, display: 'flex', justifyContent: 'center' }}>
-                    <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#fff' }}>
-                        Depark
+                <Box
+                    sx={{
+                        px: 2,
+                        mb: 3,
+                        display: 'flex',
+                        justifyContent: 'center',
+                        cursor: 'pointer',
+                    }}
+                    onClick={() => navigate('/admin')} // ניווט לנתיב הרצוי
+                >
+                    <Typography
+                        variant="h5"
+                        sx={{
+                            fontWeight: 'bold',
+                            color: '#fff',
+                            textAlign: 'center',
+                            '&:hover': { textDecoration: 'underline' },
+                        }}
+                    >
+                        DEPARK
                     </Typography>
                 </Box>
             )}
@@ -145,12 +180,14 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
                     // determine visible subMenu after filtering by allowed
                     const visibleSubMenu = item.subMenu?.filter((s) => isAllowed(s.allowed)) ?? [];
 
+                    const isThisSubMenuOpen = openSubMenu === item.text;
+
                     return (
                         <React.Fragment key={item.text}>
                             <ListItemButton
                                 onClick={() => {
                                     if (item.subMenu) {
-                                        setReportsOpen(!reportsOpen);
+                                        setOpenSubMenu(isThisSubMenuOpen ? null : item.text);
                                     } else if (item.path) {
                                         navigate(item.path);
                                     }
@@ -166,13 +203,13 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
                                 {open && <ListItemText primary={item.text} sx={{ ml: 2 }} />}
                                 {item.subMenu && open && (
                                     <IconButton sx={{ color: '#fff', ml: 2 }}>
-                                        {reportsOpen ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />}
+                                        {isThisSubMenuOpen ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />}
                                     </IconButton>
                                 )}
                             </ListItemButton>
 
                             {item.subMenu && visibleSubMenu.length > 0 && (
-                                <Collapse in={reportsOpen} timeout="auto" unmountOnExit>
+                                <Collapse in={isThisSubMenuOpen} timeout="auto" unmountOnExit>
                                     <List component="div" disablePadding>
                                         {visibleSubMenu.map((subItem) => (
                                             <ListItemButton
