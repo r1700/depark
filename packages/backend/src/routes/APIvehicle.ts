@@ -1,12 +1,11 @@
 import { Router, Request, Response } from 'express';
-import client from '../services/db/connection'; 
+import sequelize from '../config/sequelize';
+import { QueryTypes } from 'sequelize';
 
-const router = Router();
+const router: Router = Router();
 
 router.get('/', async (req: Request, res: Response) => {
   try {
-    console.log('Received /api/vehicles request, query:', req.query);
-
     const { search, is_active, is_currently_parked, created_at, updated_at } = req.query;
 
     let query = `
@@ -74,14 +73,12 @@ router.get('/', async (req: Request, res: Response) => {
 
     query += ` ORDER BY v.id ASC`;
 
-    console.log('Executing SQL:', query);
-    console.log('With values:', values);
+    const vehicles = await sequelize.query(query, {
+      bind: values,
+      type: QueryTypes.SELECT,
+    });
 
-    const { rows } = await client.query(query, values);
-
-    console.log(`DB returned ${rows.length} rows`);
-
-    return res.status(200).json({ success: true, vehicles: rows, filters: req.query });
+    return res.status(200).json({ success: true, vehicles, filters: req.query });
   } catch (error: any) {
     console.error('Database error:', error);
     return res.status(500).json({ success: false, error: error.message || 'Internal server error' });

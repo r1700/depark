@@ -1,15 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Button, TextField, Typography, Paper, Autocomplete, Checkbox, FormControlLabel, Snackbar, Alert } from '@mui/material';
-
+export const styleModal = {
+  position: 'absolute' as 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  borderRadius: 2,
+  p: 4,
+  width: { xs: '90%', sm: 400 },
+  align: 'center',
+};
 export type FieldConfig = {
   name: string;
   label: string;
   type?: FieldType;
   required?: boolean;
-  options?: { label: string; value: any }[]; 
+  options?: { label: string; value: any }[];
   disabled?: boolean | ((formData: any) => boolean);
 };
-
 export interface GenericFormProps {
   title: string;
   fields: FieldConfig[];
@@ -19,9 +27,7 @@ export interface GenericFormProps {
   entityToEdit?: Object | null;
   onChange?: (name: string, value: any) => void;
 }
-
 type FieldType = 'text' | 'number' | 'email' | 'select' | 'boolean';
-
 export const GenericForm = ({
   title = 'Form',
   fields,
@@ -33,18 +39,16 @@ export const GenericForm = ({
 }: GenericFormProps) => {
   const [formData, setFormData] = useState(initialState);
   const [errors, setErrors] = useState({} as Partial<Record<string, string>>);
-
   const [snackOpen, setSnackOpen] = useState(false);
   const [snackMessage, setSnackMessage] = useState<string>('');
   const [snackSeverity, setSnackSeverity] = useState<'success' | 'error' | 'info'>('success');
   const [lastSubmissionSuccess, setLastSubmissionSuccess] = useState<boolean | null>(null);
-
+console.log(formData);
   useEffect(() => {
     if (entityToEdit) {
       setFormData(entityToEdit);
     }
   }, [entityToEdit]);
-
   const isFieldDisabled = (field: FieldConfig, data: any) => {
     if (typeof field.disabled === 'function') {
       try {
@@ -55,11 +59,11 @@ export const GenericForm = ({
     }
     return !!field.disabled;
   };
-
+  console.log('Form Data:', formData);
+  console.log('entityToEdit:', entityToEdit);
   useEffect(() => {
     const updates: any = {};
     let shouldUpdate = false;
-
     fields.forEach((field) => {
       const disabled = isFieldDisabled(field, formData);
       const name = String(field.name);
@@ -73,24 +77,15 @@ export const GenericForm = ({
         }
       }
     });
-
     if (shouldUpdate) {
       setFormData((prev:any) => ({ ...prev, ...updates }));
     }
   }, [formData, fields]);
-
-  const cancel = () => {
-    setFormData(initialState);
-    onClose();
-    setErrors({});
-  };
-
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | any
   ) => {
     const target = e?.target ?? e;
     const { name, value, type, checked } = target;
-
     if (type === 'checkbox') {
       const newVal = !!checked;
       setFormData((prev:any) => ({ ...prev, [name]: newVal }));
@@ -98,36 +93,29 @@ export const GenericForm = ({
       if (onChange) onChange(String(name), newVal);
       return;
     }
-
     const parsedValue = type === 'number' ? Number(value) : value;
     setFormData((prev:any) => ({
       ...prev,
       [name]: parsedValue,
     }));
-
-    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: '' }));    
+    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: '' }));
     if (onChange) onChange(String(name), parsedValue);
   };
-
   const handleValidate = (): boolean => {
     const newErrors: Partial<Record<string, string>> = {};
     fields.forEach((field) => {
       if (isFieldDisabled(field, formData)) return;
-
       const value = formData[field.name];
-
       if (field.required && (value === undefined || value === null || value === '')) {
         newErrors[field.name] = `${field.label} is required`;
         return;
       }
-
       if (field.type === 'email' && value) {
         const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
         if (!emailRegex.test(String(value).trim())) {
           newErrors[field.name] = 'Invalid email address';
         }
       }
-
       if (field.type === 'number' && (value !== undefined && value !== null && value !== '')) {
         const numValue = Number(value);
         if (isNaN(numValue)) {
@@ -140,22 +128,18 @@ export const GenericForm = ({
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
   const openSnack = (message: string, severity: 'success' | 'error' | 'info') => {
     setSnackMessage(message);
     setSnackSeverity(severity);
     setSnackOpen(true);
   };
-
   const handleSubmit = async () => {
     if (!handleValidate()) {
       console.log('Validation failed', errors);
       return false;
     }
-
     try {
       console.log('Submitting form data:', formData);
-      
     const sanitizedData: Record<string, any> = {};
     for (const [key, value] of Object.entries(formData || {})) {
       if (value && typeof value === 'object') {
@@ -169,23 +153,19 @@ export const GenericForm = ({
       }
     }
   console.log('Sanitized data:', sanitizedData);
-  
       const result = await Promise.resolve(onSubmit(sanitizedData || {}));
-
       if (result && (result as any).meta && (result as any).meta.requestStatus === 'rejected') {
         const message = (result as any).error?.message || (result as any).payload?.message || 'Operation failed';
         openSnack(message, 'error');
         setLastSubmissionSuccess(false);
         return;
       }
-
       if (result && typeof result === 'object' && 'success' in result && result.success === false) {
         const message = (result as any).message || 'Operation failed';
         openSnack(message, 'error');
         setLastSubmissionSuccess(false);
         return;
       }
-
       openSnack('Saved successfully', 'success');
       setLastSubmissionSuccess(true);
       setFormData(initialState);
@@ -196,7 +176,6 @@ export const GenericForm = ({
       setLastSubmissionSuccess(false);
     }
   };
-
   const handleSnackClose = (_: any, reason?: string) => {
     if (reason === 'clickaway') return;
     setSnackOpen(false);
@@ -204,9 +183,8 @@ export const GenericForm = ({
       onClose();
     }
   };
-
   return (
-    <Paper sx={{ p: 4, maxWidth: 800, mx: 'auto', mt: 4, border: '2px solid #1976d2' }}>
+    <Paper sx={{ p: 4, maxWidth: 800, mx: 'auto', mt: 4, border: '2px solid #1976D2' }}>
       <Typography variant="h6" mb={2} color="primary" textAlign="center">
         {title}
       </Typography>
@@ -214,11 +192,9 @@ export const GenericForm = ({
         {fields.map((field) => {
           const disabled = isFieldDisabled(field, formData);
           const fieldKey = String(field.name);
-
           if (field.type === 'select') {
             const options = field.options || [];
             const selectedOption = options.find(opt => opt.value === (formData as any)[field.name]) || null;
-
             return (
               <Box sx={{ mb: 2 }} key={fieldKey}>
                 <Autocomplete
@@ -254,7 +230,6 @@ export const GenericForm = ({
               </Box>
             );
           }
-
           if (field.type === 'boolean') {
             return (
               <div key={fieldKey}>
@@ -275,7 +250,6 @@ export const GenericForm = ({
               </div>
             );
           }
-
           return (
             <TextField
               key={fieldKey}
@@ -302,7 +276,6 @@ export const GenericForm = ({
           Cancel
         </Button>
       </Box>
-
       <Snackbar open={snackOpen} autoHideDuration={3000} onClose={handleSnackClose} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
         <Alert onClose={handleSnackClose} severity={snackSeverity} sx={{ width: '100%' }}>
           {snackMessage}
@@ -311,6 +284,4 @@ export const GenericForm = ({
     </Paper>
   );
 };
-
 export default GenericForm;
-

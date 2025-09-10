@@ -26,41 +26,41 @@ async function loadImage(dataUrl: string): Promise<HTMLImageElement> {
 }
 
 /** convert ArrayBuffer -> base64 using FileReader (browser-safe) */
-function arrayBufferToBase64(buffer: ArrayBuffer): Promise<string> {
-  return new Promise((resolve, reject) => {
-    try {
-      const blob = new Blob([buffer]);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const dataUrl = reader.result as string;
-        const comma = dataUrl.indexOf(',');
-        const base64 = dataUrl.substring(comma + 1);
-        resolve(base64);
-      };
-      reader.onerror = (err) => reject(err);
-      reader.readAsDataURL(blob);
-    } catch (e) {
-      reject(e);
-    }
-  });
-}
+// function arrayBufferToBase64(buffer: ArrayBuffer): Promise<string> {
+//   return new Promise((resolve, reject) => {
+//     try {
+//       const blob = new Blob([buffer]);
+//       const reader = new FileReader();
+//       reader.onloadend = () => {
+//         const dataUrl = reader.result as string;
+//         const comma = dataUrl.indexOf(',');
+//         const base64 = dataUrl.substring(comma + 1);
+//         resolve(base64);
+//       };
+//       reader.onerror = (err) => reject(err);
+//       reader.readAsDataURL(blob);
+//     } catch (e) {
+//       reject(e);
+//     }
+//   });
+// }
 
 /** sanitize filename: remove illegal chars and trim length */
 function sanitizeFilename(name: string): string {
-  const cleaned = name.replace(/[\/\\:\*\?"<>\|\n\r\t]+/g, ' ').trim();
+  const cleaned = name.replace(/[/\\:*?"<>|\n\r\t]+/g, ' ').trim();
   return cleaned.substring(0, 160) || 'export';
 }
 
 /** embed font into jsPDF instance from a URL (fetch -> base64 -> addFileToVFS + addFont) */
-async function embedFontFromUrl(pdf: jsPDF, fontUrl: string, fontName = 'CustomFont'): Promise<void> {
-  const res = await fetch(fontUrl);
-  if (!res.ok) throw new Error(`Failed fetching font from ${fontUrl}: ${res.status}`);
-  const buffer = await res.arrayBuffer();
-  const base64 = await arrayBufferToBase64(buffer);
-  const fileName = `${fontName}.ttf`;
-  (pdf as any).addFileToVFS(fileName, base64);
-  (pdf as any).addFont(fileName, fontName, 'normal');
-}
+// async function embedFontFromUrl(pdf: jsPDF, fontUrl: string, fontName = 'CustomFont'): Promise<void> {
+//   const res = await fetch(fontUrl);
+//   if (!res.ok) throw new Error(`Failed fetching font from ${fontUrl}: ${res.status}`);
+//   const buffer = await res.arrayBuffer();
+//   const base64 = await arrayBufferToBase64(buffer);
+//   const fileName = `${fontName}.ttf`;
+//   (pdf as any).addFileToVFS(fileName, base64);
+//   (pdf as any).addFont(fileName, fontName, 'normal');
+// }
 
 /** detect presence of Hebrew characters */
 function containsHebrew(text?: string): boolean {

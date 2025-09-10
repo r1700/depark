@@ -2,10 +2,47 @@ import { Router } from 'express';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import { validateLoginData } from '../../src/validation/check';
-import { getId, getRole } from '../../src/services/db/operation';
-const router = Router();
+import sequelize from '../config/sequelize';
+import { QueryTypes } from 'sequelize';
+const router : Router= Router();
 const JWT_SECRET = process.env.JWT_SECRET;
 if (!JWT_SECRET) throw new Error("JWT_SECRET is not defined in environment variables");
+// פונקציה לשאוב id לפי אימייל
+const getId = async (email: string) => {
+  try {
+    const [result]: any = await sequelize.query(
+      `SELECT id FROM baseuser WHERE email = $1`,
+      { bind: [email], type: QueryTypes.SELECT }
+    );
+    return result?.id;
+  } catch (err) {
+    console.error("Query error in getId:", err);
+  }
+};
+// פונקציה לשאוב פרטי משתמש ותפקיד
+const getRole = async (id: string) => {
+  try {
+    const [result]: any = await sequelize.query(
+      `
+      SELECT
+        a.role,
+        a.permissions,
+        a.password_hash,
+        b.first_name,
+        b.last_name,
+        b.email,
+        b.id
+      FROM adminusers a
+      JOIN baseuser b ON a.baseuser_id = b.id
+      WHERE a.baseuser_id = $1
+      `,
+      { bind: [id], type: QueryTypes.SELECT }
+    );
+    return result;
+  } catch (err) {
+    console.error("Query error in getRole:", err);
+  }
+};
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
   try {

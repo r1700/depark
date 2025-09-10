@@ -1,7 +1,9 @@
 import { OPCUAServer, Variant, DataType, StatusCodes ,VariantArrayType} from "node-opcua";
-// Start an OPC-UA server simulating a PLC
 
+//----------------------------
+// Start an OPC-UA server simulating a PLC
 export async function createPlcOpcServer() {
+  // Added userManager and allowAnonymous to require username and password
   const server = new OPCUAServer({
     port: 4080,
     resourcePath: "/UA/PLC",
@@ -10,7 +12,15 @@ export async function createPlcOpcServer() {
       buildNumber: "1",
       buildDate: new Date(),
     },
+    userManager: {
+      isValidUser: (username: string, password: string): boolean => {
+        // Define allowed username and password here
+        return username === "TestUser" && password === "Interpaz1234!";
+      },
+    },
+    allowAnonymous: false, // Username and password are required
   });
+
   await server.initialize();
 
   const addressSpace = server.engine.addressSpace!;
@@ -20,18 +30,16 @@ export async function createPlcOpcServer() {
     organizedBy: addressSpace.rootFolder.objects,
     browseName: "PLC",
   });
-  
+
   console.log("objectsFolder:", addressSpace.rootFolder.objects.nodeId.toString());
-  // Internal variables to simulate state
-  // Each has its own nodeId
+  // Internal variables to simulate PLC state
   let licensePlateEntry = "";
   let licensePlateExit = "";
   let parkingSpot = "";
   let vehicleExitRequest = ["", "", ""];
-  //{ licensePlate: "", undergroundSpot: "", CustomerLocation: "" };
   let exitRequestApproval = ["", "", ""];
-  //{ licensePlate: "", position: "", assignedPickupSpot: "" };
   // Add Outputs variables
+
   namespace.addVariable({
     componentOf: device,
     browseName: "licensePlateEntry",
@@ -104,7 +112,7 @@ export async function createPlcOpcServer() {
   
   namespace.addVariable({
     componentOf: device,
-    browseName: "licensePlateEntry = `ABC-${Math.floor(Math.random() * 1000)}`",
+    browseName: "ExitRequestApproval",
     nodeId: "ns=1;s=ExitRequestApproval",
     dataType: "String", // סוג הנתונים הוא מחרוזת
     minimumSamplingInterval: 1000,
@@ -143,7 +151,8 @@ export async function createPlcOpcServer() {
       `${Math.floor(Math.random() * 5)}:${Math.floor(Math.random() * 5)}` // assignedPickupSpot
     ];
   }, 2000); // Every 2 seconds
-
+  
+//----------------------------------
   await server.start();
   console.log(":white_check_mark: OPC-UA server running at:", server.endpoints[0].endpointDescriptions()[0].endpointUrl);
 }

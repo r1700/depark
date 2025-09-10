@@ -279,7 +279,8 @@ const GenericStatsChart: React.FC<GenericStatsChartProps> = ({
                     data={dataTablePayload}
                     onRowClick={onTableRowClick}
                     enablePagination={false}
-                    showActions={false}
+                   showDelete={false}
+                   showEdit={false}
                     maxHeight={420}
                     dense={true}
                   />
@@ -367,7 +368,7 @@ const GenericStatsChart: React.FC<GenericStatsChartProps> = ({
             <TabContext value={view}>
               <Box sx={{ borderBottom: 1, borderColor: 'divider', position: 'relative', flex: 1 }}>
                 <TabList
-                  onChange={(_, newValue: string) => setView(newValue as 'table' | 'bar' | 'pie')}
+                  onChange={(_:React.SyntheticEvent, newValue: string) => setView(newValue as 'table' | 'bar' | 'pie')}
                   aria-label="view tabs"
                   centered
                   variant="standard"

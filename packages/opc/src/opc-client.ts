@@ -29,8 +29,13 @@ const nodesToMonitor = [
   "ns=1;s=parkingSpot",
   "ns=1;s=licensePlateExit",
   "ns=1;s=licensePlateEntry",
+  "ns=1;s=Queue",
+  "ns=1;s=ExitRequestApproval"
 ];
 
+// ----------------------------
+// Helpers
+// ----------------------------
 // Function to check if the session is valid
 function isChannelValid(session: ClientSession | null): boolean {
   return session ? session.sessionId !== null : false;
@@ -41,17 +46,21 @@ function isConnected(client: OPCUAClient | null): boolean {
   return client ? client.connectionStrategy.maxRetry === 0 : false;
 }
 
+
+// ----------------------------
+// Client / Session Management
+// ----------------------------
 // Create or reuse an OPC UA client
 async function getOpcClient(): Promise<OPCUAClient> {
   if (!opcClient || !isConnected(opcClient)) {
     opcClient = OPCUAClient.create({
-      // endpointMustExist: false,
-      // securityMode: MessageSecurityMode.Sign,
-      // securityPolicy: SecurityPolicy.Basic256Sha256,
-      // connectionStrategy: {
-      //   initialDelay: 1000,
-      //   maxRetry: 3,
-      // },
+      endpointMustExist: false,
+      securityMode: MessageSecurityMode.Sign,
+      securityPolicy: SecurityPolicy.Basic256Sha256,
+      connectionStrategy: {
+        initialDelay: 1000,
+        maxRetry: 3,
+      },
     });
     try {
       await opcClient.connect(endpointUrl);
@@ -63,7 +72,6 @@ async function getOpcClient(): Promise<OPCUAClient> {
   }
   return opcClient;
 }
-
 // Ensure a valid session
 export async function ensureSession(): Promise<ClientSession> {
   try {
@@ -74,11 +82,11 @@ export async function ensureSession(): Promise<ClientSession> {
       }
       opcClient = await getOpcClient();
       opcSession = await opcClient.createSession(
-        // {
-        //   type: UserTokenType.UserName,
-        //   userName: PLC_USERNAME || "TestUser",
-        //   password: PLC_PASSWORD || "Interpaz1234!",
-        // }
+        {
+          type: UserTokenType.UserName,
+          userName: PLC_USERNAME || "TestUser",
+          password: PLC_PASSWORD || "Interpaz1234!",
+        }
       );
       console.log("OPC UA session created");
     }
@@ -106,7 +114,9 @@ async function closeOpcConnection(): Promise<void> {
   }
 }
 
-// Detect the data type of a value
+// ----------------------------
+// Write Support
+// ----------------------------
 function detectDataType(value: any): { dataType: DataType; arrayType?: VariantArrayType } {
   if (Array.isArray(value)) {
     const elementType = typeof value[0];
@@ -212,7 +222,7 @@ export async function createSubscription(): Promise<ClientSubscription> {
   });
 
   subscription.on("keepalive", () => {
-    console.log("🔄 Subscription keepalive: Connection is active");
+    // console.log("🔄 Subscription keepalive: Connection is active");
   });
 
   subscription.on("status_changed", (status) => {
@@ -257,6 +267,15 @@ export async function createMonitoredItems(subscription: ClientSubscription): Pr
         event = 'entry';
       } else if (nodeId === "ns=1;s=parkingSpot") {
         event = 'parkingSpot';
+      }
+      else if (nodeId === "ns=1;s=Queue") {
+        event = 'Queue';
+      }
+      // else if (nodeId === "ns=1;s=ActiveFaultList") {
+      //   event = 'fault';
+      // }
+      else if (nodeId === "ns=1;s=ExitRequestApproval") {
+        event = 'exitRequestApproval';
       }
       console.log(`🔄 Node ${nodeId} changed:`, val);
       await sendDataToBackend(event, val);

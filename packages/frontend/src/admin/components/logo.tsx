@@ -7,9 +7,7 @@ import Typography from '@mui/material/Typography';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import Select from '@mui/material/Select';
-import OutlinedInput from '@mui/material/OutlinedInput';
 import Chip from '@mui/material/Chip';
-import { useNavigate } from "react-router-dom";
 import CircularProgress from "@mui/material/CircularProgress";
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
@@ -38,40 +36,19 @@ export default function AdminLogoManagement() {
   const [prevSelectedLogos, setPrevSelectedLogos] = useState<{ [key: string]: string[] }>({});
   const [overlayMessage, setOverlayMessage] = useState<string | null>(null);
   const [overlayType, setOverlayType] = useState<'success' | 'error' | null>(null);
+  // State for MUI Menu anchor elements per screen type
   const [anchorEl, setAnchorEl] = useState<{ [key: string]: HTMLElement | null }>({});
   const [overlayVisible, setOverlayVisible] = useState(false);
   const [logoDialogOpen, setLogoDialogOpen] = useState(false);
   const [selectedScreenType, setSelectedScreenType] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [errorVisible, setErrorVisible] = useState(false);
+  // מערך לוגואים שממתינים להעלאה
+  // State for pending logos
   const [pendingLogos, setPendingLogos] = useState<File[]>([]);
-  const [pendingLogosVersion, setPendingLogosVersion] = useState(0);
-  // בדיקה האם יש שינוי בלוגואים של screenType
-  function isScreenTypeChanged(screenType: string) {
-    const current = selectedLogos[screenType] || [];
-    const prev = prevSelectedLogos[screenType] || [];
-    return JSON.stringify(current) !== JSON.stringify(prev);
-  }
+  const [, setPendingLogosVersion] = useState(0);
 
-  // עדכן prevSelectedLogos רק אחרי טעינה ראשונית של screenTypeLogos
-  useEffect(() => {
-    const fetchScreenTypeLogos = async () => {
-      const result: { [key: string]: string[] } = {};
-      for (const type of SCREEN_TYPES) {
-        try {
-          const res = await fetch(`${API_BASE}/api/screentypes/${type}/logos`);
-          const data = await res.json();
-          result[type] = (data.logoIds || []).map(String);
-        } catch {
-          result[type] = [];
-        }
-      }
-      setSelectedLogos(result);
-      setPrevSelectedLogos(result); // עדכון ראשוני בלבד
-    };
-    fetchScreenTypeLogos();
-  }, []);
+  // Remove prevSelectedLogos update on every logos/selectedLogos change
+  // Instead, update prevSelectedLogos only after successful save
 
   useEffect(() => {
     fetch(`${API_BASE}/api/logos`)
@@ -84,7 +61,16 @@ export default function AdminLogoManagement() {
         setLogos([]);
         if (originalLogos.length === 0) setOriginalLogos([]);
       });
-  }, []);
+  }, [originalLogos.length]);
+
+  // When selectedLogos is fetched, set prevSelectedLogos to match (only on initial fetch)
+  useEffect(() => {
+    // Only set if prevSelectedLogos is empty (first load)
+    if (Object.keys(prevSelectedLogos).length === 0 && Object.keys(selectedLogos).length > 0) {
+      setPrevSelectedLogos({ ...selectedLogos });
+    }
+
+  }, [selectedLogos, prevSelectedLogos]);
 
   useEffect(() => {
     const fetchScreenTypeLogos = async () => {
@@ -114,11 +100,6 @@ export default function AdminLogoManagement() {
     }
   }, [overlayMessage]);
 
-  // Dialog logic
-  const openLogoDialog = (screenType: string) => {
-    setSelectedScreenType(screenType);
-    setLogoDialogOpen(true);
-  };
   const closeLogoDialog = () => {
     setLogoDialogOpen(false);
     setSelectedScreenType(null);
@@ -147,11 +128,6 @@ export default function AdminLogoManagement() {
 
   // Save selected logos for a screen type to the server
   const handleSaveScreenTypeLogos = async (screenType: string) => {
-    if (!isScreenTypeChanged(screenType)) {
-      setOverlayMessage("לא בוצע שינוי בלוגואים");
-      setOverlayType('error');
-      return;
-    }
     const logoIds = selectedLogos[screenType] || [];
     setIsLoading(true);
     try {
@@ -164,11 +140,8 @@ export default function AdminLogoManagement() {
       if (response.ok) {
         setOverlayMessage(`Logos saved successfully for ${screenType}!`);
         setOverlayType('success');
-        // עדכן את prevSelectedLogos לערך החדש
-        setPrevSelectedLogos(prev => ({
-          ...prev,
-          [screenType]: [...logoIds]
-        }));
+        // Update prevSelectedLogos only after successful save
+        setPrevSelectedLogos(prev => ({ ...prev, [screenType]: [...logoIds] }));
       } else {
         const errorData = await response.json();
         if (errorData && errorData.missingIds) {
@@ -190,38 +163,6 @@ export default function AdminLogoManagement() {
     }
   };
 
-  // Remove a logo from a screen type selection and update server
-  const handleRemoveLogoFromScreenType = (screenType: string, logoId: string) => {
-    const updated = (selectedLogos[screenType] || []).filter(id => id !== logoId);
-    setSelectedLogos(prev => ({ ...prev, [screenType]: updated }));
-    setIsLoading(true);
-    fetch(`${API_BASE}/api/screentypes/${screenType}/logos`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ logoIds: updated }),
-      credentials: "include",
-    })
-      .then(response => {
-        if (response.ok) {
-          setOverlayMessage(`Logo removed successfully from ${screenType}!`);
-          setOverlayType('success');
-          // רענון הבחירה מהשרת
-          fetch(`${API_BASE}/api/screentypes/${screenType}/logos`)
-            .then(res => res.json())
-            .then(data => {
-              setSelectedLogos(prev => ({ ...prev, [screenType]: data.logoIds.map(String) }));
-            });
-        } else {
-          setOverlayMessage(`Error removing logo from ${screenType}`);
-          setOverlayType('error');
-        }
-      })
-      .catch(() => {
-        setOverlayMessage("Error removing logo");
-        setOverlayType('error');
-      })
-      .finally(() => setIsLoading(false));
-  };
   // עדכון סטייט אחרי מחיקה דרך הדיאלוג בלבד
   const handleDeleteLogo = async (id: number) => {
     const API_BASE = "http://localhost:3001";

@@ -8,7 +8,7 @@ import {
   fetchParkingStats,
   fetchParkingDayDetails,
   clearParkingDayDetails,
-} from '../../pages/parkingStats/parkingStatsSlice';
+} from './parkingStatsSlice';
 
 interface ParkingStatItem {
   day: string;
@@ -27,18 +27,16 @@ const ParkingStatsPage: React.FC = () => {
     error,
     dayData: rawDayData,
     dayLoading,
-    dayError,
     selectedDay,
   } = useAppSelector((state) => state.parkingStats);
 
   // AbortControllers
   const mainAbortRef = useRef<AbortController | null>(null);
-  const dayAbortRef = useRef<AbortController | null>(null);
+  // const dayAbortRef = useRef<AbortController | null>(null);
 
   // UI state
   const [selectedRow, setSelectedRow] = useState<string | null>(null);
   const [retryMain, setRetryMain] = useState(0);
-  const [retryDay, setRetryDay] = useState(0);
 
   // Main fetch with abort
   useEffect(() => {
@@ -52,22 +50,18 @@ const ParkingStatsPage: React.FC = () => {
   const data: ParkingStatItem[] = useMemo(() => {
     if (!Array.isArray(rawData)) return [];
     return rawData.map((item: any) => {
-      if (!item.period) {
-        return {
-          day: '',
-          hour: '',
-          period: '',
-          monthYear: '',
-          entries: Number(item.entries) || 0,
-          exits: Number(item.exits) || 0,
-        };
+      const period = item && typeof item.period === 'string' ? item.period : '';
+      let date;
+      try {
+        date = parseISO(period);
+      } catch {
+        date = new Date('');
       }
-      const date = parseISO(item.period);
       return {
-        day: format(date, 'd'),
-        hour: format(date, 'HH:00'),
-        period: item.period,
-        monthYear: format(date, 'MMM yyyy'),
+        day: isValid(date) ? format(date, 'd') : '',
+        hour: isValid(date) ? format(date, 'HH:00') : '',
+        period: period,
+        monthYear: isValid(date) ? format(date, 'MMM yyyy') : '',
         entries: Number(item.entries) || 0,
         exits: Number(item.exits) || 0,
       };
@@ -77,22 +71,18 @@ const ParkingStatsPage: React.FC = () => {
   const selectedDayData: ParkingStatItem[] | null = useMemo(() => {
     if (!Array.isArray(rawDayData)) return null;
     return rawDayData.map((item: any) => {
-      if (!item.period) {
-        return {
-          day: '',
-          hour: '',
-          period: '',
-          monthYear: '',
-          entries: Number(item.entries) || 0,
-          exits: Number(item.exits) || 0,
-        };
+      const period = item && typeof item.period === 'string' ? item.period : '';
+      let date;
+      try {
+        date = parseISO(period);
+      } catch {
+        date = new Date('');
       }
-      const date = parseISO(item.period);
       return {
-        day: format(date, 'd'),
-        hour: format(date, 'HH:00'),
-        period: item.period,
-        monthYear: format(date, 'MMM yyyy'),
+        day: isValid(date) ? format(date, 'd') : '',
+        hour: isValid(date) ? format(date, 'HH:00') : '',
+        period: period,
+        monthYear: isValid(date) ? format(date, 'MMM yyyy') : '',
         entries: Number(item.entries) || 0,
         exits: Number(item.exits) || 0,
       };
@@ -197,10 +187,10 @@ const ParkingStatsPage: React.FC = () => {
     </div>
   );
 
-  // Highlight selected row
-  const getRowProps = useCallback((row: any) => ({
-    style: selectedRow && row.period === selectedRow ? { background: '#e3f2fd' } : undefined
-  }), [selectedRow]);
+  // // Highlight selected row
+  // const getRowProps = useCallback((row: any) => ({
+  //   style: selectedRow && row.period === selectedRow ? { background: '#e3f2fd' } : undefined
+  // }), [selectedRow]);
 
   // Main render
   if (loading) return renderLoading();
@@ -251,7 +241,7 @@ const ParkingStatsPage: React.FC = () => {
             tableRows={selectedDayData}
           />
           {dayLoading && renderLoading(18)}
-          {dayError && renderError(`Error loading day details: ${String(dayError)}`, () => setRetryDay(r => r + 1))}
+          
         </div>
       ) : (
         <GenericStatsChart

@@ -3,7 +3,7 @@ import multer from 'multer';
 import path from 'path';
 import {Logo} from '../model/database-models/logo.model';
 import { Router } from 'express';
-const router = Router();
+const router: Router = Router();
 
 // Multer setup for file uploads
 const storage = multer.diskStorage({

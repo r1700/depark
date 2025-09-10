@@ -29,7 +29,7 @@ type RoleName = 'admin' | 'hr' | 'guest';
 interface User {
     firstName: string;
     lastName: string;
-    role?: number | string; // מקור השרת
+    role?: number | string; 
 }
 interface SidebarProps {
     user: User;
@@ -67,20 +67,20 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
         allowed?: RoleName[];
         subMenu?: Array<{ text: string; path: string; allowed?: RoleName[] }>;
     }> = [
-    { text: 'Users', icon: <PeopleIcon />, path: '/admin/layout/users' },
-    { text: 'Vehicles', icon: <DirectionsCarIcon />, path: '/admin/layout/vehicles' },
-        {
-            text: 'Reports',
-            icon: <AssessmentIcon />,
-            path: '',
-            subMenu: [
-                { text: 'Parking Stats', path: '/admin/layout/reports/parking-stats' },
-                { text: 'Surface Stats', path: '/admin/layout/reports/surface-stats' },
-            ],
-        },
-    { text: 'Parking Config', icon: <LocalParkingIcon />, path: '/admin/layout/parkings' },
-    { text: 'Logo Management', icon: <PhotoIcon />, path: '/admin/layout/logos' },
-       
+            { text: 'Users', icon: <PeopleIcon />, path: '/layout/users', allowed: ['admin'] }, // רק מנהל
+            { text: 'Admin', icon: <PeopleIcon />, path: '/admin/layout/admin-users', allowed: ['admin'] },
+            { text: 'Vehicles', icon: <DirectionsCarIcon />, path: '/layout/vehicles', allowed: ['admin', 'hr'] }, // שניהם
+            {
+                text: 'Reports',
+                icon: <AssessmentIcon />,
+                path: '',
+                allowed: ['admin', 'hr'], 
+                subMenu: [
+                    { text: 'Parking Stats', path: '/admin/layout/reports/parking-stats', allowed: ['admin'] },
+                    { text: 'Surface Stats', path: '/admin/layout/reports/surface-stats', allowed: ['admin', 'hr'] },
+               { text: 'Parkings Occupancy', path: '/admin/layout/reports/parkings-occupancy', allowed: ['admin', 'hr'] },
+                ],
+            },
         ];
     // helper: check if current user role allowed to see item
     // כל אחד יכול לראות הכל
@@ -124,7 +124,7 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
             {open && (
                 <Box sx={{ px: 2, mb: 3, display: 'flex', justifyContent: 'center' }}>
                     <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#fff' }}>
-                        DEPARK
+                        Depark
                     </Typography>
                 </Box>
             )}

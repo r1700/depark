@@ -1,18 +1,19 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { addUser, fetchUsers, updateUser } from './userThunks';
+import { addUser, fetchUsers, updateUser,uploadCsvFile } from './userThunks';
 import { User } from '../../types/User'
-
 
 export interface UserState {
   users: User[];
   loading: boolean;
   error: string | null;
+  uploadResult?: any;
 }
-
-const initialState: UserState = {
+export const initialState: UserState = {
   users: [],
   loading: false,
   error: null,
+   uploadResult: undefined,
+
 };
 
 export const userSlice = createSlice({
@@ -31,8 +32,8 @@ export const userSlice = createSlice({
       })
       .addCase(fetchUsers.fulfilled, (state, action) => {
         state.loading = false;
-        // state.users = action.payload; // חשוב!
-        state.error = null;
+        state.users = action.payload; // חובה לשים!
+       state.error = null;
       })
       .addCase(fetchUsers.rejected, (state, action) => {
         state.loading = false;
@@ -63,7 +64,20 @@ export const userSlice = createSlice({
       .addCase(updateUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || 'Update failed';
+      })
+      .addCase(uploadCsvFile.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(uploadCsvFile.fulfilled, (state, action) => {
+        console.log(action.payload); // כאן תראה את התשובה
+        state.uploadResult = action.payload;
+      })
+      .addCase(uploadCsvFile.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Update failed';
       });
+
   },
 });
 

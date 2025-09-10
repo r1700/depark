@@ -2,7 +2,7 @@ import { Router } from 'express';
 import sequelize from '../config/sequelize';
 import { QueryTypes } from 'sequelize';
 
-const router = Router();
+const router : Router = Router();
 
 router.get('/stats', async (req, res) => {
   try {
