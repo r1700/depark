@@ -81,6 +81,7 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onLogout }) => {
                 subMenu: [
                     { text: 'Parking Stats', path: '/admin/layout/reports/parking-stats', allowed: ['admin'] },
                     { text: 'Surface Stats', path: '/admin/layout/reports/surface-stats', allowed: ['admin', 'hr'] },
+               { text: 'Parkings Occupancy', path: '/admin/layout/reports/parkings-occupancy', allowed: ['admin', 'hr'] },
                 ],
             },
         ];
