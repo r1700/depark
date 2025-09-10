@@ -36,6 +36,8 @@ export const VehicleRegistrationForm = ({ onSuccess }: VehicleRegistrationFormPr
   const [serverError, setServerError] = useState("");
   const [success, setSuccess] = useState(false);
 
+  const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
+
   const {
     register,
     handleSubmit,
@@ -52,7 +54,7 @@ export const VehicleRegistrationForm = ({ onSuccess }: VehicleRegistrationFormPr
         setSuccess(false);
         return;
       }
-      await axios.post("/api/vehicles2", {
+      await axios.post(`${API_BASE}/vehicles2`, {
         ...data,
         baseuser_id,
         dimension_overrides: {
@@ -224,5 +226,5 @@ export const VehicleRegistrationForm = ({ onSuccess }: VehicleRegistrationFormPr
   );
 };
 
- 
+
 
