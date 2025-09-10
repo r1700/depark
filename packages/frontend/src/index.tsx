@@ -16,6 +16,8 @@ import Login from './mobile/pages/Login';
 import { AuthProvider } from './mobile/auth/AuthContext';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import UnifiedEntry from './tablet/components/UnifiedEntry/UnifiedEntry';
+import VehicleQueue from './tablet/components/VehicleQueue/VehicleQueue';
+import AdminLogoManagement from './admin/components/logo';
 
 
 const routers = createBrowserRouter([
@@ -30,6 +32,8 @@ const routers = createBrowserRouter([
       { path: 'reset-password', element: <ResetPassword /> },
       { path: 'VehicleRow', element: <VehicleRow /> },
       { path: 'Notifications', element: <Notifications /> },
+      { path: 'VehicleQueue', element: <VehicleQueue /> },
+      { path: 'AdminLogoManagement', element: <AdminLogoManagement /> },
 
     ]
   }

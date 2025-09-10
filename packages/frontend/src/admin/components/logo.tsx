@@ -26,7 +26,7 @@ type Logo = {
   name?: string;
   url?: string;
 };
-const API_BASE = "http://localhost:3001";
+const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
 
 export default function AdminLogoManagement() {
   const [isDragOver, setIsDragOver] = useState(false);
@@ -51,7 +51,7 @@ export default function AdminLogoManagement() {
   // Instead, update prevSelectedLogos only after successful save
 
   useEffect(() => {
-    fetch(`${API_BASE}/api/logos`)
+    fetch(`${API_BASE}/logos`)
       .then((res) => res.json())
       .then((data) => {
         setLogos(data.logos);
@@ -77,7 +77,7 @@ export default function AdminLogoManagement() {
       const result: { [key: string]: string[] } = {};
       for (const type of SCREEN_TYPES) {
         try {
-          const res = await fetch(`${API_BASE}/api/screentypes/${type}/logos`);
+          const res = await fetch(`${API_BASE}/screentypes/${type}/logos`);
           const data = await res.json();
           result[type] = (data.logoIds || []).map(String);
         } catch {
@@ -131,7 +131,7 @@ export default function AdminLogoManagement() {
     const logoIds = selectedLogos[screenType] || [];
     setIsLoading(true);
     try {
-      const response = await fetch(`${API_BASE}/api/screentypes/${screenType}/logos`, {
+      const response = await fetch(`${API_BASE}/screentypes/${screenType}/logos`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ logoIds }),
@@ -165,13 +165,13 @@ export default function AdminLogoManagement() {
 
   // עדכון סטייט אחרי מחיקה דרך הדיאלוג בלבד
   const handleDeleteLogo = async (id: number) => {
-    const API_BASE = "http://localhost:3001";
+const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
     try {
       // לא למחוק ישירות, רק לעדכן סטייט אחרי דיאלוג
   setOverlayMessage("Logo deleted successfully!");
   setOverlayType('success');
       // Always fetch latest logos from server after deletion
-      const res = await fetch(`${API_BASE}/api/logos`);
+      const res = await fetch(`${API_BASE}/logos`);
       if (res.ok) {
         const data = await res.json();
         setLogos(data.logos);
@@ -232,7 +232,7 @@ export default function AdminLogoManagement() {
         const formData = new FormData();
         formData.append("logo", file);
         formData.append("updatedBy", updatedBy);
-        const response = await fetch(`${API_BASE}/api/logos/upload`, {
+        const response = await fetch(`${API_BASE}/logos/upload`, {
           method: "POST",
           body: formData,
           credentials: "include",
@@ -246,7 +246,7 @@ export default function AdminLogoManagement() {
       }
       setOverlayMessage("Logos saved successfully!");
       setOverlayType('success');
-      fetch(`${API_BASE}/api/logos`)
+      fetch(`${API_BASE}/logos`)
         .then((res) => res.json())
         .then((data) => setLogos(data.logos));
       setPendingLogos([]);
@@ -405,7 +405,7 @@ export default function AdminLogoManagement() {
                     if (!isChanged) return;
                     try {
                       const now = new Date().toISOString();
-                      const response = await fetch(`${API_BASE}/api/logos/${logo.id}`, {
+                      const response = await fetch(`${API_BASE}/logos/${logo.id}`, {
                         method: "PUT",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ name: logo.name, url: logo.url, logoUrl: logo.logoUrl, updatedBy: logo.updatedBy, updatedAt: now }),
@@ -670,7 +670,7 @@ type LogoDeleteBoxProps = {
 };
 const LogoDeleteBox: React.FC<LogoDeleteBoxProps> = ({ logo, onDelete }) => {
   const [open, setOpen] = React.useState(false);
-  const API_BASE = "http://localhost:3001";
+const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
   const [deleteLoading, setDeleteLoading] = React.useState(false);
   return (
     <>
@@ -698,7 +698,7 @@ const LogoDeleteBox: React.FC<LogoDeleteBoxProps> = ({ logo, onDelete }) => {
       </IconButton>
       <DeleteConfirmDialog
         itemData={{ name: logo.name, id: logo.id }}
-        deletePath={`${API_BASE}/api/logos`}
+        deletePath={`${API_BASE}/logos`}
         open={open}
         onClose={() => setOpen(false)}
         onDeleteResult={async (result) => {
