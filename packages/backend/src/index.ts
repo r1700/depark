@@ -40,6 +40,7 @@ import './cronJob';
 import  VehicleModelRouter  from './routes/vehicleModel';
 import APIvehicle from './routes/APIvehicle';
 import pritectedRoute from './routes/protected';
+import userApprovalRoutes from './routes/userApprovalRoute';
 import path from 'path';
 const app = express();
 const server = http.createServer(app);
@@ -161,7 +162,7 @@ app.use('/api/protected',pritectedRoute);
 app.use('/api/logos', logoRouter);
 app.use('/api/screentypes', screenTypeRouter);
 app.use('/logos', express.static(path.join(process.cwd(), 'public/logos')));
-
+app.use('/api/users', userApprovalRoutes);
 app.use('/api/tablet', Retrival);
 
 // Log all incoming requests

@@ -12,7 +12,7 @@ export interface MailOptions {
 export class MailService {
     private outputDir: string;
 
-    constructor(outputDir = path.resolve(process.cwd(), 'emails_out')) {
+    constructor(outputDir = path.resolve(process.cwd(),'..', 'frontend', 'src','admin', 'app', 'pages','emails_out')) {
         this.outputDir = outputDir;
         if (!fs.existsSync(this.outputDir)) {
             fs.mkdirSync(this.outputDir, { recursive: true });
