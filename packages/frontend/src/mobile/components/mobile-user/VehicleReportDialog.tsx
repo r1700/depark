@@ -55,6 +55,7 @@ const formatDuration = (minutes: number): string => {
 const minutesToHours = (minutes: number): number => {
   return Math.floor(minutes / 60);
 };
+  const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
 
 export const VehicleReportDialog = ({ open, onClose, userId }: Props) => {
   const [loading, setLoading] = useState(false);
@@ -65,7 +66,7 @@ export const VehicleReportDialog = ({ open, onClose, userId }: Props) => {
     setLoading(true);
     setError("");
     try {
-      const response = await fetch(`/api/report/${encodeURIComponent(userId || '')}`);
+      const response = await fetch(`${API_BASE}/report/${encodeURIComponent(userId || '')}`);
       if (!response.ok) {
         const errRes = await response.json().catch(() => ({}));
         throw new Error(errRes.message || "Failed to fetch report data");

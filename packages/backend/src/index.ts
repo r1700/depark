@@ -135,7 +135,7 @@ app.use('/api/surface-stats', surfaceReport);
 app.use('/api/tablet', retrieveRoute);
 app.use('/api/otp', otpRoutes);
 app.use("/api", routes);
-app.use("/notifications", notifications);
+app.use("/api/notifications", notifications);
 app.use('/api/importFromCsv', importFromCsv);
 app.use('/api/unknown-vehicles', VehicleModelRouter);
 

@@ -21,6 +21,7 @@ interface Notification {
   read: boolean;
   timestamp: string;
 }
+const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
 
 const Notifications: React.FC = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -28,6 +29,7 @@ const Notifications: React.FC = () => {
   const [userId, setUserId] = useState<number | null>(null);
   const location = useLocation();
   const navigate = useNavigate();
+
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -55,7 +57,7 @@ const Notifications: React.FC = () => {
       if (!userId) return;
       try {
         const response = await axios.get(
-          `/notifications?baseuser_id=${userId}`
+          `${API_BASE}/notifications?baseuser_id=${userId}`
         );
         setNotifications(response.data);
         setLoading(false);
@@ -70,7 +72,7 @@ const Notifications: React.FC = () => {
 
   const markAsRead = async (notificationId: number) => {
     try {
-      await axios.post('/notifications/mark-read', {
+      await axios.post(`${API_BASE}/notifications/mark-read`, {
         notificationIds: [notificationId],
       });
       setNotifications((prevNotifications) =>
@@ -123,7 +125,7 @@ const Notifications: React.FC = () => {
         >
           Back
         </Button>
-       
+
       </Box>
 
       {loading ? (
@@ -155,14 +157,14 @@ const Notifications: React.FC = () => {
                 border: `1px solid #1976d2`,
                 transition: "0.2s",
                 mx: "auto",
-                  "&:hover": {
-      background: "linear-gradient(135deg, #d0e6fc 0%, #e3f2fd 100%)",
-      boxShadow: "0 8px 32px rgba(30,144,255,0.18)",
-    },
-    "&:active": {
-      background: "linear-gradient(135deg, #bbdefb 0%, #e3f2fd 100%)",
-      boxShadow: "0 4px 16px rgba(30,144,255,0.22)",
-    },
+                "&:hover": {
+                  background: "linear-gradient(135deg, #d0e6fc 0%, #e3f2fd 100%)",
+                  boxShadow: "0 8px 32px rgba(30,144,255,0.18)",
+                },
+                "&:active": {
+                  background: "linear-gradient(135deg, #bbdefb 0%, #e3f2fd 100%)",
+                  boxShadow: "0 4px 16px rgba(30,144,255,0.22)",
+                },
               }}
             >
               <Typography fontWeight="bold" sx={{ color: "#1976d2", fontSize: "1.1rem" }}>
