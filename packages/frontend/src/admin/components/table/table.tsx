@@ -187,13 +187,13 @@ const DataTable: React.FC<DataTableProps> = ({
     setDeleteDialogOpen(false);
   };
   const stableSort = (array: any[] = [], comparator: any) => {
-  const stabilizedArray = array.map((el, index) => [el, index] as any);
+  const stabilizedArray = (array || []).map((el, index) => [el, index] as any);
   stabilizedArray.sort((a: any, b: any) => {
     const orderRes = comparator(a[0], b[0]);
     if (orderRes !== 0) return orderRes;
     return a[1] - b[1];
   });
-  return stabilizedArray.map((el: any) => el[0]);
+  return (stabilizedArray || []).map((el: any) => el[0]);
 };
 
   const comparator = (a: any, b: any) => {
@@ -227,7 +227,7 @@ const DataTable: React.FC<DataTableProps> = ({
         >
           <TableHead className="table-head">
             <TableRow>
-              {columns.map((column) => (
+              {(columns || []).map((column) => (
                 <TableCell key={column.id} sx={{ position: 'relative', whiteSpace: 'nowrap' }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', position: 'relative' }}>
                     <span>{column.label}</span>
@@ -300,7 +300,7 @@ const DataTable: React.FC<DataTableProps> = ({
             </TableRow>
           </TableHead>
           <TableBody>
-            {visibleRows.map((row, idx) => (
+            {(visibleRows || []).map((row, idx) => (
               <TableRow
                 key={idx}
                 hover={!!onRowClick}
@@ -309,7 +309,7 @@ const DataTable: React.FC<DataTableProps> = ({
                 }}
                 sx={{ cursor: 'default' }}
               >
-                {columns.map((column) => (
+                {(columns || []).map((column) => (
                   <TableCell key={column.id}>
                     {typeof row[column.id] === 'boolean'
                       ? row[column.id]
