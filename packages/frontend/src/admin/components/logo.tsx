@@ -42,7 +42,7 @@ export default function AdminLogoManagement() {
   const [logoDialogOpen, setLogoDialogOpen] = useState(false);
   const [selectedScreenType, setSelectedScreenType] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  // מערך לוגואים שממתינים להעלאה
+  // Array of logos pending upload
   // State for pending logos
   const [pendingLogos, setPendingLogos] = useState<File[]>([]);
   const [, setPendingLogosVersion] = useState(0);
@@ -163,11 +163,11 @@ export default function AdminLogoManagement() {
     }
   };
 
-  // עדכון סטייט אחרי מחיקה דרך הדיאלוג בלבד
+  // Update state after deletion only via dialog
   const handleDeleteLogo = async (id: number) => {
     const API_BASE = "http://localhost:3001";
     try {
-      // לא למחוק ישירות, רק לעדכן סטייט אחרי דיאלוג
+  // Do not delete directly, only update state after dialog
   setOverlayMessage("Logo deleted successfully!");
   setOverlayType('success');
       // Always fetch latest logos from server after deletion
@@ -531,14 +531,14 @@ export default function AdminLogoManagement() {
               <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                 <img src="https://mui.com/static/images/icons/image.svg" alt="drag here" style={{ width: 64, height: 64, opacity: 0.7, marginBottom: 8 }} />
                 <Typography variant="h6" sx={{ fontWeight: 700, color: isDragOver ? '#388e3c' : '#1976d2', mb: 1 }}>
-                  גרור תמונה לכאן
+                  Drag an image here
                 </Typography>
                 <Typography variant="body1" sx={{ color: '#555', mb: 1 }}>
-                  או לחץ על "בחר לוגואים" להעלאה ידנית
+                  Or click "Select Logos" to upload manually
                 </Typography>
                 {isDragOver && (
                   <Typography variant="body2" sx={{ color: '#43a047', fontWeight: 600 }}>
-                    שחרר את הקובץ להעלאה
+                    Release the file to upload
                   </Typography>
                 )}
               </Box>
