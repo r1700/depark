@@ -53,7 +53,7 @@ const APIvehicle :React.FC= () => {
   return (
     <Box sx={{ maxWidth: 1000, mx: 'auto', p: 3 }}>
       <Typography variant="h4" mb={3}>
-        Vehicles – Combined Filter
+        Vehicles 
       </Typography>
 
       <Box component="form" sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 3 }}>
