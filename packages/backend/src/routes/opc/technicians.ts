@@ -7,7 +7,7 @@ import {
   deleteTechnician,
 } from "../../services/technicianService";
 
-const router :Router = Router();
+const router : Router= Router();
 
 router.post("/", async (req, res) => {
   try {

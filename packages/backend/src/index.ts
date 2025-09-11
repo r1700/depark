@@ -10,9 +10,11 @@ import passwordRoutes from './routes/user.routes';
 import vehicleRoutes from './routes/vehicle';
 import exportToCSV from './routes/exportToCSV';
 import userGoogleAuthRoutes from './routes/userGoogle-auth';
+
 import Opc from './routes/opc/router-opc';
 import http from 'http';
 import { WebSocketServer } from 'ws';
+import Opc from './routes/opc/router-opc';
 import session from 'express-session';
 import adminConfigRouter from './routes/adminConfig';
 import userRoutes from './routes/user.routes';
@@ -31,6 +33,7 @@ import retrieveRoute from './routes/RetrivalQueue';
 import otpRoutes from './routes/otp.server';
 import routes from './routes/mobile/mobileUserRoutes';
 import notifications from "./routes/mobile/notificationsRoutes"; 
+
 import adminUsersRouter from './routes/admin/adminUsers';
 import Retrival from './routes/RetrivalQueue';
 import './cronJob'; 
@@ -40,7 +43,7 @@ import pritectedRoute from './routes/protected';
 import path from 'path';
 const app = express();
 const server = http.createServer(app);
-export const wss = new WebSocketServer({ server })
+export const wss = new WebSocketServer({ server });
 app.use(express.json());
 
 // --- DEBUG: log incoming requests and who sends responses ---
@@ -149,6 +152,7 @@ app.use("/api", routes);
 app.use("/notifications", notifications);
 app.use('/api/importFromCsv', importFromCsv);
 app.use('/api/opc',Opc)
+
 app.use('/api/unknown-vehicles', VehicleModelRouter);
 app.use('/api/vehicles', APIvehicle); // Ensure this route is correctly set up
 app.use('/api/protected',pritectedRoute);
@@ -163,6 +167,7 @@ app.use((req, res, next) => {
     console.log(`[${req.method}] ${req.path}`, req.body);
     next();
 });
+
 
 function printRoutes() {
     console.log("Registered routes:", app);
@@ -231,5 +236,6 @@ app.listen(PORT, () => {
         console.log(':memo: Using mock data - Supabase not configured');
     }
 });
-// export { server };
-// export default app;
+
+export { server };
+export default app;

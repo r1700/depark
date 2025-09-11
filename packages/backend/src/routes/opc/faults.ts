@@ -6,8 +6,7 @@ import {
   resolveFaultByParkingAndType,
 } from "../../services/faultService";
 
-
-const router :Router = Router();
+const router : Router = Router();
 
 // Endpoint for logging faults
 router.post("/", async (req, res) => {
