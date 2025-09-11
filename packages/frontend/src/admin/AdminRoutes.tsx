@@ -13,6 +13,7 @@ import ParkingsPage from "./Pages/ParkingsPage";
 import AdminUsersPage from "./Pages/adminUser/AdminUsersPage";
 import ParkingStatsPage from "./app/pages/parkingStats/parkingStats";
 import SurfaceStatsPage from "./app/pages/surfaceStats/surfaceStats";
+import AdminLogoManagement from "./components/logo";
 
 function getUserFromStorage() {
   try {
@@ -68,6 +69,8 @@ const AdminRoutes: React.FC = () => {
         <Route path="admin-config" element={<AdminConfigPage />} />
         <Route path="parkings" element={<ParkingsPage />} />
         <Route path="admin-users" element={<AdminUsersPage />} />
+        <Route path="admin-config/:id" element={<AdminConfigPage />} />
+        <Route path="logo-management" element={<AdminLogoManagement />} />
 
         <Route path="reports">
           <Route path="parking-stats" element={<ParkingStatsPage />} />
