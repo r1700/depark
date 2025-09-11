@@ -1,6 +1,6 @@
 import { Router } from 'express';
 
-const router = Router();
+const router: Router = Router();
           console.log('Signup request received');
 
 // router.get('/', (req, res) => {

@@ -24,18 +24,26 @@ function normalizeResponseBody<T>(res: any): T | T[] | null {
 
 export async function fetchAdminUsersAPI(filters?: AdminUserFilters): Promise<AdminUser[]> {
   try {
+    const params = new URLSearchParams();
+    if (filters) {
+      Object.entries(filters).forEach(([key, value]) => {
+        if (Array.isArray(value)) {
+          value.forEach(v => params.append(key, v));
+        } else if (value !== undefined && value !== null) {
+          params.append(key, String(value));
+        }
+      });
+    }
     const response = await axios.get('/admin/users', {
-      params: filters,
+      params,
+      paramsSerializer: params => params.toString(),
       headers: { 'Cache-Control': 'no-cache' },
     });
-
     if (response.status === 304) return [];
 
     const normalized = normalizeResponseBody<AdminUser>(response);
     if (Array.isArray(normalized)) return normalized;
-    // sometimes API returns { data: { rows: [...] } } handled above; if here but single object -> wrap
     if (normalized && typeof normalized === 'object') {
-      // if it's a single AdminUser object, return as single-element array
       return [normalized as AdminUser];
     }
 

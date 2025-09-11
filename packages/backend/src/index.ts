@@ -10,6 +10,8 @@ import passwordRoutes from './routes/user.routes';
 import vehicleRoutes from './routes/vehicle';
 import exportToCSV from './routes/exportToCSV';
 import userGoogleAuthRoutes from './routes/userGoogle-auth';
+
+import Opc from './routes/opc/router-opc';
 import http from 'http';
 import { WebSocketServer } from 'ws';
 import Opc from './routes/opc/router-opc';
@@ -31,9 +33,13 @@ import retrieveRoute from './routes/RetrivalQueue';
 import otpRoutes from './routes/otp.server';
 import routes from './routes/mobile/mobileUserRoutes';
 import notifications from "./routes/mobile/notificationsRoutes"; 
-import Retrival from './routes/RetrivalQueue';
-// import './cronJob'; // Ensure the cron job runs on server start
 
+import adminUsersRouter from './routes/admin/adminUsers';
+import Retrival from './routes/RetrivalQueue';
+import './cronJob'; 
+import  VehicleModelRouter  from './routes/vehicleModel';
+import APIvehicle from './routes/APIvehicle';
+import pritectedRoute from './routes/protected';
 import path from 'path';
 const app = express();
 const server = http.createServer(app);
@@ -113,10 +119,20 @@ app.use((req, res, next) => {
 });
 
 app.use(loggerRoutes);
-
+import parkingStatus from './routes/parkingStatus';
+app.use('/api/parkingStatus',parkingStatus);
+// WS
+import { initWebSocket } from './services/WS-server';
+// CURD to table parkingsessions
+import parkingsessionsCURD from './routes/parkingStatusFunc';
+app.use('/api/parkingStatusCURD', parkingsessionsCURD);
+// WebSocket on server restart
+initWebSocket(server);
 // API routes
+app.use('/admin', adminUsersRouter);
 app.use('/api/health', healthRoutes);
 app.use('/api/password', passwordRoutes);
+app.use('/api/auth', passwordRoutes);
 app.use('/api/vehicle', vehicleRoutes);
 app.use('/api/exportToCSV', exportToCSV);
 app.use('/api', userRoutes);
@@ -136,6 +152,10 @@ app.use("/api", routes);
 app.use("/notifications", notifications);
 app.use('/api/importFromCsv', importFromCsv);
 app.use('/api/opc',Opc)
+
+app.use('/api/unknown-vehicles', VehicleModelRouter);
+app.use('/api/vehicles', APIvehicle); // Ensure this route is correctly set up
+app.use('/api/protected',pritectedRoute);
 app.use('/api/logos', logoRouter);
 app.use('/api/screentypes', screenTypeRouter);
 app.use('/logos', express.static(path.join(process.cwd(), 'public/logos')));
@@ -147,6 +167,26 @@ app.use((req, res, next) => {
     console.log(`[${req.method}] ${req.path}`, req.body);
     next();
 });
+
+
+function printRoutes() {
+    console.log("Registered routes:", app);
+    app._router?.stack?.forEach((middleware: any) => {
+        if (middleware.route) {
+            const methods = Object.keys(middleware.route.methods).join(',').toUpperCase();
+            console.log(`${methods} ${middleware.route.path}`);
+        } else if (middleware.name === 'router' && middleware.handle && middleware.handle.stack) {
+            middleware.handle.stack.forEach((handler: any) => {
+                if (handler.route) {
+                    const methods = Object.keys(handler.route.methods).join(',').toUpperCase();
+                    console.log(`${methods} ${handler.route.path}`);
+                }
+            });
+        }
+    });
+}
+
+printRoutes();
 
 // Root route
 app.get('/', (req, res) => {
@@ -197,15 +237,5 @@ app.listen(PORT, () => {
     }
 });
 
-process.on('exit', code => console.log('Process exit event, code =', code));
-process.on('SIGINT', () => {
-    console.log('SIGINT received');
-    process.exit(0);
-});
-
-process.on('SIGTERM', () => {
-    console.log('SIGTERM received');
-    process.exit(0);
-});
-process.on('uncaughtException', err => console.error('uncaughtException', err));
-process.on('unhandledRejection', reason => console.error('unhandledRejection', reason));
+export { server };
+export default app;

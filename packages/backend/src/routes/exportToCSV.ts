@@ -2,9 +2,9 @@ import express, { Request, Response } from "express";
 import { Router } from 'express';
 import { saveCSV } from '../utils/ExportToCSV'; 
 
-const router = Router();
+const router : Router= Router();
 
-router.post('/save-csv', (req: Request, res: Response) => {
+router.post('/save-csv', (req, res) => {
    
     
     const { jsonData, filename } = req.body;
