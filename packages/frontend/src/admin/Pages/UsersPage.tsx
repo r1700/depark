@@ -72,7 +72,7 @@ const UsersPage: React.FC = () => {
             }
           });
         }
-        const response = await axios.get(`${API_BASE}/api/users`, { params });
+        const response = await axios.get(`${API_BASE}/users`, { params });
         setUsers(response.data.results || response.data);
       } catch (error) {
         console.error("Failed to fetch users:", error);
@@ -258,7 +258,7 @@ const UsersPage: React.FC = () => {
           onEdit={handleEdit}
           showEdit={true}
           showDelete={true}
-          deletePath={`${API_BASE}/api/users`}
+          deletePath={`${API_BASE}/users`}
         />
       </Paper>
     </Container>
