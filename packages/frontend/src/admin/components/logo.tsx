@@ -321,8 +321,32 @@ export default function AdminLogoManagement() {
       <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', mb: 4, justifyContent: 'flex-start' }}>
         {logos.length === 0 && <Typography>No logos found.</Typography>}
         {logos.map((logo) => {
-          const originalLogo = originalLogos.find(l => l.id === logo.id);
-          let isChanged: boolean = false;
+          const originalLogo = originalLogos.find(l => l.id === logo.id);          const isNewLogo = !originalLogo;
+          const nameFilled = logo.name && logo.name.trim() !== "";
+          const urlFilled = logo.url && logo.url.trim() !== "";
+          let isChanged: boolean;
+          if (isNewLogo) {
+            // New logo: allow save if either name or url is filled
+            const savedLogo = originalLogos.find(l => l.id === logo.id);
+            if (!savedLogo) {
+              isChanged = !!(nameFilled || urlFilled);
+            } else {
+              // If already saved, enable if either name or url is changed (not both required)
+              const nameChanged = logo.name !== (savedLogo.name || "");
+              const urlChanged = logo.url !== (savedLogo.url || "");
+              isChanged = nameChanged || urlChanged;
+            }
+          } else {
+            const nameChanged = logo.name !== (originalLogo.name || "");
+            const urlChanged = logo.url !== (originalLogo.url || "");
+            isChanged = nameChanged || urlChanged;
+          }
+          if (isNewLogo && !isChanged && (logo.name || logo.url)) {
+            // Mark logo as "active" (i.e., no longer new)
+            // This happens automatically because originalLogos updates after save
+          }
+          // For new logo, save button is enabled only if there is a change in name or url and both are not empty
+          // For existing logo, only if there is a change
           if (originalLogo) {
             // לוגו קיים: שינוי רק אם name או url שונים מהמקור
             const nameChanged = (logo.name || "") !== (originalLogo.name || "");
@@ -446,7 +470,7 @@ export default function AdminLogoManagement() {
               })}
             </Box>
             <IconButton
-              aria-label="הוסף לוגו"
+              aria-label="add logo"
               size="small"
               sx={{ background: '#e3f2fd', borderRadius: 2, fontWeight: 600, mb: 1 }}
               onClick={event => {
