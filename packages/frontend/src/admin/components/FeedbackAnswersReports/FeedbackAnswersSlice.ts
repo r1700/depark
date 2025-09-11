@@ -13,7 +13,7 @@ export interface RatingStats {
   count: number;
 }
 
-interface FeedbackState {
+export interface FeedbackState {
   questionStats: QuestionStats[];
   ratingStats: RatingStats[];
   loading: boolean;

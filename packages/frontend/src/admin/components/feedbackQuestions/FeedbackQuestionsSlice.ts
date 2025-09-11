@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { fetchFeedbackQuestions, addFeedbackQuestion, updateFeedbackQuestion } from './FeedbackQuestionsThunks';
 import { FeedbackQuestion } from './FeeadbackQuestionsMetadata';
 
-interface FeedbackQuestionsState {
+export interface FeedbackQuestionsState {
   questions: FeedbackQuestion[];
   loading: boolean;
   error: string | null;
