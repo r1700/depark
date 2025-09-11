@@ -10,10 +10,6 @@ import passwordRoutes from './routes/user.routes';
 import vehicleRoutes from './routes/vehicle';
 import exportToCSV from './routes/exportToCSV';
 import userGoogleAuthRoutes from './routes/userGoogle-auth';
-import Exit from './routes/opc/exit';
-import './cronJob'; // Ensure the cron job runs on server start
-import faultsRouter from './routes/opc/faults';
-import techniciansRoutes from "./routes/opc/technicians";
 import Opc from './routes/opc/router-opc';
 import http from 'http';
 import { WebSocketServer } from 'ws';
@@ -24,6 +20,7 @@ import authRoutes from './routes/auth';
 import importFromCsv from './routes/importFromCsv';
 import logoRouter from './routes/logos';
 import screenTypeRouter from './routes/screenType';
+import './cronJob'; // Import the cron job to ensure it runs on server start
 import vehicle from './routes/vehicleRoute';
 import GoogleAuth from './routes/google-auth';
 import parkingReport from './routes/parkingStat';
@@ -136,9 +133,6 @@ app.use('/api/password', passwordRoutes);
 app.use('/api/auth', passwordRoutes);
 app.use('/api/vehicle', vehicleRoutes);
 app.use('/api/exportToCSV', exportToCSV);
-app.use('/api/auth', userGoogleAuthRoutes);
-app.use('/api/tablet', Retrival);
-app.use('/api/opc', Exit);
 app.use('/api', userRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userApi);
@@ -146,6 +140,7 @@ app.use('/api/reservedparking', ResevedParking);
 app.use('/api/auth', userGoogleAuthRoutes);
 app.use('/api/vehicles', vehicle)
 app.use('/api/admin', adminConfigRouter);
+app.use('/api/users', userApprovalRoutes);
 app.use('/OAuth', GoogleAuth);
 app.use('/api/admin', adminConfigRouter);
 app.use('/api/parking-stats', parkingReport);
@@ -162,7 +157,7 @@ app.use('/api/protected',pritectedRoute);
 app.use('/api/logos', logoRouter);
 app.use('/api/screentypes', screenTypeRouter);
 app.use('/logos', express.static(path.join(process.cwd(), 'public/logos')));
-app.use('/api/users', userApprovalRoutes);
+
 app.use('/api/tablet', Retrival);
 
 // Log all incoming requests
