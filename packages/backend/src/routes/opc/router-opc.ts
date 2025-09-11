@@ -8,7 +8,7 @@ const router : Router = Router();
 
 router.use("/technicians", techniciansRoutes);
 router.use('/fault', faultsRouter);
-router.use('/Queue', Queue);
+router.use('/WriteQueue', Queue);
 // router.use('/opc-nodes', opcNodesRouter);
 
 router.post('/:param', (req, res) => {          

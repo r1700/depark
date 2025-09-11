@@ -10,9 +10,9 @@ import passwordRoutes from './routes/user.routes';
 import vehicleRoutes from './routes/vehicle';
 import exportToCSV from './routes/exportToCSV';
 import userGoogleAuthRoutes from './routes/userGoogle-auth';
-import Opc from './routes/opc/router-opc';
 import http from 'http';
 import { WebSocketServer } from 'ws';
+import Opc from './routes/opc/router-opc';
 import session from 'express-session';
 import adminConfigRouter from './routes/adminConfig';
 import userRoutes from './routes/user.routes';
@@ -31,14 +31,13 @@ import retrieveRoute from './routes/RetrivalQueue';
 import otpRoutes from './routes/otp.server';
 import routes from './routes/mobile/mobileUserRoutes';
 import notifications from "./routes/mobile/notificationsRoutes"; 
-import Exit from './routes/opc/exit';
 import Retrival from './routes/RetrivalQueue';
 // import './cronJob'; // Ensure the cron job runs on server start
 
 import path from 'path';
 const app = express();
 const server = http.createServer(app);
-export const wss = new WebSocketServer({ server })
+export const wss = new WebSocketServer({ server });
 app.use(express.json());
 
 // --- DEBUG: log incoming requests and who sends responses ---
@@ -197,3 +196,16 @@ app.listen(PORT, () => {
         console.log(':memo: Using mock data - Supabase not configured');
     }
 });
+
+process.on('exit', code => console.log('Process exit event, code =', code));
+process.on('SIGINT', () => {
+    console.log('SIGINT received');
+    process.exit(0);
+});
+
+process.on('SIGTERM', () => {
+    console.log('SIGTERM received');
+    process.exit(0);
+});
+process.on('uncaughtException', err => console.error('uncaughtException', err));
+process.on('unhandledRejection', reason => console.error('unhandledRejection', reason));

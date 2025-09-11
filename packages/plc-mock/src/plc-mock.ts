@@ -38,6 +38,8 @@ export async function createPlcOpcServer() {
   let parkingSpot = "";
   let vehicleExitRequest = ["", "", ""];
   let exitRequestApproval = ["", "", ""];
+  let queue = ["", "", ""];
+
   // Add Outputs variables
 
   namespace.addVariable({
@@ -136,7 +138,52 @@ export async function createPlcOpcServer() {
       },
     },
   });
-  
+
+
+  namespace.addVariable({
+    componentOf: device,
+    browseName: "queue",
+    nodeId: "ns=1;s=queue",
+    dataType: "String", // סוג הנתונים הוא מחרוזת
+    minimumSamplingInterval: 1000,
+    value: {
+      // בעת קריאה, המערך יוחזר ישירות
+      get: () => new Variant({
+        dataType: DataType.String,
+        arrayType: VariantArrayType.Array, // מציין שזה מערך
+        value: queue,
+      }),
+      // בעת כתיבה, הערך המתקבל יומר למערך
+      set: (variant: Variant) => {
+        if (Array.isArray(variant.value) && variant.value.every(v => typeof v === "string")) {
+          queue = variant.value;
+          console.log("queue updated:", queue); // לוג לערך החדש
+          return StatusCodes.Good;
+        } else {
+          console.error("Invalid data format for queue. Expected an array of strings.");
+          return StatusCodes.BadInvalidArgument;
+        }
+      },
+    },
+  });
+  function generateQueueData() {
+  const floors = [1, 2, 3, 4, 5, 6];
+  const queueData = floors.map(floor => {
+    const elevators = [];
+    for (let elevator = 1; elevator <= 6; elevator++) {
+      // מספר ממתינים אקראי (1-5)
+      const waitingCount = Math.floor(Math.random() * 5) + 1;
+      // לוחית רישוי אקראית
+      const licensePlate = `LP${floor}${elevator}${Math.floor(Math.random() * 10000)}`;
+      // כל מעלית: [לוחית רישוי, מספר ממתינים]
+      elevators.push([licensePlate, waitingCount]);
+    }
+    // כל קומה: [מספר קומה, [מעליות]]
+    return [floor, elevators];
+  });
+  return queueData;
+}
+
   
 
   // Function to update values periodically using setInterval
@@ -151,6 +198,12 @@ export async function createPlcOpcServer() {
       `${Math.floor(Math.random() * 5)}:${Math.floor(Math.random() * 5)}` // assignedPickupSpot
     ];
   }, 2000); // Every 2 seconds
+
+  setInterval(() => {
+    // Update the queue with new values
+    queue = generateQueueData().map(item => JSON.stringify(item));
+    console.log("queue updated:", queue);
+  }, 30000);
   
 //----------------------------------
   await server.start();

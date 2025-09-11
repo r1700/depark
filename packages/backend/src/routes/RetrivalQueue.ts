@@ -56,6 +56,8 @@ router.post('/retrieve', async (req, res) => {
         const underground_spot = session.underground_spot;
 
         try {
+            console.log(`Sending VehicleExitRequest to PLC for license plate: ${licensePlate}, underground spot: ${underground_spot}, floor: ${floor}`);
+            
             await callWriteToPlcApi('VehicleExitRequest', { licensePlate, underground_spot, floor });
             console.log('Successfully sent VehicleExitRequest to PLC');
         } catch (plcError) {

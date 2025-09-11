@@ -12,6 +12,7 @@ import {
   MessageSecurityMode,
   SecurityPolicy,
   UserTokenType,
+  ExtensionObject
 } from 'node-opcua';
 import { sendDataToBackend } from "./backendService";
 import dotenv from 'dotenv';
@@ -19,7 +20,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const { TARGET_URL, PLC_USERNAME, PLC_PASSWORD, TARGET_URL_MOCK } = process.env;
-const endpointUrl: string = TARGET_URL || `opc.tcp://${TARGET_URL_MOCK}/UA/PLC`;
+const endpointUrl: string = TARGET_URL ? `opc.tcp://${TARGET_URL}` : `opc.tcp://${TARGET_URL_MOCK}/UA/PLC`;
 
 let opcClient: OPCUAClient | null = null;
 let opcSession: ClientSession | null = null;
@@ -29,8 +30,9 @@ const nodesToMonitor = [
   "ns=1;s=parkingSpot",
   "ns=1;s=licensePlateExit",
   "ns=1;s=licensePlateEntry",
-  "ns=1;s=Queue",
-  "ns=1;s=ExitRequestApproval"
+  "ns=1;s=queue",
+  // "ns=4;i=31",
+  // "ns=4;i=169"
 ];
 
 // ----------------------------
@@ -124,7 +126,7 @@ function detectDataType(value: any): { dataType: DataType; arrayType?: VariantAr
       case "boolean":
         return { dataType: DataType.Boolean, arrayType: VariantArrayType.Array };
       case "number":
-        return { dataType: Number.isInteger(value[0]) ? DataType.Int32 : DataType.Double, arrayType: VariantArrayType.Array };
+        return { dataType: Number.isInteger(value[0]) ? DataType.Int16 : DataType.Double, arrayType: VariantArrayType.Array };
       case "string":
         return { dataType: DataType.String, arrayType: VariantArrayType.Array };
       default:
@@ -136,7 +138,7 @@ function detectDataType(value: any): { dataType: DataType; arrayType?: VariantAr
     case "boolean":
       return { dataType: DataType.Boolean };
     case "number":
-      return { dataType: Number.isInteger(value) ? DataType.Int32 : DataType.Double };
+      return { dataType: Number.isInteger(value) ? DataType.Int16 : DataType.Double }; // טיפול בערכים מסוג Int16
     case "string":
       return { dataType: DataType.String };
     case "object":
@@ -148,7 +150,6 @@ function detectDataType(value: any): { dataType: DataType; arrayType?: VariantAr
       throw new Error(`Unsupported data type: ${typeof value}`);
   }
 }
-
 // Interface for write items
 export interface WriteItem {
   nodeId: string;
@@ -163,25 +164,38 @@ export async function writeNodeValues(writeItems: WriteItem[]): Promise<void> {
   }
 
   const nodesToWrite = writeItems.map((item) => {
+    // זיהוי סוג הנתונים
     const dataType: any = detectDataType(item.value);
+
+    // יצירת פריט לכתיבה
     return {
       nodeId: item.nodeId,
       attributeId: AttributeIds.Value,
       value: {
         value: new Variant({
-          ...dataType,
+          ...dataType, // שינוי ל-Int16 באופן מפורש
           value: item.value,
         }),
-      }
+      },
     };
   });
 
   try {
     console.log("Writing nodes:", JSON.stringify(nodesToWrite, null, 2));
-    await opcSession.write(nodesToWrite);
-    console.log("Write successful");
+    const statusCodes = await opcSession.write(nodesToWrite);
+    console.log("Write status codes:", statusCodes);
+
+    // בדיקת סטטוס הכתיבה
+    statusCodes.forEach((statusCode, index) => {
+      if (statusCode.value !== 0) {
+        console.error(`❌ Write failed for node ${nodesToWrite[index].nodeId}:`, statusCode.toString());
+        throw new Error(`Write failed for node ${nodesToWrite[index].nodeId}: ${statusCode.toString()}`);
+      }
+    });
+
+    console.log("✅ Write successful");
   } catch (err) {
-    console.error("Failed to write nodes:", err);
+    console.error("❌ Failed to write nodes:", err);
     throw err;
   }
 }
@@ -268,15 +282,19 @@ export async function createMonitoredItems(subscription: ClientSubscription): Pr
       } else if (nodeId === "ns=1;s=parkingSpot") {
         event = 'parkingSpot';
       }
-      else if (nodeId === "ns=1;s=Queue") {
-        event = 'Queue';
-      }
+      else if (nodeId === "ns=1;s=queue") {
+        event = 'WriteQueue';
+      }      
       // else if (nodeId === "ns=1;s=ActiveFaultList") {
       //   event = 'fault';
       // }
-      else if (nodeId === "ns=1;s=ExitRequestApproval") {
-        event = 'exitRequestApproval';
-      }
+      // else if (nodeId === "ns=4;i=31") {
+      //   event = 'exitRequestApproval';
+      // }
+      // else if (nodeId === "ns=4;i=169") {
+      //   event = 'active';
+      // }
+
       console.log(`🔄 Node ${nodeId} changed:`, val);
       await sendDataToBackend(event, val);
     });
@@ -329,6 +347,23 @@ export async function waitForNodeChange(
     });
   });
 }
+
+async function writeToNode() {
+  const writeItems = [
+    {
+      nodeId: "ns=4;i=176", // Node ID של הבקר
+      value: 59, // הערך שברצונך לכתוב (לדוגמה: מספר שלם מסוג Int16)
+    },
+  ];
+
+  try {
+    await writeNodeValues(writeItems);
+    console.log("✅ Successfully wrote to node 176");
+  } catch (err) {
+    console.error("❌ Failed to write to node 176:", err);
+  }
+}
+// setTimeout(()=>writeToNode(), 5000); // המתנה של 5 שניות לפני הקריאה לפונקציה
 
 process.on("SIGINT", async () => {
   console.log("Closing OPC UA connection...");
