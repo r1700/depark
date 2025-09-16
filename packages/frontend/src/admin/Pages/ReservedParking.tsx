@@ -16,7 +16,7 @@ const filterFields: FieldConfigGeneric<any>[] = [
 ];
 
 
-
+const API_BASE= process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
 const ReservedParkingPage: React.FC = () => {
   const navigate = useNavigate();
 
@@ -37,7 +37,7 @@ const ReservedParkingPage: React.FC = () => {
       }
       console.log({ params });
 
-      const response = await axios.get("/api/reservedparking", { params });
+      const response = await axios.get(`${API_BASE}/reservedparking`, { params });
       setReservedParking(response.data.results || response.data);
     } catch (error) {
       console.error("Failed to fetch reserved parking:", error);
@@ -213,7 +213,7 @@ const ReservedParkingPage: React.FC = () => {
           onEdit={handleEdit}
           showEdit={true}
           showDelete={true}
-          deletePath="/api/reservedparking"
+          deletePath={`${API_BASE}/reservedparking`}
         />
       </Paper>
     </Container>

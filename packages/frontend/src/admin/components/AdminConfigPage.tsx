@@ -61,6 +61,8 @@ interface ParkingConfig {
   updatedBy?: string;
 }
 
+const API_BASE= process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
+
 // Styled Components
 // Alternative - blue glow border:
 const StyledCard = styled(Card)(({ theme }) => ({
@@ -224,8 +226,8 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
         setLoading(true);
         try {
           console.log('🔄 Loading existing config for lotId:', lotId);
-          const response = await fetch(`/api/admin/${lotId}`, {
-            headers: getAuthHeaders()
+            const response = await fetch(`${API_BASE}/admin/${lotId}`, {
+              headers: getAuthHeaders()
           });
           
           if (response.ok) {
@@ -341,7 +343,7 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
   const getAllParkingLots = useCallback(async () => {
     try {
       console.log('🔄 FETCH_LOTS: Starting to fetch parking lots');
-      const response = await fetch('/api/admin/', {
+      const response = await fetch(`${API_BASE}/admin/`, {
         headers: getAuthHeaders()
       });
       if (!response.ok) {
@@ -404,7 +406,7 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
     if (!deleteConfirmDialog.lotData) return;
     
     try {
-      const response = await fetch(`/api/admin/${deleteConfirmDialog.lotData.id}`, {
+      const response = await fetch(`${API_BASE}/admin/${deleteConfirmDialog.lotData.id}`, {
         method: 'DELETE',
         headers: getAuthHeaders()
       });
@@ -605,8 +607,8 @@ export default function AdminConfigPage({}: AdminConfigPageProps) {
       console.log('🔄 Sending timestamp:', now.toISOString());
 
       const url = isNewLot
-        ? '/api/admin'
-        : `/api/admin/${lotId}`; // Use lotId from useParams
+        ? `${API_BASE}/admin`
+        : `${API_BASE}/admin/${lotId}`; // Use lotId from useParams
 
       const method = isNewLot ? 'POST' : 'PUT';
 

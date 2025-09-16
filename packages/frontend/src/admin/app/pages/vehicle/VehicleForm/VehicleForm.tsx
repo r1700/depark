@@ -2,16 +2,16 @@ import { useAppDispatch} from '../../../store';
 import { FieldConfig, GenericForm } from '../../../../components/forms/Form';
 import { addVehicle, updateVehicle } from '../vehicleThunks';
 
-interface VehicleFormData {
-  licensePlate: string;
-  user: string;
-  vehicleModelId: number;
-  width: number;
-  height: number;
-  length: number;
-  weight: number;
-  dimensionsSource: string;
-}
+// interface VehicleFormData {
+//   licensePlate: string;
+//   user: string;
+//   vehicleModelId: number;
+//   width: number;
+//   height: number;
+//   length: number;
+//   weight: number;
+//   dimensionsSource: string;
+// }
 
 const AddOrEditVehicleForm = ({ onClose, vehicleToEdit = null }
   : {

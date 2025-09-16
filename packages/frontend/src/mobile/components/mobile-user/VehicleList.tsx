@@ -38,6 +38,7 @@ interface Vehicle {
     height?: string;
   };
 }
+const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
 
 export const VehicleRow = () => {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
@@ -58,7 +59,6 @@ export const VehicleRow = () => {
   } | null>(null);
   const [pickupDialogOpen, setPickupDialogOpen] = useState(false);
 
-  
   useEffect(() => {
     const lastFeedback = localStorage.getItem("lastFeedbackSent");
     if (!lastFeedback) {
@@ -71,13 +71,13 @@ export const VehicleRow = () => {
     }
   }, []);
 
-  
+
   useEffect(() => {
     if (!userId) return;
 
     const fetchNotifications = async () => {
       try {
-        const res = await fetch(`/notifications?baseuser_id=${userId}`);
+        const res = await fetch(`${API_BASE}/notifications?baseuser_id=${userId}`);
         if (!res.ok) throw new Error("Failed to fetch notifications");
         const data = await res.json();
         const unread = data.filter((n: any) => !n.read).length;
@@ -92,7 +92,7 @@ export const VehicleRow = () => {
     return () => clearInterval(interval);
   }, [userId]);
 
-  
+
   useEffect(() => {
     const userStr = localStorage.getItem("user");
     if (userStr !== null) {
@@ -114,7 +114,7 @@ export const VehicleRow = () => {
       return;
     }
     try {
-      const res = await fetch(`/api/vehicles/${userId}`);
+      const res = await fetch(`${API_BASE}/vehicles/${userId}`);
       if (!res.ok) {
         const text = await res.text();
         throw new Error(text || "Server Error");
@@ -170,13 +170,13 @@ export const VehicleRow = () => {
     const vehicle = vehicles[currentIndex];
     if (!vehicle || !userId) return;
     try {
-      const res = await fetch("/api/tablet/retrieve", {
+      const res = await fetch(`${API_BASE}/tablet/retrieve`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          
+
           licensePlate: vehicle.license_plate,
-          floor:'mobile'
+          floor: 'mobile'
         }),
       });
 

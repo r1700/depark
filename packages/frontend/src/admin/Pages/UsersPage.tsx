@@ -18,6 +18,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { numberToStatus } from "../../utils/statusMapper";
 
+const API_BASE= process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
 
 const filterFields: FieldConfigGeneric<any>[] = [
 
@@ -71,7 +72,7 @@ const UsersPage: React.FC = () => {
             }
           });
         }
-        const response = await axios.get("/api/users", { params });
+        const response = await axios.get(`${API_BASE}/users`, { params });
         setUsers(response.data.results || response.data);
       } catch (error) {
         console.error("Failed to fetch users:", error);
@@ -257,7 +258,7 @@ const UsersPage: React.FC = () => {
           onEdit={handleEdit}
           showEdit={true}
           showDelete={true}
-          deletePath="/api/users"
+          deletePath={`${API_BASE}/users`}
         />
       </Paper>
     </Container>

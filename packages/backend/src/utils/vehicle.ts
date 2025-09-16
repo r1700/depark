@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { DimensionsSource } from '../enums/vehicle';
-import { api } from '../../src/routes/vehicleRoute';
+import { api } from '../routes/vehicleRoute';
 import sequelize from '../config/sequelize';
 import { QueryTypes } from 'sequelize';
 import { Axios } from 'axios';

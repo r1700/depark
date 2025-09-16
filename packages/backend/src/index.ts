@@ -142,14 +142,14 @@ app.use('/api/reservedparking', ResevedParking);
 app.use('/api/auth', userGoogleAuthRoutes);
 app.use('/api/vehicles', vehicle)
 app.use('/api/admin', adminConfigRouter);
-app.use('/OAuth', GoogleAuth);
+app.use('/api/OAuth', GoogleAuth);
 app.use('/api/admin', adminConfigRouter);
 app.use('/api/parking-stats', parkingReport);
 app.use('/api/surface-stats', surfaceReport);
 app.use('/api/tablet', retrieveRoute);
 app.use('/api/otp', otpRoutes);
 app.use("/api", routes);
-app.use("/notifications", notifications);
+app.use("/api/notifications", notifications);
 app.use('/api/importFromCsv', importFromCsv);
 app.use('/api/opc',Opc)
 

@@ -28,15 +28,15 @@ const [showAddVehicleModal, setShowAddVehicleModal] = useState(false);
   };
 
 
-  const handleLogout = () => {
-    localStorage.removeItem('firstName');
-    localStorage.removeItem('lastName');
-  };
+  // const handleLogout = () => {
+  //   localStorage.removeItem('firstName');
+  //   localStorage.removeItem('lastName');
+  // };
 
-  const user = {
-    firstName: localStorage.getItem('firstName') ?? '',
-    lastName: localStorage.getItem('lastName') ?? '',
-  };
+  // const user = {
+  //   firstName: localStorage.getItem('firstName') ?? '',
+  //   lastName: localStorage.getItem('lastName') ?? '',
+  // };
 
   return (<>
     <Box sx={{ display: 'flex' }}>

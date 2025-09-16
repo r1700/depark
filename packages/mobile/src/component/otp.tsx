@@ -10,6 +10,8 @@ function Otp() {
     const [error, setError] = useState('');
     const [message, setMessage] = useState('');
 
+    const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
+
     // Handle sending OTP
     const sendOtp = async () => {
         setError('');
@@ -24,7 +26,7 @@ function Otp() {
         }
 
         try {
-            const response = await fetch('http://localhost:3000/otp/create', {
+            const response = await fetch(`${API_BASE}/otp/create`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ contact }),
@@ -54,7 +56,7 @@ function Otp() {
         }
 
         try {
-            const response = await fetch('http://localhost:3000/otp/verify', {
+            const response = await fetch(`${API_BASE}/otp/verify`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ contact, otp }),

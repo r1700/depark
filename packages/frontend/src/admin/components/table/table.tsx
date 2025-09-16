@@ -77,7 +77,7 @@ const DataTable: React.FC<DataTableProps> = ({
   const [sortMenuOpen, setSortMenuOpen] = useState<string | null>(null);
   const [currentDeleteItem, setCurrentDeleteItem] = useState<any>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [tableRows, setTableRows] = useState<any[]>(data.rows);
+  const [tableRows, setTableRows] = useState<any[]>(data?.rows ?? []);
   const [showModal, setShowModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const columns = data.columns;
@@ -147,8 +147,9 @@ const DataTable: React.FC<DataTableProps> = ({
     setSelectedItem(null);
   };
   useEffect(() => {
-    setTableRows(data.rows);
-  }, [data.rows]);
+    setTableRows(data?.rows ?? []);
+  }, [data?.rows]);
+
   const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
     setPage(newPage);
   };
@@ -186,15 +187,16 @@ const DataTable: React.FC<DataTableProps> = ({
     setCurrentDeleteItem(null);
     setDeleteDialogOpen(false);
   };
-  const stableSort = (array: any[], comparator: any) => {
-    const stabilizedArray = array.map((el, index) => [el, index] as any);
-    stabilizedArray.sort((a: any, b: any) => {
-      const orderRes = comparator(a[0], b[0]);
-      if (orderRes !== 0) return orderRes;
-      return a[1] - b[1];
-    });
-    return stabilizedArray.map((el: any) => el[0]);
-  };
+  const stableSort = (array: any[] = [], comparator: any) => {
+  const stabilizedArray = (array || []).map((el, index) => [el, index] as any);
+  stabilizedArray.sort((a: any, b: any) => {
+    const orderRes = comparator(a[0], b[0]);
+    if (orderRes !== 0) return orderRes;
+    return a[1] - b[1];
+  });
+  return (stabilizedArray || []).map((el: any) => el[0]);
+};
+
   const comparator = (a: any, b: any) => {
     if (!orderBy) return 0;
     if (a[orderBy] < b[orderBy]) return order === 'asc' ? -1 : 1;
@@ -228,7 +230,7 @@ const DataTable: React.FC<DataTableProps> = ({
         >
           <TableHead className="table-head">
             <TableRow>
-              {columns.map((column) => (
+              {(columns || []).map((column) => (
                 <TableCell key={column.id} sx={{ position: 'relative', whiteSpace: 'nowrap' }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', position: 'relative' }}>
                     <span>{column.label}</span>
@@ -301,13 +303,16 @@ const DataTable: React.FC<DataTableProps> = ({
             </TableRow>
           </TableHead>
           <TableBody>
-            {visibleRows.map((row, idx) => (
+            {(visibleRows || []).map((row, idx) => (
               <TableRow
                 key={idx}
                 hover={!!onRowClick}
+                onClick={() => {
+                  if (onRowClick) onRowClick(row);
+                }}
                 sx={{ cursor: 'default' }}
               >
-                {columns.map((column) => (
+                {(columns || []).map((column) => (
                   <TableCell key={column.id}>
                     {typeof row[column.id] === 'boolean'
                       ? row[column.id]

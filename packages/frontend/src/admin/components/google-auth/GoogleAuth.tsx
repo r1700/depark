@@ -5,6 +5,7 @@ import './GoogleAuth.css';
 interface GoogleAuthProps {
   setLogin: React.Dispatch<React.SetStateAction<boolean>>;  // פרופס מ-LoginScreen
 }
+const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
 
 const GoogleAuth: React.FC<GoogleAuthProps> = ({ setLogin }) => {
   const [message, setMessage] = useState<string | null>(null);
@@ -17,7 +18,7 @@ const GoogleAuth: React.FC<GoogleAuthProps> = ({ setLogin }) => {
   };
 
   const authenticateUser = (idToken: string): void => {
-    fetch('http://localhost:3001/OAuth/verify-google-token', {
+    fetch(`${API_BASE}/OAuth/verify-google-token`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ idToken: idToken }),
