@@ -91,6 +91,10 @@ function LayoutIndexRedirect() {
     : <Navigate to="hr-dashboard" replace />;
 }
 
+import { Provider } from 'react-redux';
+import { store } from './admin/app/store';
+
+
 const routers = createBrowserRouter([
   {
     path: '/',
@@ -143,6 +147,7 @@ const routers = createBrowserRouter([
       { path: 'VehicleRow', element: <VehicleRow /> },
       { path: 'Notifications', element: <Notifications /> },
       { path: 'VehicleQueue', element: <VehicleQueue /> },
+
     ]
   }
 ]);
@@ -153,8 +158,10 @@ root.render(
   <React.StrictMode>
     <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID!}>
       <AuthProvider>
+
         <RouterProvider router={routers} />
       </AuthProvider>
+
     </GoogleOAuthProvider>
   </React.StrictMode>
 );

@@ -10,11 +10,11 @@ import passwordRoutes from './routes/user.routes';
 import vehicleRoutes from './routes/vehicle';
 import exportToCSV from './routes/exportToCSV';
 import userGoogleAuthRoutes from './routes/userGoogle-auth';
-import Exit from './routes/opc/exit'; // Import the exit route
-import faultsRouter from './routes/opc/faults';
-import techniciansRoutes from "./routes/opc/technicians";
+
+import Opc from './routes/opc/router-opc';
 import http from 'http';
 import { WebSocketServer } from 'ws';
+import Opc from './routes/opc/router-opc';
 import session from 'express-session';
 import adminConfigRouter from './routes/adminConfig';
 import userRoutes from './routes/user.routes';
@@ -33,12 +33,17 @@ import retrieveRoute from './routes/RetrivalQueue';
 import otpRoutes from './routes/otp.server';
 import routes from './routes/mobile/mobileUserRoutes';
 import notifications from "./routes/mobile/notificationsRoutes"; 
-import  VehicleModelRouter  from './routes/vehicleModel';
 
+import adminUsersRouter from './routes/admin/adminUsers';
+import Retrival from './routes/RetrivalQueue';
+import './cronJob'; 
+import  VehicleModelRouter  from './routes/vehicleModel';
+import APIvehicle from './routes/APIvehicle';
+import pritectedRoute from './routes/protected';
 import path from 'path';
 const app = express();
 const server = http.createServer(app);
-export const wss = new WebSocketServer({ server })
+export const wss = new WebSocketServer({ server });
 app.use(express.json());
 
 // --- DEBUG: log incoming requests and who sends responses ---
@@ -114,8 +119,17 @@ app.use((req, res, next) => {
 });
 
 app.use(loggerRoutes);
-
+import parkingStatus from './routes/parkingStatus';
+app.use('/api/parkingStatus',parkingStatus);
+// WS
+import { initWebSocket } from './services/WS-server';
+// CURD to table parkingsessions
+import parkingsessionsCURD from './routes/parkingStatusFunc';
+app.use('/api/parkingStatusCURD', parkingsessionsCURD);
+// WebSocket on server restart
+initWebSocket(server);
 // API routes
+app.use('/admin', adminUsersRouter);
 app.use('/api/health', healthRoutes);
 app.use('/api/password', passwordRoutes);
 app.use('/api/auth', passwordRoutes);
@@ -137,11 +151,16 @@ app.use('/api/otp', otpRoutes);
 app.use("/api", routes);
 app.use("/api/notifications", notifications);
 app.use('/api/importFromCsv', importFromCsv);
-app.use('/api/unknown-vehicles', VehicleModelRouter);
+app.use('/api/opc',Opc)
 
+app.use('/api/unknown-vehicles', VehicleModelRouter);
+app.use('/api/vehicles', APIvehicle); // Ensure this route is correctly set up
+app.use('/api/protected',pritectedRoute);
 app.use('/api/logos', logoRouter);
 app.use('/api/screentypes', screenTypeRouter);
 app.use('/logos', express.static(path.join(process.cwd(), 'public/logos')));
+
+app.use('/api/tablet', Retrival);
 
 // Log all incoming requests
 app.use((req, res, next) => {
@@ -150,11 +169,6 @@ app.use((req, res, next) => {
 });
 
 
-app.use("/api/opc", techniciansRoutes);
-app.use('/api/opc', faultsRouter);
-app.use('/api/opc', Exit);
-
-// Print registered routes (debug)
 function printRoutes() {
     console.log("Registered routes:", app);
     app._router?.stack?.forEach((middleware: any) => {
@@ -174,7 +188,7 @@ function printRoutes() {
 
 printRoutes();
 
-// Start server - בסוף!
+// Root route
 app.get('/', (req, res) => {
     res.json({ message: 'DePark Backend is running!' });
 });
@@ -222,3 +236,6 @@ app.listen(PORT, () => {
         console.log(':memo: Using mock data - Supabase not configured');
     }
 });
+
+export { server };
+export default app;

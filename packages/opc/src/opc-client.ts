@@ -9,18 +9,18 @@ import {
   TimestampsToReturn,
   Variant,
   VariantArrayType,
-  UserTokenType,
   MessageSecurityMode,
-  SecurityPolicy
-} from "node-opcua";
-import dotenv from "dotenv";
+  SecurityPolicy,
+  UserTokenType,
+  ExtensionObject
+} from 'node-opcua';
 import { sendDataToBackend } from "./backendService";
+import dotenv from 'dotenv';
 
 dotenv.config();
-const { TARGET_URL, PLC_USERNAME, PLC_PASSWORD, TARGET_URL_MOCK } = process.env;
 
-// עדיף לשים את ה־endpoint מה־.env
-const endpointUrl: string = `opc.tcp://${TARGET_URL}/UA/PLC`;
+const { TARGET_URL, PLC_USERNAME, PLC_PASSWORD, TARGET_URL_MOCK } = process.env;
+const endpointUrl: string = TARGET_URL ? `opc.tcp://${TARGET_URL}` : `opc.tcp://${TARGET_URL_MOCK}/UA/PLC`;
 
 let opcClient: OPCUAClient | null = null;
 let opcSession: ClientSession | null = null;
@@ -30,67 +30,80 @@ const nodesToMonitor = [
   "ns=1;s=parkingSpot",
   "ns=1;s=licensePlateExit",
   "ns=1;s=licensePlateEntry",
-  "ns=1;s=ActiveFaultList", // רשימת תקלות
-  "ns=1;s=Queue",
+  "ns=1;s=queue",
+  // "ns=4;i=31",
+  // "ns=4;i=169"
 ];
 
 // ----------------------------
 // Helpers
 // ----------------------------
+// Function to check if the session is valid
 function isChannelValid(session: ClientSession | null): boolean {
   return session ? session.sessionId !== null : false;
 }
 
+// Function to check if the client is connected
 function isConnected(client: OPCUAClient | null): boolean {
   return client ? client.connectionStrategy.maxRetry === 0 : false;
 }
 
+
 // ----------------------------
 // Client / Session Management
 // ----------------------------
+// Create or reuse an OPC UA client
 async function getOpcClient(): Promise<OPCUAClient> {
-  if (!opcClient) {
+  if (!opcClient || !isConnected(opcClient)) {
     opcClient = OPCUAClient.create({
-      applicationName: "ParkingSystemClient",
+      endpointMustExist: false,
+      securityMode: MessageSecurityMode.Sign,
+      securityPolicy: SecurityPolicy.Basic256Sha256,
       connectionStrategy: {
         initialDelay: 1000,
-        maxRetry: 10,
+        maxRetry: 3,
       },
-      securityMode: MessageSecurityMode.None,
-      securityPolicy: SecurityPolicy.None,
     });
+    try {
+      await opcClient.connect(endpointUrl);
+      console.log(`Connected to OPC UA server at ${endpointUrl}`);
+    } catch (err) {
+      console.error("Failed to connect to OPC UA server:", err);
+      throw err;
+    }
   }
   return opcClient;
 }
-
+// Ensure a valid session
 export async function ensureSession(): Promise<ClientSession> {
   try {
-    if (opcSession && isChannelValid(opcSession)) {
-      return opcSession;
+    if (!opcSession || !isChannelValid(opcSession)) {
+      if (opcClient && isConnected(opcClient)) {
+        await opcClient.disconnect();
+        console.log("Disconnected inactive OPC UA client");
+      }
+      opcClient = await getOpcClient();
+      opcSession = await opcClient.createSession(
+        {
+          type: UserTokenType.UserName,
+          userName: PLC_USERNAME || "TestUser",
+          password: PLC_PASSWORD || "Interpaz1234!",
+        }
+      );
+      console.log("OPC UA session created");
     }
-
-    const client = await getOpcClient();
-    await client.connect(endpointUrl);
-    console.log("✅ Connected to OPC UA server");
-
-    opcSession = await client.createSession({
-      type: UserTokenType.UserName,
-      userName: PLC_USERNAME || "",
-      password: PLC_PASSWORD || "",
-    });
-
-    console.log("✅ Session created");
     return opcSession;
   } catch (err) {
-    console.error("❌ OPC connection failed. Retrying in 5s...", err);
+    console.error("Failed to create OPC UA session:", err);
     opcSession = null;
     opcClient = null;
-    setTimeout(() => ensureSession(), 5000);
+    setTimeout(() => ensureSession(), 5000); // Retry after 5 seconds
     throw err;
   }
 }
 
-async function closeOpcConnection() {
+// Close the OPC UA connection
+async function closeOpcConnection(): Promise<void> {
   if (opcSession) {
     await opcSession.close();
     console.log("OPC UA session closed");
@@ -113,7 +126,7 @@ function detectDataType(value: any): { dataType: DataType; arrayType?: VariantAr
       case "boolean":
         return { dataType: DataType.Boolean, arrayType: VariantArrayType.Array };
       case "number":
-        return { dataType: Number.isInteger(value[0]) ? DataType.Int32 : DataType.Double, arrayType: VariantArrayType.Array };
+        return { dataType: Number.isInteger(value[0]) ? DataType.Int16 : DataType.Double, arrayType: VariantArrayType.Array };
       case "string":
         return { dataType: DataType.String, arrayType: VariantArrayType.Array };
       default:
@@ -125,43 +138,69 @@ function detectDataType(value: any): { dataType: DataType; arrayType?: VariantAr
     case "boolean":
       return { dataType: DataType.Boolean };
     case "number":
-      return { dataType: Number.isInteger(value) ? DataType.Int32 : DataType.Double };
+      return { dataType: Number.isInteger(value) ? DataType.Int16 : DataType.Double }; // טיפול בערכים מסוג Int16
     case "string":
       return { dataType: DataType.String };
     case "object":
-      if (value instanceof Date) return { dataType: DataType.DateTime };
+      if (value instanceof Date) {
+        return { dataType: DataType.DateTime };
+      }
       throw new Error("Unsupported object type");
     default:
       throw new Error(`Unsupported data type: ${typeof value}`);
   }
 }
-
 // Interface for write items
 export interface WriteItem {
   nodeId: string;
   value: any;
 }
 
+// Write values to OPC UA nodes
 export async function writeNodeValues(writeItems: WriteItem[]): Promise<void> {
+  await ensureSession();
+  if (!opcSession) {
+    throw new Error("OPC session is not initialized");
+  }
+
   const nodesToWrite = writeItems.map((item) => {
+    // זיהוי סוג הנתונים
     const dataType: any = detectDataType(item.value);
+
+    // יצירת פריט לכתיבה
     return {
       nodeId: item.nodeId,
       attributeId: AttributeIds.Value,
-      value: new Variant({
-        ...dataType,
-        value: item.value,
-      }),
+      value: {
+        value: new Variant({
+          ...dataType, // שינוי ל-Int16 באופן מפורש
+          value: item.value,
+        }),
+      },
     };
   });
 
-  console.log(`Nodes to write: ${JSON.stringify(nodesToWrite)}`);
-  await opcSession!.write(nodesToWrite);
+  try {
+    console.log("Writing nodes:", JSON.stringify(nodesToWrite, null, 2));
+    const statusCodes = await opcSession.write(nodesToWrite);
+    console.log("Write status codes:", statusCodes);
+
+    // בדיקת סטטוס הכתיבה
+    statusCodes.forEach((statusCode, index) => {
+      if (statusCode.value !== 0) {
+        console.error(`❌ Write failed for node ${nodesToWrite[index].nodeId}:`, statusCode.toString());
+        throw new Error(`Write failed for node ${nodesToWrite[index].nodeId}: ${statusCode.toString()}`);
+      }
+    });
+
+    console.log("✅ Write successful");
+  } catch (err) {
+    console.error("❌ Failed to write nodes:", err);
+    throw err;
+  }
 }
 
-// ----------------------------
-// Subscription + Monitoring
-// ----------------------------
+// Create a subscription
 export async function createSubscription(): Promise<ClientSubscription> {
   if (subscription) {
     try {
@@ -173,8 +212,11 @@ export async function createSubscription(): Promise<ClientSubscription> {
     subscription = null;
   }
 
-  await ensureSession();
-  if (!opcSession) throw new Error("OPC session not initialized");
+  await ensureSession(); // Ensure the session exists
+  console.log("Creating OPC UA subscription...");
+  if (!opcSession) {
+    throw new Error("OPC session is not initialized");
+  }
 
   subscription = ClientSubscription.create(opcSession, {
     requestedPublishingInterval: 500,
@@ -193,10 +235,19 @@ export async function createSubscription(): Promise<ClientSubscription> {
     console.log("Subscription terminated");
   });
 
+  subscription.on("keepalive", () => {
+    // console.log("🔄 Subscription keepalive: Connection is active");
+  });
+
+  subscription.on("status_changed", (status) => {
+    console.log("⚠️ Subscription status changed:", status.toString());
+  });
+
   return subscription;
 }
 
-export async function createMonitoredItems(subscription: ClientSubscription) {
+export async function createMonitoredItems(subscription: ClientSubscription): Promise<void> {
+  // Cleanup previous monitored items
   for (const item of monitoredItems) {
     try {
       await item.terminate();
@@ -209,56 +260,43 @@ export async function createMonitoredItems(subscription: ClientSubscription) {
   nodesToMonitor.forEach((nodeId) => {
     const monitoredItem = ClientMonitoredItem.create(
       subscription,
-      { nodeId, attributeId: AttributeIds.Value },
-      { samplingInterval: 100, discardOldest: true, queueSize: 10 },
+      {
+        nodeId,
+        attributeId: AttributeIds.Value,
+      },
+      {
+        samplingInterval: 100,
+        discardOldest: true,
+        queueSize: 10,
+      },
       TimestampsToReturn.Both
     );
 
     monitoredItem.on("changed", async (dataValue: DataValue) => {
       const val = dataValue.value?.value;
       let event: string = '';
-      let payload: any = {};
       if (nodeId === "ns=1;s=licensePlateExit") {
         event = 'exit';
-        payload = { value: val };
       } else if (nodeId === "ns=1;s=licensePlateEntry") {
         event = 'entry';
-        payload = { value: val };
       } else if (nodeId === "ns=1;s=parkingSpot") {
         event = 'parkingSpot';
-        payload = { value: val };
       }
-      else if (nodeId === "ns=1;s=Queue") {
-        event = 'Queue';
-        payload = { value: val };
-      } else if (nodeId === "ns=1;s=ActiveFaultList") {
-        event = 'fault';
-        let faultObj = val;
-        if (typeof val === "string") {
-          try {
-            faultObj = JSON.parse(val);
-          } catch (e) {
-            console.warn("ActiveFaultList value is not valid JSON:", val);
-            return;
-          }
-        }
-        if (faultObj && typeof faultObj === "object") {
-          console.log("ActiveFaultList changed:", faultObj);
-          payload = {
-            parkingId: faultObj.parkingId,
-            faultDescription: faultObj.faultDescription,
-            severity: faultObj.severity || "medium",
-            assigneeId: faultObj.assigneeId ?? null,
-          };
-        } else {
-          return;
-        }
-      } else {
-        return; // Unknown nodeId, do nothing
-      }
+      else if (nodeId === "ns=1;s=queue") {
+        event = 'WriteQueue';
+      }      
+      // else if (nodeId === "ns=1;s=ActiveFaultList") {
+      //   event = 'fault';
+      // }
+      // else if (nodeId === "ns=4;i=31") {
+      //   event = 'exitRequestApproval';
+      // }
+      // else if (nodeId === "ns=4;i=169") {
+      //   event = 'active';
+      // }
 
-      sendDataToBackend(event, payload);
-
+      console.log(`🔄 Node ${nodeId} changed:`, val);
+      await sendDataToBackend(event, val);
     });
 
     monitoredItem.on("err", (err) => {
@@ -269,14 +307,15 @@ export async function createMonitoredItems(subscription: ClientSubscription) {
   });
 }
 
-// ----------------------------
-// Wait for single node change
-// ----------------------------
 export async function waitForNodeChange(
   nodeId: string,
-  options: { samplingInterval?: number; timeout?: number; predicate?: (v: any, dv?: DataValue) => boolean } = {}
+  options: {
+    samplingInterval?: number;
+    timeout?: number;
+    predicate?: (v: any, dv?: DataValue) => boolean;
+  } = {}
 ): Promise<any> {
-  const { samplingInterval = 100, timeout = 5000, predicate } = options;
+  const { samplingInterval = 100, timeout = 10000, predicate } = options;
 
   return new Promise((resolve, reject) => {
     const monitoredItem = ClientMonitoredItem.create(
@@ -309,10 +348,25 @@ export async function waitForNodeChange(
   });
 }
 
-// ----------------------------
+async function writeToNode() {
+  const writeItems = [
+    {
+      nodeId: "ns=4;i=176", // Node ID של הבקר
+      value: 59, // הערך שברצונך לכתוב (לדוגמה: מספר שלם מסוג Int16)
+    },
+  ];
+
+  try {
+    await writeNodeValues(writeItems);
+    console.log("✅ Successfully wrote to node 176");
+  } catch (err) {
+    console.error("❌ Failed to write to node 176:", err);
+  }
+}
+// setTimeout(()=>writeToNode(), 5000); // המתנה של 5 שניות לפני הקריאה לפונקציה
+
 process.on("SIGINT", async () => {
   console.log("Closing OPC UA connection...");
   await closeOpcConnection();
   process.exit(0);
 });
-

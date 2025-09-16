@@ -1,6 +1,5 @@
 import { OPCUAServer, Variant, DataType, StatusCodes ,VariantArrayType} from "node-opcua";
-//----------------------------
-import express from "express";
+
 //----------------------------
 // Start an OPC-UA server simulating a PLC
 export async function createPlcOpcServer() {
@@ -38,9 +37,9 @@ export async function createPlcOpcServer() {
   let licensePlateExit = "";
   let parkingSpot = "";
   let vehicleExitRequest = ["", "", ""];
-  //{ licensePlate: "", undergroundSpot: "", CustomerLocation: "" };
   let exitRequestApproval = ["", "", ""];
-  //{ licensePlate: "", position: "", assignedPickupSpot: "" };
+  let queue = ["", "", ""];
+
   // Add Outputs variables
 
   namespace.addVariable({
@@ -115,7 +114,7 @@ export async function createPlcOpcServer() {
   
   namespace.addVariable({
     componentOf: device,
-    browseName: "licensePlateEntry = `ABC-${Math.floor(Math.random() * 1000)}`",
+    browseName: "ExitRequestApproval",
     nodeId: "ns=1;s=ExitRequestApproval",
     dataType: "String", // סוג הנתונים הוא מחרוזת
     minimumSamplingInterval: 1000,
@@ -139,7 +138,52 @@ export async function createPlcOpcServer() {
       },
     },
   });
-  
+
+
+  namespace.addVariable({
+    componentOf: device,
+    browseName: "queue",
+    nodeId: "ns=1;s=queue",
+    dataType: "String", // סוג הנתונים הוא מחרוזת
+    minimumSamplingInterval: 1000,
+    value: {
+      // בעת קריאה, המערך יוחזר ישירות
+      get: () => new Variant({
+        dataType: DataType.String,
+        arrayType: VariantArrayType.Array, // מציין שזה מערך
+        value: queue,
+      }),
+      // בעת כתיבה, הערך המתקבל יומר למערך
+      set: (variant: Variant) => {
+        if (Array.isArray(variant.value) && variant.value.every(v => typeof v === "string")) {
+          queue = variant.value;
+          console.log("queue updated:", queue); // לוג לערך החדש
+          return StatusCodes.Good;
+        } else {
+          console.error("Invalid data format for queue. Expected an array of strings.");
+          return StatusCodes.BadInvalidArgument;
+        }
+      },
+    },
+  });
+  function generateQueueData() {
+  const floors = [1, 2, 3, 4, 5, 6];
+  const queueData = floors.map(floor => {
+    const elevators = [];
+    for (let elevator = 1; elevator <= 6; elevator++) {
+      // מספר ממתינים אקראי (1-5)
+      const waitingCount = Math.floor(Math.random() * 5) + 1;
+      // לוחית רישוי אקראית
+      const licensePlate = `LP${floor}${elevator}${Math.floor(Math.random() * 10000)}`;
+      // כל מעלית: [לוחית רישוי, מספר ממתינים]
+      elevators.push([licensePlate, waitingCount]);
+    }
+    // כל קומה: [מספר קומה, [מעליות]]
+    return [floor, elevators];
+  });
+  return queueData;
+}
+
   
 
   // Function to update values periodically using setInterval
@@ -155,64 +199,12 @@ export async function createPlcOpcServer() {
     ];
   }, 2000); // Every 2 seconds
 
-  // Simulate fault list as an object (you can adjust the structure as needed)
-  let activeFaultList = {
-    parkingId: 1,
-    faultDescription: "Test fault",
-    severity: "high",
-    assigneeId: null
-  };
-
-  // Keep reference to the ActiveFaultList node
-  let activeFaultListNode = namespace.addVariable({
-    componentOf: device,
-    browseName: "ActiveFaultList",
-    nodeId: "ns=1;s=ActiveFaultList",
-    dataType: "String", // You can use DataType.String or DataType.ByteString for JSON
-    minimumSamplingInterval: 1000,
-    value: {
-      get: () => new Variant({ dataType: DataType.String, value: JSON.stringify(activeFaultList) }),
-      set: (variant: Variant) => {
-        // Update the fault list from client
-        try {
-          activeFaultList = JSON.parse(variant.value);
-        } catch (e) {
-          // Ignore invalid JSON
-        }
-        return StatusCodes.Good;
-      },
-    },
-  });
-
-  // Add Express server for manual fault trigger
-  const app = express();
-  app.use(express.json());
-
-  app.post("/api/fault/random", (req, res) => {
-    activeFaultList = {
-      parkingId: Math.floor(Math.random() * 10) + 1,
-      faultDescription: "Auto fault " + Math.floor(Math.random() * 100),
-      severity: ["low", "medium", "high"][Math.floor(Math.random() * 3)],
-      assigneeId: null
-    };
-    // Update the value in OPC UA so client gets event
-    activeFaultListNode.setValueFromSource({
-      dataType: DataType.String,
-      value: JSON.stringify(activeFaultList)
-    });
-    res.json({ status: "ok", fault: activeFaultList });
-  });
-  //------------------------------------------------------------
-  // Simulate PLC value changes every 2 seconds
-  setInterval(async () => {
-    licensePlateEntry = `ABC-${Math.floor(Math.random() * 1000)}`;
-    licensePlateExit = `XYZ-${Math.floor(Math.random() * 1000)}`;
-    parkingSpot = `Spot-${Math.floor(Math.random() * 100)}`;
-  }, 2000);
-//----------------------------------
-  app.listen(4081, () => {
-    console.log("Express API for PLC mock listening on port 4081");
-  });
+  setInterval(() => {
+    // Update the queue with new values
+    queue = generateQueueData().map(item => JSON.stringify(item));
+    console.log("queue updated:", queue);
+  }, 30000);
+  
 //----------------------------------
   await server.start();
   console.log(":white_check_mark: OPC-UA server running at:", server.endpoints[0].endpointDescriptions()[0].endpointUrl);

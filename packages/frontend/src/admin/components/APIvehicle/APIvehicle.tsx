@@ -117,9 +117,25 @@ const APIvehicle :React.FC= () => {
         />
       </Box>
 
-      <Button variant="contained" onClick={loadData} disabled={loading} sx={{ mb: 3 }}>
-        {loading ? 'Loading...' : 'Load Vehicles'}
-      </Button>
+       <Button
+  variant="contained"
+  onClick={loadData}
+  disabled={loading}
+  sx={{
+    mb: 3,
+    bgcolor: '#0f2681ff',        // רקע
+    color: '#fff',               // טקסט
+    '&:hover': {
+      bgcolor: '#0f2681ff',        // צבע במעבר עכבר (כדאי לחשב כהצללה)
+    },
+    '&.Mui-disabled': {
+      bgcolor: '#0f2681ff',        // צבע כשהכפתור מושבת
+      color: '#fff',
+    },
+  }}
+>
+ {loading ? 'Loading...' : 'Load Vehicles'}</Button>
+
 
       {error && (
         <Typography color="error" sx={{ mb: 2 }}>
@@ -127,10 +143,12 @@ const APIvehicle :React.FC= () => {
         </Typography>
       )}
 
-    <DataTable data={data}  />
+      <DataTable data={data}
+        showEdit={false}
+        showDelete={false}
+      />
     </Box>
   );
 };
 
-export default APIvehicle;
-
+export default APIvehicle;       

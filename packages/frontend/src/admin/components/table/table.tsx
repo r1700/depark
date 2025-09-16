@@ -71,7 +71,7 @@ const DataTable: React.FC<DataTableProps> = ({
     bottom: 56,
   });
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(50);
   const [order, setOrder] = useState<'asc' | 'desc'>('asc');
   const [orderBy, setOrderBy] = useState<string>('');
   const [sortMenuOpen, setSortMenuOpen] = useState<string | null>(null);
@@ -153,8 +153,9 @@ const DataTable: React.FC<DataTableProps> = ({
   const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
     setPage(newPage);
   };
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+    const value = Number((event.target as HTMLInputElement).value);
+    setRowsPerPage(value);
     setPage(0);
   };
   const handleDelete = async (row: any) => {
@@ -206,7 +207,9 @@ const DataTable: React.FC<DataTableProps> = ({
     return <p>No data to display.</p>;
   // rowHeightPx was unused and removed
   const sorted = stableSort(rows, comparator);
-  const visibleRows = enablePagination ? sorted.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) : sorted;
+  const visibleRows = enablePagination
+    ? (rowsPerPage > 0 ? sorted.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) : sorted)
+    : sorted;
   return (
     <>
       <TableContainer
@@ -391,10 +394,15 @@ const DataTable: React.FC<DataTableProps> = ({
               backgroundColor: 'white',
             },
           }}
-          rowsPerPageOptions={[3, 5, 10, 20]}
+          rowsPerPageOptions={[
+            { value: 50, label: '50' },
+            { value: 100, label: '100' },
+            { value: 200, label: '200' },
+            { value: -1, label: 'All' },
+          ]}
           component="div"
           count={rows.length}
-          rowsPerPage={rowsPerPage}
+          rowsPerPage={rowsPerPage === -1 ? rows.length : rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}

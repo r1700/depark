@@ -8,6 +8,7 @@ export const fetchFilteredVehicles = async (filters: {
   const params = new URLSearchParams();
   const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
 
+
   if (filters.search) params.append('search', filters.search);
   if (filters.is_active !== undefined) params.append('is_active', String(filters.is_active));
   if (filters.is_currently_parked !== undefined) params.append('is_currently_parked', String(filters.is_currently_parked));
@@ -16,12 +17,12 @@ export const fetchFilteredVehicles = async (filters: {
 
   const response = await fetch(`${API_BASE}/vehicles?${params.toString()}`);
 
+
   if (!response.ok) {
     throw new Error('Failed to fetch data');
   }
 
   const data = await response.json();
-
 
   const columns = [
     { id: 'baseuser_name', label: 'Full Name' },
